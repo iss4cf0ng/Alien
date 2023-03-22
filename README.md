@@ -15,6 +15,13 @@ Windows
 ## 語言
 C# .NET Framework V4.8
 
+## 功能
+- File Manager (可顯示圖片)
+- T
+- Virtual Terminal
+- Database
+- Registry
+
 ## 一句話木馬
 一句話木馬是在滲透測試中用來控制伺服器的工具\
 強大之處在於木馬本身體積小，不易發現\
