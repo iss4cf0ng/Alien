@@ -17,7 +17,6 @@ C# .NET Framework V4.8
 
 ## 功能
 - File Manager (可顯示圖片)
-- T
 - Virtual Terminal
 - Database
 - Registry
