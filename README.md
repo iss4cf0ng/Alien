@@ -41,7 +41,7 @@ C# .NET Framework V4.8
 shell有進行更改, 新增了可以顯示圖片的功能
 
 ## 關於NodeJS webshell
-基於NodeJS特性, 原理跟一般php asp aspx等動態語言的shell不同, \
+由於NodeJS特性, 原理跟一般php asp aspx等動態語言的shell不同, \
 NodeJS目的重在管理而非滲透
 
 ## 伺服器
