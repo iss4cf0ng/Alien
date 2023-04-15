@@ -9,6 +9,15 @@ You should take the consequence if you use in illegal purpose.
 ## Language
 C# .NET Framework V4.8
 
+## Function
+- FileManager(Can display image file, search file)
+- Virtual Terminal
+- System Information
+- Database Management
+- RegEdit
+- Monitor
+- Screenshot
+
 ## OneShell
 OneShell is a tool use in pentesting for control the server.\
 It can be very tiny and very difficult to be found.
