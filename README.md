@@ -16,10 +16,13 @@ Windows
 C# .NET Framework V4.8
 
 ## 功能
-- File Manager (可顯示圖片)
+- File Manager (可顯示圖片, 可SearchFile)
 - Virtual Terminal
 - Database
 - Registry
+- Monitor
+- Screenshot
+- System Information
 
 ## 一句話木馬
 一句話木馬是在滲透測試中用來控制伺服器的工具\
