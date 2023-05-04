@@ -1,6 +1,6 @@
 # Alien
 
-網站管理工具
+Webshell 管理工具
 
 ## Author
 - [@ISSAC](https://www.github.com/malbuffer4pt)
