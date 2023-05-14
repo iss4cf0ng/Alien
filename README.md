@@ -74,6 +74,10 @@ HTTP POST a=phpinfo(); 就可以執行phpinfo();
 ![4](https://github.com/malbuffer4pt/Alien/blob/main/4.png)
 ![7](https://github.com/malbuffer4pt/Alien/blob/main/7.png)
 ![8](https://github.com/malbuffer4pt/Alien/blob/main/8.png)
-
+![9](https://github.com/malbuffer4pt/Alien/blob/main/9.png)
+![10](https://github.com/malbuffer4pt/Alien/blob/main/10.png)
+![11](https://github.com/malbuffer4pt/Alien/blob/main/11.png)
+![12](https://github.com/malbuffer4pt/Alien/blob/main/12.png)
+11
 ## 致謝
 研究webshell的各位前輩
