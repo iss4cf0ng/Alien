@@ -9,6 +9,9 @@ Webshell 管理工具
 工具只限用於學習用途，網站管理和合法滲透測試，不可用於非法用途。\
 如非法使用則後果自負。
 
+## 文檔
+https://malbuffer4pt.github.io/Alien/
+
 ## 工具平台
 Windows
 
