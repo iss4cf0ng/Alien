@@ -20,6 +20,9 @@ namespace Alien
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Save shell config.
+        /// </summary>
         void SaveShell()
         {
             stShellConfig config = new stShellConfig()
