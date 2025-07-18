@@ -12,12 +12,15 @@ namespace Alien
 {
     public partial class frmEditShell : Form
     {
-        public Sqlite m_sqlConn;
+        public clsSqlite m_sqlConn;
         public stShellConfig m_stShellConfig;
 
-        public frmEditShell()
+        public frmEditShell(clsSqlite sqlConn, stShellConfig config)
         {
             InitializeComponent();
+
+            m_sqlConn = sqlConn;
+            m_stShellConfig = config;
         }
 
         /// <summary>
@@ -37,13 +40,22 @@ namespace Alien
             }
         }
 
-        void setup()
+        void fnSetup()
         {
             //Validate
             if (m_sqlConn == null)
             {
                 MessageBox.Show("m_sqlConn is NULL.", "NULL", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            //Controls init
+            foreach (string szName in Enum.GetNames(typeof(Language)))
+                comboBox1.Items.Add(szName);
+            foreach (string szName in Enum.GetNames(typeof(PayloadType)))
+                comboBox3.Items.Add(szName);
+
+            comboBox1.SelectedIndex = 0;
+            comboBox3.SelectedIndex = 0;
 
             if (string.IsNullOrEmpty(m_stShellConfig.szUrl))
             {
@@ -60,7 +72,7 @@ namespace Alien
 
         private void frmEditShell_Load(object sender, EventArgs e)
         {
-            setup();
+            fnSetup();
         }
 
         //Test
@@ -76,7 +88,11 @@ namespace Alien
             config.szPassword = textBox2.Text;
             config.language = (Language)Enum.Parse(typeof(Language), comboBox1.Text);
 
-            if (!m_sqlConn.SaveShell(config))
+            if (m_sqlConn.SaveShell(config))
+            {
+                MessageBox.Show("Save webshell successfully.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
             {
                 MessageBox.Show("Failed to save shell!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

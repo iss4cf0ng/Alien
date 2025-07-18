@@ -2,15 +2,23 @@ namespace Alien
 {
     public partial class frmMain : Form
     {
-        public Sqlite m_sqlConn;
+        public clsSqlite m_sqlConn;
 
         public frmMain()
         {
             InitializeComponent();
         }
 
+        #region Tool
+
+        private clsVictim fnGetVictimTag(ListViewItem item) => (clsVictim)item.Tag;
+        private List<clsVictim> fnGetVictimList(ListView lv) => lv.SelectedItems.Cast<ListViewItem>().Select(x => fnGetVictimTag(x)).ToList();
+
+        #endregion
+
         void fnLoadShell()
         {
+            listView1.Items.Clear();
             List<stShellConfig> lsConfig = m_sqlConn.fnGetAllShellConfig();
             foreach (var config in lsConfig)
             {
@@ -21,15 +29,17 @@ namespace Alien
                 item.SubItems.Add(config.dtLastModified.ToString("F"));
                 item.SubItems.Add(config.dtLastAccessed.ToString("F"));
 
+                item.Tag = new clsVictim(m_sqlConn, config);
+
                 listView1.Items.Add(item);
             }
 
             toolStripStatusLabel1.Text = $"Shell[{listView1.Items.Count}]";
         }
 
-        void setup()
+        void fnSetup()
         {
-            Sqlite sqlConn = new Sqlite("data.sqlite");
+            clsSqlite sqlConn = new clsSqlite("data.sqlite");
             m_sqlConn = sqlConn;
 
             fnLoadShell();
@@ -37,24 +47,28 @@ namespace Alien
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            setup();
+            fnSetup();
         }
 
+        //Control Panel
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView1.SelectedItems)
             {
-                frmFileMgr f = new frmFileMgr();
-                f.StartPosition = FormStartPosition.CenterScreen;
-                f.Text = "File Manager";
-
+                frmControlPanel f = new frmControlPanel(fnGetVictimTag(item));
                 f.Show();
             }
         }
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell();
+
+            stShellConfig config = new stShellConfig()
+            {
+
+            };
+
+            frmEditShell f = new frmEditShell(m_sqlConn, config);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Edit Shell";
 
@@ -65,13 +79,21 @@ namespace Alien
 
         private void toolStripMenuItem8_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell();
+            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig());
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Add Shell";
 
             f.m_sqlConn = m_sqlConn;
 
             f.ShowDialog();
+        }
+
+        private void listView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                fnLoadShell();
+            }
         }
     }
 }

@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    public class Web
+    public class clsWeb
     {
         public string m_szURL { get; set; }
         public HttpClient m_clnt { get; set; }
 
-        public Web(string szURL)
+        public clsWeb(string szURL)
         {
             m_szURL = szURL;
             

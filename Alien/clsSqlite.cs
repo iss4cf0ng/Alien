@@ -10,7 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Alien
 {
-    public class Sqlite
+    public class clsSqlite
     {
         public string m_szFileName { get; set; }
         public string m_szConnString { get; set; }
@@ -21,8 +21,11 @@ namespace Alien
                 "Shell",
                 new string[]
                 {
+                    "ID",
                     "URL",
                     "Password",
+                    "Language",
+                    "Method",
                     "Type",
                     "CreateDate",
                     "LastModified",
@@ -44,12 +47,12 @@ namespace Alien
 
         public SQLiteConnection m_sqlConn { get; set; }
 
-        public Sqlite(SQLiteConnection sqlConn)
+        public clsSqlite(SQLiteConnection sqlConn)
         {
             m_sqlConn = sqlConn;
         }
 
-        public Sqlite(string szFileName)
+        public clsSqlite(string szFileName)
         {
             m_szFileName = szFileName;
 
@@ -71,6 +74,7 @@ namespace Alien
             {
                 m_szConnString = $"Data Source=\"{m_szFileName}\"";
                 m_sqlConn = new SQLiteConnection(m_szConnString);
+                m_sqlConn.Open();
 
                 foreach (string szKey in m_dicTable.Keys)
                 {
@@ -91,7 +95,7 @@ namespace Alien
             try
             {
                 string szQuery = $"CREATE TABLE \"{szTableName}\" ({string.Join(",", aszColumns.Select(x => $"{x} TEXT"))})";
-                DataTable dt = SqlQuery(szQuery);
+                DataTable dt = fnSqlQuery(szQuery);
 
                 return true;
             }
@@ -101,7 +105,7 @@ namespace Alien
             }
         }
 
-        public DataTable SqlQuery(string szQuery)
+        public DataTable fnSqlQuery(string szQuery)
         {
             DataTable dt = new DataTable();
             using (SQLiteCommand sqlCmd = new SQLiteCommand(szQuery, m_sqlConn))
@@ -115,7 +119,7 @@ namespace Alien
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "SqlQuery()", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(ex.Message, "fnSqlQuery()", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -123,7 +127,25 @@ namespace Alien
         }
 
         #endregion
+        #region Tool
 
+        private stShellConfig fnDataRowToStruct(DataRow dr)
+        {
+            stShellConfig config = new stShellConfig()
+            {
+                szUrl = dr["URL"].ToString(),
+                szPassword = dr["Password"].ToString(),
+                language = (Language)Enum.Parse(typeof(Language), dr["Language"].ToString()),
+                payloadType = (PayloadType)Enum.Parse(typeof(PayloadType), dr["Type"].ToString()),
+                dtCreateDate = DateTime.Parse(dr["CreateDate"].ToString()),
+                dtLastModified = DateTime.Parse(dr["LastModified"].ToString()),
+                dtLastAccessed = DateTime.Parse(dr["LastAccessed"].ToString()),
+            };
+
+            return config;
+        }
+
+        #endregion
         #region Shell
 
         public bool ShellExists(string szUrl)
@@ -131,7 +153,7 @@ namespace Alien
             try
             {
                 string szQuery = $"SELECT 1 FROM `Shell` WHERE URL = \"{szUrl}\";";
-                DataTable dtResult = SqlQuery(szQuery);
+                DataTable dtResult = fnSqlQuery(szQuery);
                 if (dtResult.Rows.Count == 0)
                     return false;
 
@@ -160,16 +182,24 @@ namespace Alien
                 {
                     //Update shell config.
 
-                    szQuery = $"";
+                    szQuery = $"UPDATE \"Shell\" SET " +
+                        $"Password=\"{config.szPassword}\"," +
+                        $"Language=\"{config.language}\"," +
+                        $"Method=\"X\"" +
+                        $"Type=\"{config.payloadType}\"," +
+                        $"LastModified=\"{DateTime.Now.ToString("F")}\" " +
+                        $"WHERE URL=\"{config.szUrl}\";";
                 }
                 else
                 {
-                    //Modify shell config.
+                    //Add shell config.
 
                     szQuery = $"INSERT INTO \"Shell\" (" +
 
                         $"URL," +
                         $"Password," +
+                        $"Language," +
+                        $"Method," +
                         $"Type," +
                         $"CreateDate," +
                         $"LastModified," +
@@ -180,6 +210,8 @@ namespace Alien
                         $"\"{config.szUrl}\"," +
                         $"\"{config.szPassword}\"," +
                         $"\"{config.language.ToString()}\"," +
+                        $"\"X\"," +
+                        $"\"{config.payloadType}\"," +
                         $"\"{szDt}\"," +
                         $"\"{szDt}\"," +
                         $"\"{szDt}\"" +
@@ -187,7 +219,7 @@ namespace Alien
                         $");";
                 }
 
-                SqlQuery(szQuery); //Execute write operation.
+                fnSqlQuery(szQuery); //Execute write operation.
 
                 return ShellExists(config.szUrl); //Check successed.
             }
@@ -199,7 +231,11 @@ namespace Alien
 
         public stShellConfig fnGetShellConfig(string szUrl)
         {
-            stShellConfig config = new stShellConfig();
+            string szQuery = $"SELECT * FROM \"Shell\" WHERE \"URL\" = \"{szUrl}\";";
+            DataTable dt = fnSqlQuery(szQuery);
+            DataRow dr = dt.Rows[0];
+
+            stShellConfig config = fnDataRowToStruct(dr);
 
             return config;
         }
@@ -207,7 +243,13 @@ namespace Alien
         public List<stShellConfig> fnGetAllShellConfig()
         {
             List<stShellConfig> lsConfig = new List<stShellConfig>();
-
+            string szQuery = $"SELECT * FROM \"Shell\";";
+            DataTable dt = fnSqlQuery(szQuery);
+            foreach (DataRow dr in dt.Rows)
+            {
+                stShellConfig config = fnDataRowToStruct(dr);
+                lsConfig.Add(config);
+            }
 
             return lsConfig;
         }

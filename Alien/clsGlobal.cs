@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class Global
+    internal class clsGlobal
     {
 
     }
@@ -38,6 +38,7 @@ namespace Alien
 
     public struct stShellConfig
     {
+        public string ID;
         public string szUrl;
         public string szPassword;
 

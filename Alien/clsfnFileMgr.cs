@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class fnFileMgr : Web
+    internal class clsfnFileMgr : clsWeb
     {
-        public fnFileMgr(string szURL) : base(szURL)
+        public clsfnFileMgr(string szURL) : base(szURL)
         {
             
         }

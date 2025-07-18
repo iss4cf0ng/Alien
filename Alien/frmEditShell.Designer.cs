@@ -35,13 +35,17 @@
             textBox2 = new TextBox();
             label2 = new Label();
             groupBox1 = new GroupBox();
+            comboBox3 = new ComboBox();
+            label5 = new Label();
             label3 = new Label();
             comboBox1 = new ComboBox();
             groupBox2 = new GroupBox();
             groupBox3 = new GroupBox();
+            comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
-            comboBox2 = new ComboBox();
+            comboBox4 = new ComboBox();
+            label6 = new Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -101,6 +105,10 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(comboBox4);
+            groupBox1.Controls.Add(label6);
+            groupBox1.Controls.Add(comboBox3);
+            groupBox1.Controls.Add(label5);
             groupBox1.Controls.Add(label3);
             groupBox1.Controls.Add(comboBox1);
             groupBox1.Controls.Add(label1);
@@ -109,10 +117,27 @@
             groupBox1.Controls.Add(textBox2);
             groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(474, 143);
+            groupBox1.Size = new Size(474, 191);
             groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Shell";
+            // 
+            // comboBox3
+            // 
+            comboBox3.FormattingEnabled = true;
+            comboBox3.Location = new Point(98, 152);
+            comboBox3.Name = "comboBox3";
+            comboBox3.Size = new Size(270, 27);
+            comboBox3.TabIndex = 9;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(43, 155);
+            label5.Name = "label5";
+            label5.Size = new Size(49, 19);
+            label5.TabIndex = 8;
+            label5.Text = "Type :";
             // 
             // label3
             // 
@@ -135,9 +160,9 @@
             // 
             groupBox2.Controls.Add(groupBox3);
             groupBox2.Controls.Add(checkBox1);
-            groupBox2.Location = new Point(12, 161);
+            groupBox2.Location = new Point(12, 209);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(474, 335);
+            groupBox2.Size = new Size(474, 287);
             groupBox2.TabIndex = 8;
             groupBox2.TabStop = false;
             groupBox2.Text = "Cryptography Tamper";
@@ -148,9 +173,17 @@
             groupBox3.Controls.Add(label4);
             groupBox3.Location = new Point(8, 55);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(460, 274);
+            groupBox3.Size = new Size(460, 226);
             groupBox3.TabIndex = 10;
             groupBox3.TabStop = false;
+            // 
+            // comboBox2
+            // 
+            comboBox2.FormattingEnabled = true;
+            comboBox2.Location = new Point(79, 20);
+            comboBox2.Name = "comboBox2";
+            comboBox2.Size = new Size(375, 27);
+            comboBox2.TabIndex = 2;
             // 
             // label4
             // 
@@ -172,13 +205,22 @@
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
-            // comboBox2
+            // comboBox4
             // 
-            comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(79, 20);
-            comboBox2.Name = "comboBox2";
-            comboBox2.Size = new Size(375, 27);
-            comboBox2.TabIndex = 2;
+            comboBox4.FormattingEnabled = true;
+            comboBox4.Location = new Point(98, 119);
+            comboBox4.Name = "comboBox4";
+            comboBox4.Size = new Size(270, 27);
+            comboBox4.TabIndex = 11;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(21, 122);
+            label6.Name = "label6";
+            label6.Size = new Size(71, 19);
+            label6.TabIndex = 10;
+            label6.Text = "Method :";
             // 
             // frmEditShell
             // 
@@ -220,5 +262,9 @@
         private Label label4;
         private CheckBox checkBox1;
         private ComboBox comboBox2;
+        private ComboBox comboBox3;
+        private Label label5;
+        private ComboBox comboBox4;
+        private Label label6;
     }
 }

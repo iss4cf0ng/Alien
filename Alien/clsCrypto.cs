@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class fnShell
+    internal class clsCrypto
     {
     }
 }
