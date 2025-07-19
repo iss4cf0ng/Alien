@@ -16,14 +16,6 @@ namespace Alien
     public enum Language
     {
         PHP,
-        ASP,
-        ASPX,
-        ASHX,
-        ASMX,
-        JSP,
-        JSPX,
-        GO,
-        PYTHON,
     }
 
     public enum PayloadType
@@ -33,7 +25,6 @@ namespace Alien
     }
 
     #endregion
-
     #region Struct
 
     public struct stShellConfig
@@ -45,9 +36,22 @@ namespace Alien
         public Language language;
         public PayloadType payloadType;
 
+        public string szEncoding;
+
         public DateTime dtCreateDate;
         public DateTime dtLastModified;
         public DateTime dtLastAccessed;
+    }
+
+    public struct stFileEntry
+    {
+        public string szFilePath;
+        public int nFileSize;
+        public string szPriviledge;
+
+        public DateTime dtCreationDate;
+        public DateTime dtLastModifiedDate;
+        public DateTime dtLastAccessedDate;
     }
 
     #endregion

@@ -29,7 +29,7 @@ namespace Alien
                 item.SubItems.Add(config.dtLastModified.ToString("F"));
                 item.SubItems.Add(config.dtLastAccessed.ToString("F"));
 
-                item.Tag = new clsVictim(m_sqlConn, config);
+                item.Tag = new clsVictim(m_sqlConn, config, false);
 
                 listView1.Items.Add(item);
             }

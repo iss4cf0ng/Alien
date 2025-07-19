@@ -11,5 +11,28 @@ namespace Alien
         public clsTool() { }
 
         public static List<ListViewItem> fnExtractListViewSelectedItems(ListView lv) => lv.SelectedItems.Cast<ListViewItem>().ToList();
+        
+        /// <summary>
+        /// Normalize bytes length.
+        /// </summary>
+        /// <param name="nSize">Bytes length</param>
+        /// <returns>String value of normalized bytes length.</returns>
+        public static string fnSizeNormalization(long nSize)
+        {
+            if (nSize < 0)
+                return "[INVALID_SIZE]";
+
+            string[] asSize = { "B", "KB", "MB", "GB", "TB" };
+            double dSize = nSize;
+            int nIndex = 0;
+
+            while (dSize >= 1024 && nIndex < asSize.Length - 1)
+            {
+                dSize /= 1024;
+                nIndex++;
+            }
+
+            return string.Format("{0:0.##} {1}", dSize, asSize[nIndex]);
+        }
     }
 }
