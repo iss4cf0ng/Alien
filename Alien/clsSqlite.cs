@@ -52,11 +52,11 @@ namespace Alien
             m_sqlConn = sqlConn;
         }
 
-        public clsSqlite(string szFileName)
+        public clsSqlite(string szFileName, Dictionary<string, string[]> dicTable = null)
         {
             m_szFileName = szFileName;
 
-            if (!File.Exists(m_szFileName) && !CreateDB())
+            if (!File.Exists(m_szFileName) && !CreateDB(dicTable == null ? m_dicTable : dicTable))
                 throw new Exception("CreateDB() error.");
             else
             {
@@ -68,7 +68,7 @@ namespace Alien
 
         #region Basic
 
-        public bool CreateDB()
+        public bool CreateDB(Dictionary<string, string[]> dicTable)
         {
             try
             {
@@ -76,9 +76,9 @@ namespace Alien
                 m_sqlConn = new SQLiteConnection(m_szConnString);
                 m_sqlConn.Open();
 
-                foreach (string szKey in m_dicTable.Keys)
+                foreach (string szKey in dicTable.Keys)
                 {
-                    if (!CreateTable(szKey, m_dicTable[szKey]))
+                    if (!CreateTable(szKey, dicTable[szKey]))
                         throw new Exception("CreateTable() error.");
                 }
 

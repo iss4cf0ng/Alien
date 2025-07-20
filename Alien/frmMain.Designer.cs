@@ -56,9 +56,9 @@
             toolStripMenuItem2 = new ToolStripMenuItem();
             toolStripMenuItem3 = new ToolStripMenuItem();
             toolStripMenuItem4 = new ToolStripMenuItem();
-            textBox1 = new TextBox();
             toolStripSeparator2 = new ToolStripSeparator();
             toolStripMenuItem5 = new ToolStripMenuItem();
+            textBox1 = new TextBox();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -91,13 +91,13 @@
             // toolStripMenuItem7
             // 
             toolStripMenuItem7.Name = "toolStripMenuItem7";
-            toolStripMenuItem7.Size = new Size(180, 24);
+            toolStripMenuItem7.Size = new Size(114, 24);
             toolStripMenuItem7.Text = "Build";
             // 
             // toolStripMenuItem8
             // 
             toolStripMenuItem8.Name = "toolStripMenuItem8";
-            toolStripMenuItem8.Size = new Size(180, 24);
+            toolStripMenuItem8.Size = new Size(114, 24);
             toolStripMenuItem8.Text = "Add";
             toolStripMenuItem8.Click += toolStripMenuItem8_Click;
             // 
@@ -109,6 +109,7 @@
             toolStripButton2.Name = "toolStripButton2";
             toolStripButton2.Size = new Size(63, 23);
             toolStripButton2.Text = "Setting";
+            toolStripButton2.Click += toolStripButton2_Click;
             // 
             // toolStripButton3
             // 
@@ -118,6 +119,7 @@
             toolStripButton3.Name = "toolStripButton3";
             toolStripButton3.Size = new Size(55, 23);
             toolStripButton3.Text = "About";
+            toolStripButton3.Click += toolStripButton3_Click;
             // 
             // statusStrip1
             // 
@@ -265,14 +267,6 @@
             toolStripMenuItem4.Size = new Size(172, 24);
             toolStripMenuItem4.Text = "Delete";
             // 
-            // textBox1
-            // 
-            textBox1.Dock = DockStyle.Bottom;
-            textBox1.Location = new Point(0, 425);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(794, 27);
-            textBox1.TabIndex = 1;
-            // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
@@ -283,6 +277,14 @@
             toolStripMenuItem5.Name = "toolStripMenuItem5";
             toolStripMenuItem5.Size = new Size(172, 24);
             toolStripMenuItem5.Text = "Folder";
+            // 
+            // textBox1
+            // 
+            textBox1.Dock = DockStyle.Bottom;
+            textBox1.Location = new Point(0, 425);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(794, 27);
+            textBox1.TabIndex = 1;
             // 
             // frmMain
             // 

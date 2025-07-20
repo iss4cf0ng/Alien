@@ -8,8 +8,6 @@ namespace Alien
 {
     internal class clsfnFileMgr : clsWeb
     {
-        public string m_szCurrentPath { get; set; }
-
         public clsfnFileMgr(clsVictim victim) : base(victim)
         {
             

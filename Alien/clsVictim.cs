@@ -15,7 +15,7 @@ namespace Alien
         public string ShellURL { get { return m_ShellConfig.szUrl; } }
         public string ShellEncoding { get { return m_ShellConfig.szEncoding; } }
         public string m_szShellDomain { get { return ShellURL.Split('/')[2]; } }
-        public string m_szPortfolio { get { return Path.Combine(Application.StartupPath, m_szShellDomain); } }
+        public string m_szPortfolio { get { return Path.Combine(new string[] { Application.StartupPath, "Victim", m_szShellDomain }); } }
         public bool m_bUnixLike { get; set; }
 
         public clsVictim(clsSqlite sqlConn, stShellConfig config, bool bUnixLike)

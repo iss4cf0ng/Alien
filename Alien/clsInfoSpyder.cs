@@ -12,5 +12,17 @@ namespace Alien
         {
             m_victim = victim;
         }
+
+        public string fnszGetInfo()
+        {
+            try
+            {
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                return $"ERROR://{ex.Message}";
+            }
+        }
     }
 }

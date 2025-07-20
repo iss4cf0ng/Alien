@@ -29,7 +29,11 @@ namespace Alien
                 item.SubItems.Add(config.dtLastModified.ToString("F"));
                 item.SubItems.Add(config.dtLastAccessed.ToString("F"));
 
-                item.Tag = new clsVictim(m_sqlConn, config, false);
+                clsVictim victim = new clsVictim(m_sqlConn, config, false);
+                victim.fnbBuildPortfolio();
+
+                item.Tag = victim;
+
 
                 listView1.Items.Add(item);
             }
@@ -94,6 +98,18 @@ namespace Alien
             {
                 fnLoadShell();
             }
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            frmSetting f = new frmSetting();
+            f.Show();
+        }
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            frmAbout f = new frmAbout();
+            f.Show();
         }
     }
 }

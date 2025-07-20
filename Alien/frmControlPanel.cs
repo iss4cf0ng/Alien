@@ -36,9 +36,9 @@ namespace Alien
 
         }
 
-        void fnSetup()
+        async void fnSetup()
         {
-
+            richTextBox1.Text = m_infoSpyder.fnszGetInfo();
         }
 
         private void frmControlPanel_Load(object sender, EventArgs e)

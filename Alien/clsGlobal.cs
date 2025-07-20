@@ -24,6 +24,18 @@ namespace Alien
         CryptoOneShell,
     }
 
+    public enum enDatabaseType
+    {
+        MySQL,
+
+    }
+
+    public enum enLogMsgType
+    {
+        System,
+        Error,
+    }
+
     #endregion
     #region Struct
 
