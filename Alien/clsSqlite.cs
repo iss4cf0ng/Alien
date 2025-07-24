@@ -241,6 +241,22 @@ namespace Alien
             }
         }
 
+        public bool fnbDeleteShell(string szID)
+        {
+            try
+            {
+                string szQuery = $"DELETE FROM \"Shell\" WHERE \"ID\" = \"{szID}\";";
+                fnSqlQuery(szQuery);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return false;
+            }
+        }
+
         public stShellConfig fnGetShellConfig(string szUrl)
         {
             string szQuery = $"SELECT * FROM \"Shell\" WHERE \"URL\" = \"{szUrl}\";";

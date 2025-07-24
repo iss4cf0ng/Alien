@@ -11,6 +11,11 @@ namespace Alien
         private clsWeb m_web { get; set; }
         public string m_szFolderPath { get; set; }
 
+        public ImageList m_ExtIcon { get; set; }
+
+        public string m_szCurrentPath { get; set; }
+        public string m_szHomePath { get; set; }
+
         public clsfnFileMgr(clsWeb web)
         {
             m_web = web;
@@ -18,6 +23,10 @@ namespace Alien
 
             if (!Directory.Exists(m_szFolderPath))
                 Directory.Exists(m_szFolderPath);
+
+            m_ExtIcon = new ImageList();
+            m_ExtIcon.ImageSize = new Size(25, 25);
+            fnGetExtensionIcon("txt");
         }
 
         public struct stInit
@@ -31,7 +40,8 @@ namespace Alien
         {
             public bool bIsDirectory;
             public string szEntryPath;
-            public int nSize;
+            public string szEntryName { get { return Path.GetFileName(szEntryPath); } }
+            public long nSize;
             public string szPriviledge;
             public string szSize { get { return clsTool.fnSizeNormalization(nSize); } }
 
@@ -46,6 +56,8 @@ namespace Alien
             string szCurrentDir = szData[0];
             List<string> lsDrive = szData[1].Split(',').ToList();
 
+            m_szHomePath = szCurrentDir;
+
             stInit init = new stInit()
             {
                 szCurrentDir = szCurrentDir,
@@ -54,18 +66,82 @@ namespace Alien
 
             return init;
         }
+        
+        public Image fnGetExtensionIcon(string szExtension)
+        {
+            if (m_ExtIcon.Images.Keys.Contains(szExtension))
+            {
+                return m_ExtIcon.Images[szExtension];
+            }
+            else
+            {
+                string szTmpFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid().ToString().Replace("-", "_")}.{szExtension}");
+                File.WriteAllText(szTmpFilePath, string.Empty);
 
-        public List<stEntry> fnleScandir(string szTargetDirPath)
+                Icon icon = Icon.ExtractAssociatedIcon(szTmpFilePath);
+                File.Delete(szTmpFilePath);
+
+                if (icon == null)
+                    return m_ExtIcon.Images["txt"];
+
+                m_ExtIcon.Images.Add(icon);
+                m_ExtIcon.Images.SetKeyName(m_ExtIcon.Images.Count - 1, szExtension);
+
+                return icon.ToBitmap();
+            }
+        }
+
+        public async Task<List<stEntry>> fnleScandir(string szTargetDirPath)
         {
             szTargetDirPath = szTargetDirPath.Replace("\\", "/");
             List<stEntry> l = new List<stEntry>();
 
+            string szResp = await m_web.fnszSendPayload("file_scandir", new string[] { szTargetDirPath });
+            foreach (string szEntry in szResp.Split('|'))
+            {
+                try
+                {
+                    string[] aInfo = szEntry.Split('?');
+                    string szFileName = clsEzData.fnszB64d2str(aInfo[0]);
+                    bool bDir = szFileName.StartsWith("/");
 
+                    szFileName = szFileName.Replace("/", string.Empty);
+                    string szFilePath = Path.Combine(szTargetDirPath, szFileName).Replace("\\", "/");
+                    if (string.Equals(szFileName, ".") || string.Equals(szFileName, ".."))
+                        continue;
+
+                    string szPerm = aInfo[1];
+                    long nLength = long.Parse(aInfo[2]);
+                    DateTime ctime = DateTime.Parse(aInfo[3]);
+                    DateTime mtime = DateTime.Parse(aInfo[4]);
+                    DateTime atime = DateTime.Parse(aInfo[5]);
+
+                    stEntry entry = new stEntry()
+                    {
+                        bIsDirectory = bDir,
+                        szEntryPath = szFilePath,
+                        nSize = nLength,
+                        szPriviledge = szPerm,
+
+                        dtCreationDate = ctime,
+                        dtLastModifiedDate = mtime,
+                        dtLastAccessedDate = atime,
+                    };
+
+                    l.Add(entry);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+
+            m_szCurrentPath = szTargetDirPath;
 
             return l;
         }
 
-        public bool fnbWrite(string szFilePath, string szContent)
+        public async Task<bool> fnbWrite(string szFilePath, string szContent)
         {
             try
             {
@@ -77,9 +153,16 @@ namespace Alien
             }
         }
 
-        public string fnszRead(string szFilePath)
+        public async Task<string> fnszRead(string szFilePath)
         {
-            return string.Empty;
+            string szContent = await m_web.fnszSendPayload("file_read", new string[] { szFilePath });
+            if (szContent.Contains("ERROR://"))
+            {
+                MessageBox.Show(szContent);
+                return szContent;
+            }
+
+            return clsEzData.fnszB64d2str(szContent);
         }
     }
 }

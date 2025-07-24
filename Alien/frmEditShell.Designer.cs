@@ -35,6 +35,8 @@
             textBox2 = new TextBox();
             label2 = new Label();
             groupBox1 = new GroupBox();
+            label7 = new Label();
+            comboBox5 = new ComboBox();
             comboBox4 = new ComboBox();
             label6 = new Label();
             comboBox3 = new ComboBox();
@@ -46,8 +48,9 @@
             comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
-            label7 = new Label();
-            comboBox5 = new ComboBox();
+            label8 = new Label();
+            comboBox6 = new ComboBox();
+            button3 = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -107,6 +110,9 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(button3);
+            groupBox1.Controls.Add(label8);
+            groupBox1.Controls.Add(comboBox6);
             groupBox1.Controls.Add(label7);
             groupBox1.Controls.Add(comboBox5);
             groupBox1.Controls.Add(comboBox4);
@@ -121,25 +127,43 @@
             groupBox1.Controls.Add(textBox2);
             groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(474, 244);
+            groupBox1.Size = new Size(474, 268);
             groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Shell";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(10, 122);
+            label7.Name = "label7";
+            label7.Size = new Size(82, 19);
+            label7.TabIndex = 13;
+            label7.Text = "Encoding :";
+            // 
+            // comboBox5
+            // 
+            comboBox5.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox5.FormattingEnabled = true;
+            comboBox5.Location = new Point(98, 119);
+            comboBox5.Name = "comboBox5";
+            comboBox5.Size = new Size(370, 27);
+            comboBox5.TabIndex = 12;
             // 
             // comboBox4
             // 
             comboBox4.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox4.FormattingEnabled = true;
-            comboBox4.Location = new Point(98, 174);
+            comboBox4.Location = new Point(98, 185);
             comboBox4.Name = "comboBox4";
-            comboBox4.Size = new Size(270, 27);
+            comboBox4.Size = new Size(370, 27);
             comboBox4.TabIndex = 11;
             comboBox4.SelectedIndexChanged += comboBox4_SelectedIndexChanged;
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(21, 177);
+            label6.Location = new Point(21, 188);
             label6.Name = "label6";
             label6.Size = new Size(71, 19);
             label6.TabIndex = 10;
@@ -149,15 +173,15 @@
             // 
             comboBox3.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox3.FormattingEnabled = true;
-            comboBox3.Location = new Point(98, 207);
+            comboBox3.Location = new Point(98, 218);
             comboBox3.Name = "comboBox3";
-            comboBox3.Size = new Size(270, 27);
+            comboBox3.Size = new Size(370, 27);
             comboBox3.TabIndex = 9;
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(43, 210);
+            label5.Location = new Point(43, 221);
             label5.Name = "label5";
             label5.Size = new Size(49, 19);
             label5.TabIndex = 8;
@@ -166,7 +190,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(6, 144);
+            label3.Location = new Point(6, 155);
             label3.Name = "label3";
             label3.Size = new Size(86, 19);
             label3.TabIndex = 7;
@@ -176,9 +200,9 @@
             // 
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(98, 141);
+            comboBox1.Location = new Point(98, 152);
             comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(270, 27);
+            comboBox1.Size = new Size(370, 27);
             comboBox1.TabIndex = 6;
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
@@ -186,9 +210,9 @@
             // 
             groupBox2.Controls.Add(groupBox3);
             groupBox2.Controls.Add(checkBox1);
-            groupBox2.Location = new Point(12, 262);
+            groupBox2.Location = new Point(12, 286);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(474, 234);
+            groupBox2.Size = new Size(474, 210);
             groupBox2.TabIndex = 8;
             groupBox2.TabStop = false;
             groupBox2.Text = "Cryptography Tamper";
@@ -199,7 +223,7 @@
             groupBox3.Controls.Add(label4);
             groupBox3.Location = new Point(8, 55);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(460, 166);
+            groupBox3.Size = new Size(460, 146);
             groupBox3.TabIndex = 10;
             groupBox3.TabStop = false;
             // 
@@ -231,23 +255,32 @@
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
-            // label7
+            // label8
             // 
-            label7.AutoSize = true;
-            label7.Location = new Point(10, 100);
-            label7.Name = "label7";
-            label7.Size = new Size(82, 19);
-            label7.TabIndex = 13;
-            label7.Text = "Encoding :";
+            label8.AutoSize = true;
+            label8.Location = new Point(32, 89);
+            label8.Name = "label8";
+            label8.Size = new Size(60, 19);
+            label8.TabIndex = 15;
+            label8.Text = "Group :";
             // 
-            // comboBox5
+            // comboBox6
             // 
-            comboBox5.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBox5.FormattingEnabled = true;
-            comboBox5.Location = new Point(98, 97);
-            comboBox5.Name = "comboBox5";
-            comboBox5.Size = new Size(270, 27);
-            comboBox5.TabIndex = 12;
+            comboBox6.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox6.FormattingEnabled = true;
+            comboBox6.Location = new Point(98, 86);
+            comboBox6.Name = "comboBox6";
+            comboBox6.Size = new Size(264, 27);
+            comboBox6.TabIndex = 14;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(368, 85);
+            button3.Name = "button3";
+            button3.Size = new Size(100, 28);
+            button3.TabIndex = 16;
+            button3.Text = "...";
+            button3.UseVisualStyleBackColor = true;
             // 
             // frmEditShell
             // 
@@ -295,5 +328,8 @@
         private Label label6;
         private Label label7;
         private ComboBox comboBox5;
+        private Label label8;
+        private ComboBox comboBox6;
+        private Button button3;
     }
 }

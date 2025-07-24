@@ -74,6 +74,8 @@ namespace Alien
             f.m_sqlConn = m_sqlConn;
 
             f.ShowDialog();
+
+            fnLoadShell();
         }
 
         private void toolStripMenuItem8_Click(object sender, EventArgs e)
@@ -85,6 +87,8 @@ namespace Alien
             f.m_sqlConn = m_sqlConn;
 
             f.ShowDialog();
+
+            fnLoadShell();
         }
 
         private void listView1_KeyDown(object sender, KeyEventArgs e)
@@ -123,6 +127,22 @@ namespace Alien
             f.m_sqlConn = m_sqlConn;
 
             f.ShowDialog();
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            List<string> lsID = listView1.SelectedItems.Cast<ListViewItem>().Select(x => x.Text).ToList();
+            if (lsID.Count == 0)
+                return;
+
+            DialogResult dr = MessageBox.Show($"Delete {lsID.Count} shell{(lsID.Count > 1 ? "s" : string.Empty)}, are you sure?", "Sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dr == DialogResult.Yes)
+            {
+                foreach (string szID in lsID)
+                    m_sqlConn.fnbDeleteShell(szID);
+
+                fnLoadShell();
+            }
         }
     }
 }

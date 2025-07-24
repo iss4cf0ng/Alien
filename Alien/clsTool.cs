@@ -34,20 +34,5 @@ namespace Alien
 
             return string.Format("{0:0.##} {1}", dSize, asSize[nIndex]);
         }
-
-        /// <summary>
-        /// Generate random string with specified length.
-        /// </summary>
-        /// <param name="nLength">Length of random string.</param>
-        /// <returns>Random string.</returns>
-        public static string fnszGenerateRandomStr(int nLength = 10)
-        {
-            const string szPattern = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            StringBuilder sb = new StringBuilder(nLength);
-            for (int i = 0; i < nLength; i++)
-                sb.Append(new Random(szPattern.Length).Next());
-
-            return sb.ToString();
-        }
     }
 }
