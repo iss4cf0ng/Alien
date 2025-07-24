@@ -24,6 +24,7 @@ namespace Alien
                     "ID",
                     "URL",
                     "Password",
+                    "Encoding",
                     "Language",
                     "Method",
                     "Type",
@@ -60,7 +61,7 @@ namespace Alien
                 throw new Exception("CreateDB() error.");
             else
             {
-                m_szConnString = $"Data Source=\"{m_szFileName}\"";
+                m_szConnString = $"Data Source=\"{m_szFileName}\";Compress=True";
                 m_sqlConn = new SQLiteConnection(m_szConnString);
                 m_sqlConn.Open();
             }
@@ -72,7 +73,7 @@ namespace Alien
         {
             try
             {
-                m_szConnString = $"Data Source=\"{m_szFileName}\"";
+                m_szConnString = $"Data Source={m_szFileName};Compress=True;";
                 m_sqlConn = new SQLiteConnection(m_szConnString);
                 m_sqlConn.Open();
 
@@ -86,6 +87,7 @@ namespace Alien
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message, "CreateDB", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -101,6 +103,7 @@ namespace Alien
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message, "CreateTable()", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -133,10 +136,13 @@ namespace Alien
         {
             stShellConfig config = new stShellConfig()
             {
+                ID = dr["ID"].ToString(),
                 szUrl = dr["URL"].ToString(),
                 szPassword = dr["Password"].ToString(),
+                szEncoding = dr["Encoding"].ToString(),
                 language = (Language)Enum.Parse(typeof(Language), dr["Language"].ToString()),
                 payloadType = (PayloadType)Enum.Parse(typeof(PayloadType), dr["Type"].ToString()),
+                szMethod = dr["Method"].ToString(),
                 dtCreateDate = DateTime.Parse(dr["CreateDate"].ToString()),
                 dtLastModified = DateTime.Parse(dr["LastModified"].ToString()),
                 dtLastAccessed = DateTime.Parse(dr["LastAccessed"].ToString()),
@@ -183,12 +189,14 @@ namespace Alien
                     //Update shell config.
 
                     szQuery = $"UPDATE \"Shell\" SET " +
+                        $"URL=\"{config.szUrl}\"," +
                         $"Password=\"{config.szPassword}\"," +
+                        $"Encoding=\"{config.szEncoding}\"," +
                         $"Language=\"{config.language}\"," +
-                        $"Method=\"X\"" +
+                        $"Method=\"{config.szMethod}\"," +
                         $"Type=\"{config.payloadType}\"," +
                         $"LastModified=\"{DateTime.Now.ToString("F")}\" " +
-                        $"WHERE URL=\"{config.szUrl}\";";
+                        $"WHERE ID=\"{config.ID}\";";
                 }
                 else
                 {
@@ -196,8 +204,10 @@ namespace Alien
 
                     szQuery = $"INSERT INTO \"Shell\" (" +
 
+                        "ID," +
                         $"URL," +
                         $"Password," +
+                        $"Encoding," +
                         $"Language," +
                         $"Method," +
                         $"Type," +
@@ -207,10 +217,12 @@ namespace Alien
 
                         $") VALUES (" +
 
+                        $"\"{config.ID}\"," +
                         $"\"{config.szUrl}\"," +
                         $"\"{config.szPassword}\"," +
+                        $"\"{config.szEncoding}\"," +
                         $"\"{config.language.ToString()}\"," +
-                        $"\"X\"," +
+                        $"\"{config.szMethod}\"," +
                         $"\"{config.payloadType}\"," +
                         $"\"{szDt}\"," +
                         $"\"{szDt}\"," +

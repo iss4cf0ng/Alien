@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class clsfnShell : clsWeb
+    internal class clsfnShell
     {
-        public clsfnShell(clsVictim victim) : base(victim)
-        {
+        private clsWeb m_web { get; set; }
 
+        public clsfnShell(clsWeb web)
+        {
+            m_web = web;
         }
     }
 }

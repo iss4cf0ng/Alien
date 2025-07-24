@@ -9,11 +9,15 @@ namespace Alien
     public class clsVictim
     {
         private clsSqlite m_sqlConn { get; set; }
-        private stShellConfig m_ShellConfig { get; set; }
+        public stShellConfig m_ShellConfig { get; set; }
 
         public string ShellID { get { return m_ShellConfig.ID; } }
         public string ShellURL { get { return m_ShellConfig.szUrl; } }
+        public string ShellPassword { get { return m_ShellConfig.szPassword; } }
         public string ShellEncoding { get { return m_ShellConfig.szEncoding; } }
+        public Language ShellLanguage { get { return m_ShellConfig.language; } }
+        public string ShellMethod { get { return m_ShellConfig.szMethod; } }
+        public PayloadType ShellPayloadType { get { return m_ShellConfig.payloadType; } }
         public string m_szShellDomain { get { return ShellURL.Split('/')[2]; } }
         public string m_szPortfolio { get { return Path.Combine(new string[] { Application.StartupPath, "Victim", m_szShellDomain }); } }
         public bool m_bUnixLike { get; set; }

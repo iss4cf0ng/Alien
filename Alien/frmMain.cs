@@ -11,8 +11,8 @@ namespace Alien
 
         #region Tool
 
-        private clsVictim fnGetVictimTag(ListViewItem item) => (clsVictim)item.Tag;
-        private List<clsVictim> fnGetVictimList(ListView lv) => lv.SelectedItems.Cast<ListViewItem>().Select(x => fnGetVictimTag(x)).ToList();
+        private clsWeb fnGetVictimTag(ListViewItem item) => (clsWeb)item.Tag;
+        private List<clsWeb> fnGetVictimList(ListView lv) => lv.SelectedItems.Cast<ListViewItem>().Select(x => fnGetVictimTag(x)).ToList();
 
         #endregion
 
@@ -22,7 +22,7 @@ namespace Alien
             List<stShellConfig> lsConfig = m_sqlConn.fnGetAllShellConfig();
             foreach (var config in lsConfig)
             {
-                ListViewItem item = new ListViewItem("ID");
+                ListViewItem item = new ListViewItem(config.ID);
                 item.SubItems.Add(config.szUrl);
                 item.SubItems.Add(config.language.ToString());
                 item.SubItems.Add(config.dtCreateDate.ToString("F"));
@@ -31,8 +31,9 @@ namespace Alien
 
                 clsVictim victim = new clsVictim(m_sqlConn, config, false);
                 victim.fnbBuildPortfolio();
+                clsWeb web = new clsWeb(victim);
 
-                item.Tag = victim;
+                item.Tag = web;
 
 
                 listView1.Items.Add(item);
@@ -66,15 +67,9 @@ namespace Alien
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-
-            stShellConfig config = new stShellConfig()
-            {
-
-            };
-
-            frmEditShell f = new frmEditShell(m_sqlConn, config);
+            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig());
             f.StartPosition = FormStartPosition.CenterScreen;
-            f.Text = "Edit Shell";
+            f.Text = "Add Shell";
 
             f.m_sqlConn = m_sqlConn;
 
@@ -110,6 +105,24 @@ namespace Alien
         {
             frmAbout f = new frmAbout();
             f.Show();
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            List<clsWeb> lc = fnGetVictimList(listView1);
+            if (lc.Count == 0)
+                return;
+            else if (lc.Count > 1)
+                MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            clsWeb web = lc[0];
+            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig);
+            f.StartPosition = FormStartPosition.CenterScreen;
+            f.Text = "Edit Shell";
+
+            f.m_sqlConn = m_sqlConn;
+
+            f.ShowDialog();
         }
     }
 }

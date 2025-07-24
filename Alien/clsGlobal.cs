@@ -20,8 +20,8 @@ namespace Alien
 
     public enum PayloadType
     {
-        RegularOneShell,
-        CryptoOneShell,
+        OneShell,
+        Crypto,
     }
 
     public enum enDatabaseType
@@ -46,6 +46,7 @@ namespace Alien
         public string szPassword;
 
         public Language language;
+        public string szMethod;
         public PayloadType payloadType;
 
         public string szEncoding;
