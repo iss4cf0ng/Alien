@@ -34,5 +34,14 @@ namespace Alien
 
             return string.Format("{0:0.##} {1}", dSize, asSize[nIndex]);
         }
+
+        public static Image fnimgB64strToImage(string szB64str)
+        {
+            byte[] abBuffer = Convert.FromBase64String(szB64str);
+            using (MemoryStream ms = new MemoryStream(abBuffer))
+            {
+                return Image.FromStream(ms);
+            }
+        }
     }
 }

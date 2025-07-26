@@ -16,5 +16,15 @@ namespace Alien
         {
             InitializeComponent();
         }
+
+        private void fnSetup()
+        {
+
+        }
+
+        private void frmEditGroup_Load(object sender, EventArgs e)
+        {
+            fnSetup();
+        }
     }
 }

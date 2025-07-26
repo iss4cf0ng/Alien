@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Alien
 {
     public partial class frmMain : Form
@@ -13,13 +15,38 @@ namespace Alien
 
         private clsWeb fnGetVictimTag(ListViewItem item) => (clsWeb)item.Tag;
         private List<clsWeb> fnGetVictimList(ListView lv) => lv.SelectedItems.Cast<ListViewItem>().Select(x => fnGetVictimTag(x)).ToList();
+        private List<stShellConfig> fnSearchShell(string szPattern)
+        {
+            List<stShellConfig> lsConfig = m_sqlConn.fnGetAllShellConfig();
+            List<stShellConfig> lsResult = new List<stShellConfig>();
+
+            foreach (var config in lsConfig)
+            {
+                if (
+                    Regex.IsMatch(config.szUrl, szPattern)
+                    || Regex.IsMatch(config.ID, szPattern)
+                    || Regex.IsMatch(config.language.ToString(), szPattern)
+                    || Regex.IsMatch(config.szEncoding.ToString(), szPattern)
+                )
+                {
+                    lsResult.Add(config);
+                }
+            }
+
+            return lsResult;
+        }
 
         #endregion
 
-        void fnLoadShell()
+        void fnLoadShell(List<stShellConfig> lsConfig = null)
         {
+            //todo: Dispose all exist clsWeb
+
             listView1.Items.Clear();
-            List<stShellConfig> lsConfig = m_sqlConn.fnGetAllShellConfig();
+
+            if (lsConfig == null)
+                lsConfig = m_sqlConn.fnGetAllShellConfig();
+
             foreach (var config in lsConfig)
             {
                 ListViewItem item = new ListViewItem(config.ID);
@@ -47,6 +74,12 @@ namespace Alien
             clsSqlite sqlConn = new clsSqlite("data.sqlite");
             m_sqlConn = sqlConn;
 
+            TreeNode node = new TreeNode("Group");
+            node.Nodes.Add(new TreeNode("All"));
+
+            treeView1.Nodes.Add(node);
+            treeView1.ExpandAll();
+
             fnLoadShell();
         }
 
@@ -67,7 +100,7 @@ namespace Alien
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig());
+            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Add Shell";
 
@@ -80,7 +113,7 @@ namespace Alien
 
         private void toolStripMenuItem8_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig());
+            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Add Shell";
 
@@ -120,7 +153,7 @@ namespace Alien
                 MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             clsWeb web = lc[0];
-            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig);
+            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Edit Shell";
 
@@ -143,6 +176,19 @@ namespace Alien
 
                 fnLoadShell();
             }
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                fnLoadShell(fnSearchShell(textBox1.Text));
+            }
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
         }
     }
 }

@@ -14,6 +14,8 @@ namespace Alien
     {
         public clsSqlite m_sqlConn;
         public stShellConfig m_stShellConfig;
+        private bool m_bNewShell { get; set; }
+
         private string[] m_asEncoding =
         {
             "ASCII",
@@ -28,12 +30,13 @@ namespace Alien
             "EUC-KR",
         };
 
-        public frmEditShell(clsSqlite sqlConn, stShellConfig config)
+        public frmEditShell(clsSqlite sqlConn, stShellConfig config, bool bNewShell)
         {
             InitializeComponent();
 
             m_sqlConn = sqlConn;
             m_stShellConfig = config;
+            m_bNewShell = bNewShell;
         }
 
         void fnSetup()
@@ -99,7 +102,7 @@ namespace Alien
         private void button2_Click(object sender, EventArgs e)
         {
             stShellConfig config = new stShellConfig();
-            config.ID = Guid.NewGuid().ToString();
+            config.ID = m_bNewShell ? Guid.NewGuid().ToString() : m_stShellConfig.ID;
             config.szUrl = textBox1.Text;
             config.szPassword = textBox2.Text;
             config.szEncoding = comboBox5.Text;

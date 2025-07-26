@@ -33,7 +33,7 @@ namespace Alien
         {
             public string szCurrentDir;
             public List<string> lsLogicalDrive;
-            public bool bUnixLike { get { return szCurrentDir.Contains(":"); } }
+            public bool bUnixLike { get { return !szCurrentDir.Contains(":"); } }
         }
 
         public struct stEntry
@@ -91,12 +91,33 @@ namespace Alien
             }
         }
 
+        public async Task<Image> fnReadImage(string szFilePath)
+        {
+            szFilePath = szFilePath.Replace("\\", "/");
+            string szResp = await m_web.fnszSendPayload("file_image", new string[] { szFilePath });
+            if (szResp.Contains("ERROR://"))
+            {
+                MessageBox.Show(szResp);
+                return null;
+            }
+
+            Image img = clsTool.fnimgB64strToImage(szResp);
+            
+            return img;
+        }
+
         public async Task<List<stEntry>> fnleScandir(string szTargetDirPath)
         {
             szTargetDirPath = szTargetDirPath.Replace("\\", "/");
             List<stEntry> l = new List<stEntry>();
 
             string szResp = await m_web.fnszSendPayload("file_scandir", new string[] { szTargetDirPath });
+            if (szResp.Contains("ERROR://"))
+            {
+                MessageBox.Show(szResp, "fnleScandir()", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return l;
+            }
+
             foreach (string szEntry in szResp.Split('|'))
             {
                 try
@@ -132,7 +153,7 @@ namespace Alien
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    //MessageBox.Show(ex.Message);
                 }
             }
 
@@ -145,10 +166,15 @@ namespace Alien
         {
             try
             {
+                string szResp = await m_web.fnszSendPayload("file_write", new string[] { szFilePath, szContent });
+                if (!string.Equals(szResp, "1"))
+                    throw new Exception(szResp);
+
                 return true;
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message, "fnbWrite()", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

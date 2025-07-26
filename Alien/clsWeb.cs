@@ -37,6 +37,8 @@ namespace Alien
 
         public clsWeb(clsVictim victim)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             m_victim = victim;
             m_clnt = new HttpClient()
             {

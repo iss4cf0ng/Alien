@@ -22,6 +22,7 @@ namespace Alien
                 new string[]
                 {
                     "ID",
+                    "Group",
                     "URL",
                     "Password",
                     "Encoding",
@@ -276,6 +277,23 @@ namespace Alien
             foreach (DataRow dr in dt.Rows)
             {
                 stShellConfig config = fnDataRowToStruct(dr);
+                lsConfig.Add(config);
+            }
+
+            return lsConfig;
+        }
+
+        public List<stShellConfig> fnGetShellWithGroupName(string szGroupName)
+        {
+            if (szGroupName == "All")
+                return fnGetAllShellConfig();
+
+            List<stShellConfig> lsConfig = new List<stShellConfig>();
+            string szQuery = $"SELECT * FROM \"Shell\" WHERE \"GroupName\" = \"{szGroupName}\";";
+            DataTable dt = fnSqlQuery(szQuery);
+            foreach (DataRow dr in dt.Rows)
+            {
+                var config = fnDataRowToStruct(dr);
                 lsConfig.Add(config);
             }
 

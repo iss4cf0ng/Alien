@@ -60,18 +60,19 @@
             tabControl1.Controls.Add(tabPage2);
             tabControl1.Dock = DockStyle.Fill;
             tabControl1.Location = new Point(0, 24);
-            tabControl1.Margin = new Padding(4, 4, 4, 4);
+            tabControl1.Margin = new Padding(4);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
             tabControl1.Size = new Size(845, 387);
             tabControl1.TabIndex = 2;
+            tabControl1.KeyDown += tabControl1_KeyDown;
             // 
             // tabPage1
             // 
             tabPage1.Location = new Point(4, 28);
-            tabPage1.Margin = new Padding(4, 4, 4, 4);
+            tabPage1.Margin = new Padding(4);
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(4, 4, 4, 4);
+            tabPage1.Padding = new Padding(4);
             tabPage1.Size = new Size(837, 355);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "tabPage1";
@@ -79,11 +80,11 @@
             // 
             // tabPage2
             // 
-            tabPage2.Location = new Point(4, 24);
-            tabPage2.Margin = new Padding(4, 4, 4, 4);
+            tabPage2.Location = new Point(4, 28);
+            tabPage2.Margin = new Padding(4);
             tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(4, 4, 4, 4);
-            tabPage2.Size = new Size(249, 99);
+            tabPage2.Padding = new Padding(4);
+            tabPage2.Size = new Size(837, 355);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "tabPage2";
             tabPage2.UseVisualStyleBackColor = true;
@@ -98,8 +99,9 @@
             Controls.Add(menuStrip1);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             MainMenuStrip = menuStrip1;
-            Margin = new Padding(4, 4, 4, 4);
+            Margin = new Padding(4);
             Name = "frmTextEditor";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "frmTextEditor";
             Load += frmTextEditor_Load;
             tabControl1.ResumeLayout(false);
