@@ -35,6 +35,11 @@ namespace Alien
             return string.Format("{0:0.##} {1}", dSize, asSize[nIndex]);
         }
 
+        /// <summary>
+        /// Convert base64 string into Image object.
+        /// </summary>
+        /// <param name="szB64str">Image base64 string value.</param>
+        /// <returns>Image object.</returns>
         public static Image fnimgB64strToImage(string szB64str)
         {
             byte[] abBuffer = Convert.FromBase64String(szB64str);

@@ -20,14 +20,14 @@ namespace Alien
         {
             "ASCII",
             "UTF-8",
-            "Big5",
-            "GB2312",
+            "Big5", //Traditional Chinese
+            "GB2312", //Simplified Chinese
             "GBK",
             "ISO-8859-1",
             "Windows-1252",
-            "Shift_JIS",
-            "EUC-JP",
-            "EUC-KR",
+            "Shift_JIS", //Japanese
+            "EUC-JP", //Japanese
+            "EUC-KR", //Korean
         };
 
         public frmEditShell(clsSqlite sqlConn, stShellConfig config, bool bNewShell)
@@ -59,6 +59,11 @@ namespace Alien
 
             comboBox5.SelectedIndex = 0;
 
+            foreach (string szName in m_sqlConn.m_lsGroupName)
+                comboBox6.Items.Add(szName);
+
+            comboBox6.SelectedIndex = 0;
+
             string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper");
             if (Directory.Exists(szTamperDirPath))
             {
@@ -85,6 +90,12 @@ namespace Alien
                 //Edit shell
                 textBox1.Text = m_stShellConfig.szUrl;
                 textBox2.Text = m_stShellConfig.szPassword;
+
+                comboBox6.Text = m_stShellConfig.szGroupName;
+                comboBox5.Text = m_stShellConfig.szEncoding;
+                comboBox1.Text = m_stShellConfig.language.ToString();
+                comboBox4.Text = m_stShellConfig.szMethod;
+                comboBox3.Text = m_stShellConfig.payloadType.ToString();
             }
         }
 
@@ -103,6 +114,7 @@ namespace Alien
         {
             stShellConfig config = new stShellConfig();
             config.ID = m_bNewShell ? Guid.NewGuid().ToString() : m_stShellConfig.ID;
+            config.szGroupName = comboBox6.Text;
             config.szUrl = textBox1.Text;
             config.szPassword = textBox2.Text;
             config.szEncoding = comboBox5.Text;
@@ -151,6 +163,13 @@ namespace Alien
 
             if (comboBox3.Items.Count > 0)
                 comboBox3.SelectedIndex = 0;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            frmEditGroup f = new frmEditGroup(m_sqlConn);
+
+            f.ShowDialog();
         }
     }
 }

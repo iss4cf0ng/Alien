@@ -225,7 +225,7 @@ namespace Alien
             {
                 f = new frmFileImage(lsImagePath.Count);
                 f.Text = "DisplayImage";
-                
+
                 f.Show();
             }
             else
@@ -279,7 +279,11 @@ namespace Alien
 
         async void fnFileDirExists(string szDirPath)
         {
+            szDirPath = await m_fileMgr.fnszCheckPathExists(szDirPath);
+            fnFileAddPathToTreeView(szDirPath);
 
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDirPath);
+            treeView3.SelectedNode = node;
         }
 
         public async void fnFileUpload()
@@ -288,6 +292,16 @@ namespace Alien
         }
 
         public async void fnFileDownload()
+        {
+
+        }
+
+        public async void fnFileNewFolder()
+        {
+
+        }
+
+        public async void fnFileNewFile()
         {
 
         }
@@ -338,7 +352,7 @@ namespace Alien
 
         }
 
-        async void fnReadTable()
+        async void fnDbReadTable()
         {
 
         }
@@ -413,7 +427,7 @@ namespace Alien
         {
             TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, m_fileMgr.m_szCurrentPath);
             if (node != null && node.Parent != null)
-                treeView3.SelectedNode = node;
+                treeView3.SelectedNode = node.Parent;
         }
         //File.Home
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -479,12 +493,45 @@ namespace Alien
                 return;
 
             var entry = fnFileGetItemTag(lItem[0]);
-            fnFileRead(entry.szEntryPath);
+            if (entry.bIsDirectory)
+            {
+                TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, entry.szEntryPath);
+                if (node != null)
+                    treeView3.SelectedNode = node;
+            }
+            else
+            {
+                fnFileRead(entry.szEntryPath);
+            }
         }
 
         private void listView2_KeyDown(object sender, KeyEventArgs e)
         {
-
+            if (e.Modifiers == Keys.Control)
+            {
+                if (e.KeyCode == Keys.A)
+                {
+                    listView2.Items.Cast<ListViewItem>().Select(x => x.Selected = true);
+                }
+            }
+            else
+            {
+                if (e.KeyCode == Keys.F5)
+                {
+                    fnFileScandir(m_fileMgr.m_szCurrentPath);
+                }
+                else if (e.KeyCode == Keys.Enter)
+                {
+                    foreach (ListViewItem item in listView2.SelectedItems)
+                    {
+                        var entry = fnFileGetItemTag(item);
+                        if (entry.bIsDirectory)
+                            treeView3.SelectedNode = fnFindNodeWithFullPath(treeView3.Nodes, entry.szEntryPath);
+                        else
+                            fnFileRead(entry.szEntryPath);
+                    }
+                }
+            }
         }
 
         private void textBox3_KeyDown(object sender, KeyEventArgs e)
@@ -511,13 +558,24 @@ namespace Alien
         {
             if (e.KeyCode == Keys.Enter)
             {
-
+                fnFileDirExists(textBox1.Text);
             }
         }
 
         private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
         {
-            
+
+        }
+
+        //File.NewFolder
+        private void toolStripMenuItem15_Click(object sender, EventArgs e)
+        {
+
+        }
+        //File.NewFile
+        private void toolStripMenuItem16_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -16,6 +16,15 @@ namespace Alien
     public enum Language
     {
         PHP,
+        ASP,
+        ASPX,
+        ASMX,
+        ASHX,
+        JSP,
+        JSPX,
+        CGI,
+        Perl,
+        Python,
     }
 
     public enum PayloadType
@@ -44,6 +53,8 @@ namespace Alien
         public string ID;
         public string szUrl;
         public string szPassword;
+
+        public string szGroupName;
 
         public Language language;
         public string szMethod;

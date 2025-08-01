@@ -22,7 +22,7 @@ namespace Alien
                 new string[]
                 {
                     "ID",
-                    "Group",
+                    "GroupName",
                     "URL",
                     "Password",
                     "Encoding",
@@ -48,6 +48,7 @@ namespace Alien
         };
 
         public SQLiteConnection m_sqlConn { get; set; }
+        public List<string> m_lsGroupName = new List<string>() { "All" };
 
         public clsSqlite(SQLiteConnection sqlConn)
         {
@@ -138,6 +139,7 @@ namespace Alien
             stShellConfig config = new stShellConfig()
             {
                 ID = dr["ID"].ToString(),
+                szGroupName = dr["GroupName"].ToString(),
                 szUrl = dr["URL"].ToString(),
                 szPassword = dr["Password"].ToString(),
                 szEncoding = dr["Encoding"].ToString(),
@@ -190,6 +192,7 @@ namespace Alien
                     //Update shell config.
 
                     szQuery = $"UPDATE \"Shell\" SET " +
+                        $"GroupName=\"{config.szGroupName}\"," +
                         $"URL=\"{config.szUrl}\"," +
                         $"Password=\"{config.szPassword}\"," +
                         $"Encoding=\"{config.szEncoding}\"," +
@@ -206,6 +209,7 @@ namespace Alien
                     szQuery = $"INSERT INTO \"Shell\" (" +
 
                         "ID," +
+                        "GroupName," +
                         $"URL," +
                         $"Password," +
                         $"Encoding," +
@@ -219,6 +223,7 @@ namespace Alien
                         $") VALUES (" +
 
                         $"\"{config.ID}\"," +
+                        $"\"{config.szGroupName}\"," +
                         $"\"{config.szUrl}\"," +
                         $"\"{config.szPassword}\"," +
                         $"\"{config.szEncoding}\"," +
@@ -271,6 +276,8 @@ namespace Alien
 
         public List<stShellConfig> fnGetAllShellConfig()
         {
+            m_lsGroupName.Clear();
+
             List<stShellConfig> lsConfig = new List<stShellConfig>();
             string szQuery = $"SELECT * FROM \"Shell\";";
             DataTable dt = fnSqlQuery(szQuery);
@@ -278,6 +285,9 @@ namespace Alien
             {
                 stShellConfig config = fnDataRowToStruct(dr);
                 lsConfig.Add(config);
+
+                if (!m_lsGroupName.Contains(config.szGroupName))
+                    m_lsGroupName.Add(config.szGroupName);
             }
 
             return lsConfig;
@@ -298,6 +308,28 @@ namespace Alien
             }
 
             return lsConfig;
+        }
+
+        public void fnDeleteGroup(string szGroupName)
+        {
+            if (szGroupName == "All")
+            {
+                MessageBox.Show("Cannot delete group: " + szGroupName, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var lShell = fnGetShellWithGroupName(szGroupName);
+            if (lShell.Count == 0)
+            {
+                MessageBox.Show("Cannot find group: " + szGroupName, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            foreach (var config in lShell)
+            {
+                string szQuery = $"UPDATE \"Shell\" SET \"GroupName\"=\"All\" WHERE \"ID\"=\"{config.ID}\";";
+                fnSqlQuery(szQuery);
+            }
         }
 
         #endregion

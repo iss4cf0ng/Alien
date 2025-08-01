@@ -35,6 +35,9 @@
             textBox2 = new TextBox();
             label2 = new Label();
             groupBox1 = new GroupBox();
+            button3 = new Button();
+            label8 = new Label();
+            comboBox6 = new ComboBox();
             label7 = new Label();
             comboBox5 = new ComboBox();
             comboBox4 = new ComboBox();
@@ -48,9 +51,6 @@
             comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
-            label8 = new Label();
-            comboBox6 = new ComboBox();
-            button3 = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -131,6 +131,34 @@
             groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Shell";
+            // 
+            // button3
+            // 
+            button3.Location = new Point(368, 85);
+            button3.Name = "button3";
+            button3.Size = new Size(100, 28);
+            button3.TabIndex = 16;
+            button3.Text = "...";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(32, 89);
+            label8.Name = "label8";
+            label8.Size = new Size(60, 19);
+            label8.TabIndex = 15;
+            label8.Text = "Group :";
+            // 
+            // comboBox6
+            // 
+            comboBox6.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox6.FormattingEnabled = true;
+            comboBox6.Location = new Point(98, 86);
+            comboBox6.Name = "comboBox6";
+            comboBox6.Size = new Size(264, 27);
+            comboBox6.TabIndex = 14;
             // 
             // label7
             // 
@@ -254,33 +282,6 @@
             checkBox1.Text = "RAW";
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
-            // 
-            // label8
-            // 
-            label8.AutoSize = true;
-            label8.Location = new Point(32, 89);
-            label8.Name = "label8";
-            label8.Size = new Size(60, 19);
-            label8.TabIndex = 15;
-            label8.Text = "Group :";
-            // 
-            // comboBox6
-            // 
-            comboBox6.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBox6.FormattingEnabled = true;
-            comboBox6.Location = new Point(98, 86);
-            comboBox6.Name = "comboBox6";
-            comboBox6.Size = new Size(264, 27);
-            comboBox6.TabIndex = 14;
-            // 
-            // button3
-            // 
-            button3.Location = new Point(368, 85);
-            button3.Name = "button3";
-            button3.Size = new Size(100, 28);
-            button3.TabIndex = 16;
-            button3.Text = "...";
-            button3.UseVisualStyleBackColor = true;
             // 
             // frmEditShell
             // 

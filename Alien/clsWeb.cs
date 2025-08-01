@@ -15,6 +15,8 @@ namespace Alien
         private Dictionary<Language, string> m_dicSuffix = new Dictionary<Language, string>()
         {
             { Language.PHP, "php" },
+            { Language.ASP, "asp" },
+            { Language.Python, "py" },
         };
         private Dictionary<Language, string[]> m_dicRemoveSyntax = new Dictionary<Language, string[]>()
         {

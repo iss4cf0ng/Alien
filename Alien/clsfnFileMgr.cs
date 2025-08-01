@@ -91,6 +91,30 @@ namespace Alien
             }
         }
 
+        public async Task<string> fnszCheckPathExists(string szDirPath)
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("file_pathExists", new string[] { szDirPath });
+                if (szResp.Contains("ERROR://"))
+                    throw new Exception(szResp);
+
+                string[] asResp = szResp.Split('|');
+                if (asResp.Length == 1)
+                    throw new Exception(szResp);
+
+                if (int.Parse(asResp[0]) == 1)
+                    return asResp[1];
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "fnszCheckPathExists()", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+        }
+
         public async Task<Image> fnReadImage(string szFilePath)
         {
             szFilePath = szFilePath.Replace("\\", "/");
@@ -189,6 +213,33 @@ namespace Alien
             }
 
             return clsEzData.fnszB64d2str(szContent);
+        }
+
+        public async Task<bool> fnbNewFolder(string szDirPath)
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("file_newFolder", new string[] { szDirPath });
+                if (!string.Equals(szResp, "1"))
+                    throw new Exception(szResp);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "fnbNewFolder()", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        public async Task<bool> fnbAppendBytes(byte[] abBuffer)
+        {
+            return true;
+        }
+
+        public async Task<byte[]> fnabReadBytes()
+        {
+            return new byte[1024];
         }
     }
 }

@@ -81,6 +81,14 @@ namespace Alien
             treeView1.ExpandAll();
 
             fnLoadShell();
+
+            foreach (string szGroupName in m_sqlConn.m_lsGroupName)
+            {
+                if (szGroupName == "All" || string.IsNullOrEmpty(szGroupName))
+                    continue;
+
+                treeView1.Nodes[0].Nodes.Add(szGroupName);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
