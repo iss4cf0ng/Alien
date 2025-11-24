@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class clsCrypto
+    internal class clsTransferFileHandler
     {
+        public clsTransferFileHandler(string szLocalFile)
+        {
+
+        }
     }
 }

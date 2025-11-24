@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +49,46 @@ namespace Alien
             {
                 return Image.FromStream(ms);
             }
+        }
+
+        public static string fnszGenerateFileNameWithDateTime(string szExt = "txt")
+        {
+            if (szExt.StartsWith("."))
+                szExt = szExt.Replace(".", string.Empty);
+
+            DateTime date = DateTime.Now;
+            return string.Join(string.Empty, new int[]
+            {
+                date.Year,
+                date.Month,
+                date.Day,
+                date.Hour,
+                date.Minute,
+                date.Second,
+                date.Millisecond,
+            }) + $".{szExt}";
+        }
+
+        public static DataTable fnSqlQuery(SQLiteConnection conn, string szQuery)
+        {
+            DataTable dt = new DataTable();
+            DataSet ds = new DataSet();
+            ds.Clear();
+
+            try
+            {
+                using (var data_adapter = new SQLiteDataAdapter(szQuery, conn))
+                {
+                    data_adapter.Fill(ds);
+                    dt = ds.Tables[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return dt;
         }
     }
 }

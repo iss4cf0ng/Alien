@@ -33,16 +33,20 @@ namespace Alien
         Crypto,
     }
 
-    public enum enDatabaseType
-    {
-        MySQL,
-
-    }
-
     public enum enLogMsgType
     {
         System,
         Error,
+    }
+
+    public enum enDatabase
+    {
+        DSN,
+        MySQL,
+        MySQLi,
+        Access,
+        SqlServer,
+        Sqlite,
     }
 
     #endregion

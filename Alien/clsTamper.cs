@@ -8,11 +8,17 @@ namespace Alien
 {
     public class clsTamper
     {
-        private string m_szPayloadData { get; set; }
+        private string m_szTamperName { get; set; }
 
-        public clsTamper(string szPayloadData)
+        public clsTamper(string szTamperName)
         {
-            m_szPayloadData = szPayloadData;
+            m_szTamperName = szTamperName;
+        }
+
+        public string fnszGetPayload(string szPayload)
+        {
+            //todo: Process payload string data with tamper script.
+            return string.Empty;
         }
     }
 }

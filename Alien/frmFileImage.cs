@@ -243,12 +243,18 @@ namespace Alien
         //Copy Name
         private void toolStripMenuItem13_Click(object sender, EventArgs e)
         {
+            var lObj = listView1.SelectedItems.Cast<ListViewItem>().Select(x => fnGetItemTag(x)).ToList();
+            var lsName = lObj.Select(x => Path.GetFileName(x.szFilePath));
 
+            Clipboard.SetText(string.Join(Environment.NewLine, lsName));
         }
         //Copy Path
         private void toolStripMenuItem12_Click(object sender, EventArgs e)
         {
+            var lObj = listView1.SelectedItems.Cast<ListViewItem>().Select(x => fnGetItemTag(x)).ToList();
+            var lsName = lObj.Select(x => x.szFilePath);
 
+            Clipboard.SetText(string.Join(Environment.NewLine, lsName));
         }
     }
 }

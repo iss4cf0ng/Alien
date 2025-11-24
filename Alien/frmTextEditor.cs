@@ -1,5 +1,4 @@
-﻿using ICSharpCode.TextEditor;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using ICSharpCode.TextEditor;
 
 namespace Alien
 {
@@ -52,18 +53,6 @@ namespace Alien
 
         #endregion
 
-        void fnSetup()
-        {
-            frmControlPanel f = (frmControlPanel)ParentForm;
-            foreach (TabPage page in tabControl1.TabPages)
-                tabControl1.TabPages.Remove(page);
-        }
-
-        private void frmTextEditor_Load(object sender, EventArgs e)
-        {
-            fnSetup();
-        }
-
         public void fnShowContent(string szFilePath, string szFileContent)
         {
             TabPage page = new TabPage();
@@ -91,6 +80,18 @@ namespace Alien
 
             editor.TextChanged += TextEditorEx_TextChange;
             tbSearch.KeyDown += TextboxSearch_KeyDown;
+        }
+
+        void fnSetup()
+        {
+            frmControlPanel f = (frmControlPanel)ParentForm;
+            foreach (TabPage page in tabControl1.TabPages)
+                tabControl1.TabPages.Remove(page);
+        }
+
+        private void frmTextEditor_Load(object sender, EventArgs e)
+        {
+            fnSetup();
         }
 
         private void TextEditorEx_TextChange(object sender, EventArgs e)

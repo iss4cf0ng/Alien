@@ -44,5 +44,19 @@ namespace Alien
                 return false;
             }
         }
+
+        #region FileMgr
+
+        public void fnUploadFile(string szSrcFileName, string szDstFileName)
+        {
+
+        }
+
+        public void fnDownloadFile(string szSrcFileName, string szDstFileName)
+        {
+
+        }
+
+        #endregion
     }
 }

