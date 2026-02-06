@@ -1,4 +1,2 @@
 # Alien
-Rewrite alien
-
-重制版
+This tool is currently being rewritten.
