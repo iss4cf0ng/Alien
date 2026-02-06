@@ -12,7 +12,7 @@ namespace Alien
 {
     public partial class frmEditGroup : Form
     {
-        private clsSqlite m_sqlConn { get; set; }
+        private clsSqlite m_sqlConn { get; init; }
 
         public frmEditGroup(clsSqlite sqlConn)
         {
@@ -59,12 +59,13 @@ namespace Alien
         //Delete
         private void button3_Click(object sender, EventArgs e)
         {
-
+            foreach (ListViewItem item in listView1.CheckedItems)
+                m_sqlConn.fnDeleteGroup(item.Text);
         }
         //Add
         private void button2_Click(object sender, EventArgs e)
         {
-
+            
         }
         //Check All
         private void button4_Click(object sender, EventArgs e)

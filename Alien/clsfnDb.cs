@@ -25,6 +25,7 @@ namespace Alien
                 "Database",
                 new string[]
                 {
+                    "ID",
                     "DbType",
                     "ConnString",
                     "Source",
@@ -44,6 +45,7 @@ namespace Alien
                 }
             }
         };
+        public Dictionary<string, stDbConfig> m_stDbConfig = new Dictionary<string, stDbConfig>();
 
         public struct stDbConfig
         {
@@ -76,10 +78,10 @@ namespace Alien
 
         public bool fnbDbExists(string szSource)
         {
-            string szQuery = $"SELECT 1 FROM \"Database\" WHERE \"Source\"=\"{szSource}\";";
+            string szQuery = $"SELECT EXISTS(SELECT 1 FROM \"Database\" WHERE \"Source\"=\"{szSource}\");";
             DataTable dt = clsTool.fnSqlQuery(m_sqlConn.m_sqlConn, szQuery);
 
-            return (int)dt.Rows[0][0] == 1;
+            return (Int64)dt.Rows[0][0] == (Int64)1;
         }
         
         private bool fnbDbWriteValidate(stDbConfig config)
@@ -103,6 +105,22 @@ namespace Alien
             string szQuery = string.Empty;
             if (fnbDbExists(config.szSource))
             {
+                DialogResult dr = MessageBox.Show("Database config is existed, do you want to replace it?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (dr != DialogResult.Yes)
+                    return false;
+
+                szQuery = $"UPDATE \"Database\" SET " +
+                    $"\"DbType\" = \"{Enum.GetName(config.enDbType)}\"," +
+                    $"\"ConnString\" = \"{config.szConnString}\"," +
+                    $"\"Source\" = \"{config.szSource}\"," +
+                    $"\"Username\" = \"{config.szUsername}\"," +
+                    $"\"Password\" = \"{config.szPassword}\"," +
+                    $"\"CreationDate\" = \"{config.dtCreationDate.ToString("F")}\"," +
+                    $"\"LastUsed\" = \"{config.dtLastUsed.ToString("F")}\" " +
+                    $"WHERE \"ID\" = \"{config.szID}\";";
+            }
+            else
+            {
                 szQuery = $"INSERT INTO Database(" +
                     $"\"ID\"," +
                     $"\"DbType\"," +
@@ -113,7 +131,7 @@ namespace Alien
                     $"\"CreationDate\"," +
                     $"\"LastUsed\"" +
                     $") VALUES(" +
-                    $"\"{Guid.NewGuid().ToString()}\"," +
+                    $"\"{config.szID}\"," +
                     $"\"{Enum.GetName(config.enDbType)}\"," +
                     $"\"{config.szConnString}\"," +
                     $"\"{config.szSource}\"," +
@@ -122,18 +140,6 @@ namespace Alien
                     $"\"{config.dtCreationDate.ToString("F")}\"," +
                     $"\"{config.dtLastUsed.ToString("F")}\"" +
                     $");";
-            }
-            else
-            {
-                szQuery = $"UPDATE \"Database\" SET " +
-                    $"\"DbType\" = \"{Enum.GetName(config.enDbType)}\"," +
-                    $"\"ConnString\" = \"{config.szConnString}\"," +
-                    $"\"Source\" = \"{config.szSource}\"," +
-                    $"\"Username\" = \"{config.szUsername}\"," +
-                    $"\"Password\" = \"{config.szPassword}\"," +
-                    $"\"CreationDate\" = \"{config.dtCreationDate.ToString("F")}\"," +
-                    $"\"LastUsed\" = \"{config.dtLastUsed.ToString("F")}\"," +
-                    $"WHERE \"ID\" = \"{config.szID}\";";
             }
 
             DataTable dt = clsTool.fnSqlQuery(m_sqlConn.m_sqlConn, szQuery);
@@ -166,7 +172,7 @@ namespace Alien
                 DateTime dtCreation = DateTime.Parse((string)dr["CreationDate"]);
                 DateTime dtLastUsed = DateTime.Parse((string)dr["LastUsed"]);
 
-                ls.Add(new stDbConfig()
+                stDbConfig config = new stDbConfig()
                 {
                     szID = szID,
 
@@ -179,7 +185,12 @@ namespace Alien
 
                     dtCreationDate = dtCreation,
                     dtLastUsed = dtLastUsed,
-                });
+                };
+
+                ls.Add(config);
+
+                if (!m_stDbConfig.ContainsKey(szSource))
+                    m_stDbConfig.Add(szSource, config);
             }
 
             return ls;
@@ -189,21 +200,41 @@ namespace Alien
 
         #region Remote Function
 
-        public async Task<string> fnDbInit(stDbConfig config)
+        public async Task<bool> fnDbTest(stDbConfig config)
         {
             string szContent = await m_web.fnszSendPayload("db_init", new string[]
-                {
-                    config.szSource,
-                    config.szUsername,
-                    config.szPassword,
+            {
+                config.szSource,
+                config.szUsername,
+                config.szPassword,
+            });
 
-                });
+            string[] s = szContent.Split('|');
+            if (s.Length == 0)
+                return false;
 
-            return string.Empty;
+            if (s.First() != "1")
+            {
+                MessageBox.Show(s.Last(), "fnDbTest()", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
-        public async Task<string> fnSqlExec(stDbConfig config)
+        public async Task<string> fnSqlExec(stDbConfig config, string szQuery)
         {
+            string szResp = await m_web.fnszSendPayload("db_query", new string[]
+            {
+                config.szSource,
+                config.szUsername,
+                config.szPassword,
+                szQuery,
+            });
+
+            MessageBox.Show(szResp);
 
             return string.Empty;
         }

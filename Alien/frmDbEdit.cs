@@ -12,8 +12,8 @@ namespace Alien
 {
     public partial class frmDbEdit : Form
     {
-        private clsfnDb m_db { get; set; }
-        private frmControlPanel m_frmCtrl { get; set; }
+        private clsfnDb m_db { get; init; }
+        private frmControlPanel m_frmCtrl { get; init; }
 
         private clsSqlite m_sqlDb { get { return m_frmCtrl.m_dbMgr.m_sqlConn; } }
 
@@ -49,15 +49,13 @@ namespace Alien
                 case enDatabase.MySQL:
                     textBox3.Enabled = true;
 
-                    if (string.IsNullOrEmpty(textBox2.Text))
-                    {
-                        textBox2.Text = "root";
-
-                    }
+                    textBox3.Text = string.IsNullOrEmpty(textBox3.Text) ? "root" : textBox3.Text;
 
                     break;
                 case enDatabase.MySQLi:
                     textBox3.Enabled = true;
+
+                    textBox3.Text = string.IsNullOrEmpty(textBox3.Text) ? "root" : textBox3.Text;
 
                     break;
                 case enDatabase.Access:
@@ -74,9 +72,20 @@ namespace Alien
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            
+            var config = new clsfnDb.stDbConfig()
+            {
+                szSource = textBox2.Text,
+                szUsername = textBox3.Text,
+                szPassword = textBox4.Text,
+            };
+
+            bool bRet = await m_db.fnDbTest(config);
+            if (bRet)
+                MessageBox.Show("Connect test successfully.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+                MessageBox.Show("Connect testing is failed.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -86,7 +95,30 @@ namespace Alien
 
         private void button2_Click(object sender, EventArgs e)
         {
+            var config = new clsfnDb.stDbConfig()
+            {
+                szConnString = string.Empty,
 
+                enDbType = (enDatabase)Enum.Parse(typeof(enDatabase), comboBox1.Text),
+                szID = Guid.NewGuid().ToString(),
+                szSource = textBox2.Text,
+                szUsername = textBox3.Text,
+                szPassword = textBox4.Text,
+
+                dtCreationDate = DateTime.Now,
+                dtLastUsed = DateTime.Now,
+
+            };
+
+            if (m_db.fnbSaveDatabase(config))
+            {
+                m_frmCtrl.fnDbInit();
+                MessageBox.Show("Database config is saved.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Save config failed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

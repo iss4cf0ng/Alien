@@ -13,7 +13,7 @@ namespace Alien
 
     #region Enume
 
-    public enum Language
+    public enum enLanguage
     {
         PHP,
         ASP,
@@ -27,7 +27,7 @@ namespace Alien
         Python,
     }
 
-    public enum PayloadType
+    public enum enPayloadType
     {
         OneShell,
         Crypto,
@@ -60,9 +60,9 @@ namespace Alien
 
         public string szGroupName;
 
-        public Language language;
+        public enLanguage language;
         public string szMethod;
-        public PayloadType payloadType;
+        public enPayloadType payloadType;
 
         public string szEncoding;
 

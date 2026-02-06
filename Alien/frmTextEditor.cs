@@ -19,6 +19,12 @@ namespace Alien
             InitializeComponent();
         }
 
+        public class clsTabColor
+        {
+            public Color BackColor { get; set; }
+            public Color ForeColor { get; set; }
+        }
+
         #region Tool
 
         (TabPage page, TextEditorControlEx editorEx, TextBox tbPath, TextBox tbSearch) fnGetTabControl(TabPage page = null)
@@ -87,6 +93,10 @@ namespace Alien
             frmControlPanel f = (frmControlPanel)ParentForm;
             foreach (TabPage page in tabControl1.TabPages)
                 tabControl1.TabPages.Remove(page);
+
+            tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl1.Padding = new Point(18, 5);
         }
 
         private void frmTextEditor_Load(object sender, EventArgs e)
@@ -136,6 +146,75 @@ namespace Alien
                         }
 
                         break;
+                }
+            }
+        }
+
+        private void tabControl1_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            TabControl tab = (TabControl)sender;
+            if (tab == null)
+                return;
+
+            TabPage page = tab.TabPages[e.Index];
+            Rectangle rect = tab.GetTabRect(e.Index);
+
+            bool bIsSelected = e.Index == tab.SelectedIndex;
+
+            Color backColor = bIsSelected ? Color.FromArgb(45, 45, 48) : Color.FromArgb(60, 60, 60);
+            Color foreColor = bIsSelected ? Color.White : Color.LightGray;
+
+            if (page.Tag is clsTabColor tc)
+            {
+                backColor = tc.BackColor;
+                ForeColor = tc.ForeColor;
+            }
+
+            using (SolidBrush bg = new SolidBrush(backColor))
+                e.Graphics.FillRectangle(bg, rect);
+
+            TextRenderer.DrawText(
+                e.Graphics,
+                page.Text,
+                page.Font,
+                new Rectangle(rect.X + 6, rect.Y + 4, rect.Width - 20, rect.Height),
+                foreColor,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter
+            );
+
+            Rectangle closeRect = new Rectangle(
+                rect.Right - 15,
+                rect.Top + (rect.Height - 10) / 2,
+                10,
+                10
+            );
+
+            using (Pen pen = new Pen(Color.Red, 2))
+            {
+                e.Graphics.DrawLine(pen, closeRect.Left, closeRect.Top, closeRect.Right, closeRect.Bottom);
+                e.Graphics.DrawLine(pen, closeRect.Right, closeRect.Top, closeRect.Left, closeRect.Bottom);
+            }
+        }
+
+        private void tabControl1_MouseDown(object sender, MouseEventArgs e)
+        {
+            TabControl tab = (TabControl)sender;
+
+            for (int i = 0; i < tab.TabPages.Count; i++)
+            {
+                Rectangle rect = tab.GetTabRect(i);
+
+                Rectangle closeRect = new Rectangle(
+                    rect.Right - 15,
+                    rect.Top + (rect.Height - 10) / 2,
+                    10,
+                    10
+                );
+
+                if (closeRect.Contains(e.Location))
+                {
+                    tab.TabPages.RemoveAt(i);
+                    return;
                 }
             }
         }

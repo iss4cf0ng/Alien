@@ -8,5 +8,6 @@ namespace Alien
 {
     internal class clsCrypto
     {
+
     }
 }

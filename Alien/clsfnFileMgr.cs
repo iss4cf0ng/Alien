@@ -233,24 +233,31 @@ namespace Alien
             }
         }
 
-        public async Task<bool> fnbFileUpload(string szSrcFilePath, string szDstFilePath, Action fnCallback = null)
+        public async Task<bool> fnbFileUpload(string szSrcFilePath, string szDstFilePath, int nChunkSize, Action actOnChunkSent = null, Action fnCallback = null)
         {
             try
             {
                 using (FileStream fs = File.OpenRead(szSrcFilePath))
                 {
-                    int nChunkSize = 1024 * 5;
                     byte[] abBuffer = new byte[nChunkSize];
                     int nRead = 0;
 
                     while ((nRead = fs.Read(abBuffer, 0, abBuffer.Length)) > 0)
                     {
-                        string szResp = await m_web.fnszSendPayload("file_uf", new string[]
+                        string szResp = await m_web.fnszSendPayload("file_upload", new string[]
                         {
-                        szDstFilePath, //Destination file path.
-                        nRead.ToString(), //File object seek offset.
-                        Convert.ToBase64String(abBuffer), //File bytes in base64
+                            szDstFilePath, //Destination file path.
+                            nRead.ToString(), //File object seek offset.
+                            Convert.ToBase64String(abBuffer, 0, nRead), //File bytes in base64
                         });
+
+                        if (!string.Equals(szResp, "1"))
+                            throw new Exception("Send file chunk error.");
+
+                        if (actOnChunkSent != null)
+                            actOnChunkSent();
+
+                        await Task.Delay(10);
                     }
 
                     if (fnCallback != null)
@@ -266,29 +273,42 @@ namespace Alien
             }
         }
 
-        public async Task<bool> fnbFileDownload(string szRemoteFilePath, string szLocalFilePath, Action fnCallback = null)
+        public async Task<bool> fnbFileDownload(string szRemoteFilePath, string szLocalFilePath, int nChunkSize, Action actOnChunkRecvived, Action fnCallback = null)
         {
             try
             {
                 using (FileStream fs = File.OpenWrite(szLocalFilePath))
                 {
-                    int nChunkSize = 1024 * 5;
-                    byte[] abBuffer = new byte[nChunkSize];
                     int nOffset = 0;
                     string szResp = string.Empty;
 
+                    int nCode = 0;
+                    string szMsg = string.Empty;
+
                     do
                     {
-                        szResp = await m_web.fnszSendPayload("file_df", new string[]
+                        szResp = await m_web.fnszSendPayload("file_download", new string[]
                         {
                             szRemoteFilePath,
                             nChunkSize.ToString(),
                             nOffset.ToString(),
                         });
 
-                        nOffset++;
+                        string[] s = szResp.Split('|');
+                        nCode = int.Parse(s[0]);
+                        szMsg = s[1];
+
+                        if (nCode == 0)
+                            throw new Exception(szMsg);
+                        else if (nCode == 2)
+                            break;
+
+                        byte[] abBuffer = Convert.FromBase64String(szMsg);
+                        fs.Write(abBuffer, 0, abBuffer.Length);
+
+                        nOffset += nChunkSize;
                     }
-                    while (szResp.StartsWith("ERROR://") || szResp == "-1");
+                    while (nCode == 1);
 
                     if (fnCallback != null)
                         fnCallback();
@@ -299,6 +319,48 @@ namespace Alien
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "fnbFileDownload", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        public async Task<bool> fnbDelete(string szDestEntry)
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("file_delete", new string[]
+                {
+                    szDestEntry,
+                });
+
+                if (!string.Equals(szResp, "1"))
+                    throw new Exception("Delete file failed: " + szDestEntry);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "fnbDelete", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        public async Task<bool> fnbWGET(string szUrl)
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("file_wget", new string[]
+                {
+                    szUrl,
+                });
+
+                if (!string.Equals(szResp, "1"))
+                    throw new Exception("WGET failed.");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "fnbWGET", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

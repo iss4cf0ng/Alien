@@ -48,7 +48,7 @@ namespace Alien
             }
 
             //Controls init
-            foreach (string szName in Enum.GetNames(typeof(Language)))
+            foreach (string szName in Enum.GetNames(typeof(enLanguage)))
                 comboBox1.Items.Add(szName);
 
             if (comboBox1.Items.Count > 0)
@@ -62,7 +62,8 @@ namespace Alien
             foreach (string szName in m_sqlConn.m_lsGroupName)
                 comboBox6.Items.Add(szName);
 
-            comboBox6.SelectedIndex = 0;
+            if (comboBox6.Items.Count > 0)
+                comboBox6.SelectedIndex = 0;
 
             string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper");
             if (Directory.Exists(szTamperDirPath))
@@ -118,9 +119,9 @@ namespace Alien
             config.szUrl = textBox1.Text;
             config.szPassword = textBox2.Text;
             config.szEncoding = comboBox5.Text;
-            config.language = (Language)Enum.Parse(typeof(Language), comboBox1.Text);
+            config.language = (enLanguage)Enum.Parse(typeof(enLanguage), comboBox1.Text);
             config.szMethod = comboBox4.Text;
-            config.payloadType = (PayloadType)Enum.Parse(typeof(PayloadType), comboBox3.Text);
+            config.payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), comboBox3.Text);
 
             if (m_sqlConn.SaveShell(config))
             {

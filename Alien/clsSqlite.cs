@@ -143,8 +143,8 @@ namespace Alien
                 szUrl = dr["URL"].ToString(),
                 szPassword = dr["Password"].ToString(),
                 szEncoding = dr["Encoding"].ToString(),
-                language = (Language)Enum.Parse(typeof(Language), dr["Language"].ToString()),
-                payloadType = (PayloadType)Enum.Parse(typeof(PayloadType), dr["Type"].ToString()),
+                language = (enLanguage)Enum.Parse(typeof(enLanguage), dr["Language"].ToString()),
+                payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), dr["Type"].ToString()),
                 szMethod = dr["Method"].ToString(),
                 dtCreateDate = DateTime.Parse(dr["CreateDate"].ToString()),
                 dtLastModified = DateTime.Parse(dr["LastModified"].ToString()),
@@ -308,6 +308,11 @@ namespace Alien
             }
 
             return lsConfig;
+        }
+
+        public void fnAddGroup(string szGroupName)
+        {
+            
         }
 
         public void fnDeleteGroup(string szGroupName)

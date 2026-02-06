@@ -65,7 +65,9 @@
             tabControl1.SelectedIndex = 0;
             tabControl1.Size = new Size(845, 387);
             tabControl1.TabIndex = 2;
+            tabControl1.DrawItem += tabControl1_DrawItem;
             tabControl1.KeyDown += tabControl1_KeyDown;
+            tabControl1.MouseDown += tabControl1_MouseDown;
             // 
             // tabPage1
             // 
@@ -80,11 +82,11 @@
             // 
             // tabPage2
             // 
-            tabPage2.Location = new Point(4, 28);
+            tabPage2.Location = new Point(4, 24);
             tabPage2.Margin = new Padding(4);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(4);
-            tabPage2.Size = new Size(837, 355);
+            tabPage2.Size = new Size(837, 359);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "tabPage2";
             tabPage2.UseVisualStyleBackColor = true;

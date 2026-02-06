@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -143,6 +144,8 @@ namespace Alien
 
             fnFileAddPathToTreeView(asDirPath[1..], aNode[0]);
         }
+
+        async void fnFileMgrRefresh() => Invoke(new Action(() => fnFileScandir(m_fileMgr.m_szCurrentPath)));
 
         async void fnFileScandir(string szDir)
         {
@@ -290,41 +293,125 @@ namespace Alien
             treeView3.SelectedNode = node;
         }
 
-        public async Task<Dictionary<string, bool>> fnFileUpload(List<string> lsSrcFilePath)
+        public async Task<Dictionary<string, bool>> fnFileUpload(List<string> lsSrcFilePath, int nThread = 3, int nChunkSize = 5 * 1024, Action fnOnCallback = null)
         {
+            tabControl6.SelectedIndex = 1;
+
             string szCurrentDir = m_fileMgr.m_szCurrentPath;
             Dictionary<string, bool> dicState = new Dictionary<string, bool>();
+            Dictionary<string, TreeNode> dicNode = new Dictionary<string, TreeNode>();
+
+            TreeNode nodeUpload = treeView4.Nodes[0];
 
             foreach (string szSrcFilePath in lsSrcFilePath)
             {
-                string szFileName = Path.GetFileName(szSrcFilePath);
-                string szDstFilePath = Path.Combine(szCurrentDir, szFileName);
+                long nFileSize = -1;
 
-                bool bRet = await m_fileMgr.fnbFileUpload(szSrcFilePath, szDstFilePath);
-                dicState[szFileName] = bRet;
+                if (nFileSize == -1)
+                {
+                    FileInfo info = new FileInfo(szSrcFilePath);
+                    nFileSize = info.Length;
+                }
+
+                string szFileName = Path.GetFileName(szSrcFilePath);
+                TreeNode node = new TreeNode($"{szFileName}[0%|0/{nFileSize}]");
+                node.Tag = 0;
+                nodeUpload.Nodes.Add(node);
+
+                dicNode.Add(szSrcFilePath, node);
+
+                nodeUpload.Expand();
+            }
+
+            List<Task> lsTask = new List<Task>();
+            using (SemaphoreSlim semaphore = new SemaphoreSlim(nThread))
+            {
+                foreach (string szSrcFilePath in lsSrcFilePath)
+                {
+                    long nFileSize = -1;
+
+                    string szFileName = Path.GetFileName(szSrcFilePath);
+                    string szDstFilePath = Path.Combine(szCurrentDir, szFileName).Replace("\\", "/");
+
+                    if (nFileSize == -1)
+                    {
+                        FileInfo info = new FileInfo(szSrcFilePath);
+                        nFileSize = info.Length;
+                    }
+
+                    long nProgress = 0;
+
+                    TreeNode node = dicNode[szSrcFilePath];
+                    node.Tag = nProgress;
+
+                    Action act = () =>
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            nProgress = (long)node.Tag;
+                            nProgress += nChunkSize;
+                            node.Tag = nProgress;
+
+                            string szProgress = (((decimal)nProgress / nFileSize) * 100).ToString("0.00");
+                            node.Text = $"{szFileName}[{szProgress}%|{nProgress}/{nFileSize}]";
+
+                            if (nProgress >= nFileSize)
+                            {
+                                nodeUpload.Nodes.Remove(node);
+                            }
+                        }));
+                    };
+
+                    lsTask.Add(Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync();
+
+                        try
+                        {
+                            bool bRet = await m_fileMgr.fnbFileUpload(szSrcFilePath, szDstFilePath, nChunkSize, act, fnOnCallback);
+                            dicState[szFileName] = bRet;
+
+                            Invoke(new Action(() =>
+                            {
+                                if (dicNode.ContainsKey(szSrcFilePath))
+                                    dicNode.Remove(szSrcFilePath);
+                            }));
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }));
+
+                    await Task.WhenAll(lsTask);
+                }
             }
 
             return dicState;
         }
 
-        public async Task<Dictionary<string, bool>> fnFileDownload(List<string> lsRemoteFilePath)
+        public async Task<(Dictionary<string, bool> dicState, string szSaveDirPath)> fnFileDownload(List<string> lsRemoteFilePath, int nThread = 3, int nChunkSize = 5 * 1024, Action fnCallback = null)
         {
-            string szLocalSaveDirPath = Path.Combine(m_victim.m_szShellDomain, "Downloads");
+            string szLocalSaveDirPath = Path.Combine("Victim", m_victim.m_szShellDomain, "Downloads");
             if (!Directory.Exists(szLocalSaveDirPath))
                 Directory.CreateDirectory(szLocalSaveDirPath);
 
             Dictionary<string, bool> dicState = new Dictionary<string, bool>();
+
+            lsRemoteFilePath = lsRemoteFilePath.Select(x => x.Replace("\\", "/")).ToList();
+
+            long nFileSize = -1;
 
             foreach (string szRemoteFilePath in lsRemoteFilePath)
             {
                 string szFileName = Path.GetFileName(szRemoteFilePath);
                 string szLocalFilePath = Path.Combine(szLocalSaveDirPath, szFileName);
 
-                bool bRet = await m_fileMgr.fnbFileDownload(szRemoteFilePath, szLocalFilePath);
+                bool bRet = await m_fileMgr.fnbFileDownload(szRemoteFilePath, szLocalFilePath, nChunkSize, null);
                 dicState[szRemoteFilePath] = bRet;
             }
 
-            return dicState;
+            return (dicState, szLocalSaveDirPath);
         }
 
         public async void fnFileNewFolder()
@@ -348,6 +435,14 @@ namespace Alien
             string szFilePath = Path.Combine(m_fileMgr.m_szCurrentPath, szFileName).Replace("\\", "/");
             f.fnShowContent(szFilePath, string.Empty);
         }
+
+        public async void fnFileDelete(string szDstEntry)
+        {
+            bool bRet = await m_fileMgr.fnbDelete(szDstEntry);
+            if (bRet)
+                fnFileMgrRefresh();
+        }
+        public async void fnFileDelete(clsfnFileMgr.stEntry entry) => fnFileDelete((entry.bIsDirectory ? entry.szEntryPath + "/" : entry.szEntryPath).Replace("\\", "/"));
 
         #endregion
         #region Shell
@@ -385,7 +480,7 @@ namespace Alien
         #endregion
         #region Database
 
-        void fnDbInit()
+        public void fnDbInit()
         {
             //Load database from *.sqlite file.
             treeView2.Nodes.Clear();
@@ -469,6 +564,9 @@ namespace Alien
                 //Shell
                 m_rShell.m_szCurrentDir = fileInit.szCurrentDir;
                 fnShellInit();
+
+                //Database
+                fnDbInit();
             }
             else
             {
@@ -669,6 +767,99 @@ namespace Alien
             frmDbEdit f = new frmDbEdit(m_dbMgr, this);
 
             f.ShowDialog();
+        }
+
+        private async void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            TreeNode node = treeView2.SelectedNode;
+            if (node.Parent == null)
+            {
+                //Show tables
+                var config = m_dbMgr.m_stDbConfig[node.Text];
+                string szTables = await m_dbMgr.fnSqlExec(config, "SHOW TABLES;");
+                MessageBox.Show(szTables);
+            }
+        }
+
+        //Upload
+        private void toolStripMenuItem8_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Multiselect = true;
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                List<string> lsSrcFiles = ofd.FileNames.ToList();
+
+                fnFileUpload(lsSrcFiles, 3, 1024 * 10, fnFileMgrRefresh);
+            }
+        }
+
+        //Download
+        private async void toolStripMenuItem9_Click(object sender, EventArgs e)
+        {
+            List<clsfnFileMgr.stEntry> lsEntry = listView2.SelectedItems.Cast<ListViewItem>().Select(x => fnFileGetItemTag(x)).ToList();
+            var lsDir = lsEntry.Where(x => x.bIsDirectory).Select(x => x.szEntryPath).ToList();
+            var lsFile = lsEntry.Where(x => !x.bIsDirectory).Select(x => x.szEntryPath).ToList();
+
+            var result = await fnFileDownload(lsFile);
+            var dicState = result.dicState;
+            var szSaveDirPath = result.szSaveDirPath;
+
+            if (dicState.Values.Any(x => x == true))
+            {
+                DialogResult dr = MessageBox.Show(
+                    "Downloading task is completed, do you want to open the save folder?",
+                    "Finished",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (dr == DialogResult.Yes)
+                {
+                    Process.Start("explorer.exe", szSaveDirPath);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Failed", "Download File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //WGET
+        private void toolStripMenuItem10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Parent
+        private void toolStripButton5_Click(object sender, EventArgs e)
+        {
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, m_fileMgr.m_szCurrentPath);
+            if (node == null || node.Parent == null)
+                return;
+
+            treeView3.SelectedNode = node.Parent;
+        }
+
+        //Home
+        private void toolStripButton6_Click(object sender, EventArgs e)
+        {
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, m_fileMgr.m_szHomePath);
+            if (node == null)
+                return;
+
+            treeView3.SelectedNode = node;
+        }
+
+        //Delete
+        private void toolStripMenuItem17_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in listView2.SelectedItems)
+            {
+                var entry = fnFileGetItemTag(item);
+                fnFileDelete(entry);
+            }
         }
     }
 }

