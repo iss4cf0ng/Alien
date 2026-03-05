@@ -83,7 +83,7 @@ namespace Alien
         }
         private clsfnFileMgr.stEntry fnFileGetItemTag(ListViewItem item) => (clsfnFileMgr.stEntry)item.Tag;
 
-        private T fnFindForm<T>() where T : Form
+        private T? fnFindForm<T>() where T : Form
         {
             foreach (Form f in Application.OpenForms)
             {
@@ -227,7 +227,7 @@ namespace Alien
                 return;
             }
 
-            frmFileImage f = fnFindForm<frmFileImage>();
+            frmFileImage? f = fnFindForm<frmFileImage>();
             if (f == null)
             {
                 f = new frmFileImage(lsImagePath.Count);
@@ -256,7 +256,7 @@ namespace Alien
 
         async void fnFileRead(string szFilePath)
         {
-            frmTextEditor f = fnFindForm<frmTextEditor>();
+            frmTextEditor? f = fnFindForm<frmTextEditor>();
             if (f == null)
             {
                 f = new frmTextEditor();
@@ -421,7 +421,7 @@ namespace Alien
 
         public void fnFileNewFile()
         {
-            frmTextEditor f = fnFindForm<frmTextEditor>();
+            frmTextEditor? f = fnFindForm<frmTextEditor>();
             if (null == f)
             {
                 f = new frmTextEditor();
@@ -442,7 +442,7 @@ namespace Alien
             if (bRet)
                 fnFileMgrRefresh();
         }
-        public async void fnFileDelete(clsfnFileMgr.stEntry entry) => fnFileDelete((entry.bIsDirectory ? entry.szEntryPath + "/" : entry.szEntryPath).Replace("\\", "/"));
+        public void fnFileDelete(clsfnFileMgr.stEntry entry) => fnFileDelete((entry.bIsDirectory ? entry.szEntryPath + "/" : entry.szEntryPath).Replace("\\", "/"));
 
         #endregion
         #region Shell
@@ -860,6 +860,12 @@ namespace Alien
                 var entry = fnFileGetItemTag(item);
                 fnFileDelete(entry);
             }
+        }
+
+        //Find
+        private void toolStripButton4_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }
