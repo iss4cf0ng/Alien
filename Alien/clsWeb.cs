@@ -12,6 +12,7 @@ namespace Alien
         public clsVictim m_victim { get; set; }
         public HttpClient m_clnt { get; set; }
 
+
         private Dictionary<enLanguage, string> m_dicSuffix = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "php" },
