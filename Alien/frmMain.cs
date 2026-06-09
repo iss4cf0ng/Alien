@@ -4,6 +4,10 @@ namespace Alien
 {
     public partial class frmMain : Form
     {
+        private const string m_szName = "Alien";
+        private const string m_szVersion = "v5.0.0";
+        private const string m_szAuthor = "iss4cf0ng/ISSAC";
+
         public clsSqlite m_sqlConn;
         private string[] m_generalGroup = 
         {
@@ -72,6 +76,14 @@ namespace Alien
             }
 
             toolStripStatusLabel1.Text = $"Shell[{listView1.Items.Count}]";
+        }
+
+        void fnUpdateState()
+        {
+            treeView1.Refresh();
+            listView1.Refresh();
+
+            Text = $"{m_szName} v{m_szVersion} by {m_szAuthor}";
         }
 
         void fnSetup()
