@@ -9,7 +9,7 @@ namespace Alien
         private const string m_szAuthor = "iss4cf0ng/ISSAC";
 
         public clsSqlite m_sqlConn;
-        private string[] m_generalGroup = 
+        private string[] m_generalGroup =
         {
             "_All",
             "_Orphan",
@@ -75,7 +75,7 @@ namespace Alien
                 listView1.Items.Add(item);
             }
 
-            toolStripStatusLabel1.Text = $"Shell[{listView1.Items.Count}]";
+            fnUpdateState();
         }
 
         void fnUpdateState()
@@ -83,7 +83,9 @@ namespace Alien
             treeView1.Refresh();
             listView1.Refresh();
 
-            Text = $"{m_szName} v{m_szVersion} by {m_szAuthor}";
+            Text = $"{m_szName} {m_szVersion} by {m_szAuthor} | Selected[{listView1.SelectedItems.Count}]";
+            toolStripStatusLabel1.Text = $"Shell[{listView1.Items.Count}]";
+            toolStripStatusLabel3.Text = "iss4cf0ng/ISSAC";
         }
 
         void fnSetup()
@@ -264,6 +266,11 @@ namespace Alien
             f.m_sqlConn = m_sqlConn;
 
             f.ShowDialog();
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            fnUpdateState();
         }
     }
 }

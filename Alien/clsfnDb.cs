@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    public class clsfnDb
+    public class clsfnDb : clsfnBase
     {
         private clsWeb m_web { get; set; }
 

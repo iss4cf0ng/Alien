@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    public class clsfnFileMgr
+    public class clsfnFileMgr : clsfnBase
     {
         private clsWeb m_web { get; set; }
         public string m_szFolderPath { get; set; }

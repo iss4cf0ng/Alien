@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    public class clsfnShell
+    public class clsfnShell : clsfnBase
     {
         private clsWeb m_web { get; set; }
         public string m_szCurrentDir { get; set; }

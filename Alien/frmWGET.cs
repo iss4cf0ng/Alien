@@ -17,9 +17,14 @@ namespace Alien
             InitializeComponent();
         }
 
-        private void frmWGET_Load(object sender, EventArgs e)
+        void fnSetup()
         {
 
+        }
+
+        private void frmWGET_Load(object sender, EventArgs e)
+        {
+            fnSetup();
         }
     }
 }

@@ -30,8 +30,8 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
-            TreeNode treeNode1 = new TreeNode("Upload");
-            TreeNode treeNode2 = new TreeNode("Download");
+            TreeNode treeNode5 = new TreeNode("Upload");
+            TreeNode treeNode6 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -121,6 +121,11 @@
             tabPage12 = new TabPage();
             toolStrip8 = new ToolStrip();
             fileImageList = new ImageList(components);
+            tabPage15 = new TabPage();
+            tabPage16 = new TabPage();
+            tabControl7 = new TabControl();
+            tabPage17 = new TabPage();
+            tabPage18 = new TabPage();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -164,6 +169,8 @@
             tabControl5.SuspendLayout();
             tabPage11.SuspendLayout();
             tabPage12.SuspendLayout();
+            tabPage16.SuspendLayout();
+            tabControl7.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl1
@@ -173,6 +180,8 @@
             tabControl1.Controls.Add(tabPage3);
             tabControl1.Controls.Add(tabPage4);
             tabControl1.Controls.Add(tabPage5);
+            tabControl1.Controls.Add(tabPage15);
+            tabControl1.Controls.Add(tabPage16);
             tabControl1.Dock = DockStyle.Fill;
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
@@ -323,7 +332,7 @@
             tabPage14.Location = new Point(4, 24);
             tabPage14.Name = "tabPage14";
             tabPage14.Padding = new Padding(3);
-            tabPage14.Size = new Size(251, 375);
+            tabPage14.Size = new Size(251, 371);
             tabPage14.TabIndex = 1;
             tabPage14.Text = "Task";
             tabPage14.UseVisualStyleBackColor = true;
@@ -333,12 +342,12 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode1.Name = "Node0";
-            treeNode1.Text = "Upload";
-            treeNode2.Name = "Node1";
-            treeNode2.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
-            treeView4.Size = new Size(245, 369);
+            treeNode5.Name = "Node0";
+            treeNode5.Text = "Upload";
+            treeNode6.Name = "Node1";
+            treeNode6.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode5, treeNode6 });
+            treeView4.Size = new Size(245, 365);
             treeView4.TabIndex = 0;
             // 
             // listView2
@@ -627,10 +636,10 @@
             tabPage7.Controls.Add(splitContainer2);
             tabPage7.Controls.Add(statusStrip3);
             tabPage7.Controls.Add(toolStrip3);
-            tabPage7.Location = new Point(4, 24);
+            tabPage7.Location = new Point(4, 28);
             tabPage7.Name = "tabPage7";
             tabPage7.Padding = new Padding(3);
-            tabPage7.Size = new Size(990, 490);
+            tabPage7.Size = new Size(990, 482);
             tabPage7.TabIndex = 1;
             tabPage7.Text = "Find";
             tabPage7.UseVisualStyleBackColor = true;
@@ -648,7 +657,7 @@
             // splitContainer2.Panel2
             // 
             splitContainer2.Panel2.Controls.Add(listView1);
-            splitContainer2.Size = new Size(984, 436);
+            splitContainer2.Size = new Size(984, 428);
             splitContainer2.SplitterDistance = 284;
             splitContainer2.TabIndex = 2;
             // 
@@ -657,7 +666,7 @@
             treeView1.Dock = DockStyle.Fill;
             treeView1.Location = new Point(0, 0);
             treeView1.Name = "treeView1";
-            treeView1.Size = new Size(284, 436);
+            treeView1.Size = new Size(284, 428);
             treeView1.TabIndex = 0;
             // 
             // listView1
@@ -667,7 +676,7 @@
             listView1.FullRowSelect = true;
             listView1.Location = new Point(0, 0);
             listView1.Name = "listView1";
-            listView1.Size = new Size(696, 436);
+            listView1.Size = new Size(696, 428);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -689,7 +698,7 @@
             // 
             // statusStrip3
             // 
-            statusStrip3.Location = new Point(3, 465);
+            statusStrip3.Location = new Point(3, 457);
             statusStrip3.Name = "statusStrip3";
             statusStrip3.Size = new Size(984, 22);
             statusStrip3.TabIndex = 1;
@@ -764,10 +773,10 @@
             // 
             // tabPage9
             // 
-            tabPage9.Location = new Point(4, 24);
+            tabPage9.Location = new Point(4, 28);
             tabPage9.Name = "tabPage9";
             tabPage9.Padding = new Padding(3);
-            tabPage9.Size = new Size(996, 492);
+            tabPage9.Size = new Size(996, 488);
             tabPage9.TabIndex = 1;
             tabPage9.Text = "Virtual Shell";
             tabPage9.UseVisualStyleBackColor = true;
@@ -969,10 +978,10 @@
             // tabPage12
             // 
             tabPage12.Controls.Add(toolStrip8);
-            tabPage12.Location = new Point(4, 24);
+            tabPage12.Location = new Point(4, 28);
             tabPage12.Name = "tabPage12";
             tabPage12.Padding = new Padding(3);
-            tabPage12.Size = new Size(541, 492);
+            tabPage12.Size = new Size(541, 488);
             tabPage12.TabIndex = 1;
             tabPage12.Text = "POST";
             tabPage12.UseVisualStyleBackColor = true;
@@ -992,6 +1001,57 @@
             fileImageList.TransparentColor = Color.Transparent;
             fileImageList.Images.SetKeyName(0, "folder");
             fileImageList.Images.SetKeyName(1, "harddrive");
+            // 
+            // tabPage15
+            // 
+            tabPage15.Location = new Point(4, 28);
+            tabPage15.Name = "tabPage15";
+            tabPage15.Size = new Size(1004, 520);
+            tabPage15.TabIndex = 5;
+            tabPage15.Text = "Linux";
+            tabPage15.UseVisualStyleBackColor = true;
+            // 
+            // tabPage16
+            // 
+            tabPage16.Controls.Add(tabControl7);
+            tabPage16.Location = new Point(4, 28);
+            tabPage16.Name = "tabPage16";
+            tabPage16.Size = new Size(1004, 520);
+            tabPage16.TabIndex = 6;
+            tabPage16.Text = "Windows";
+            tabPage16.UseVisualStyleBackColor = true;
+            // 
+            // tabControl7
+            // 
+            tabControl7.Controls.Add(tabPage17);
+            tabControl7.Controls.Add(tabPage18);
+            tabControl7.Dock = DockStyle.Fill;
+            tabControl7.Location = new Point(0, 0);
+            tabControl7.Name = "tabControl7";
+            tabControl7.SelectedIndex = 0;
+            tabControl7.Size = new Size(1004, 520);
+            tabControl7.SizeMode = TabSizeMode.Fixed;
+            tabControl7.TabIndex = 0;
+            // 
+            // tabPage17
+            // 
+            tabPage17.Location = new Point(4, 28);
+            tabPage17.Name = "tabPage17";
+            tabPage17.Padding = new Padding(3);
+            tabPage17.Size = new Size(996, 488);
+            tabPage17.TabIndex = 0;
+            tabPage17.Text = "Users";
+            tabPage17.UseVisualStyleBackColor = true;
+            // 
+            // tabPage18
+            // 
+            tabPage18.Location = new Point(4, 28);
+            tabPage18.Name = "tabPage18";
+            tabPage18.Padding = new Padding(3);
+            tabPage18.Size = new Size(996, 488);
+            tabPage18.TabIndex = 1;
+            tabPage18.Text = "Registry";
+            tabPage18.UseVisualStyleBackColor = true;
             // 
             // frmControlPanel
             // 
@@ -1067,6 +1127,8 @@
             tabPage11.PerformLayout();
             tabPage12.ResumeLayout(false);
             tabPage12.PerformLayout();
+            tabPage16.ResumeLayout(false);
+            tabControl7.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -1162,5 +1224,10 @@
         private ColumnHeader columnHeader8;
         private ColumnHeader columnHeader9;
         private ToolStripButton toolStripButton4;
+        private TabPage tabPage15;
+        private TabPage tabPage16;
+        private TabControl tabControl7;
+        private TabPage tabPage17;
+        private TabPage tabPage18;
     }
 }
