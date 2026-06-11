@@ -117,4 +117,4 @@ def send(cmd, data=None):
 
 print(send("ping"))
 print(send("echo", "hello world"))
-print(send("eval", "phpinfo();"))
+print(send("eval", "echo('x');"))
