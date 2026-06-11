@@ -1,0 +1,33 @@
+GET /webshell/crypto/backdoor.php HTTP/1.1
+Host: localhost
+
+HTTP/1.1 200 OK
+Date: Thu, 11 Jun 2026 09:01:57 GMT
+Server: Apache/2.4.56 (Win64) OpenSSL/1.1.1t PHP/8.2.4
+X-Powered-By: PHP/8.2.4
+Content-Length: 1487
+Content-Type: application/json
+
+{"signPubKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmgQIR5v5mS53\/0N52OjI\n8VHjp45rsMC\/NRjmzokawnd\/AnjJLBUaAavwIejFBHY2YxDBEPJ0Vc5y\/Y40\/hbk\n1Q7NTpi61jrSUkf+nW7BZjopkZiRciQR+1dKtZgnfr0zm5WuQlSi5r92EiC+wlRM\norFq0gzhvvPFuNRazFDYVE30ChOyCxH\/7\/P+LPlxewiJ3paOJM7qRF8kHoAGk+wI\nT2LvaVtN+W6Ct5bxMw1xi8bjmLnqA9ICmJvPKxyjHpqOpxcTbUINTDAeZDAaIaOA\n+r3rPkH9wUcR3dy+q68k0MPR+84RI7ZWHOsIs96H4C74vt2SusSPSM2f8wTxBDMA\nlQIDAQAB\n-----END PUBLIC KEY-----\n","serverEcdhPub":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtSO5v2ogejmdJf0bmO5tocG+Oe89\nwhRcHKZTWKW6BFzVGTU+bD8InpiUt5CXp9FPI\/jeKk8z2XODF+WAHf0zeA==\n-----END PUBLIC KEY-----","signature":"idNPvLphluEd2KmWAF2EgkQPSoRXr8qRUOMiksxDVC2RuC+g3nUhj8\/grQKSJr2rVIqeAKgAI\/QDtLBfHtiKf2G2LudzNiFuvTcgUXh2MEfDlS4B1P98Xclu8WnnFXoz+SllCRYNLQlNHdNEJIhMC7NKL0MMof4SC4mIRIpqzOWPuakGJUc1YpwbfzZe5o0JPzlMqJiyCjTdyOOkY0bn5UubKbOa2eutR\/Qnv6t2Gl8nDQ0WVhQX3TJJ\/WTJ45LJcthdJNTXHiO+KGURVBxAJQrpePMMwNACiosyv0+EcrCfyqvrnnyrguaFFe9MneaUJXupY\/q3zRmQoDz7Yk0O4Q==","handshakeToken":"zkFqoDXWaBL8iyFQJ8wjPoxavK68KMJ6kNMuAshghQTYKRvBCatwE3PX0j7lulD7uk5bqLHrJE-k2Ntcn03PuyT42V1NgVG_jGAQQjCSTL1jBSCMtymvUzFFoJ-gY_PoHMtJqIhefSfUM89hlG0RqZLsBjrCdO6ippok9oAP5FBpsiKIWsXCR-QcUxzMoTobw1lHppNd6ZabG4T5S_9ttxsP3tDSbYmtFRGEyvxnwsS6Fb6CcdSKn_Wd9BUpo9LtP5adMlY-G5ZD_zswX5jlgjos-kdETuU67TYlqhRW4E0HQnkL0I1o0Ea-RJvAzZJHZ5vO7WXHQDYkLwl37PsFB1d9n7JHim2vquabxfPKka19zmJv5RzQn9wuqnzAMxYY7fVbQK-vIXh3oQ0isAEiN_agGRFaYF8E6OA"}GET /webshell/crypto/backdoor.php HTTP/1.1
+Host: localhost
+
+HTTP/1.1 200 OK
+Date: Thu, 11 Jun 2026 09:01:57 GMT
+Server: Apache/2.4.56 (Win64) OpenSSL/1.1.1t PHP/8.2.4
+X-Powered-By: PHP/8.2.4
+Content-Length: 1488
+Content-Type: application/json
+
+{"signPubKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmgQIR5v5mS53\/0N52OjI\n8VHjp45rsMC\/NRjmzokawnd\/AnjJLBUaAavwIejFBHY2YxDBEPJ0Vc5y\/Y40\/hbk\n1Q7NTpi61jrSUkf+nW7BZjopkZiRciQR+1dKtZgnfr0zm5WuQlSi5r92EiC+wlRM\norFq0gzhvvPFuNRazFDYVE30ChOyCxH\/7\/P+LPlxewiJ3paOJM7qRF8kHoAGk+wI\nT2LvaVtN+W6Ct5bxMw1xi8bjmLnqA9ICmJvPKxyjHpqOpxcTbUINTDAeZDAaIaOA\n+r3rPkH9wUcR3dy+q68k0MPR+84RI7ZWHOsIs96H4C74vt2SusSPSM2f8wTxBDMA\nlQIDAQAB\n-----END PUBLIC KEY-----\n","serverEcdhPub":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEC1ephCgNdplGQW2f5pj1bkOu2xMl\nfpVPHf1z7+4bieA9NnkrBQyWB82vyD6z1HWxSPWEYTyVR1\/5tOD65XCvIg==\n-----END PUBLIC KEY-----","signature":"eFCB7r9VWOHBvzF8\/GWsSAmCT616066gMA0HkMDfy4P+14QWv3jbJGsw3SpHXXC\/3+D3BZBdcJFG4miep3pQM0mizW+LyLXF2wtkzV1yYBMLYRiP8vIIDo7Jghj3cbW6KXc8I1y7msiDwzN2oeCQlvNOyOdO44mKHJ4zeBdBqJcSHDe7l5f8Pzdq6kSec1kD0edaTnavnpE56F2AgGNt+4uAXtLfzFvz4lVywgMX4L8a0wOgnFLXXjAbZx0cSThd9GwzQn7JiX8u+G8HUsQEMKy5iUCHi9bmEhni\/bSLmjrY2ioqKuPB3rAeYCDuiihe9bN5DNISi9cx2paUplRJuw==","handshakeToken":"ZZLP8RELcf1BGFfXJB134XXmtALfhcJVywZVNCOHDxGU5dpWKP4EHEBQXksiDypDqdR2U6au-FPM9uD49TezpyfVfkD9KQMYR2aFYNQf5NtkH8byc8hQYzY-BgG3DNKXL5BJ0aLAd-HrHFF4A0aSEXFIld4QT9MClc9RVsp03J17PWwdlGxU1LrX5qCf7E96WiHbD3bhd-tkeTOo3DQU60BIGk580uKqntLregomdY_VWZ8PC0EK4m9TPsHFK-UPRP7gEH99XDtzos6Ff28qlA2UFN9NDLmrrWHQsdQaOEi0psnhQwwND-JqyWxN6ro7ZM_RaqGu37BnS2zGupSySy_2P2PZ0Jm8TpS9vHvAJHAKxNkxd6u_OHtNUyitgmLaNR8vbJ_wEID83a8EEYyM3cMDJb2oSOQvGE31NQ"}POST /webshell/crypto/backdoor.php HTTP/1.1
+Host: localhost
+Content-Type: application/json; charset=utf-8
+Content-Length: 969
+
+{"handshakeToken":"ZZLP8RELcf1BGFfXJB134XXmtALfhcJVywZVNCOHDxGU5dpWKP4EHEBQXksiDypDqdR2U6au-FPM9uD49TezpyfVfkD9KQMYR2aFYNQf5NtkH8byc8hQYzY-BgG3DNKXL5BJ0aLAd-HrHFF4A0aSEXFIld4QT9MClc9RVsp03J17PWwdlGxU1LrX5qCf7E96WiHbD3bhd-tkeTOo3DQU60BIGk580uKqntLregomdY_VWZ8PC0EK4m9TPsHFK-UPRP7gEH99XDtzos6Ff28qlA2UFN9NDLmrrWHQsdQaOEi0psnhQwwND-JqyWxN6ro7ZM_RaqGu37BnS2zGupSySy_2P2PZ0Jm8TpS9vHvAJHAKxNkxd6u_OHtNUyitgmLaNR8vbJ_wEID83a8EEYyM3cMDJb2oSOQvGE31NQ","clientEcdhPub":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHttfiaIerAbZG\u002Bao5L\u002B8ZWJbg/UQ\nknmRGqITY\u002BMGfXyTzoKslNOO7ewx/lYmveN1AkJcBGd38Lny/wQWxbLB4A==\n-----END PUBLIC KEY-----","clientSignPub":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAET3pHUCbvzMLk7T73RL7rY7JE\u002B9aQ\na3/ceLPrHIwpfsFmetCnS0hEUytLT63w7JxLTUqyiZZc\u002BstI//OLOAkNlg==\n-----END PUBLIC KEY-----","clientSig":"l5R25/9I0cvlf6NmNqcDgzOAdcx/TIuTFMJDcA6RXPLLZZzhyRuICGXAEyH2SmXRjj10jobavJITwJYj9S5W/w=="}HTTP/1.1 200 OK
+Date: Thu, 11 Jun 2026 09:01:57 GMT
+Server: Apache/2.4.56 (Win64) OpenSSL/1.1.1t PHP/8.2.4
+X-Powered-By: PHP/8.2.4
+Content-Length: 40
+Content-Type: application/json
+
+{"error":"client authentication failed"}

