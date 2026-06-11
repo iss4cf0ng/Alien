@@ -47,6 +47,10 @@ namespace Alien
 
         #endregion
 
+        /// <summary>
+        /// Load shell from SQLite database and display them in listview.
+        /// </summary>
+        /// <param name="lsConfig"></param>
         void fnLoadShell(List<stShellConfig> lsConfig = null)
         {
             //todo: Dispose all exist clsWeb
@@ -70,7 +74,6 @@ namespace Alien
                 clsWeb web = new clsWeb(victim);
 
                 item.Tag = web;
-
 
                 listView1.Items.Add(item);
             }

