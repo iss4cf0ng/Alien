@@ -26,3 +26,10 @@ Notes of developing Alien webshell management tool.
   - Implemented ASP backdoor
 - 2026-6-12
   - Implemented CFM backdoor
+  - Fixed Upload
+  - Fixed Download
+  - Check available database modules
+    - SQLite
+    - Redis
+    - ODBC
+    - Oracle
