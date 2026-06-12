@@ -14,6 +14,7 @@ namespace Alien
     {
         private clsfnDb m_db { get; init; }
         private frmControlPanel m_frmCtrl { get; init; }
+        private clsfnDb.stDbConfig m_dbConfig { get; set; }
 
         private clsSqlite m_sqlDb { get { return m_frmCtrl.m_dbMgr.m_sqlConn; } }
 
@@ -23,6 +24,15 @@ namespace Alien
 
             m_db = db;
             m_frmCtrl = frmCtrl;
+        }
+
+        public frmDbEdit(clsfnDb db, frmControlPanel frmCtrl, clsfnDb.stDbConfig dbConfig)
+        {
+            InitializeComponent();
+
+            m_db = db;
+            m_frmCtrl = frmCtrl;
+            m_dbConfig = dbConfig;
         }
 
         void fnSetup()

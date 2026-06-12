@@ -298,6 +298,9 @@ namespace Alien
                         nCode = int.Parse(s[0]);
                         szMsg = s[1];
 
+                        if (actOnChunkRecvived != null)
+                            actOnChunkRecvived();
+
                         if (nCode == 0)
                             throw new Exception(szMsg);
                         else if (nCode == 2)

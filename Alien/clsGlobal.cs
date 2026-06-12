@@ -43,10 +43,12 @@ namespace Alien
     {
         DSN,
         MySQL,
-        MySQLi,
         Access,
-        SqlServer,
-        Sqlite,
+        SQLServer,
+        PostgreSQL,
+        SQLite,
+        ODBC,
+        Oracle,
     }
 
     #endregion
