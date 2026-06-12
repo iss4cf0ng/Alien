@@ -74,7 +74,7 @@
             // 
             button1.Location = new Point(16, 245);
             button1.Name = "button1";
-            button1.Size = new Size(184, 63);
+            button1.Size = new Size(184, 51);
             button1.TabIndex = 3;
             button1.Text = "Test";
             button1.UseVisualStyleBackColor = true;
@@ -142,7 +142,7 @@
             // 
             button2.Location = new Point(218, 245);
             button2.Name = "button2";
-            button2.Size = new Size(184, 63);
+            button2.Size = new Size(184, 51);
             button2.TabIndex = 11;
             button2.Text = "Save";
             button2.UseVisualStyleBackColor = true;
@@ -163,7 +163,7 @@
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(415, 318);
+            ClientSize = new Size(415, 306);
             Controls.Add(checkBox1);
             Controls.Add(button2);
             Controls.Add(label5);

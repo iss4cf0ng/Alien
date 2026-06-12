@@ -578,19 +578,19 @@ namespace Alien
             }
         }
 
-        void fnDbGetTable()
+        async void fnDbShowTablePage(string szHost, string szDbName, List<string> lsTable)
         {
+            TabPage page = new TabPage($"Table[{szHost}] - {szDbName}");
+            foreach (TabPage p in tabControl4.TabPages)
+            {
+                if (string.Equals(p.Text, page.Text))
+                {
+                    page = p;
+                    break;
+                }
+            }
 
-        }
-
-        void fnDbReadTable()
-        {
-
-        }
-
-        void fnAddNewDbConfig()
-        {
-
+            
         }
 
         #endregion
@@ -859,14 +859,7 @@ namespace Alien
 
         private async void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            TreeNode node = treeView2.SelectedNode;
-            if (node.Parent == null)
-            {
-                //Show tables
-                var config = m_dbMgr.m_stDbConfig[node.Text];
-                string szTables = await m_dbMgr.fnSqlExec(config, "SHOW TABLES;");
-                MessageBox.Show(szTables);
-            }
+            
         }
 
         //Upload
@@ -981,6 +974,32 @@ namespace Alien
         private void toolStripMenuItem19_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private async void treeView2_DoubleClick(object sender, EventArgs e)
+        {
+            TreeNode node = treeView2.SelectedNode;
+            if (node.Parent == null)
+            {
+                //Show databases
+                var config = m_dbMgr.m_stDbConfig[node.Text];
+                DataTable dt = await m_dbMgr.fnSqlQuery(config, "SHOW DATABASES;");
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    string? szDb = dr[0].ToString();
+                    if (string.IsNullOrEmpty(szDb))
+                        continue;
+
+                    TreeNode nodeDb = new TreeNode(szDb);
+                    node.Nodes.Add(nodeDb);
+                }
+
+                node.Expand();
+
+                var lsTables = await m_dbMgr.fnDbGetTables(config, node.Text);
+
+            }
         }
     }
 }

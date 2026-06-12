@@ -62,21 +62,18 @@ namespace Alien
                     textBox3.Text = string.IsNullOrEmpty(textBox3.Text) ? "root" : textBox3.Text;
 
                     break;
-                case enDatabase.MySQLi:
-                    textBox3.Enabled = true;
-
-                    textBox3.Text = string.IsNullOrEmpty(textBox3.Text) ? "root" : textBox3.Text;
-
-                    break;
                 case enDatabase.Access:
                     textBox3.Enabled = false;
 
                     break;
-                case enDatabase.SqlServer:
+                case enDatabase.SQLServer:
                     textBox3.Enabled = true;
 
                     break;
-                case enDatabase.Sqlite:
+                case enDatabase.PostgreSQL:
+
+                    break;
+                case enDatabase.SQLite:
 
                     break;
             }
@@ -86,10 +83,15 @@ namespace Alien
         {
             var config = new clsfnDb.stDbConfig()
             {
+                enDbType = (enDatabase)Enum.Parse(typeof(enDatabase), comboBox1.Text),
+
                 szSource = textBox2.Text,
                 szUsername = textBox3.Text,
                 szPassword = textBox4.Text,
             };
+
+            config.szConnString = clsfnDb.fnBuildConnStr(config);
+            MessageBox.Show(config.szConnString);
 
             bool bRet = await m_db.fnDbTest(config);
             if (bRet)
@@ -107,8 +109,6 @@ namespace Alien
         {
             var config = new clsfnDb.stDbConfig()
             {
-                szConnString = string.Empty,
-
                 enDbType = (enDatabase)Enum.Parse(typeof(enDatabase), comboBox1.Text),
                 szID = Guid.NewGuid().ToString(),
                 szSource = textBox2.Text,
@@ -119,6 +119,8 @@ namespace Alien
                 dtLastUsed = DateTime.Now,
 
             };
+
+            config.szConnString = clsfnDb.fnBuildConnStr(config);
 
             if (m_db.fnbSaveDatabase(config))
             {

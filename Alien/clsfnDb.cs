@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Alien
@@ -74,6 +75,14 @@ namespace Alien
             m_sqlConn = new clsSqlite(m_szDbFilePath, m_dicTable);
         }
 
+        public class clsQueryResponse
+        {
+            public bool success { get; set; }
+            public int rowCount { get; set; }
+            public List<Dictionary<string, object>> data { get; set; }
+            public string error { get; set; }
+        }
+
         #region Local Function
 
         public bool fnbDbExists(string szSource)
@@ -90,6 +99,7 @@ namespace Alien
                 return false;
 
             stDbConfig x = fnGetDbConfig(config.szSource);
+
             bool bRet = string.Equals(x.szID, config.szID)
                 && string.Equals(x.szSource, config.szSource)
                 && string.Equals(x.szUsername, config.szUsername)
@@ -142,7 +152,7 @@ namespace Alien
                     $");";
             }
 
-            DataTable dt = clsTool.fnSqlQuery(m_sqlConn.m_sqlConn, szQuery);
+            clsTool.fnSqlQuery(m_sqlConn.m_sqlConn, szQuery);
 
             return fnbDbWriteValidate(config);
         }
@@ -205,7 +215,7 @@ namespace Alien
             switch (cfg.enDbType)
             {
                 case enDatabase.MySQL:
-                    return $"Server={cfg.szSource};Database=default;Uid={cfg.szUsername};Pwd={cfg.szPassword};";
+                    return $"Server={cfg.szSource};Database=information_schema;Uid={cfg.szUsername};Pwd={cfg.szPassword};";
 
                 case enDatabase.SQLServer:
                     return $"Server={cfg.szSource};Database=master;User Id={cfg.szUsername};Password={cfg.szPassword};";
@@ -226,7 +236,7 @@ namespace Alien
                     return $"User Id={cfg.szUsername};Password={cfg.szPassword};Data Source={cfg.szSource};";
 
                 default:
-                    throw new NotSupportedException("Unsupported database type");
+                    throw new NotSupportedException($"Unsupported database type: {Enum.GetName(typeof(enDatabase), cfg.enDbType)}");
             }
         }
 
@@ -242,26 +252,86 @@ namespace Alien
             return result;
         }
 
-        public async Task<bool> fnDbTest(stDbConfig config)
+        private DataTable fnConvertToTable(List<Dictionary<string, object>> objData)
         {
+            DataTable dt = new DataTable();
+            if (objData == null || objData.Count == 0)
+                return dt;
 
+            foreach (var key in objData.First().Keys)
+                dt.Columns.Add(key);
 
-            return true;
+            foreach (var dict in objData)
+            {
+                DataRow dr = dt.NewRow();
+                foreach (var key in dict.Keys)
+                    dr[key] = dict[key]?.ToString();
+
+                dt.Rows.Add(dr);
+            }
+
+            return dt;
         }
 
-        public async Task<string> fnSqlExec(stDbConfig config, string szQuery)
+        public async Task<string> fnszSqlExec(stDbConfig config, string szQuery)
         {
-            string szResp = await m_web.fnszSendPayload("db_query", new string[]
+            string? szDb = Enum.GetName(typeof(enDatabase), config.enDbType);
+            if (string.IsNullOrEmpty(szDb))
             {
-                config.szSource,
-                config.szUsername,
-                config.szPassword,
+                MessageBox.Show("Parse language enumerator error.");
+                return string.Empty;
+            }
+
+            string szPayload = $"db_{szDb.ToLower()}_query";
+            string szResp = await m_web.fnszSendPayload(szPayload, new string[]
+            {
+                config.szConnString,
                 szQuery,
             });
 
+            return szResp;
+        }
+
+        public async Task<DataTable> fnSqlQuery(stDbConfig config, string szQuery)
+        {
+            DataTable dt = new DataTable();
+            string szResp = await fnszSqlExec(config, szQuery);
+
             MessageBox.Show(szResp);
 
-            return string.Empty;
+            clsQueryResponse? result = JsonSerializer.Deserialize<clsQueryResponse>(szResp);
+            if (result == null)
+                return dt;
+
+            dt = fnConvertToTable(result.data);
+
+            return dt;
+        }
+
+        public async Task<bool> fnDbTest(stDbConfig config)
+        {
+            string szQuery = "SELECT 1;";
+            DataTable dt = await fnSqlQuery(config, szQuery);
+
+            return dt.Rows.Count > 0 && dt.Columns.Count > 0 && Convert.ToInt32(dt.Rows[0][0]) == 1;
+        }
+
+        public async Task<List<string>> fnDbGetTables(stDbConfig config, string szDbName)
+        {
+            string szQuery = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{szDbName}';";
+            DataTable dt = await fnSqlQuery(config, szQuery);
+
+            List<string> lsTable = new List<string>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                string? szTable = dr[0].ToString();
+                if (string.IsNullOrEmpty(szTable))
+                    continue;
+
+                lsTable.Add(szTable);
+            }
+
+            return lsTable;
         }
 
         #endregion
