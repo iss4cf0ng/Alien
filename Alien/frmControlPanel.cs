@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Entity.Core.Common.CommandTrees;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -49,6 +50,54 @@ namespace Alien
 
             m_dbMgr = new clsfnDb(web, "db.sqlite");
         }
+
+        #region struct
+
+        private struct stTablePageControls
+        {
+            public TabPage page { get; set; }
+            public ToolStrip toolStrip { get; set; }
+            public ListView listView { get; set; }
+            public TextBox textBox { get; set; }
+
+            public bool bIsNull { get { return toolStrip == null || listView == null || textBox == null; } }
+
+            public void fnInit(TabPage page)
+            {
+                this.page = page;
+
+                ToolStrip ts = new ToolStrip();
+                ListView lv = new ListView();
+                TextBox tb = new TextBox();
+
+                ToolStripButton btnRefresh = new ToolStripButton("Refresh");
+                btnRefresh.DisplayStyle = ToolStripItemDisplayStyle.Text;
+
+                ToolStripButton btnNew = new ToolStripButton("New");
+                btnNew.DisplayStyle = ToolStripItemDisplayStyle.Text;
+
+                ts.Items.AddRange(new ToolStripItem[]
+                {
+                    btnRefresh,
+                    btnNew,
+                });
+
+                page.Controls.Add(ts);
+                page.Controls.Add(lv);
+                page.Controls.Add(tb);
+
+                ts.Dock = DockStyle.Top;
+                lv.Dock = DockStyle.Fill;
+                tb.Dock = DockStyle.Bottom;
+
+                tb.SendToBack();
+                lv.BringToFront();
+
+                lv.View = View.LargeIcon;
+            }
+        }
+
+        #endregion
 
         async Task<bool> fnbValidator()
         {
@@ -578,7 +627,37 @@ namespace Alien
             }
         }
 
-        async void fnDbShowTablePage(string szHost, string szDbName, List<string> lsTable)
+        stTablePageControls fnDbGetTablePageContent(TabPage page)
+        {
+            try
+            {
+                var ctrls = page.Controls;
+                if (ctrls.Count != 3)
+                {
+                    MessageBox.Show("Invalid table page", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return new stTablePageControls();
+                }
+
+                ToolStrip ts = (ToolStrip)ctrls[0];
+                ListView lv = (ListView)ctrls[1];
+                TextBox tb = (TextBox)ctrls[2];
+
+                return new stTablePageControls()
+                {
+                    page = page,
+                    toolStrip = ts,
+                    listView = lv,
+                    textBox = tb,
+                };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return new stTablePageControls();
+            }
+        }
+
+        void fnDbShowTablePage(string szHost, string szDbName, List<string> lsTable)
         {
             TabPage page = new TabPage($"Table[{szHost}] - {szDbName}");
             foreach (TabPage p in tabControl4.TabPages)
@@ -590,7 +669,13 @@ namespace Alien
                 }
             }
 
-            
+            stTablePageControls ctrls = new stTablePageControls();
+            ctrls.fnInit(page);
+
+            if (!tabControl4.TabPages.Contains(page))
+                tabControl4.TabPages.Add(page);
+
+            tabControl4.SelectedTab = page;
         }
 
         #endregion

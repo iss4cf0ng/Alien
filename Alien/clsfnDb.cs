@@ -297,7 +297,7 @@ namespace Alien
             DataTable dt = new DataTable();
             string szResp = await fnszSqlExec(config, szQuery);
 
-            MessageBox.Show(szResp);
+            //MessageBox.Show(szResp);
 
             clsQueryResponse? result = JsonSerializer.Deserialize<clsQueryResponse>(szResp);
             if (result == null)
