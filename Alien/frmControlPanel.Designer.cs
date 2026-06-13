@@ -104,6 +104,14 @@
             splitContainer3 = new SplitContainer();
             splitContainer5 = new SplitContainer();
             treeView2 = new TreeView();
+            menuDatabase = new ContextMenuStrip(components);
+            toolStripMenuItem20 = new ToolStripMenuItem();
+            toolStripMenuItem21 = new ToolStripMenuItem();
+            toolStripSeparator4 = new ToolStripSeparator();
+            toolStripMenuItem22 = new ToolStripMenuItem();
+            toolStripMenuItem23 = new ToolStripMenuItem();
+            toolStripMenuItem24 = new ToolStripMenuItem();
+            dbImageList = new ImageList(components);
             listView4 = new ListView();
             columnHeader10 = new ColumnHeader();
             columnHeader11 = new ColumnHeader();
@@ -166,6 +174,7 @@
             splitContainer5.Panel1.SuspendLayout();
             splitContainer5.Panel2.SuspendLayout();
             splitContainer5.SuspendLayout();
+            menuDatabase.SuspendLayout();
             toolStrip4.SuspendLayout();
             tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer4).BeginInit();
@@ -339,7 +348,7 @@
             tabPage14.Location = new Point(4, 24);
             tabPage14.Name = "tabPage14";
             tabPage14.Padding = new Padding(3);
-            tabPage14.Size = new Size(251, 375);
+            tabPage14.Size = new Size(251, 371);
             tabPage14.TabIndex = 1;
             tabPage14.Text = "Task";
             tabPage14.UseVisualStyleBackColor = true;
@@ -354,7 +363,7 @@
             treeNode2.Name = "Node1";
             treeNode2.Text = "Download";
             treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
-            treeView4.Size = new Size(245, 369);
+            treeView4.Size = new Size(245, 365);
             treeView4.TabIndex = 0;
             // 
             // listView2
@@ -646,7 +655,7 @@
             tabPage7.Location = new Point(4, 24);
             tabPage7.Name = "tabPage7";
             tabPage7.Padding = new Padding(3);
-            tabPage7.Size = new Size(990, 490);
+            tabPage7.Size = new Size(990, 486);
             tabPage7.TabIndex = 1;
             tabPage7.Text = "Find";
             tabPage7.UseVisualStyleBackColor = true;
@@ -664,7 +673,7 @@
             // splitContainer2.Panel2
             // 
             splitContainer2.Panel2.Controls.Add(listView1);
-            splitContainer2.Size = new Size(984, 436);
+            splitContainer2.Size = new Size(984, 432);
             splitContainer2.SplitterDistance = 284;
             splitContainer2.TabIndex = 2;
             // 
@@ -673,7 +682,7 @@
             treeView1.Dock = DockStyle.Fill;
             treeView1.Location = new Point(0, 0);
             treeView1.Name = "treeView1";
-            treeView1.Size = new Size(284, 436);
+            treeView1.Size = new Size(284, 432);
             treeView1.TabIndex = 0;
             // 
             // listView1
@@ -683,7 +692,7 @@
             listView1.FullRowSelect = true;
             listView1.Location = new Point(0, 0);
             listView1.Name = "listView1";
-            listView1.Size = new Size(696, 436);
+            listView1.Size = new Size(696, 432);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -705,7 +714,7 @@
             // 
             // statusStrip3
             // 
-            statusStrip3.Location = new Point(3, 465);
+            statusStrip3.Location = new Point(3, 461);
             statusStrip3.Name = "statusStrip3";
             statusStrip3.Size = new Size(984, 22);
             statusStrip3.TabIndex = 1;
@@ -841,13 +850,78 @@
             // 
             // treeView2
             // 
+            treeView2.ContextMenuStrip = menuDatabase;
             treeView2.Dock = DockStyle.Fill;
+            treeView2.ImageIndex = 0;
+            treeView2.ImageList = dbImageList;
             treeView2.Location = new Point(0, 0);
             treeView2.Name = "treeView2";
+            treeView2.SelectedImageIndex = 0;
             treeView2.Size = new Size(256, 221);
             treeView2.TabIndex = 1;
             treeView2.AfterSelect += treeView2_AfterSelect;
             treeView2.DoubleClick += treeView2_DoubleClick;
+            // 
+            // menuDatabase
+            // 
+            menuDatabase.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            menuDatabase.Items.AddRange(new ToolStripItem[] { toolStripMenuItem20, toolStripMenuItem21, toolStripSeparator4, toolStripMenuItem22, toolStripMenuItem23, toolStripMenuItem24 });
+            menuDatabase.Name = "menuDatabase";
+            menuDatabase.Size = new Size(136, 130);
+            // 
+            // toolStripMenuItem20
+            // 
+            toolStripMenuItem20.Name = "toolStripMenuItem20";
+            toolStripMenuItem20.Size = new Size(135, 24);
+            toolStripMenuItem20.Text = "Info";
+            toolStripMenuItem20.Click += toolStripMenuItem20_Click;
+            // 
+            // toolStripMenuItem21
+            // 
+            toolStripMenuItem21.Name = "toolStripMenuItem21";
+            toolStripMenuItem21.Size = new Size(135, 24);
+            toolStripMenuItem21.Text = "SQL";
+            toolStripMenuItem21.Click += toolStripMenuItem21_Click;
+            // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(132, 6);
+            // 
+            // toolStripMenuItem22
+            // 
+            toolStripMenuItem22.Name = "toolStripMenuItem22";
+            toolStripMenuItem22.Size = new Size(135, 24);
+            toolStripMenuItem22.Text = "Add";
+            toolStripMenuItem22.Click += toolStripMenuItem22_Click;
+            // 
+            // toolStripMenuItem23
+            // 
+            toolStripMenuItem23.Name = "toolStripMenuItem23";
+            toolStripMenuItem23.Size = new Size(135, 24);
+            toolStripMenuItem23.Text = "Edit";
+            toolStripMenuItem23.Click += toolStripMenuItem23_Click;
+            // 
+            // toolStripMenuItem24
+            // 
+            toolStripMenuItem24.Name = "toolStripMenuItem24";
+            toolStripMenuItem24.Size = new Size(135, 24);
+            toolStripMenuItem24.Text = "Remove";
+            toolStripMenuItem24.Click += toolStripMenuItem24_Click;
+            // 
+            // dbImageList
+            // 
+            dbImageList.ColorDepth = ColorDepth.Depth32Bit;
+            dbImageList.ImageStream = (ImageListStreamer)resources.GetObject("dbImageList.ImageStream");
+            dbImageList.TransparentColor = Color.Transparent;
+            dbImageList.Images.SetKeyName(0, "table");
+            dbImageList.Images.SetKeyName(1, "database");
+            dbImageList.Images.SetKeyName(2, "redis");
+            dbImageList.Images.SetKeyName(3, "postgresql");
+            dbImageList.Images.SetKeyName(4, "sqlserver");
+            dbImageList.Images.SetKeyName(5, "mysql");
+            dbImageList.Images.SetKeyName(6, "access");
+            dbImageList.Images.SetKeyName(7, "sqlite");
             // 
             // listView4
             // 
@@ -888,7 +962,6 @@
             tabControl4.Name = "tabControl4";
             tabControl4.SelectedIndex = 0;
             tabControl4.Size = new Size(744, 442);
-            tabControl4.SizeMode = TabSizeMode.Fixed;
             tabControl4.TabIndex = 2;
             // 
             // toolStrip6
@@ -1162,6 +1235,7 @@
             splitContainer5.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer5).EndInit();
             splitContainer5.ResumeLayout(false);
+            menuDatabase.ResumeLayout(false);
             toolStrip4.ResumeLayout(false);
             toolStrip4.PerformLayout();
             tabPage5.ResumeLayout(false);
@@ -1283,5 +1357,13 @@
         private ColumnHeader columnHeader11;
         private ToolStripMenuItem toolStripMenuItem18;
         private ToolStripMenuItem toolStripMenuItem19;
+        private ImageList dbImageList;
+        private ContextMenuStrip menuDatabase;
+        private ToolStripMenuItem toolStripMenuItem20;
+        private ToolStripMenuItem toolStripMenuItem21;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripMenuItem toolStripMenuItem22;
+        private ToolStripMenuItem toolStripMenuItem23;
+        private ToolStripMenuItem toolStripMenuItem24;
     }
 }

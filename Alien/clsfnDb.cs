@@ -303,6 +303,12 @@ namespace Alien
             if (result == null)
                 return dt;
 
+            if (!result.success)
+            {
+                MessageBox.Show(result.error, "SQL query error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return dt;
+            }
+
             dt = fnConvertToTable(result.data);
 
             return dt;

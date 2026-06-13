@@ -51,24 +51,53 @@ namespace Alien
             m_dbMgr = new clsfnDb(web, "db.sqlite");
         }
 
-        #region struct
+        #region Classes
 
-        private struct stTablePageControls
+        private class clsDbTablePageControls
         {
             public TabPage page { get; set; }
             public ToolStrip toolStrip { get; set; }
             public ListView listView { get; set; }
             public TextBox textBox { get; set; }
 
-            public bool bIsNull { get { return toolStrip == null || listView == null || textBox == null; } }
+            private ImageList dbListImageList { get; init; }
 
-            public void fnInit(TabPage page)
+            public clsDbTablePageControls(TabPage page, ImageList imageList)
             {
-                this.page = page;
+                dbListImageList = new ImageList();
+                dbListImageList.ImageSize = new Size(60, 60);
+
+                foreach (string? szKey in imageList.Images.Keys)
+                {
+                    if (string.IsNullOrEmpty(szKey))
+                        continue;
+
+                    Image? img = imageList.Images[szKey];
+                    if (img == null)
+                        continue;
+
+                    dbListImageList.Images.Add(szKey, img);
+                }
+
+                if (page.Controls.Count > 0)
+                {
+                    this.page = page;
+                    toolStrip = (ToolStrip)page.Controls[0];
+                    listView = (ListView)page.Controls[1];
+                    textBox = (TextBox)page.Controls[2];
+                    dbListImageList = imageList;
+
+                    return;
+                }
 
                 ToolStrip ts = new ToolStrip();
                 ListView lv = new ListView();
                 TextBox tb = new TextBox();
+
+                this.page = page;
+                toolStrip = ts;
+                listView = lv;
+                textBox = tb;
 
                 ToolStripButton btnRefresh = new ToolStripButton("Refresh");
                 btnRefresh.DisplayStyle = ToolStripItemDisplayStyle.Text;
@@ -94,6 +123,56 @@ namespace Alien
                 lv.BringToFront();
 
                 lv.View = View.LargeIcon;
+
+                // ImageList
+                lv.LargeImageList = dbListImageList;
+            }
+        }
+        private class clsDbSqlResultControls
+        {
+            private clsfnDb.stDbConfig m_cfg { get; init; }
+            private clsfnDb m_dbMgr { get; init; }
+
+            public TextBox textBox { get; init; }
+            public DataGridView dataGridView { get; init; }
+
+            public clsDbSqlResultControls(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr)
+            {
+                m_cfg = config;
+                m_dbMgr = dbMgr;
+
+                if (page.Controls.Count > 0)
+                {
+                    textBox = (TextBox)page.Controls[0];
+                    dataGridView = (DataGridView)page.Controls[1];
+
+                    return;
+                }
+
+                textBox = new TextBox();
+                dataGridView = new DataGridView();
+
+                dataGridView.AllowUserToAddRows = true;
+                dataGridView.AllowUserToDeleteRows = true;
+
+                page.Controls.Add(textBox);
+                page.Controls.Add(dataGridView);
+
+                textBox.Dock = DockStyle.Top;
+                dataGridView.Dock = DockStyle.Fill;
+
+                textBox.SendToBack();
+
+                textBox.KeyDown += async (s, e) =>
+                {
+                    if (e.KeyCode == Keys.Enter)
+                    {
+                        string szQuery = textBox.Text;
+                        DataTable dt = await m_dbMgr.fnSqlQuery(m_cfg, szQuery);
+
+                        dataGridView.DataSource = dt;
+                    }
+                };
             }
         }
 
@@ -623,41 +702,18 @@ namespace Alien
                 TreeNode node = new TreeNode(db.szSource);
                 node.Tag = db;
 
+                string? szDb = Enum.GetName(typeof(enDatabase), db.enDbType);
+                if (string.IsNullOrEmpty(szDb))
+                    continue;
+
+                node.ImageKey = szDb.ToLower();
+                node.SelectedImageKey = node.ImageKey;
+
                 treeView2.Nodes.Add(node);
             }
         }
 
-        stTablePageControls fnDbGetTablePageContent(TabPage page)
-        {
-            try
-            {
-                var ctrls = page.Controls;
-                if (ctrls.Count != 3)
-                {
-                    MessageBox.Show("Invalid table page", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return new stTablePageControls();
-                }
-
-                ToolStrip ts = (ToolStrip)ctrls[0];
-                ListView lv = (ListView)ctrls[1];
-                TextBox tb = (TextBox)ctrls[2];
-
-                return new stTablePageControls()
-                {
-                    page = page,
-                    toolStrip = ts,
-                    listView = lv,
-                    textBox = tb,
-                };
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return new stTablePageControls();
-            }
-        }
-
-        void fnDbShowTablePage(string szHost, string szDbName, List<string> lsTable)
+        void fnDbShowTablePage(TreeNode nodeSelected, string szHost, string szDbName, List<string> lsTable)
         {
             TabPage page = new TabPage($"Table[{szHost}] - {szDbName}");
             foreach (TabPage p in tabControl4.TabPages)
@@ -669,13 +725,63 @@ namespace Alien
                 }
             }
 
-            stTablePageControls ctrls = new stTablePageControls();
-            ctrls.fnInit(page);
+            clsDbTablePageControls ctrls = new clsDbTablePageControls(page, dbImageList);
 
             if (!tabControl4.TabPages.Contains(page))
                 tabControl4.TabPages.Add(page);
 
             tabControl4.SelectedTab = page;
+
+            // Show tables
+            foreach (string szTable in lsTable)
+            {
+                if (ctrls.listView.FindItemWithText(szTable) == null)
+                {
+                    ListViewItem item = new ListViewItem(szTable);
+                    item.ImageKey = "table";
+
+                    ctrls.listView.Items.Add(item);
+                }
+
+                string szNodePath = $"{szHost}\\{szDbName}\\{szTable}";
+                if (fnFindNodeWithFullPath(nodeSelected.Nodes, szNodePath) == null)
+                {
+                    TreeNode node = new TreeNode(szTable);
+                    node.ImageKey = "table";
+                    node.SelectedImageKey = node.ImageKey;
+
+                    nodeSelected.Nodes.Add(node);
+                }
+            }
+
+            nodeSelected.Expand();
+        }
+
+        void fnDbShowData(clsfnDb.stDbConfig config, DataTable data, string szQuery)
+        {
+            TabPage page = new TabPage($"Result[{config.szSource}]");
+            foreach (TabPage p in tabControl4.TabPages)
+            {
+                if (string.Equals(p.Text, page.Text))
+                {
+                    page = p;
+                    break;
+                }
+            }
+
+            if (!tabControl4.TabPages.Contains(page))
+                tabControl4.TabPages.Add(page);
+
+            tabControl4.SelectedTab = page;
+
+            clsDbSqlResultControls ctrls = new clsDbSqlResultControls(page, config, m_dbMgr);
+            ctrls.textBox.Text = szQuery;
+            ctrls.dataGridView.DataSource = data;
+        }
+
+        void fnDbShowSqlQuery(clsfnDb.stDbConfig config, string szDbName)
+        {
+
         }
 
         #endregion
@@ -942,9 +1048,9 @@ namespace Alien
             f.ShowDialog();
         }
 
-        private async void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
+        private void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            
+
         }
 
         //Upload
@@ -1077,14 +1183,83 @@ namespace Alien
                         continue;
 
                     TreeNode nodeDb = new TreeNode(szDb);
+                    nodeDb.ImageKey = "database";
+                    nodeDb.SelectedImageKey = nodeDb.ImageKey;
+
                     node.Nodes.Add(nodeDb);
                 }
 
                 node.Expand();
-
-                var lsTables = await m_dbMgr.fnDbGetTables(config, node.Text);
-
             }
+            else if (node.Parent != null && node.Parent.Parent == null)
+            {
+                // Table -> Show items
+
+                string szHost = node.Parent.Text;
+                string szDbName = node.Text;
+
+                var config = m_dbMgr.m_stDbConfig[szHost];
+                var lsTables = await m_dbMgr.fnDbGetTables(config, szDbName);
+
+                if (lsTables.Count == 0)
+                {
+                    MessageBox.Show($"Cannot find any table in \"{szDbName}\"", "It is empty!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                fnDbShowTablePage(node, config.szSource, szDbName, lsTables);
+            }
+            else if (node.Parent != null && node.Parent.Parent != null && node.Parent.Parent.Parent == null)
+            {
+                // Show data
+
+                string szHost = node.Parent.Parent.Text;
+                string szDbName = node.Parent.Text;
+                string szTable = node.Text;
+
+                string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT 100;";
+                var config = m_dbMgr.m_stDbConfig[szHost];
+                DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
+
+                fnDbShowData(config, dt, szQuery);
+            }
+        }
+
+        // Database.Info
+        private void toolStripMenuItem20_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // Database.SQL
+        private void toolStripMenuItem21_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // Database.Add
+        private void toolStripMenuItem22_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // Database.Edit
+        private void toolStripMenuItem23_Click(object sender, EventArgs e)
+        {
+            TreeNode? node = treeView2.SelectedNode;
+            while (node.Parent != null)
+                node = node.Parent;
+
+            var cfg = (clsfnDb.stDbConfig)node.Tag;
+
+            frmDbEdit f = new frmDbEdit(m_dbMgr, this, cfg);
+            f.ShowDialog();
+        }
+
+        // Database.Remove (This functionality do NOT remove the remote database, just only the local configuration
+        private void toolStripMenuItem24_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
