@@ -28,5 +28,21 @@ namespace Alien
         public static string fnszB64d2str(string szData) => Encoding.UTF8.GetString(Convert.FromBase64String(szData));
         public static string fnszLs2b64str(List<string> lInput, string szSplitter = ",") => string.Join(szSplitter, lInput.Select(x => fnszStre2b64(x)));
         public static List<string> fnlsB64d2str(string szInput, string szSpliter = ",") => szInput.Split(szSpliter).Select(x => fnszB64d2str(x)).ToList();
+    
+        public static Image fnResizeImage(Image image, int nWidth, int nHeight)
+        {
+            Bitmap bmp = new Bitmap(nWidth, nHeight);
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+                g.DrawImage(image, 0, 0, nWidth, nHeight);
+            }
+
+            return bmp;
+        }
     }
 }

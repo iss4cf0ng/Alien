@@ -17,6 +17,8 @@ namespace Alien
 {
     public partial class frmControlPanel : Form
     {
+        private TabPage draggedTab = null;
+
         private clsWeb m_web { get; init; }
         private clsVictim m_victim { get { return m_web.m_victim; } }
 
@@ -62,10 +64,11 @@ namespace Alien
 
             private ImageList dbListImageList { get; init; }
 
-            public clsDbTablePageControls(TabPage page, ImageList imageList)
+            public clsDbTablePageControls(TabPage page, ImageList imageList, ContextMenuStrip menuTable)
             {
                 dbListImageList = new ImageList();
                 dbListImageList.ImageSize = new Size(60, 60);
+                dbListImageList.ColorDepth = ColorDepth.Depth32Bit;
 
                 foreach (string? szKey in imageList.Images.Keys)
                 {
@@ -76,7 +79,9 @@ namespace Alien
                     if (img == null)
                         continue;
 
-                    dbListImageList.Images.Add(szKey, img);
+                    Image imgNew = clsEzData.fnResizeImage(img, 60, 60);
+
+                    dbListImageList.Images.Add(szKey, imgNew);
                 }
 
                 if (page.Controls.Count > 0)
@@ -123,6 +128,7 @@ namespace Alien
                 lv.BringToFront();
 
                 lv.View = View.LargeIcon;
+                lv.ContextMenuStrip = menuTable;
 
                 // ImageList
                 lv.LargeImageList = dbListImageList;
@@ -143,8 +149,8 @@ namespace Alien
 
                 if (page.Controls.Count > 0)
                 {
-                    textBox = (TextBox)page.Controls[0];
-                    dataGridView = (DataGridView)page.Controls[1];
+                    dataGridView = (DataGridView)page.Controls[0];
+                    textBox = (TextBox)page.Controls[1];
 
                     return;
                 }
@@ -158,10 +164,10 @@ namespace Alien
                 page.Controls.Add(textBox);
                 page.Controls.Add(dataGridView);
 
+                dataGridView.BringToFront();
+
                 textBox.Dock = DockStyle.Top;
                 dataGridView.Dock = DockStyle.Fill;
-
-                textBox.SendToBack();
 
                 textBox.KeyDown += async (s, e) =>
                 {
@@ -173,6 +179,24 @@ namespace Alien
                         dataGridView.DataSource = dt;
                     }
                 };
+            }
+        }
+        private class clsDbSqlShell
+        {
+            private clsfnDb.stDbConfig m_config { get; init; }
+            private clsfnDb m_dbMgr { get; init; }
+
+            private SplitContainer splitContainer { get; init; }
+
+            public RichTextBox richTextBox { get; init; }
+            public TextEditorControlEx textEditorControl { get; init; }
+
+            public clsDbSqlShell(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr)
+            {
+                m_config = config;
+                m_dbMgr = dbMgr;
+
+
             }
         }
 
@@ -226,6 +250,27 @@ namespace Alien
             }
 
             return null;
+        }
+
+        private int fnGetTabIndexAt(Point p)
+        {
+            for (int i = 0; i < tabControl4.TabPages.Count; i++)
+            {
+                if (tabControl4.GetTabRect(i).Contains(p))
+                    return i;
+            }
+            return -1;
+        }
+
+        private Rectangle fnGetCloseRect(int i)
+        {
+            Rectangle tabRect = tabControl4.GetTabRect(i);
+
+            return new Rectangle(
+                tabRect.Right - 20,
+                tabRect.Top + 4,
+                15,
+                15);
         }
 
         #endregion
@@ -725,7 +770,21 @@ namespace Alien
                 }
             }
 
-            clsDbTablePageControls ctrls = new clsDbTablePageControls(page, dbImageList);
+            clsDbTablePageControls ctrls = new clsDbTablePageControls(page, dbImageList, menuDbTable);
+            ctrls.listView.DoubleClick += async (s, e) =>
+            {
+                if (ctrls.listView.SelectedItems.Count == 0)
+                    return;
+
+                ListViewItem item = ctrls.listView.SelectedItems[0];
+                string szTable = item.Text;
+
+                string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT 100;";
+                var config = m_dbMgr.m_stDbConfig[szHost];
+                DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
+
+                fnDbShowData(config, dt, szQuery);
+            };
 
             if (!tabControl4.TabPages.Contains(page))
                 tabControl4.TabPages.Add(page);
@@ -781,7 +840,22 @@ namespace Alien
 
         void fnDbShowSqlQuery(clsfnDb.stDbConfig config, string szDbName)
         {
+            TabPage page = new TabPage($"SQL[{config.szSource}]");
+            foreach (TabPage p in tabControl4.TabPages)
+            {
+                if (string.Equals(p.Text, page.Text))
+                {
+                    page = p;
+                    break;
+                }
+            }
 
+            if (!tabControl4.TabPages.Contains(page))
+                tabControl4.TabPages.Add(page);
+
+            tabControl4.SelectedTab = page;
+
+            
         }
 
         #endregion
@@ -845,6 +919,67 @@ namespace Alien
 
             //Database
             fnDbInit();
+
+            tabControl4.AllowDrop = true;
+            tabControl4.Padding = new Point(30, 3);
+            tabControl4.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl4.DrawItem += (s, e) =>
+            {
+                TabPage page = tabControl4.TabPages[e.Index];
+                Rectangle rect = tabControl4.GetTabRect(e.Index);
+
+                // text
+                TextRenderer.DrawText(
+                    e.Graphics,
+                    page.Text,
+                    e.Font,
+                    rect,
+                    Color.Black);
+
+                // X button
+                Rectangle closeRect = fnGetCloseRect(e.Index);
+
+                ControlPaint.DrawCaptionButton(
+                    e.Graphics,
+                    closeRect,
+                    CaptionButton.Close,
+                    ButtonState.Flat);
+            };
+            tabControl4.MouseDown += (s, e) =>
+            {
+                int nIdx = fnGetTabIndexAt(e.Location);
+                if (nIdx == -1) return;
+
+                // CLOSE click has priority
+                if (fnGetCloseRect(nIdx).Contains(e.Location))
+                {
+                    tabControl4.TabPages.RemoveAt(nIdx);
+                    return;
+                }
+
+                // otherwise start drag
+                draggedTab = tabControl4.TabPages[nIdx];
+                tabControl4.DoDragDrop(draggedTab, DragDropEffects.Move);
+            };
+            tabControl4.DragOver += (s, e) =>
+            {
+                e.Effect = DragDropEffects.Move;
+            };
+            tabControl4.DragDrop += (s, e) =>
+            {
+                Point p = tabControl4.PointToClient(new Point(e.X, e.Y));
+                int nIdx = fnGetTabIndexAt(p);
+
+                if (nIdx < 0 || draggedTab == null)
+                    return;
+
+                int nOldIdx = tabControl4.TabPages.IndexOf(draggedTab);
+
+                tabControl4.TabPages.Remove(draggedTab);
+                tabControl4.TabPages.Insert(nOldIdx, draggedTab);
+
+                tabControl4.SelectedTab = draggedTab;
+            };
         }
 
         private void frmControlPanel_Load(object sender, EventArgs e)
@@ -1170,6 +1305,9 @@ namespace Alien
         private async void treeView2_DoubleClick(object sender, EventArgs e)
         {
             TreeNode node = treeView2.SelectedNode;
+            if (node == null)
+                return;
+
             if (node.Parent == null)
             {
                 //Show databases
@@ -1207,7 +1345,7 @@ namespace Alien
                     return;
                 }
 
-                fnDbShowTablePage(node, config.szSource, szDbName, lsTables);
+                fnDbShowTablePage(node, szHost, szDbName, lsTables);
             }
             else if (node.Parent != null && node.Parent.Parent != null && node.Parent.Parent.Parent == null)
             {

@@ -138,6 +138,12 @@
             tabPage17 = new TabPage();
             tabPage18 = new TabPage();
             fileImageList = new ImageList(components);
+            menuDbTable = new ContextMenuStrip(components);
+            toolStripMenuItem25 = new ToolStripMenuItem();
+            toolStripMenuItem28 = new ToolStripMenuItem();
+            toolStripSeparator5 = new ToolStripSeparator();
+            toolStripMenuItem26 = new ToolStripMenuItem();
+            toolStripMenuItem27 = new ToolStripMenuItem();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -187,6 +193,7 @@
             tabPage12.SuspendLayout();
             tabPage16.SuspendLayout();
             tabControl7.SuspendLayout();
+            menuDbTable.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl1
@@ -348,7 +355,7 @@
             tabPage14.Location = new Point(4, 24);
             tabPage14.Name = "tabPage14";
             tabPage14.Padding = new Padding(3);
-            tabPage14.Size = new Size(251, 371);
+            tabPage14.Size = new Size(251, 375);
             tabPage14.TabIndex = 1;
             tabPage14.Text = "Task";
             tabPage14.UseVisualStyleBackColor = true;
@@ -363,7 +370,7 @@
             treeNode2.Name = "Node1";
             treeNode2.Text = "Download";
             treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
-            treeView4.Size = new Size(245, 365);
+            treeView4.Size = new Size(245, 369);
             treeView4.TabIndex = 0;
             // 
             // listView2
@@ -655,7 +662,7 @@
             tabPage7.Location = new Point(4, 24);
             tabPage7.Name = "tabPage7";
             tabPage7.Padding = new Padding(3);
-            tabPage7.Size = new Size(990, 486);
+            tabPage7.Size = new Size(990, 490);
             tabPage7.TabIndex = 1;
             tabPage7.Text = "Find";
             tabPage7.UseVisualStyleBackColor = true;
@@ -673,7 +680,7 @@
             // splitContainer2.Panel2
             // 
             splitContainer2.Panel2.Controls.Add(listView1);
-            splitContainer2.Size = new Size(984, 432);
+            splitContainer2.Size = new Size(984, 436);
             splitContainer2.SplitterDistance = 284;
             splitContainer2.TabIndex = 2;
             // 
@@ -682,7 +689,7 @@
             treeView1.Dock = DockStyle.Fill;
             treeView1.Location = new Point(0, 0);
             treeView1.Name = "treeView1";
-            treeView1.Size = new Size(284, 432);
+            treeView1.Size = new Size(284, 436);
             treeView1.TabIndex = 0;
             // 
             // listView1
@@ -692,7 +699,7 @@
             listView1.FullRowSelect = true;
             listView1.Location = new Point(0, 0);
             listView1.Name = "listView1";
-            listView1.Size = new Size(696, 432);
+            listView1.Size = new Size(696, 436);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -714,7 +721,7 @@
             // 
             // statusStrip3
             // 
-            statusStrip3.Location = new Point(3, 461);
+            statusStrip3.Location = new Point(3, 465);
             statusStrip3.Name = "statusStrip3";
             statusStrip3.Size = new Size(984, 22);
             statusStrip3.TabIndex = 1;
@@ -802,9 +809,9 @@
             tabPage4.Controls.Add(splitContainer3);
             tabPage4.Controls.Add(textBox2);
             tabPage4.Controls.Add(toolStrip4);
-            tabPage4.Location = new Point(4, 28);
+            tabPage4.Location = new Point(4, 24);
             tabPage4.Name = "tabPage4";
-            tabPage4.Size = new Size(1004, 520);
+            tabPage4.Size = new Size(1004, 524);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "Database";
             tabPage4.UseVisualStyleBackColor = true;
@@ -825,7 +832,7 @@
             // 
             splitContainer3.Panel2.Controls.Add(tabControl4);
             splitContainer3.Panel2.Controls.Add(toolStrip6);
-            splitContainer3.Size = new Size(1004, 467);
+            splitContainer3.Size = new Size(1004, 471);
             splitContainer3.SplitterDistance = 256;
             splitContainer3.TabIndex = 1;
             // 
@@ -844,8 +851,8 @@
             // splitContainer5.Panel2
             // 
             splitContainer5.Panel2.Controls.Add(listView4);
-            splitContainer5.Size = new Size(256, 442);
-            splitContainer5.SplitterDistance = 221;
+            splitContainer5.Size = new Size(256, 446);
+            splitContainer5.SplitterDistance = 225;
             splitContainer5.TabIndex = 2;
             // 
             // treeView2
@@ -857,7 +864,7 @@
             treeView2.Location = new Point(0, 0);
             treeView2.Name = "treeView2";
             treeView2.SelectedImageIndex = 0;
-            treeView2.Size = new Size(256, 221);
+            treeView2.Size = new Size(256, 225);
             treeView2.TabIndex = 1;
             treeView2.AfterSelect += treeView2_AfterSelect;
             treeView2.DoubleClick += treeView2_DoubleClick;
@@ -914,14 +921,14 @@
             dbImageList.ColorDepth = ColorDepth.Depth32Bit;
             dbImageList.ImageStream = (ImageListStreamer)resources.GetObject("dbImageList.ImageStream");
             dbImageList.TransparentColor = Color.Transparent;
-            dbImageList.Images.SetKeyName(0, "table");
-            dbImageList.Images.SetKeyName(1, "database");
-            dbImageList.Images.SetKeyName(2, "redis");
-            dbImageList.Images.SetKeyName(3, "postgresql");
-            dbImageList.Images.SetKeyName(4, "sqlserver");
-            dbImageList.Images.SetKeyName(5, "mysql");
-            dbImageList.Images.SetKeyName(6, "access");
-            dbImageList.Images.SetKeyName(7, "sqlite");
+            dbImageList.Images.SetKeyName(0, "database");
+            dbImageList.Images.SetKeyName(1, "redis");
+            dbImageList.Images.SetKeyName(2, "postgresql");
+            dbImageList.Images.SetKeyName(3, "sqlserver");
+            dbImageList.Images.SetKeyName(4, "mysql");
+            dbImageList.Images.SetKeyName(5, "access");
+            dbImageList.Images.SetKeyName(6, "sqlite");
+            dbImageList.Images.SetKeyName(7, "table");
             // 
             // listView4
             // 
@@ -948,7 +955,7 @@
             // toolStrip5
             // 
             toolStrip5.Dock = DockStyle.Bottom;
-            toolStrip5.Location = new Point(0, 442);
+            toolStrip5.Location = new Point(0, 446);
             toolStrip5.Name = "toolStrip5";
             toolStrip5.Size = new Size(256, 25);
             toolStrip5.TabIndex = 0;
@@ -961,13 +968,13 @@
             tabControl4.Location = new Point(0, 0);
             tabControl4.Name = "tabControl4";
             tabControl4.SelectedIndex = 0;
-            tabControl4.Size = new Size(744, 442);
+            tabControl4.Size = new Size(744, 446);
             tabControl4.TabIndex = 2;
             // 
             // toolStrip6
             // 
             toolStrip6.Dock = DockStyle.Bottom;
-            toolStrip6.Location = new Point(0, 442);
+            toolStrip6.Location = new Point(0, 446);
             toolStrip6.Name = "toolStrip6";
             toolStrip6.Size = new Size(744, 25);
             toolStrip6.TabIndex = 0;
@@ -1173,6 +1180,42 @@
             fileImageList.Images.SetKeyName(0, "folder");
             fileImageList.Images.SetKeyName(1, "harddrive");
             // 
+            // menuDbTable
+            // 
+            menuDbTable.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            menuDbTable.Items.AddRange(new ToolStripItem[] { toolStripMenuItem25, toolStripMenuItem28, toolStripSeparator5, toolStripMenuItem26, toolStripMenuItem27 });
+            menuDbTable.Name = "menuDbTable";
+            menuDbTable.Size = new Size(123, 106);
+            // 
+            // toolStripMenuItem25
+            // 
+            toolStripMenuItem25.Name = "toolStripMenuItem25";
+            toolStripMenuItem25.Size = new Size(122, 24);
+            toolStripMenuItem25.Text = "Open";
+            // 
+            // toolStripMenuItem28
+            // 
+            toolStripMenuItem28.Name = "toolStripMenuItem28";
+            toolStripMenuItem28.Size = new Size(122, 24);
+            toolStripMenuItem28.Text = "Dump";
+            // 
+            // toolStripSeparator5
+            // 
+            toolStripSeparator5.Name = "toolStripSeparator5";
+            toolStripSeparator5.Size = new Size(119, 6);
+            // 
+            // toolStripMenuItem26
+            // 
+            toolStripMenuItem26.Name = "toolStripMenuItem26";
+            toolStripMenuItem26.Size = new Size(122, 24);
+            toolStripMenuItem26.Text = "New";
+            // 
+            // toolStripMenuItem27
+            // 
+            toolStripMenuItem27.Name = "toolStripMenuItem27";
+            toolStripMenuItem27.Size = new Size(122, 24);
+            toolStripMenuItem27.Text = "Delete";
+            // 
             // frmControlPanel
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -1253,6 +1296,7 @@
             tabPage12.PerformLayout();
             tabPage16.ResumeLayout(false);
             tabControl7.ResumeLayout(false);
+            menuDbTable.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -1365,5 +1409,11 @@
         private ToolStripMenuItem toolStripMenuItem22;
         private ToolStripMenuItem toolStripMenuItem23;
         private ToolStripMenuItem toolStripMenuItem24;
+        private ContextMenuStrip menuDbTable;
+        private ToolStripMenuItem toolStripMenuItem25;
+        private ToolStripMenuItem toolStripMenuItem28;
+        private ToolStripSeparator toolStripSeparator5;
+        private ToolStripMenuItem toolStripMenuItem26;
+        private ToolStripMenuItem toolStripMenuItem27;
     }
 }
