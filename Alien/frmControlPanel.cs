@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.TextEditor;
+using ICSharpCode.TextEditor.Actions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -181,22 +182,105 @@ namespace Alien
                 };
             }
         }
-        private class clsDbSqlShell
+        private class clsDbSqlShellControls
         {
             private clsfnDb.stDbConfig m_config { get; init; }
             private clsfnDb m_dbMgr { get; init; }
 
             private SplitContainer splitContainer { get; init; }
 
+            public int m_nPromitStart { get; set; }
+
             public RichTextBox richTextBox { get; init; }
+            public ToolStrip toolStrip { get; init; }
             public TextEditorControlEx textEditorControl { get; init; }
 
-            public clsDbSqlShell(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr)
+            public clsDbSqlShellControls(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr)
             {
                 m_config = config;
                 m_dbMgr = dbMgr;
 
+                splitContainer = new SplitContainer();
+                toolStrip = new ToolStrip();
+                richTextBox = new RichTextBox();
+                textEditorControl = new TextEditorControlEx();
 
+                page.Controls.Add(splitContainer);
+                splitContainer.FixedPanel = FixedPanel.Panel2;
+                splitContainer.SplitterDistance = 300;
+                splitContainer.Panel1.Controls.Add(richTextBox);
+                splitContainer.Panel2.Controls.Add(toolStrip);
+                splitContainer.Panel2.Controls.Add(textEditorControl);
+
+                splitContainer.Orientation = Orientation.Horizontal;
+                splitContainer.Dock = DockStyle.Fill;
+
+                richTextBox.Font = new Font("Consolas", page.Font.Size);
+                richTextBox.BackColor = Color.Black;
+                richTextBox.ForeColor = Color.White;
+                richTextBox.Dock = DockStyle.Fill;
+                richTextBox.WordWrap = false;
+
+                richTextBox.BringToFront();
+
+                textEditorControl.Dock = DockStyle.Fill;
+            }
+
+            public void fnPrintTable(DataTable dt)
+            {
+                if (dt == null || dt.Columns.Count == 0)
+                    return;
+
+                int[] nWidths = new int[dt.Columns.Count];
+
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    nWidths[i] = dt.Columns[i].ColumnName.Length;
+
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string szValue = dr[0].ToString() ?? string.Empty;
+                        nWidths[i] = Math.Max(nWidths[i], szValue.Length);
+                    }
+                }
+
+                StringBuilder sb = new StringBuilder();
+                string szSeparate = "+" + string.Join("+", nWidths.Select(w => new string('-', w + 2))) + "+";
+
+                sb.AppendLine(szSeparate);
+
+                // Header
+                sb.Append("|");
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    sb.Append(" ");
+                    sb.Append(dt.Columns[i].ColumnName.PadRight(nWidths[i]));
+                    sb.Append(" |");
+                }
+
+                sb.AppendLine();
+                sb.AppendLine(szSeparate);
+
+                // Rows
+                foreach (DataRow dr in dt.Rows)
+                {
+                    sb.Append("|");
+
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        string szValue = dr[i]?.ToString() ?? string.Empty;
+
+                        sb.Append(" ");
+                        sb.Append(szValue.PadRight(nWidths[i]));
+                        sb.Append(" |");
+                    }
+
+                    sb.AppendLine();
+                }
+
+                sb.AppendLine(szSeparate);
+
+                richTextBox.AppendText(sb.ToString());
             }
         }
 
@@ -855,7 +939,48 @@ namespace Alien
 
             tabControl4.SelectedTab = page;
 
-            
+            string szPrompt = $"{config.szSource}({Enum.GetName(typeof(enDatabase), config.enDbType)})> ";
+
+            clsDbSqlShellControls ctrls = new clsDbSqlShellControls(page, config, m_dbMgr);
+            ctrls.richTextBox.AppendText("SQL Shell\n\n");
+            ctrls.richTextBox.AppendText(szPrompt);
+            ctrls.richTextBox.SelectionStart = ctrls.richTextBox.Text.Length;
+            ctrls.m_nPromitStart = ctrls.richTextBox.Text.Length;
+            ctrls.richTextBox.KeyDown += async (s, e) =>
+            {
+                if (e.KeyCode == Keys.Back)
+                {
+                    if (ctrls.richTextBox.SelectionStart <= ctrls.m_nPromitStart)
+                    {
+                        e.SuppressKeyPress = true;
+                    }
+                }
+                else if (e.KeyCode == Keys.Enter)
+                {
+                    e.SuppressKeyPress = true;
+
+                    string szCommand = ctrls.richTextBox.Text.Substring(ctrls.m_nPromitStart);
+
+                    ctrls.richTextBox.AppendText("\n\n");
+
+                    DataTable dt = await m_dbMgr.fnSqlQuery(config, szCommand);
+                    if (dt != null)
+                    {
+                        ctrls.fnPrintTable(dt);
+                        ctrls.richTextBox.AppendText("\n");
+                    }
+
+                    ctrls.richTextBox.AppendText(szPrompt);
+                    ctrls.m_nPromitStart = ctrls.richTextBox.TextLength;
+                }
+            };
+            ctrls.richTextBox.SelectionChanged += (s, e) =>
+            {
+                if (ctrls.richTextBox.SelectionStart < ctrls.m_nPromitStart)
+                {
+                    ctrls.richTextBox.SelectionStart = ctrls.richTextBox.TextLength;
+                }
+            };
         }
 
         #endregion
@@ -891,6 +1016,8 @@ namespace Alien
             m_ctrlEvalBrowser.BringToFront();
             m_ctrlEvalEditor.BringToFront();
             m_ctrlPostEditor.BringToFront();
+
+            toolStripStatusLabel3.Text = string.Empty;
 
             var fileInit = await m_fileMgr.fnszInit();
 
@@ -1279,14 +1406,16 @@ namespace Alien
 
         }
 
-        private void textBox4_KeyDown(object sender, KeyEventArgs e)
+        // Eval script
+        private async void toolStripButton7_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel3.Text = "Loading...";
 
-        }
+            string szCode = m_ctrlEvalEditor.Text;
+            string szResp = await m_runScript.fnszRunScript(szCode);
+            m_ctrlEvalBrowser.DocumentText = szResp;
 
-        private void toolStripButton7_Click(object sender, EventArgs e)
-        {
-
+            toolStripStatusLabel3.Text = "Run code is executed.";
         }
 
         // Database.Add
@@ -1366,13 +1495,31 @@ namespace Alien
         // Database.Info
         private void toolStripMenuItem20_Click(object sender, EventArgs e)
         {
+            TreeNode? node = treeView2.SelectedNode;
+            if (node == null)
+                return;
+
+            while (node.Parent != null)
+                node = node.Parent;
+
+            var cfg = (clsfnDb.stDbConfig)node.Tag;
 
         }
 
         // Database.SQL
         private void toolStripMenuItem21_Click(object sender, EventArgs e)
         {
+            TreeNode? node = treeView2.SelectedNode;
+            if (node == null)
+                return;
 
+            while (node.Parent != null)
+                node = node.Parent;
+
+            var cfg = (clsfnDb.stDbConfig)node.Tag;
+            string szDbName = node.Text;
+
+            fnDbShowSqlQuery(cfg, szDbName);
         }
 
         // Database.Add
@@ -1385,6 +1532,9 @@ namespace Alien
         private void toolStripMenuItem23_Click(object sender, EventArgs e)
         {
             TreeNode? node = treeView2.SelectedNode;
+            if (node == null)
+                return;
+
             while (node.Parent != null)
                 node = node.Parent;
 

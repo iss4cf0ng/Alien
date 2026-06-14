@@ -17,7 +17,7 @@ namespace Alien
 
         public async Task<string> fnszRunScript(string szCode)
         {
-            string szPost = await m_web.fnszSendPayload("run_script", new string[] { szCode });
+            string szPost = await m_web.fnszSendPayload("eval", new string[] { szCode });
             return szPost;
         }
     }
