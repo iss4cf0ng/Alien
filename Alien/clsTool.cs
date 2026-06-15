@@ -72,15 +72,12 @@ namespace Alien
         public static DataTable fnSqlQuery(SQLiteConnection conn, string szQuery)
         {
             DataTable dt = new DataTable();
-            DataSet ds = new DataSet();
-            ds.Clear();
 
             try
             {
                 using (var data_adapter = new SQLiteDataAdapter(szQuery, conn))
                 {
-                    data_adapter.Fill(ds);
-                    dt = ds.Tables[0];
+                    data_adapter.Fill(dt);
                 }
             }
             catch (Exception ex)

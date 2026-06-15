@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,9 +13,10 @@ namespace Alien
 {
     public partial class frmEditShell : Form
     {
-        public clsSqlite m_sqlConn;
-        public stShellConfig m_stShellConfig;
-        private bool m_bNewShell { get; set; }
+        public clsSqlite m_sqlConn { get; init; }
+        public stShellConfig m_stShellConfig { get; init; }
+        private bool m_bNewShell { get; init; }
+        private List<string> m_lsGroupName { get; init; }
 
         private string[] m_asEncoding =
         {
@@ -30,13 +32,14 @@ namespace Alien
             "EUC-KR", //Korean
         };
 
-        public frmEditShell(clsSqlite sqlConn, stShellConfig config, bool bNewShell)
+        public frmEditShell(clsSqlite sqlConn, stShellConfig config, bool bNewShell, List<string> lsGroupName)
         {
             InitializeComponent();
 
             m_sqlConn = sqlConn;
             m_stShellConfig = config;
             m_bNewShell = bNewShell;
+            m_lsGroupName = lsGroupName;
         }
 
         void fnSetup()
@@ -59,11 +62,12 @@ namespace Alien
 
             comboBox5.SelectedIndex = 0;
 
-            foreach (string szName in m_sqlConn.m_lsGroupName)
+            // Load groups
+
+            foreach (string szName in m_lsGroupName)
                 comboBox6.Items.Add(szName);
 
-            if (comboBox6.Items.Count > 0)
-                comboBox6.SelectedIndex = 0;
+            comboBox6.SelectedIndex = 1; // _Orphan
 
             string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper");
             if (Directory.Exists(szTamperDirPath))

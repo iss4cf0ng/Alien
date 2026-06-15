@@ -8,6 +8,7 @@ using System.Data.Entity.Core.Common.CommandTrees;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -58,15 +59,23 @@ namespace Alien
 
         private class clsDbTablePageControls
         {
-            public TabPage page { get; set; }
-            public ToolStrip toolStrip { get; set; }
-            public ListView listView { get; set; }
-            public TextBox textBox { get; set; }
+            public clsfnDb.stDbConfig m_config { get; init; }
+            public TreeNode m_nodeRoot { get; init; }
+            public TabPage page { get; init; }
+
+            public ToolStrip toolStrip { get; init; }
+            public ListView listView { get; init; }
+            public TextBox textBox { get; init; }
+
+            public List<string> m_lsLastTable = new List<string>();
 
             private ImageList dbListImageList { get; init; }
 
-            public clsDbTablePageControls(TabPage page, ImageList imageList, ContextMenuStrip menuTable)
+            public clsDbTablePageControls(clsfnDb.stDbConfig config, TreeNode nodeRoot, TabPage page, ImageList imageList, ContextMenuStrip menuTable)
             {
+                m_config = config;
+                m_nodeRoot = nodeRoot;
+
                 dbListImageList = new ImageList();
                 dbListImageList.ImageSize = new Size(60, 60);
                 dbListImageList.ColorDepth = ColorDepth.Depth32Bit;
@@ -85,22 +94,13 @@ namespace Alien
                     dbListImageList.Images.Add(szKey, imgNew);
                 }
 
-                if (page.Controls.Count > 0)
-                {
-                    this.page = page;
-                    toolStrip = (ToolStrip)page.Controls[0];
-                    listView = (ListView)page.Controls[1];
-                    textBox = (TextBox)page.Controls[2];
-                    dbListImageList = imageList;
-
-                    return;
-                }
-
                 ToolStrip ts = new ToolStrip();
                 ListView lv = new ListView();
                 TextBox tb = new TextBox();
 
                 this.page = page;
+                this.page.Tag = this;
+
                 toolStrip = ts;
                 listView = lv;
                 textBox = tb;
@@ -116,6 +116,7 @@ namespace Alien
                     btnRefresh,
                     btnNew,
                 });
+                ts.Font = page.Font;
 
                 page.Controls.Add(ts);
                 page.Controls.Add(lv);
@@ -190,6 +191,7 @@ namespace Alien
             private SplitContainer splitContainer { get; init; }
 
             public int m_nPromitStart { get; set; }
+            public string m_szPrompt { get { return $"{m_config.szSource}({Enum.GetName(typeof(enDatabase), m_config.enDbType)})> "; } }
 
             public RichTextBox richTextBox { get; init; }
             public ToolStrip toolStrip { get; init; }
@@ -207,13 +209,13 @@ namespace Alien
 
                 page.Controls.Add(splitContainer);
                 splitContainer.FixedPanel = FixedPanel.Panel2;
-                splitContainer.SplitterDistance = 300;
                 splitContainer.Panel1.Controls.Add(richTextBox);
                 splitContainer.Panel2.Controls.Add(toolStrip);
                 splitContainer.Panel2.Controls.Add(textEditorControl);
 
                 splitContainer.Orientation = Orientation.Horizontal;
                 splitContainer.Dock = DockStyle.Fill;
+                splitContainer.SplitterDistance = 200;
 
                 richTextBox.Font = new Font("Consolas", page.Font.Size);
                 richTextBox.BackColor = Color.Black;
@@ -224,6 +226,34 @@ namespace Alien
                 richTextBox.BringToFront();
 
                 textEditorControl.Dock = DockStyle.Fill;
+                textEditorControl.BringToFront();
+
+                ToolStripButton btnExec = new ToolStripButton("Execute");
+
+                toolStrip.Items.AddRange(new ToolStripItem[]
+                {
+                    btnExec,
+                });
+                toolStrip.Font = page.Font;
+
+                btnExec.Click += async (s, e) =>
+                {
+                    string szSQL = textEditorControl.Text;
+                    if (string.IsNullOrEmpty(szSQL))
+                        return;
+
+                    szSQL = m_dbMgr.fnToSingleLineSql(szSQL);
+
+                    DataTable dt = await m_dbMgr.fnSqlQuery(m_config, szSQL);
+
+                    richTextBox.AppendText("\n\nExecute SQL result:\n\n");
+                    fnPrintTable(dt);
+                    richTextBox.AppendText("\n");
+
+                    richTextBox.AppendText(m_szPrompt);
+                    richTextBox.ScrollToCaret();
+                    m_nPromitStart = richTextBox.TextLength;
+                };
             }
 
             public void fnPrintTable(DataTable dt)
@@ -233,19 +263,22 @@ namespace Alien
 
                 int[] nWidths = new int[dt.Columns.Count];
 
+                // Calculate widths
                 for (int i = 0; i < dt.Columns.Count; i++)
                 {
                     nWidths[i] = dt.Columns[i].ColumnName.Length;
 
                     foreach (DataRow dr in dt.Rows)
                     {
-                        string szValue = dr[0].ToString() ?? string.Empty;
+                        string szValue = dr[i]?.ToString() ?? string.Empty;
                         nWidths[i] = Math.Max(nWidths[i], szValue.Length);
                     }
                 }
 
                 StringBuilder sb = new StringBuilder();
-                string szSeparate = "+" + string.Join("+", nWidths.Select(w => new string('-', w + 2))) + "+";
+
+                string szSeparate =
+                    "+" + string.Join("+", nWidths.Select(w => new string('-', w + 2))) + "+";
 
                 sb.AppendLine(szSeparate);
 
@@ -812,6 +845,12 @@ namespace Alien
 
         public async void fnDbInit()
         {
+            // UI init
+            treeView2.Nodes.Clear();
+            listView4.Items.Clear();
+            foreach (TabPage tab in tabControl4.TabPages)
+                tabControl4.TabPages.Remove(tab);
+
             // Scan available modules.
             var lsDb = await m_dbMgr.fnDbInit();
             foreach (var module in lsDb)
@@ -823,8 +862,6 @@ namespace Alien
             }
 
             // Load database config from *.sqlite file.
-            treeView2.Nodes.Clear();
-
             var ls = m_dbMgr.fnGetAllDbConfig();
             foreach (var db in ls)
             {
@@ -854,7 +891,9 @@ namespace Alien
                 }
             }
 
-            clsDbTablePageControls ctrls = new clsDbTablePageControls(page, dbImageList, menuDbTable);
+            var config = (clsfnDb.stDbConfig)nodeSelected.Parent.Tag;
+
+            clsDbTablePageControls ctrls = new clsDbTablePageControls(config, nodeSelected, page, dbImageList, menuDbTable);
             ctrls.listView.DoubleClick += async (s, e) =>
             {
                 if (ctrls.listView.SelectedItems.Count == 0)
@@ -869,6 +908,25 @@ namespace Alien
 
                 fnDbShowData(config, dt, szQuery);
             };
+            ctrls.textBox.KeyDown += (s, e) =>
+            {
+                Task.Run(() =>
+                {
+                    List<string> lsMatched = ctrls.m_lsLastTable.Where(x => x.Contains(ctrls.textBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+                    Invoke(() =>
+                    {
+                        ctrls.listView.Clear();
+
+                        foreach (var table in lsMatched)
+                        {
+                            ListViewItem item = new ListViewItem(table);
+                            item.ImageKey = "table";
+
+                            ctrls.listView.Items.Add(item);
+                        }
+                    });
+                });
+            };
 
             if (!tabControl4.TabPages.Contains(page))
                 tabControl4.TabPages.Add(page);
@@ -876,6 +934,9 @@ namespace Alien
             tabControl4.SelectedTab = page;
 
             // Show tables
+            if (ctrls.m_lsLastTable.Count > 0)
+                ctrls.m_lsLastTable.Clear();
+
             foreach (string szTable in lsTable)
             {
                 if (ctrls.listView.FindItemWithText(szTable) == null)
@@ -895,6 +956,8 @@ namespace Alien
 
                     nodeSelected.Nodes.Add(node);
                 }
+
+                ctrls.m_lsLastTable.Add(szTable);
             }
 
             nodeSelected.Expand();
@@ -939,11 +1002,9 @@ namespace Alien
 
             tabControl4.SelectedTab = page;
 
-            string szPrompt = $"{config.szSource}({Enum.GetName(typeof(enDatabase), config.enDbType)})> ";
-
             clsDbSqlShellControls ctrls = new clsDbSqlShellControls(page, config, m_dbMgr);
             ctrls.richTextBox.AppendText("SQL Shell\n\n");
-            ctrls.richTextBox.AppendText(szPrompt);
+            ctrls.richTextBox.AppendText(ctrls.m_szPrompt);
             ctrls.richTextBox.SelectionStart = ctrls.richTextBox.Text.Length;
             ctrls.m_nPromitStart = ctrls.richTextBox.Text.Length;
             ctrls.richTextBox.KeyDown += async (s, e) =>
@@ -970,7 +1031,8 @@ namespace Alien
                         ctrls.richTextBox.AppendText("\n");
                     }
 
-                    ctrls.richTextBox.AppendText(szPrompt);
+                    ctrls.richTextBox.AppendText(ctrls.m_szPrompt);
+                    ctrls.richTextBox.ScrollToCaret();
                     ctrls.m_nPromitStart = ctrls.richTextBox.TextLength;
                 }
             };
@@ -1077,7 +1139,7 @@ namespace Alien
                 int nIdx = fnGetTabIndexAt(e.Location);
                 if (nIdx == -1) return;
 
-                // CLOSE click has priority
+                // "Close" click has priority
                 if (fnGetCloseRect(nIdx).Contains(e.Location))
                 {
                     tabControl4.TabPages.RemoveAt(nIdx);
@@ -1440,6 +1502,7 @@ namespace Alien
             if (node.Parent == null)
             {
                 //Show databases
+
                 var config = m_dbMgr.m_stDbConfig[node.Text];
                 DataTable dt = await m_dbMgr.fnSqlQuery(config, "SHOW DATABASES;");
 
@@ -1457,6 +1520,8 @@ namespace Alien
                 }
 
                 node.Expand();
+
+                textBox2.Text = config.szConnString;
             }
             else if (node.Parent != null && node.Parent.Parent == null)
             {
@@ -1546,6 +1611,71 @@ namespace Alien
 
         // Database.Remove (This functionality do NOT remove the remote database, just only the local configuration
         private void toolStripMenuItem24_Click(object sender, EventArgs e)
+        {
+            TreeNode? nodeSelected = treeView2.SelectedNode;
+            if (nodeSelected == null)
+                return;
+
+            TreeNode node = nodeSelected;
+            while (node.Parent != null)
+                node = node.Parent;
+
+            DialogResult dr = MessageBox.Show($"Are you sure to remove \"{node.Text}\"? (Tips: This will only remove the local configuration rather than the remote database).", "Remove?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dr != DialogResult.Yes)
+                return;
+
+            var config = (clsfnDb.stDbConfig)node.Tag;
+            
+            if (!m_dbMgr.fnbDbDelete(config))
+            {
+                MessageBox.Show("Cannot remote database: " + node.Text, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            node.Nodes.Clear();
+            treeView2.Nodes.Remove(node);
+        }
+
+        // DbTable.Open
+        private async void toolStripMenuItem25_Click(object sender, EventArgs e)
+        {
+            TabPage? page = tabControl4.SelectedTab;
+            if (page == null || page.Tag == null)
+                return;
+
+            clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
+            
+            if (ctrls.listView.Items.Count == 0)
+                return;
+
+            ListViewItem item = ctrls.listView.SelectedItems[0];
+            if (item == null)
+                return;
+
+            var config = ctrls.m_config;
+            string szDbName = ctrls.m_nodeRoot.Text;
+            string szTable = item.Text;
+
+            string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT 100;";
+            DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
+
+            fnDbShowData(config, dt, szQuery);
+        }
+
+        // DbTable.Dump
+        private void toolStripMenuItem28_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // DbTable.New
+        private void toolStripMenuItem26_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // DbTable.Delete
+        private void toolStripMenuItem27_Click(object sender, EventArgs e)
         {
 
         }

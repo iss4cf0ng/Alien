@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Security;
+﻿using System.Data;
+using System.Data.SQLite;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Alien
 {
@@ -46,6 +43,62 @@ namespace Alien
                 }
             }
         };
+        private Dictionary<enDatabase, string> m_dicInfoSQL = new Dictionary<enDatabase, string>()
+        {
+            {
+                enDatabase.MySQL,
+                @"SELECT
+                    @@hostname AS host,
+                    @@port AS port,
+                    VERSION() AS version,
+                    DATABASE() AS current_database,
+                    USER() AS connected_user,
+                    CURRENT_USER() AS authenticated_user;"
+            },
+            {
+                enDatabase.Access,
+                @""
+            },
+            {
+                enDatabase.SQLServer,
+                @"SELECT
+                    @@SERVERNAME AS server_name,
+                    SERVERPROPERTY('MachineName') AS machine_name,
+                    SERVERPROPERTY('InstanceName') AS instance_name,
+                    @@VERSION AS version,
+                    DB_NAME() AS current_database,
+                    SYSTEM_USER AS current_user;"
+            },
+            {
+                enDatabase.PostgreSQL,
+                @"SELECT
+                    inet_server_addr() AS server_ip,
+                    inet_server_port() AS server_port,
+                    version() AS version,
+                    current_database() AS current_database,
+                    current_user AS current_user;"
+            },
+            {
+                enDatabase.SQLite,
+                @"SELECT sqlite_version() AS version;"
+            },
+            {
+                enDatabase.Oracle,
+                @"SELECT
+                    i.host_name,
+                    i.instance_name,
+                    i.version,
+                    d.name AS database_name,
+                    USER AS current_user
+                FROM v$instance i
+                CROSS JOIN v$database d;"
+            },
+            {
+                enDatabase.DSN,
+                @""
+            }
+        };
+
         public Dictionary<string, stDbConfig> m_stDbConfig = new Dictionary<string, stDbConfig>();
 
         public struct stDbConfig
@@ -87,25 +140,28 @@ namespace Alien
 
         public bool fnbDbExists(string szSource)
         {
-            string szQuery = $"SELECT EXISTS(SELECT 1 FROM \"Database\" WHERE \"Source\"=\"{szSource}\");";
-            DataTable dt = clsTool.fnSqlQuery(m_sqlConn.m_sqlConn, szQuery);
+            string szQuery = "SELECT EXISTS(SELECT 1 FROM \"Database\" WHERE \"Source\" = @src);";
 
-            return (Int64)dt.Rows[0][0] == (Int64)1;
+            using var cmd = new SQLiteCommand(szQuery, m_sqlConn.m_sqlConn);
+            cmd.Parameters.AddWithValue("@src", szSource);
+
+            object result = cmd.ExecuteScalar();
+
+            return Convert.ToInt32(result) == 1;
         }
-        
+
         private bool fnbDbWriteValidate(stDbConfig config)
         {
             if (!fnbDbExists(config.szSource))
                 return false;
 
-            stDbConfig x = fnGetDbConfig(config.szSource);
+            stDbConfig x = fnGetDbConfig(config.szID);
 
-            bool bRet = string.Equals(x.szID, config.szID)
-                && string.Equals(x.szSource, config.szSource)
-                && string.Equals(x.szUsername, config.szUsername)
-                && string.Equals(x.szPassword, config.szPassword)
-                && DateTime.Equals(x.dtCreationDate, config.dtCreationDate)
-                && DateTime.Equals(x.dtLastUsed, config.dtLastUsed);
+            bool bRet = string.Equals(x.szID, config.szID, StringComparison.Ordinal)
+                && string.Equals(x.szConnString, config.szConnString, StringComparison.Ordinal)
+                && string.Equals(x.szSource, config.szSource, StringComparison.Ordinal)
+                && string.Equals(x.szUsername, config.szUsername, StringComparison.Ordinal)
+                && string.Equals(x.szPassword, config.szPassword, StringComparison.Ordinal);
 
             return bRet;
         }
@@ -120,7 +176,7 @@ namespace Alien
                     return false;
 
                 szQuery = $"UPDATE \"Database\" SET " +
-                    $"\"DbType\" = \"{Enum.GetName(config.enDbType)}\"," +
+                    $"\"DbType\" = \"{Enum.GetName(typeof(enDatabase), config.enDbType)}\"," +
                     $"\"ConnString\" = \"{config.szConnString}\"," +
                     $"\"Source\" = \"{config.szSource}\"," +
                     $"\"Username\" = \"{config.szUsername}\"," +
@@ -157,10 +213,10 @@ namespace Alien
             return fnbDbWriteValidate(config);
         }
 
-        public stDbConfig fnGetDbConfig(string szSource)
+        public stDbConfig fnGetDbConfig(string szId)
         {
             var ls = fnGetAllDbConfig();
-            stDbConfig config = ls.Where(x => string.Equals(x.szSource, szSource)).ToList().First();
+            stDbConfig config = ls.Where(x => string.Equals(x.szID, szId)).ToList().First();
 
             return config;
         }
@@ -206,6 +262,22 @@ namespace Alien
             return ls;
         }
 
+        public bool fnbDbDelete(stDbConfig config)
+        {
+            if (!fnbDbExists(config.szSource))
+            {
+                MessageBox.Show($"Cannot find database: {config.szSource}", "Not found!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            string szQuery = $"DELETE FROM Database WHERE ID=\"{config.szID}\";";
+            var cmd = clsTool.fnSqlQuery(m_sqlConn.m_sqlConn, szQuery);
+
+            bool bVerify = !fnbDbExists(config.szSource);
+
+            return bVerify;
+        }
+
         #endregion
 
         #region Tools
@@ -214,30 +286,78 @@ namespace Alien
         {
             switch (cfg.enDbType)
             {
+                case enDatabase.DSN:
+                    return string.IsNullOrWhiteSpace(cfg.szUsername)
+                        ? $"DSN={cfg.szSource};"
+                        : $"DSN={cfg.szSource};UID={cfg.szUsername};PWD={cfg.szPassword};";
+
                 case enDatabase.MySQL:
-                    return $"Server={cfg.szSource};Database=information_schema;Uid={cfg.szUsername};Pwd={cfg.szPassword};";
+                    return
+                        $"Server={cfg.szSource};" +
+                        $"Database=information_schema;" +
+                        $"Uid={cfg.szUsername};" +
+                        $"Pwd={cfg.szPassword};";
 
                 case enDatabase.SQLServer:
-                    return $"Server={cfg.szSource};Database=master;User Id={cfg.szUsername};Password={cfg.szPassword};";
+                    return string.IsNullOrWhiteSpace(cfg.szUsername)
+                        ? $"Server={cfg.szSource};Database=master;Trusted_Connection=True;"
+                        : $"Server={cfg.szSource};Database=master;User Id={cfg.szUsername};Password={cfg.szPassword};";
 
                 case enDatabase.PostgreSQL:
-                    return $"Host={cfg.szSource};Username={cfg.szUsername};Password={cfg.szPassword};Database=postgres;";
+                    return
+                        $"Host={cfg.szSource};" +
+                        $"Database=postgres;" +
+                        $"Username={cfg.szUsername};" +
+                        $"Password={cfg.szPassword};";
 
                 case enDatabase.SQLite:
-                    return cfg.szSource; // file path only
+                    return $"Data Source={cfg.szSource};";
 
                 case enDatabase.ODBC:
-                    return cfg.szSource; // full ODBC string already
+                    return cfg.szSource;
 
                 case enDatabase.Access:
-                    return $"Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};Dbq={cfg.szSource};";
+                    return
+                        $"Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};" +
+                        $"Dbq={cfg.szSource};";
 
                 case enDatabase.Oracle:
-                    return $"User Id={cfg.szUsername};Password={cfg.szPassword};Data Source={cfg.szSource};";
+                    return
+                        $"User Id={cfg.szUsername};" +
+                        $"Password={cfg.szPassword};" +
+                        $"Data Source={cfg.szSource};";
 
                 default:
-                    throw new NotSupportedException($"Unsupported database type: {Enum.GetName(typeof(enDatabase), cfg.enDbType)}");
+                    throw new NotSupportedException(
+                        $"Unsupported database type: {cfg.enDbType}");
             }
+        }
+
+        public string fnToSingleLineSql(string szSQL)
+        {
+            if (string.IsNullOrEmpty(szSQL))
+                return szSQL;
+
+            bool inSingleQuote = false;
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < szSQL.Length; i++)
+            {
+                char c = szSQL[i];
+
+                if (c == '\'')
+                    inSingleQuote = !inSingleQuote;
+
+                if (!inSingleQuote)
+                {
+                    if (c == '\r' || c == '\n' || c == '\t')
+                        c = ' ';
+                }
+
+                sb.Append(c);
+            }
+
+            return Regex.Replace(sb.ToString(), @"[ ]{2,}", " ").Trim();
         }
 
         #endregion
@@ -320,6 +440,20 @@ namespace Alien
             DataTable dt = await fnSqlQuery(config, szQuery);
 
             return dt.Rows.Count > 0 && dt.Columns.Count > 0 && Convert.ToInt32(dt.Rows[0][0]) == 1;
+        }
+
+        public async Task<DataTable> fnDbInfo(stDbConfig config)
+        {
+            DataTable dt = new DataTable();
+            string szQuery = m_dicInfoSQL[config.enDbType];
+
+            if (string.IsNullOrEmpty(szQuery))
+                return dt;
+            
+            szQuery = fnToSingleLineSql(szQuery);
+            dt = await fnSqlQuery(config, szQuery);
+
+            return dt;
         }
 
         public async Task<List<string>> fnDbGetTables(stDbConfig config, string szDbName)

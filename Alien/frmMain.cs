@@ -8,6 +8,20 @@ namespace Alien
         private const string m_szVersion = "v5.0.0";
         private const string m_szAuthor = "iss4cf0ng/ISSAC";
 
+        private List<string> m_lsGroupName
+        {
+            get
+            {
+                if (treeView1.Nodes.Count == 0)
+                    return new List<string>();
+
+                return treeView1.Nodes[0].Nodes
+                    .Cast<TreeNode>()
+                    .Select(n => n.Text)
+                    .ToList();
+            }
+        }
+
         public clsSqlite m_sqlConn;
         private string[] m_generalGroup =
         {
@@ -62,6 +76,8 @@ namespace Alien
 
             foreach (var config in lsConfig)
             {
+                // ListView
+
                 ListViewItem item = new ListViewItem(config.ID);
                 item.SubItems.Add(config.szUrl);
                 item.SubItems.Add(config.language.ToString());
@@ -76,6 +92,15 @@ namespace Alien
                 item.Tag = web;
 
                 listView1.Items.Add(item);
+
+                // TreeView
+                TreeNode node = treeView1.Nodes[0];
+                var lsGroupName = m_lsGroupName;
+                if (!string.IsNullOrEmpty(config.szGroupName) && !lsGroupName.Contains(config.szGroupName))
+                {
+                    TreeNode nodeNew = new TreeNode(config.szGroupName);
+                    node.Nodes.Add(nodeNew);
+                }
             }
 
             fnUpdateState();
@@ -104,14 +129,6 @@ namespace Alien
             treeView1.ExpandAll();
 
             fnLoadShell();
-
-            foreach (string szGroupName in m_sqlConn.m_lsGroupName)
-            {
-                if (szGroupName.StartsWith("_") || string.IsNullOrEmpty(szGroupName))
-                    continue;
-
-                treeView1.Nodes[0].Nodes.Add(szGroupName);
-            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -135,11 +152,9 @@ namespace Alien
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true);
+            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Add Shell";
-
-            f.m_sqlConn = m_sqlConn;
 
             f.ShowDialog();
 
@@ -148,11 +163,9 @@ namespace Alien
 
         private void toolStripMenuItem8_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true);
+            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Add Shell";
-
-            f.m_sqlConn = m_sqlConn;
 
             f.ShowDialog();
 
@@ -174,13 +187,13 @@ namespace Alien
                     MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 clsWeb web = lc[0];
-                frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false);
+                frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
                 f.StartPosition = FormStartPosition.CenterScreen;
                 f.Text = "Edit Shell";
 
-                f.m_sqlConn = m_sqlConn;
-
                 f.ShowDialog();
+
+                fnLoadShell();
             }
         }
 
@@ -205,13 +218,13 @@ namespace Alien
                 MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             clsWeb web = lc[0];
-            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false);
+            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Edit Shell";
 
-            f.m_sqlConn = m_sqlConn;
-
             f.ShowDialog();
+
+            fnLoadShell();
         }
 
         private void toolStripMenuItem4_Click(object sender, EventArgs e)
@@ -241,7 +254,7 @@ namespace Alien
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             TreeNode node = treeView1.SelectedNode;
-            if (node.Parent == null || string.Equals(node.Text, "All"))
+            if (node.Parent == null)
                 return;
 
             var ls = m_sqlConn.fnGetShellWithGroupName(node.Text);
@@ -262,13 +275,13 @@ namespace Alien
                 MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             clsWeb web = lc[0];
-            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false);
+            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Edit Shell";
 
-            f.m_sqlConn = m_sqlConn;
-
             f.ShowDialog();
+
+            fnLoadShell();
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)

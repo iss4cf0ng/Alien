@@ -40,7 +40,6 @@
             textBox4 = new TextBox();
             label5 = new Label();
             button2 = new Button();
-            checkBox1 = new CheckBox();
             SuspendLayout();
             // 
             // comboBox1
@@ -86,6 +85,7 @@
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(281, 27);
             textBox2.TabIndex = 4;
+            textBox2.TextChanged += textBox2_TextChanged;
             // 
             // label2
             // 
@@ -111,6 +111,7 @@
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(281, 27);
             textBox3.TabIndex = 6;
+            textBox3.TextChanged += textBox3_TextChanged;
             // 
             // label4
             // 
@@ -125,9 +126,10 @@
             // 
             textBox4.Location = new Point(121, 201);
             textBox4.Name = "textBox4";
-            textBox4.Size = new Size(206, 27);
+            textBox4.Size = new Size(281, 27);
             textBox4.TabIndex = 8;
             textBox4.UseSystemPasswordChar = true;
+            textBox4.TextChanged += textBox4_TextChanged;
             // 
             // label5
             // 
@@ -148,23 +150,11 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
-            // checkBox1
-            // 
-            checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(336, 203);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(67, 23);
-            checkBox1.TabIndex = 12;
-            checkBox1.Text = "Show";
-            checkBox1.UseVisualStyleBackColor = true;
-            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
-            // 
             // frmDbEdit
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(415, 306);
-            Controls.Add(checkBox1);
             Controls.Add(button2);
             Controls.Add(label5);
             Controls.Add(label4);
@@ -202,6 +192,5 @@
         private TextBox textBox4;
         private Label label5;
         private Button button2;
-        private CheckBox checkBox1;
     }
 }

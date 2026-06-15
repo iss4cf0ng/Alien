@@ -48,7 +48,6 @@ namespace Alien
         };
 
         public SQLiteConnection m_sqlConn { get; set; }
-        public List<string> m_lsGroupName = new List<string>() { "All" };
 
         public clsSqlite(SQLiteConnection sqlConn)
         {
@@ -276,8 +275,6 @@ namespace Alien
 
         public List<stShellConfig> fnGetAllShellConfig()
         {
-            m_lsGroupName.Clear();
-
             List<stShellConfig> lsConfig = new List<stShellConfig>();
             string szQuery = $"SELECT * FROM \"Shell\";";
             DataTable dt = fnSqlQuery(szQuery);
@@ -285,9 +282,6 @@ namespace Alien
             {
                 stShellConfig config = fnDataRowToStruct(dr);
                 lsConfig.Add(config);
-
-                if (!m_lsGroupName.Contains(config.szGroupName))
-                    m_lsGroupName.Add(config.szGroupName);
             }
 
             return lsConfig;
@@ -295,7 +289,7 @@ namespace Alien
 
         public List<stShellConfig> fnGetShellWithGroupName(string szGroupName)
         {
-            if (szGroupName == "All")
+            if (szGroupName == "_All")
                 return fnGetAllShellConfig();
 
             List<stShellConfig> lsConfig = new List<stShellConfig>();

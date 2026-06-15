@@ -35,12 +35,44 @@ namespace Alien
             m_dbConfig = dbConfig;
         }
 
+        void fnUpdateConnStr()
+        {
+            var tmpConfig = new clsfnDb.stDbConfig()
+            {
+                enDbType = (enDatabase)Enum.Parse(typeof(enDatabase), comboBox1.Text),
+                szSource = textBox2.Text,
+                szUsername = textBox3.Text,
+                szPassword = textBox4.Text,
+            };
+
+            textBox1.Text = clsfnDb.fnBuildConnStr(tmpConfig);
+        }
+
         void fnSetup()
         {
             foreach (string szName in Enum.GetNames(typeof(enDatabase)))
                 comboBox1.Items.Add(szName);
 
             comboBox1.SelectedIndex = 0;
+
+            if (string.IsNullOrEmpty(m_dbConfig.szID))
+                return;
+
+            // Edit
+
+            for (int i = 0; i < comboBox1.Items.Count; i++)
+            {
+                if ((int)m_dbConfig.enDbType == i)
+                {
+                    comboBox1.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            textBox1.Text = m_dbConfig.szConnString;
+            textBox2.Text = m_dbConfig.szSource;
+            textBox3.Text = m_dbConfig.szUsername;
+            textBox4.Text = m_dbConfig.szPassword;
         }
 
         private void frmDbEdit_Load(object sender, EventArgs e)
@@ -68,15 +100,19 @@ namespace Alien
                     break;
                 case enDatabase.SQLServer:
                     textBox3.Enabled = true;
+                    textBox3.Text = string.IsNullOrEmpty(textBox3.Text)? "sa" : textBox3.Text;
 
                     break;
                 case enDatabase.PostgreSQL:
+                    textBox3.Enabled = true;
 
                     break;
                 case enDatabase.SQLite:
 
                     break;
             }
+
+            fnUpdateConnStr();
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -100,17 +136,12 @@ namespace Alien
                 MessageBox.Show("Connect testing is failed.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            textBox4.UseSystemPasswordChar = !checkBox1.Checked;
-        }
-
         private void button2_Click(object sender, EventArgs e)
         {
             var config = new clsfnDb.stDbConfig()
             {
                 enDbType = (enDatabase)Enum.Parse(typeof(enDatabase), comboBox1.Text),
-                szID = Guid.NewGuid().ToString(),
+                szID = m_dbConfig.szID ?? Guid.NewGuid().ToString(),
                 szSource = textBox2.Text,
                 szUsername = textBox3.Text,
                 szPassword = textBox4.Text,
@@ -131,6 +162,21 @@ namespace Alien
             {
                 MessageBox.Show("Save config failed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            fnUpdateConnStr();
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            fnUpdateConnStr();
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            fnUpdateConnStr();
         }
     }
 }
