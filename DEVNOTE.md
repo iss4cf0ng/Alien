@@ -33,3 +33,10 @@ Notes of developing Alien webshell management tool.
     - Redis
     - ODBC
     - Oracle
+- 2026-6-14
+  - SQL, view databases, tables
+  - SQL Shell
+- 2026-6-16
+  - Shell
+    - Exec Shell
+    - Virtual Shell (Piped shell for Windows, PTY shell for Unix-like)
