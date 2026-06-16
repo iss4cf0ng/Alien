@@ -1754,7 +1754,20 @@ namespace Alien
 
         private async void button1_Click(object sender, EventArgs e)
         {
+            bool bStop = string.Equals(button1.Text, "Stop");
+
             await m_rShell.fnPipeCreate(textBox4.Text);
+
+            timerShell.Interval = 300;
+            timerShell.Start();
+        }
+
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            bool bStop = string.Equals(button2.Text, "Stop");
+
+
+            await m_rShell.fnPipeCreate(textBox5.Text);
 
             timerShell.Interval = 300;
             timerShell.Start();
@@ -1797,14 +1810,6 @@ namespace Alien
 
                 textBox5.Text = string.Empty;
             }
-        }
-
-        private async void button2_Click(object sender, EventArgs e)
-        {
-            await m_rShell.fnPipeCreate(textBox5.Text);
-
-            timerShell.Interval = 300;
-            timerShell.Start();
         }
     }
 }

