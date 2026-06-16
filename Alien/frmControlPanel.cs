@@ -1897,5 +1897,38 @@ namespace Alien
                 return;
             }
         }
+
+        private async void treeView5_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            TreeNode nodeSelected = treeView5.SelectedNode;
+            if (nodeSelected == null)
+                return;
+
+            if (nodeSelected.Parent == null)
+            {
+                //Computer
+
+                var result = await m_winReg.fnHives();
+                foreach (string szKey in result.Keys)
+                {
+                    if (result[szKey])
+                    {
+                        TreeNode node = new TreeNode(szKey);
+                        if (fnFindNodeWithFullPath(treeView5.Nodes, $"Computer\\{node.Text}") == null)
+                            nodeSelected.Nodes.Add(node);
+                    }
+                }
+            }
+            else
+            {
+                // Scan
+
+                var result = await m_winReg.fnScan(nodeSelected.FullPath.Replace("Computer\\", string.Empty));
+                if (result == null)
+                    return;
+
+                MessageBox.Show(result.Subkeys.Count.ToString());
+            }
+        }
     }
 }

@@ -825,10 +825,10 @@
             // tabPage9
             // 
             tabPage9.Controls.Add(tabControl8);
-            tabPage9.Location = new Point(4, 24);
+            tabPage9.Location = new Point(4, 28);
             tabPage9.Name = "tabPage9";
             tabPage9.Padding = new Padding(3);
-            tabPage9.Size = new Size(996, 492);
+            tabPage9.Size = new Size(996, 488);
             tabPage9.TabIndex = 1;
             tabPage9.Text = "Virtual Shell";
             tabPage9.UseVisualStyleBackColor = true;
@@ -841,7 +841,7 @@
             tabControl8.Location = new Point(3, 3);
             tabControl8.Name = "tabControl8";
             tabControl8.SelectedIndex = 0;
-            tabControl8.Size = new Size(990, 486);
+            tabControl8.Size = new Size(990, 482);
             tabControl8.TabIndex = 5;
             // 
             // tabPage10
@@ -853,7 +853,7 @@
             tabPage10.Location = new Point(4, 28);
             tabPage10.Name = "tabPage10";
             tabPage10.Padding = new Padding(3);
-            tabPage10.Size = new Size(982, 454);
+            tabPage10.Size = new Size(982, 450);
             tabPage10.TabIndex = 0;
             tabPage10.Text = "tabPage10";
             tabPage10.UseVisualStyleBackColor = true;
@@ -861,7 +861,7 @@
             // textBox5
             // 
             textBox5.Dock = DockStyle.Bottom;
-            textBox5.Location = new Point(3, 424);
+            textBox5.Location = new Point(3, 420);
             textBox5.Name = "textBox5";
             textBox5.Size = new Size(976, 27);
             textBox5.TabIndex = 5;
@@ -892,7 +892,7 @@
             webViewShell.DefaultBackgroundColor = Color.White;
             webViewShell.Location = new Point(3, 36);
             webViewShell.Name = "webViewShell";
-            webViewShell.Size = new Size(973, 474);
+            webViewShell.Size = new Size(973, 382);
             webViewShell.TabIndex = 2;
             webViewShell.ZoomFactor = 1D;
             // 
@@ -904,7 +904,7 @@
             tabPage19.Location = new Point(4, 24);
             tabPage19.Name = "tabPage19";
             tabPage19.Padding = new Padding(3);
-            tabPage19.Size = new Size(982, 458);
+            tabPage19.Size = new Size(982, 454);
             tabPage19.TabIndex = 1;
             tabPage19.Text = "tabPage19";
             tabPage19.UseVisualStyleBackColor = true;
@@ -917,7 +917,7 @@
             webViewLinuxShell.DefaultBackgroundColor = Color.White;
             webViewLinuxShell.Location = new Point(6, 39);
             webViewLinuxShell.Name = "webViewLinuxShell";
-            webViewLinuxShell.Size = new Size(970, 413);
+            webViewLinuxShell.Size = new Size(970, 409);
             webViewLinuxShell.TabIndex = 7;
             webViewLinuxShell.ZoomFactor = 1D;
             // 
@@ -1342,6 +1342,7 @@
             treeView5.Name = "treeView5";
             treeView5.Size = new Size(267, 416);
             treeView5.TabIndex = 0;
+            treeView5.AfterSelect += treeView5_AfterSelect;
             // 
             // listView3
             // 
