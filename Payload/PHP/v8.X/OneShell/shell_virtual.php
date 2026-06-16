@@ -121,7 +121,7 @@ if ($type == "create") {
             break;
         }
 
-        // 1. TRANSACTIONAL QUEUE PROCESSING (Bulletproof against high-speed input typing)
+        // Transitional queue processing (avoid high-speed input typing)
         $files = glob($queue_dir . '/*.txt');
         if (!empty($files)) {
             // Sort files alphabetically to ensure strict execution order matching timestamps
@@ -141,7 +141,7 @@ if ($type == "create") {
             $idle++;
         }
 
-        // 2. stdout stream reader and convertor
+        // stdout stream reader and convertor
         $output = "";
         while (($chunk = fread($reader, 10240)) !== false && $chunk !== "") {
             $output .= $chunk;
@@ -154,7 +154,7 @@ if ($type == "create") {
             @ftruncate($reader, 0);
         }
 
-        // 3. stderr stream reader and convertor
+        // stderr stream reader and convertor
         $errput = "";
         while (($err_chunk = fread($error, 10240)) !== false && $err_chunk !== "") {
             $errput .= $err_chunk;

