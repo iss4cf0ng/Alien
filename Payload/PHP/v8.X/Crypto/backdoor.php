@@ -293,7 +293,7 @@ if ($method === 'POST') {
             "last_seq" => $state['last_seq'],
             "seq_window" => $window,
             "client_sign_pub" => $state['client_sign_pub'],
-            "cwd" => $state['cwd'],
+            "cwd" => $state['cwd'] ?? '.',
             "env" => $state['env'] ?? [],
         ]);
 

