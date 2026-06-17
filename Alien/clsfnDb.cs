@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace Alien
 {
@@ -98,6 +99,96 @@ namespace Alien
                 @""
             }
         };
+        public Dictionary<enDatabase, string> m_dicShowDatabaseSQL = new Dictionary<enDatabase, string>()
+        {
+            {
+                enDatabase.MySQL,
+                @"SHOW DATABASES;"
+            },
+            {
+                enDatabase.SQLServer,
+                @"SELECT name FROM sys.databases ORDER BY name;"
+            },
+            {
+                enDatabase.PostgreSQL,
+                @"SELECT
+                    datname AS name
+                  FROM pg_database
+                  ORDER BY datname;"
+            },
+            {
+                enDatabase.Oracle,
+                @"SELECT name FROM v$database;"
+            },
+            {
+                enDatabase.SQLite,
+                @"SELECT '$(DATABASE)' AS name;"
+            },
+            {
+                enDatabase.Access,
+                @"SELECT '$(DATABASE)' AS name;"
+            },
+            {
+                enDatabase.DSN,
+                @""
+            }
+        };
+        private Dictionary<enDatabase, Func<string, string>> m_dicShowTablesSQL = new Dictionary<enDatabase, Func<string, string>>()
+        {
+            {
+                enDatabase.MySQL,
+                (db) =>
+                    $"SELECT table_name AS name " +
+                    $"FROM information_schema.tables " +
+                    $"WHERE table_schema = '{db}' " +
+                    $"ORDER BY table_name;"
+            },
+            {
+                enDatabase.SQLServer,
+                (db) =>
+                    $"USE [{db}]; " +
+                    $"SELECT name AS name " +
+                    $"FROM sys.tables " +
+                    $"ORDER BY name;"
+            },
+            {
+                enDatabase.PostgreSQL,
+                (db) =>
+                    $"SELECT table_name AS name " +
+                    $"FROM information_schema.tables " +
+                    $"WHERE table_catalog = '{db}' " +
+                    $"AND table_schema = 'public' " +
+                    $"ORDER BY table_name;"
+            },
+            {
+                enDatabase.Oracle,
+                (db) =>
+                    @"SELECT table_name AS name
+                      FROM user_tables
+                      ORDER BY table_name;"
+            },
+            {
+                enDatabase.SQLite,
+                (db) =>
+                    @"SELECT name AS name
+                      FROM sqlite_master
+                      WHERE type='table'
+                      ORDER BY name;"
+            },
+            {
+                enDatabase.Access,
+                (db) =>
+                    @"SELECT Name AS name
+                      FROM MSysObjects
+                      WHERE Type=1
+                      AND Name NOT LIKE 'MSys*'
+                      ORDER BY Name;"
+            },
+            {
+                enDatabase.DSN,
+                (db) => ""
+            }
+        };
 
         public Dictionary<string, stDbConfig> m_stDbConfig = new Dictionary<string, stDbConfig>();
 
@@ -134,6 +225,15 @@ namespace Alien
             public int rowCount { get; set; }
             public List<Dictionary<string, object>> data { get; set; }
             public string error { get; set; }
+        }
+
+        public class clsSqlQueryExResult
+        {
+            public bool bSuccess { get; set; }
+            public string szQuery { get; set; }
+            public string szErrorMsg { get; set; }
+
+            public DataTable dtOutput { get; set; }
         }
 
         #region Local Function
@@ -282,54 +382,155 @@ namespace Alien
 
         #region Tools
 
-        public static string fnBuildConnStr(stDbConfig cfg)
+        public static string fnPrintTable(DataTable dt)
         {
+            if (dt == null || dt.Columns.Count == 0)
+                return string.Empty;
+
+            int[] nWidths = new int[dt.Columns.Count];
+
+            // Calculate widths
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                nWidths[i] = dt.Columns[i].ColumnName.Length;
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    string szValue = dr[i]?.ToString() ?? string.Empty;
+                    nWidths[i] = Math.Max(nWidths[i], szValue.Length);
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            string szSeparate =
+                "+" + string.Join("+", nWidths.Select(w => new string('-', w + 2))) + "+";
+
+            sb.AppendLine(szSeparate);
+
+            // Header
+            sb.Append("|");
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                sb.Append(" ");
+                sb.Append(dt.Columns[i].ColumnName.PadRight(nWidths[i]));
+                sb.Append(" |");
+            }
+
+            sb.AppendLine();
+            sb.AppendLine(szSeparate);
+
+            // Rows
+            foreach (DataRow dr in dt.Rows)
+            {
+                sb.Append("|");
+
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    string szValue = dr[i]?.ToString() ?? string.Empty;
+
+                    sb.Append(" ");
+                    sb.Append(szValue.PadRight(nWidths[i]));
+                    sb.Append(" |");
+                }
+
+                sb.AppendLine();
+            }
+
+            sb.AppendLine(szSeparate);
+
+            return sb.ToString();
+        }
+
+        public static string fnBuildConnURL(stDbConfig cfg)
+        {
+            string user = Uri.EscapeDataString(cfg.szUsername ?? "");
+            string pass = Uri.EscapeDataString(cfg.szPassword ?? "");
+
+            string Auth()
+            {
+                if (string.IsNullOrWhiteSpace(cfg.szUsername))
+                    return "";
+
+                return $"{user}:{pass}@";
+            }
+
+
             switch (cfg.enDbType)
             {
                 case enDatabase.DSN:
-                    return string.IsNullOrWhiteSpace(cfg.szUsername)
-                        ? $"DSN={cfg.szSource};"
-                        : $"DSN={cfg.szSource};UID={cfg.szUsername};PWD={cfg.szPassword};";
+                    // Raw PDO DSN
+                    return $"dsn://{cfg.szSource}" + (string.IsNullOrWhiteSpace(cfg.szUsername) ? "" : $";User={user};Password={pass}");
 
                 case enDatabase.MySQL:
                     return
-                        $"Server={cfg.szSource};" +
-                        $"Database=information_schema;" +
-                        $"Uid={cfg.szUsername};" +
-                        $"Pwd={cfg.szPassword};";
+                        $"mysql://{Auth()}{cfg.szSource}/information_schema";
 
                 case enDatabase.SQLServer:
-                    return string.IsNullOrWhiteSpace(cfg.szUsername)
-                        ? $"Server={cfg.szSource};Database=master;Trusted_Connection=True;"
-                        : $"Server={cfg.szSource};Database=master;User Id={cfg.szUsername};Password={cfg.szPassword};";
+                    return $"sqlsrv://{Auth()}{cfg.szSource}/master";
+
+                case enDatabase.PostgreSQL:
+                    return $"pgsql://{Auth()}{cfg.szSource}/postgres";
+
+                case enDatabase.SQLite:
+                    return $"sqlite://{cfg.szSource}";
+
+                case enDatabase.ODBC:
+                    return $"dsn://{cfg.szSource}";
+
+                case enDatabase.Access:
+                    {
+                        string url = $"access://{cfg.szSource}";
+
+                        if (!string.IsNullOrWhiteSpace(cfg.szPassword))
+                            url += $";Password={Uri.EscapeDataString(cfg.szPassword)}";
+
+                        return url;
+                    }
+
+                case enDatabase.Oracle:
+                    return $"oracle://{Auth()}{cfg.szSource}";
+
+                default:
+                    throw new NotSupportedException($"Unsupported database type: {cfg.enDbType}");
+            }
+        }
+
+        public string fnBuildDataQuery(enDatabase dbType, string szDbName, string szTable, int nLimit = 100)
+        {
+            switch (dbType)
+            {
+                case enDatabase.MySQL:
+                    return
+                        $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT {nLimit};";
+
+                case enDatabase.SQLServer:
+                    return
+                        $"SELECT TOP {nLimit} * " +
+                        $"FROM [{szDbName}].[dbo].[{szTable}];";
 
                 case enDatabase.PostgreSQL:
                     return
-                        $"Host={cfg.szSource};" +
-                        $"Database=postgres;" +
-                        $"Username={cfg.szUsername};" +
-                        $"Password={cfg.szPassword};";
+                        $"SELECT * " +
+                        $"FROM \"{szDbName}\".\"{szTable}\" " +
+                        $"LIMIT {nLimit};";
 
                 case enDatabase.SQLite:
-                    return $"Data Source={cfg.szSource};";
-
-                case enDatabase.ODBC:
-                    return cfg.szSource;
+                    return
+                        $"SELECT * " +
+                        $"FROM \"{szTable}\" " +
+                        $"LIMIT {nLimit};";
 
                 case enDatabase.Access:
                     return
-                        $"Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};" +
-                        $"Dbq={cfg.szSource};";
+                        $"SELECT TOP {nLimit} * " +
+                        $"FROM [{szTable}];";
 
                 case enDatabase.Oracle:
-                    return
-                        $"User Id={cfg.szUsername};" +
-                        $"Password={cfg.szPassword};" +
-                        $"Data Source={cfg.szSource};";
+                    return $"SELECT * " + $"FROM \"{szTable}\" " + $"FETCH FIRST {nLimit} ROWS ONLY;";
 
                 default:
-                    throw new NotSupportedException(
-                        $"Unsupported database type: {cfg.enDbType}");
+                    throw new NotSupportedException($"Unsupported database type: {dbType}");
             }
         }
 
@@ -402,8 +603,8 @@ namespace Alien
                 return string.Empty;
             }
 
-            string szPayload = $"db_{szDb.ToLower()}_query";
-            string szResp = await m_web.fnszSendPayload(szPayload, new string[]
+            //string szPayload = $"db_{szDb.ToLower()}_query";
+            string szResp = await m_web.fnszSendPayload("db_query", new string[]
             {
                 config.szConnString,
                 szQuery,
@@ -417,21 +618,55 @@ namespace Alien
             DataTable dt = new DataTable();
             string szResp = await fnszSqlExec(config, szQuery);
 
-            //MessageBox.Show(szResp);
+            if (string.IsNullOrEmpty(szResp))
+                return dt;
+
+            try
+            {
+                clsQueryResponse? result = JsonSerializer.Deserialize<clsQueryResponse>(szResp);
+                if (result == null)
+                    return dt;
+
+                if (!result.success)
+                {
+                    MessageBox.Show(result.error, "SQL query error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return dt;
+                }
+
+                dt = fnConvertToTable(result.data);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(szResp, "HTTP response", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return dt;
+        }
+
+        public async Task<clsSqlQueryExResult> fnSqlQueryEx(stDbConfig config, string szQuery)
+        {
+            DataTable dt = new DataTable();
+            string szResp = await fnszSqlExec(config, szQuery);
 
             clsQueryResponse? result = JsonSerializer.Deserialize<clsQueryResponse>(szResp);
             if (result == null)
-                return dt;
-
-            if (!result.success)
             {
-                MessageBox.Show(result.error, "SQL query error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return dt;
+                return new clsSqlQueryExResult()
+                {
+                    bSuccess = false,
+                    szQuery = szQuery,
+                    szErrorMsg = "JSON deserialization is failed. Responsed result is null or empty.",
+                    dtOutput = dt,
+                };
             }
 
-            dt = fnConvertToTable(result.data);
-
-            return dt;
+            return new clsSqlQueryExResult()
+            {
+                bSuccess = result.success,
+                szQuery = szQuery,
+                szErrorMsg = result.error,
+                dtOutput = result.success ? fnConvertToTable(result.data) : dt
+            };
         }
 
         public async Task<bool> fnDbTest(stDbConfig config)
@@ -458,7 +693,20 @@ namespace Alien
 
         public async Task<List<string>> fnDbGetTables(stDbConfig config, string szDbName)
         {
-            string szQuery = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{szDbName}';";
+            string fnGetSQL(enDatabase dbType, string dbName)
+            {
+                if (m_dicShowTablesSQL.TryGetValue(dbType, out var fn))
+                {
+                    return fn(dbName);
+                }
+
+                return string.Empty;
+            }
+
+            string szQuery = fnGetSQL(config.enDbType, szDbName);
+            if (string.IsNullOrEmpty(szQuery))
+                return new List<string>();
+
             DataTable dt = await fnSqlQuery(config, szQuery);
 
             List<string> lsTable = new List<string>();

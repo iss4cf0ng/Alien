@@ -307,9 +307,12 @@ namespace Alien
                             break;
 
                         byte[] abBuffer = Convert.FromBase64String(szMsg);
+                        if (abBuffer == null || abBuffer.Length == 0)
+                            throw new Exception("Empty chunk received");
+
                         fs.Write(abBuffer, 0, abBuffer.Length);
 
-                        nOffset += nChunkSize;
+                        nOffset += abBuffer.Length;
                     }
                     while (nCode == 1);
 

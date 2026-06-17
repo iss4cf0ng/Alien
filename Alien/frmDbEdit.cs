@@ -35,7 +35,7 @@ namespace Alien
             m_dbConfig = dbConfig;
         }
 
-        void fnUpdateConnStr()
+        void fnUpdateConnURL()
         {
             var tmpConfig = new clsfnDb.stDbConfig()
             {
@@ -45,7 +45,7 @@ namespace Alien
                 szPassword = textBox4.Text,
             };
 
-            textBox1.Text = clsfnDb.fnBuildConnStr(tmpConfig);
+            textBox1.Text = clsfnDb.fnBuildConnURL(tmpConfig);
         }
 
         void fnSetup()
@@ -112,7 +112,7 @@ namespace Alien
                     break;
             }
 
-            fnUpdateConnStr();
+            fnUpdateConnURL();
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -126,7 +126,7 @@ namespace Alien
                 szPassword = textBox4.Text,
             };
 
-            config.szConnString = clsfnDb.fnBuildConnStr(config);
+            config.szConnString = clsfnDb.fnBuildConnURL(config);
             MessageBox.Show(config.szConnString);
 
             bool bRet = await m_db.fnDbTest(config);
@@ -151,7 +151,7 @@ namespace Alien
 
             };
 
-            config.szConnString = clsfnDb.fnBuildConnStr(config);
+            config.szConnString = clsfnDb.fnBuildConnURL(config);
 
             if (m_db.fnbSaveDatabase(config))
             {
@@ -166,17 +166,17 @@ namespace Alien
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            fnUpdateConnStr();
+            fnUpdateConnURL();
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
-            fnUpdateConnStr();
+            fnUpdateConnURL();
         }
 
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
-            fnUpdateConnStr();
+            fnUpdateConnURL();
         }
     }
 }

