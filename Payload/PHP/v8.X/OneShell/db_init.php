@@ -16,7 +16,7 @@ $checks = [
     'MongoDB' => extension_loaded('mongodb'),
     'Oracle (OCI8)' => extension_loaded('oci8'),
     'Microsoft SQL Server' => extension_loaded('sqlsrv'),
-    'ODBC' => extension_loaded('odbc'),
+    'ODBC' => extension_loaded('pdo_odbc'),
 ];
 
 foreach ($checks as $db => $available) {

