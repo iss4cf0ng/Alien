@@ -96,8 +96,6 @@ namespace Alien
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "hive", m_web.m_victim.ShellEncoding });
             szResp = szResp.Trim();
 
-            MessageBox.Show(szResp);
-
             var result = JsonConvert.DeserializeObject<Dictionary<string, bool>>(szResp);
 
             if (result == null)

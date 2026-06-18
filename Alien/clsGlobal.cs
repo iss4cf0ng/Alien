@@ -30,7 +30,9 @@ namespace Alien
     public enum enPayloadType
     {
         OneShell,
-        Crypto,
+
+        // Protected
+        ECDH,
     }
 
     public enum enLogMsgType

