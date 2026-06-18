@@ -267,7 +267,7 @@ namespace Alien
             public clsfnDb.stDbConfig m_config { get; init; }
 
             public RichTextBox richTextBox { get; init; }
-            
+
             public clsDbInformation(TabPage page, clsfnDb.stDbConfig config)
             {
                 m_page = page;
@@ -412,6 +412,8 @@ namespace Alien
         async void fnFileScandir(string szDir)
         {
             listView2.Items.Clear();
+
+            szDir = szDir.Replace("\r\n", string.Empty).Replace(Environment.NewLine, string.Empty).Trim('\n');
             textBox1.Text = szDir;
 
             TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
@@ -1705,7 +1707,7 @@ namespace Alien
                 if (lsTables.Count == 0)
                 {
                     MessageBox.Show($"Cannot find any table in \"{szDbName}\"", "It is empty!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    
+
                     return;
                 }
 
@@ -2061,6 +2063,7 @@ namespace Alien
                 richTextBox2.Clear();
 
                 richTextBox2.AppendText(szResp);
+                richTextBox2.ScrollToCaret();
             }
             else if (e.KeyCode == Keys.Up)
             {
@@ -2075,6 +2078,21 @@ namespace Alien
         private void frmControlPanel_FormClosing(object sender, FormClosingEventArgs e)
         {
             fnClose();
+        }
+
+        private void toolStripMenuItem29_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void toolStripMenuItem30_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem31_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

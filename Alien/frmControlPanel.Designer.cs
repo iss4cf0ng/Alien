@@ -161,6 +161,10 @@
             columnHeader12 = new ColumnHeader();
             columnHeader13 = new ColumnHeader();
             columnHeader14 = new ColumnHeader();
+            menuRegistry = new ContextMenuStrip(components);
+            toolStripMenuItem29 = new ToolStripMenuItem();
+            toolStripMenuItem30 = new ToolStripMenuItem();
+            toolStripMenuItem31 = new ToolStripMenuItem();
             textBox7 = new TextBox();
             statusStrip5 = new StatusStrip();
             toolStripStatusLabel4 = new ToolStripStatusLabel();
@@ -238,6 +242,7 @@
             splitContainer6.Panel1.SuspendLayout();
             splitContainer6.Panel2.SuspendLayout();
             splitContainer6.SuspendLayout();
+            menuRegistry.SuspendLayout();
             statusStrip5.SuspendLayout();
             menuDbTable.SuspendLayout();
             SuspendLayout();
@@ -855,7 +860,7 @@
             tabPage8.Location = new Point(4, 24);
             tabPage8.Name = "tabPage8";
             tabPage8.Padding = new Padding(3);
-            tabPage8.Size = new Size(1006, 491);
+            tabPage8.Size = new Size(1006, 487);
             tabPage8.TabIndex = 0;
             tabPage8.Text = "Virtual Shell";
             tabPage8.UseVisualStyleBackColor = true;
@@ -865,7 +870,7 @@
             richTextBox1.Dock = DockStyle.Fill;
             richTextBox1.Location = new Point(3, 3);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(1000, 485);
+            richTextBox1.Size = new Size(1000, 481);
             richTextBox1.TabIndex = 0;
             richTextBox1.Text = "";
             richTextBox1.SelectionChanged += richTextBox1_SelectionChanged;
@@ -878,7 +883,7 @@
             tabPage9.Location = new Point(4, 24);
             tabPage9.Name = "tabPage9";
             tabPage9.Padding = new Padding(3);
-            tabPage9.Size = new Size(1006, 491);
+            tabPage9.Size = new Size(1006, 487);
             tabPage9.TabIndex = 1;
             tabPage9.Text = "Piped & PTY";
             tabPage9.UseVisualStyleBackColor = true;
@@ -891,7 +896,7 @@
             tabControl8.Location = new Point(3, 3);
             tabControl8.Name = "tabControl8";
             tabControl8.SelectedIndex = 0;
-            tabControl8.Size = new Size(1000, 485);
+            tabControl8.Size = new Size(1000, 481);
             tabControl8.TabIndex = 5;
             // 
             // tabPage10
@@ -902,7 +907,7 @@
             tabPage10.Location = new Point(4, 28);
             tabPage10.Name = "tabPage10";
             tabPage10.Padding = new Padding(3);
-            tabPage10.Size = new Size(992, 453);
+            tabPage10.Size = new Size(992, 449);
             tabPage10.TabIndex = 0;
             tabPage10.Text = "tabPage10";
             tabPage10.UseVisualStyleBackColor = true;
@@ -916,7 +921,7 @@
             webViewShell.Dock = DockStyle.Fill;
             webViewShell.Location = new Point(3, 43);
             webViewShell.Name = "webViewShell";
-            webViewShell.Size = new Size(986, 380);
+            webViewShell.Size = new Size(986, 376);
             webViewShell.TabIndex = 2;
             webViewShell.ZoomFactor = 1D;
             // 
@@ -925,7 +930,7 @@
             textBox5.BackColor = Color.Black;
             textBox5.Dock = DockStyle.Bottom;
             textBox5.ForeColor = Color.FromArgb(224, 224, 224);
-            textBox5.Location = new Point(3, 423);
+            textBox5.Location = new Point(3, 419);
             textBox5.Name = "textBox5";
             textBox5.Size = new Size(986, 27);
             textBox5.TabIndex = 5;
@@ -972,7 +977,7 @@
             tabPage19.Location = new Point(4, 24);
             tabPage19.Name = "tabPage19";
             tabPage19.Padding = new Padding(3);
-            tabPage19.Size = new Size(992, 457);
+            tabPage19.Size = new Size(992, 453);
             tabPage19.TabIndex = 1;
             tabPage19.Text = "tabPage19";
             // 
@@ -984,7 +989,7 @@
             webViewLinuxShell.DefaultBackgroundColor = Color.White;
             webViewLinuxShell.Location = new Point(6, 39);
             webViewLinuxShell.Name = "webViewLinuxShell";
-            webViewLinuxShell.Size = new Size(980, 412);
+            webViewLinuxShell.Size = new Size(980, 408);
             webViewLinuxShell.TabIndex = 7;
             webViewLinuxShell.ZoomFactor = 1D;
             // 
@@ -1079,45 +1084,45 @@
             menuDatabase.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             menuDatabase.Items.AddRange(new ToolStripItem[] { toolStripMenuItem20, toolStripMenuItem21, toolStripSeparator4, toolStripMenuItem22, toolStripMenuItem23, toolStripMenuItem24 });
             menuDatabase.Name = "menuDatabase";
-            menuDatabase.Size = new Size(181, 152);
+            menuDatabase.Size = new Size(136, 130);
             // 
             // toolStripMenuItem20
             // 
             toolStripMenuItem20.Name = "toolStripMenuItem20";
-            toolStripMenuItem20.Size = new Size(180, 24);
+            toolStripMenuItem20.Size = new Size(135, 24);
             toolStripMenuItem20.Text = "Info";
             toolStripMenuItem20.Click += toolStripMenuItem20_Click;
             // 
             // toolStripMenuItem21
             // 
             toolStripMenuItem21.Name = "toolStripMenuItem21";
-            toolStripMenuItem21.Size = new Size(180, 24);
+            toolStripMenuItem21.Size = new Size(135, 24);
             toolStripMenuItem21.Text = "SQL";
             toolStripMenuItem21.Click += toolStripMenuItem21_Click;
             // 
             // toolStripSeparator4
             // 
             toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new Size(177, 6);
+            toolStripSeparator4.Size = new Size(132, 6);
             // 
             // toolStripMenuItem22
             // 
             toolStripMenuItem22.Name = "toolStripMenuItem22";
-            toolStripMenuItem22.Size = new Size(180, 24);
+            toolStripMenuItem22.Size = new Size(135, 24);
             toolStripMenuItem22.Text = "Add";
             toolStripMenuItem22.Click += toolStripMenuItem22_Click;
             // 
             // toolStripMenuItem23
             // 
             toolStripMenuItem23.Name = "toolStripMenuItem23";
-            toolStripMenuItem23.Size = new Size(180, 24);
+            toolStripMenuItem23.Size = new Size(135, 24);
             toolStripMenuItem23.Text = "Edit";
             toolStripMenuItem23.Click += toolStripMenuItem23_Click;
             // 
             // toolStripMenuItem24
             // 
             toolStripMenuItem24.Name = "toolStripMenuItem24";
-            toolStripMenuItem24.Size = new Size(180, 24);
+            toolStripMenuItem24.Size = new Size(135, 24);
             toolStripMenuItem24.Text = "Remove";
             toolStripMenuItem24.Click += toolStripMenuItem24_Click;
             // 
@@ -1246,9 +1251,9 @@
             // tabPage5
             // 
             tabPage5.Controls.Add(splitContainer4);
-            tabPage5.Location = new Point(4, 24);
+            tabPage5.Location = new Point(4, 28);
             tabPage5.Name = "tabPage5";
-            tabPage5.Size = new Size(1014, 519);
+            tabPage5.Size = new Size(1014, 515);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "Code Exec";
             tabPage5.UseVisualStyleBackColor = true;
@@ -1267,7 +1272,7 @@
             // splitContainer4.Panel2
             // 
             splitContainer4.Panel2.Controls.Add(tabControl5);
-            splitContainer4.Size = new Size(1014, 519);
+            splitContainer4.Size = new Size(1014, 515);
             splitContainer4.SplitterDistance = 451;
             splitContainer4.TabIndex = 1;
             // 
@@ -1275,7 +1280,7 @@
             // 
             statusStrip4.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             statusStrip4.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel3 });
-            statusStrip4.Location = new Point(0, 495);
+            statusStrip4.Location = new Point(0, 491);
             statusStrip4.Name = "statusStrip4";
             statusStrip4.Size = new Size(451, 24);
             statusStrip4.TabIndex = 0;
@@ -1295,7 +1300,7 @@
             tabControl5.Location = new Point(0, 0);
             tabControl5.Name = "tabControl5";
             tabControl5.SelectedIndex = 0;
-            tabControl5.Size = new Size(559, 519);
+            tabControl5.Size = new Size(559, 515);
             tabControl5.SizeMode = TabSizeMode.Fixed;
             tabControl5.TabIndex = 1;
             // 
@@ -1305,7 +1310,7 @@
             tabPage11.Location = new Point(4, 28);
             tabPage11.Name = "tabPage11";
             tabPage11.Padding = new Padding(3);
-            tabPage11.Size = new Size(551, 487);
+            tabPage11.Size = new Size(551, 483);
             tabPage11.TabIndex = 0;
             tabPage11.Text = "Eval";
             tabPage11.UseVisualStyleBackColor = true;
@@ -1351,9 +1356,9 @@
             // 
             // tabPage15
             // 
-            tabPage15.Location = new Point(4, 24);
+            tabPage15.Location = new Point(4, 28);
             tabPage15.Name = "tabPage15";
-            tabPage15.Size = new Size(1014, 519);
+            tabPage15.Size = new Size(1014, 515);
             tabPage15.TabIndex = 5;
             tabPage15.Text = "Linux";
             tabPage15.UseVisualStyleBackColor = true;
@@ -1361,9 +1366,9 @@
             // tabPage16
             // 
             tabPage16.Controls.Add(tabControl7);
-            tabPage16.Location = new Point(4, 24);
+            tabPage16.Location = new Point(4, 28);
             tabPage16.Name = "tabPage16";
-            tabPage16.Size = new Size(1014, 519);
+            tabPage16.Size = new Size(1014, 515);
             tabPage16.TabIndex = 6;
             tabPage16.Text = "Windows";
             tabPage16.UseVisualStyleBackColor = true;
@@ -1376,7 +1381,7 @@
             tabControl7.Location = new Point(0, 0);
             tabControl7.Name = "tabControl7";
             tabControl7.SelectedIndex = 0;
-            tabControl7.Size = new Size(1014, 519);
+            tabControl7.Size = new Size(1014, 515);
             tabControl7.SizeMode = TabSizeMode.Fixed;
             tabControl7.TabIndex = 0;
             // 
@@ -1385,7 +1390,7 @@
             tabPage17.Location = new Point(4, 28);
             tabPage17.Name = "tabPage17";
             tabPage17.Padding = new Padding(3);
-            tabPage17.Size = new Size(1006, 487);
+            tabPage17.Size = new Size(1006, 483);
             tabPage17.TabIndex = 0;
             tabPage17.Text = "Users";
             tabPage17.UseVisualStyleBackColor = true;
@@ -1447,6 +1452,7 @@
             // listView3
             // 
             listView3.Columns.AddRange(new ColumnHeader[] { columnHeader12, columnHeader13, columnHeader14 });
+            listView3.ContextMenuStrip = menuRegistry;
             listView3.Dock = DockStyle.Fill;
             listView3.FullRowSelect = true;
             listView3.GridLines = true;
@@ -1472,6 +1478,34 @@
             // 
             columnHeader14.Text = "Data";
             columnHeader14.Width = 300;
+            // 
+            // menuRegistry
+            // 
+            menuRegistry.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            menuRegistry.Items.AddRange(new ToolStripItem[] { toolStripMenuItem29, toolStripMenuItem30, toolStripMenuItem31 });
+            menuRegistry.Name = "menuRegistry";
+            menuRegistry.Size = new Size(136, 76);
+            // 
+            // toolStripMenuItem29
+            // 
+            toolStripMenuItem29.Name = "toolStripMenuItem29";
+            toolStripMenuItem29.Size = new Size(135, 24);
+            toolStripMenuItem29.Text = "Edit";
+            toolStripMenuItem29.Click += toolStripMenuItem29_Click;
+            // 
+            // toolStripMenuItem30
+            // 
+            toolStripMenuItem30.Name = "toolStripMenuItem30";
+            toolStripMenuItem30.Size = new Size(135, 24);
+            toolStripMenuItem30.Text = "Rename";
+            toolStripMenuItem30.Click += toolStripMenuItem30_Click;
+            // 
+            // toolStripMenuItem31
+            // 
+            toolStripMenuItem31.Name = "toolStripMenuItem31";
+            toolStripMenuItem31.Size = new Size(135, 24);
+            toolStripMenuItem31.Text = "Delete";
+            toolStripMenuItem31.Click += toolStripMenuItem31_Click;
             // 
             // textBox7
             // 
@@ -1662,6 +1696,7 @@
             splitContainer6.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer6).EndInit();
             splitContainer6.ResumeLayout(false);
+            menuRegistry.ResumeLayout(false);
             statusStrip5.ResumeLayout(false);
             statusStrip5.PerformLayout();
             menuDbTable.ResumeLayout(false);
@@ -1812,5 +1847,9 @@
         private ToolStripStatusLabel toolStripStatusLabel4;
         private ToolStripLabel toolStripLabel1;
         private ToolStripLabel toolStripLabel2;
+        private ContextMenuStrip menuRegistry;
+        private ToolStripMenuItem toolStripMenuItem29;
+        private ToolStripMenuItem toolStripMenuItem30;
+        private ToolStripMenuItem toolStripMenuItem31;
     }
 }

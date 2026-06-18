@@ -38,6 +38,18 @@ namespace Alien
             public List<clsRegistryValue> Values { get; set; } = new();
         }
 
+        public class clsRegistryActionResult
+        {
+            [JsonProperty("success")]
+            public bool bSuccess { get; set; } = false;
+
+            [JsonProperty("error")]
+            public string szErrorMsg { get; set; } = string.Empty;
+
+            [JsonProperty("output")]
+            public List<string> lsOutput { get; set; } = new List<string>();
+        }
+
         public static string fnFormatRegistryValue(string szType, byte[] abData)
         {
             if (abData == null)
@@ -82,10 +94,17 @@ namespace Alien
         public async Task<Dictionary<string, bool>> fnHives()
         {
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "hive", m_web.m_victim.ShellEncoding });
+            szResp = szResp.Trim();
+
+            MessageBox.Show(szResp);
+
             var result = JsonConvert.DeserializeObject<Dictionary<string, bool>>(szResp);
 
             if (result == null)
+            {
+                MessageBox.Show("JSON deserialization is failed", "fnHives", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return new Dictionary<string, bool>();
+            }
 
             return result;
         }
@@ -99,6 +118,81 @@ namespace Alien
                 return null;
 
             return result;
+        }
+
+        public async Task<bool> fnbRenameKey(string szOldPath, string szNewPath)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "rename_key", szOldPath, szNewPath });
+            if (string.IsNullOrEmpty(szResp))
+            {
+                MessageBox.Show("HTTP response is null or empty.", "fnbRenameKey", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+            {
+                MessageBox.Show("JSON deserialization is failed!", "fnbRenameKey", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (!result.bSuccess)
+            {
+                MessageBox.Show(result.szErrorMsg);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> fnbRenameValue(string szPath, string szOldName, string szNewName)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "rename_value", szPath, szOldName, szNewName });
+            if (string.IsNullOrEmpty(szResp))
+            {
+                MessageBox.Show("HTTP response is null or empty.", "fnbRenameValue", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+            {
+                MessageBox.Show("JSON deserialization is failed!", "fnbRenameValue", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (!result.bSuccess)
+            {
+                MessageBox.Show(result.szErrorMsg);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> fnbSetValue(string szPath, string szName, string szType, string szData)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "set", szPath, szName, szType, szData });
+            if (string.IsNullOrEmpty(szResp))
+            {
+                MessageBox.Show("HTTP response is null or empty.", "fnbSetValue", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+            {
+                MessageBox.Show("JSON deserialization is failed!", "fnbSetValue", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (!result.bSuccess)
+            {
+                MessageBox.Show(result.szErrorMsg);
+                return false;
+            }
+
+            return true;
         }
     }
 }
