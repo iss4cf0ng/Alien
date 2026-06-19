@@ -50,4 +50,8 @@ Notes of developing Alien webshell management tool.
     - Hex editor
   - File Manager
     - Hex editor
+    - Text editor
+      - Dragging tabpages
+    - Database manager
+      - Dragging tabpages
 
