@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -51,9 +52,46 @@ namespace Alien
             public DateTime dtLastAccessedDate;
         }
 
+        public class clsSearchResultItem
+        {
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("path")]
+            public string Path { get; set; }
+
+            [JsonProperty("type")]
+            public string Type { get; set; }
+
+            [JsonProperty("permission")]
+            public string Permission { get; set; }
+
+            [JsonProperty("created")]
+            public string Created { get; set; }
+
+            [JsonProperty("last_modified")]
+            public string LastModified { get; set; }
+
+            [JsonProperty("last_accessed")]
+            public string LastAccessed { get; set; }
+        }
+
+        public class clsSearchResponse
+        {
+            [JsonProperty("status")]
+            public bool Status { get; set; }
+
+            [JsonProperty("results")]
+            public List<clsSearchResultItem> Results { get; set; }
+
+            [JsonProperty("msg")]
+            public string Msg { get; set; }
+        }
+
         public async Task<stInit> fnszInit()
         {
-            string[] szData = (await m_web.fnszSendPayload("file_init")).Split('|');
+            string szResp = await m_web.fnszSendPayload("file_init");
+            string[] szData = szResp.Split('|');
             string szCurrentDir = szData[0];
             List<string> lsDrive = szData[1].Split(',').ToList();
 
@@ -204,6 +242,26 @@ namespace Alien
             }
         }
 
+        public async Task<bool> fnbFileWriteAllBytes(string szFilePath, byte[] abData)
+        {
+            try
+            {
+                bool bVal = await fnbDelete(szFilePath);
+                if (!bVal)
+                    return false;
+
+                string szResp = await m_web.fnszSendPayload("file_upload", new string[] { szFilePath, abData.Length.ToString(), Convert.ToBase64String(abData) });
+                int nCode = int.Parse(szResp);
+
+                return nCode == 1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
         public async Task<string> fnszRead(string szFilePath)
         {
             string szContent = await m_web.fnszSendPayload("file_read", new string[] { szFilePath });
@@ -214,6 +272,18 @@ namespace Alien
             }
 
             return clsEzData.fnszB64d2str(szContent);
+        }
+
+        public async Task<byte[]?> fnReadBuffer(string szFilePath)
+        {
+            string szContent = await m_web.fnszSendPayload("file_readbuffer", new string[] { szFilePath });
+            if (szFilePath.Contains("ERROR://"))
+            {
+                MessageBox.Show(szContent);
+                return null;
+            }
+
+            return Convert.FromBase64String(szContent);
         }
 
         public async Task<bool> fnbNewFolder(string szDirPath)
@@ -231,6 +301,18 @@ namespace Alien
                 MessageBox.Show(ex.Message, "fnbNewFolder()", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+        }
+
+        public async Task<clsSearchResponse?> fnFileSearch(string szRegexPattern, string[] dirs) => await fnFileSearch(szRegexPattern, dirs.ToList());
+        public async Task<clsSearchResponse?> fnFileSearch(string szRegexPattern, List<string> lsDir)
+        {
+            string szResp = await m_web.fnszSendPayload("file_find", new string[] { szRegexPattern, string.Join(",", lsDir) });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("HTTP response is null or empty");
+
+            var resp = JsonConvert.DeserializeObject<clsSearchResponse>(szResp);
+            
+            return resp;
         }
 
         public async Task<bool> fnbFileUpload(string szSrcFilePath, string szDstFilePath, int nChunkSize, Action actOnChunkSent = null, Action fnCallback = null)

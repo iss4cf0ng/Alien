@@ -360,6 +360,8 @@ namespace Alien
                         byte[] decrypted = new byte[respCt.Length];
                         m_aesgcm.Decrypt(respNonce, respCt, respTag, decrypted);
 
+                        m_nSequence++;
+
                         string result = Encoding.UTF8.GetString(decrypted);
                         JsonDocument json = JsonDocument.Parse(result);
                         JsonElement root = json.RootElement;
@@ -371,10 +373,6 @@ namespace Alien
                         val = clsEzData.fnszB64d2str(val).Replace("\r\n", string.Empty).Trim('\r').Trim('\n');
                         szSplitter = $"[{szSplitter}]";
                         val = val.Split(szSplitter)[1];
-
-                        m_nSequence++;
-
-                        //MessageBox.Show(val);
 
                         return val;
                     }
