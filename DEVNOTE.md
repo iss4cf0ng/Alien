@@ -40,3 +40,18 @@ Notes of developing Alien webshell management tool.
   - Shell
     - Exec Shell
     - Virtual Shell (Piped shell for Windows, PTY shell for Unix-like)
+- 2026-6-18
+  - Registry
+    - Scan hives
+    - Scan subkeys
+    - Scan values
+- 2026-6-19
+  - Registry
+    - Hex editor
+  - File Manager
+    - Hex editor
+    - Text editor
+      - Dragging tabpages
+    - Database manager
+      - Dragging tabpages
+
