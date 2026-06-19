@@ -180,6 +180,9 @@ namespace Alien
                             string szFilePath = ctrls.tbPath.Text;
                             string szContent = ctrls.editorEx.Text;
 
+                            if (Owner == null)
+                                return;
+
                             frmControlPanel f = (frmControlPanel)Owner;
                             if (await f.fnbFileWrite(szFilePath, szContent))
                                 page.Text = page.Text.Replace("*", string.Empty);
@@ -257,6 +260,103 @@ namespace Alien
                     tab.TabPages.RemoveAt(i);
                     return;
                 }
+            }
+        }
+
+        // Save.Remote
+        private async void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            TabPage? page = tabControl1.SelectedTab;
+            if (page == null)
+                return;
+
+            if (fnbIsModified())
+            {
+                var ctrls = fnGetTabControl(page);
+                string szFilePath = ctrls.tbPath.Text;
+                string szContent = ctrls.editorEx.Text;
+
+                if (Owner == null)
+                    return;
+
+                frmControlPanel f = (frmControlPanel)Owner;
+                if (await f.fnbFileWrite(szFilePath, szContent))
+                    page.Text = page.Text.Replace("*", string.Empty);
+            }
+        }
+
+        // Save.Local
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            TabPage? page = tabControl1.SelectedTab;
+            if (page == null)
+                return;
+
+            var ctrls = fnGetTabControl(page);
+            string szFilePath = ctrls.tbPath.Text;
+            string szContent = ctrls.editorEx.Text;
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.FileName = Path.GetFileName(szFilePath);
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllText(sfd.FileName, szContent);
+            }
+        }
+
+        // SaveAll.Remote
+        private async void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            foreach (TabPage page in tabControl1.TabPages)
+            {
+                var ctrls = fnGetTabControl(page);
+                string szFilePath = ctrls.tbPath.Text;
+                string szContent = ctrls.editorEx.Text;
+
+                if (Owner == null)
+                    return;
+
+                frmControlPanel f = (frmControlPanel)Owner;
+                if (await f.fnbFileWrite(szFilePath, szContent))
+                    page.Text = page.Text.Replace("*", string.Empty);
+            }
+        }
+
+        // SaveAll.Local
+        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                string szDir = fbd.SelectedPath;
+                if (!Directory.Exists(szDir))
+                {
+                    MessageBox.Show("Directory does not exist: " + szDir, "Not Found!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                Dictionary<string, string> dicContent = tabControl1.TabPages.Cast<TabPage>().Select(x => fnGetTabControl(x)).ToDictionary(ctrls => ctrls.tbPath.Text, ctrls => ctrls.editorEx.Text);
+
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        foreach (var szPath in dicContent.Keys)
+                        {
+                            string szFileName = Path.GetFileName(szPath);
+                            string szSavePath = Path.Combine(szDir, szFileName);
+
+                            File.WriteAllText(szSavePath, dicContent[szPath]);
+                        }
+
+                        MessageBox.Show("All files are saved!", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                });
             }
         }
     }

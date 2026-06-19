@@ -8,6 +8,8 @@ namespace Alien
         private const string m_szVersion = "v5.0.0";
         private const string m_szAuthor = "iss4cf0ng/ISSAC";
 
+        private clsTamper m_tamper { get; set; }
+
         private List<string> m_lsGroupName
         {
             get
@@ -116,7 +118,7 @@ namespace Alien
             toolStripStatusLabel3.Text = "iss4cf0ng/ISSAC";
         }
 
-        void fnSetup()
+        async Task fnSetup()
         {
             clsSqlite sqlConn = new clsSqlite("data.sqlite");
             m_sqlConn = sqlConn;
@@ -129,11 +131,29 @@ namespace Alien
             treeView1.ExpandAll();
 
             fnLoadShell();
+
+            // testing
+
+            return;
+
+            m_tamper = new clsTamper("http://127.0.0.1:8000", "python", "Tamper\\server.py");
+            await m_tamper.fnInitializeServerAsync();
+
+            string szInput = "ABCDEFGHIJK";
+            var parameters = new Dictionary<string, object>
+            {
+                { "key", "123" }
+            };
+
+            string szPayload = await m_tamper.fnObfuscate("RC4", szInput, parameters);
+
+            Visible = false;
+            MessageBox.Show(szPayload);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
-            fnSetup();
+            await fnSetup();
         }
 
         //Control Panel

@@ -2392,5 +2392,14 @@ namespace Alien
             string szData = string.Join(Environment.NewLine, items.Select(x => x.SubItems[1].Text).ToArray());
             Clipboard.SetText(szData);
         }
+
+        private void toolStripButton9_Click(object sender, EventArgs e)
+        {
+            string szLocalSaveDirPath = Path.Combine("Victim", m_victim.m_szShellDomain, "Downloads");
+            if (!Directory.Exists(szLocalSaveDirPath))
+                Directory.CreateDirectory(szLocalSaveDirPath);
+
+            Process.Start("explorer.exe", szLocalSaveDirPath);
+        }
     }
 }

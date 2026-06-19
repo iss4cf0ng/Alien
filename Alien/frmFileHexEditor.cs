@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace Alien
 {
@@ -87,6 +88,33 @@ namespace Alien
             hb.ByteProvider = provider;
 
             label.Text = $"Length: {abFileData.Length}";
+
+            provider.Changed += (s, e) =>
+            {
+                if (!page.Text.Contains("*"))
+                    page.Text += "*";
+            };
+            hb.KeyDown += (s, e) =>
+            {
+                if (e.Modifiers == Keys.Control)
+                {
+                    if (e.KeyCode == Keys.W)
+                    {
+
+                    }
+                    else if (e.KeyCode == Keys.S)
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            byte[] abData = provider.Bytes.ToArray();
+                            if (!await m_frmCtrl.m_fileMgr.fnbFileWriteAllBytes(file.szFilePath, abData))
+                                MessageBox.Show("Save file failed: " + file.szFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                            Invoke(() => page.Text = page.Text.Replace("*", string.Empty));
+                        });
+                    }
+                }
+            };
         }
 
         void fnSetup()
@@ -208,11 +236,9 @@ namespace Alien
 
             byte[] abData = ((DynamicByteProvider)file.hexBox.ByteProvider).Bytes.ToArray();
             if (!await m_frmCtrl.m_fileMgr.fnbFileWriteAllBytes(file.szFilePath, abData))
-                MessageBox.Show("Save file failed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Save file failed: " + file.szFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            // do something after successed. Change UI status (ex. "*" of the tabpage)
-
-
+            page.Text = page.Text.Replace("*", string.Empty);
         }
 
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
@@ -241,6 +267,60 @@ namespace Alien
                     MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private async void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            foreach (TabPage page in tabControl1.TabPages)
+            {
+                if (page.Tag == null)
+                    continue;
+
+                var file = (stFile)page.Tag;
+                if (file.hexBox.ByteProvider == null)
+                    continue;
+
+                byte[] abData = ((DynamicByteProvider)file.hexBox.ByteProvider).Bytes.ToArray();
+                if (!await m_frmCtrl.m_fileMgr.fnbFileWriteAllBytes(file.szFilePath, abData))
+                    MessageBox.Show("Save file failed: " + file.szFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                page.Text = page.Text.Replace("*", string.Empty);
+            }
+        }
+
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                List<stFile> files = tabControl1.TabPages.Cast<TabPage>().Where(x => x != null && x.Tag != null).Select(x => (stFile)x.Tag).ToList();
+                Dictionary<string, byte[]> dicBytes = files.ToDictionary(x => x.szFilePath, x => ((DynamicByteProvider)x.hexBox.ByteProvider).Bytes.ToArray());
+
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        foreach (string szPath in dicBytes.Keys)
+                        {
+                            string szFileName = Path.GetFileName(szPath);
+                            string szSavePath = Path.Combine(fbd.SelectedPath, szFileName);
+
+                            File.WriteAllBytes(szSavePath, dicBytes[szPath]);
+                        }
+
+                        MessageBox.Show("All files are saved.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                });
+            }
+        }
+
+        private void tabControl1_KeyDown(object sender, KeyEventArgs e)
+        {
+
         }
     }
 }

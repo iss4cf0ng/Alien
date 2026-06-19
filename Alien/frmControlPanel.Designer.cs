@@ -87,6 +87,7 @@
             toolStripMenuItem16 = new ToolStripMenuItem();
             toolStripButton1 = new ToolStripButton();
             toolStripButton2 = new ToolStripButton();
+            toolStripButton9 = new ToolStripButton();
             tabPage7 = new TabPage();
             splitContainer2 = new SplitContainer();
             textBox9 = new TextBox();
@@ -717,7 +718,7 @@
             // toolStrip1
             // 
             toolStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton1, toolStripButton2 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton1, toolStripButton2, toolStripButton9 });
             toolStrip1.Location = new Point(3, 3);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(994, 26);
@@ -767,6 +768,16 @@
             toolStripButton2.Size = new Size(55, 23);
             toolStripButton2.Text = "Home";
             toolStripButton2.Click += toolStripButton2_Click;
+            // 
+            // toolStripButton9
+            // 
+            toolStripButton9.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton9.Image = (Image)resources.GetObject("toolStripButton9.Image");
+            toolStripButton9.ImageTransparentColor = Color.Magenta;
+            toolStripButton9.Name = "toolStripButton9";
+            toolStripButton9.Size = new Size(92, 23);
+            toolStripButton9.Text = "Downloads";
+            toolStripButton9.Click += toolStripButton9_Click;
             // 
             // tabPage7
             // 
@@ -994,7 +1005,7 @@
             tabPage8.Location = new Point(4, 24);
             tabPage8.Name = "tabPage8";
             tabPage8.Padding = new Padding(3);
-            tabPage8.Size = new Size(1006, 451);
+            tabPage8.Size = new Size(1006, 455);
             tabPage8.TabIndex = 0;
             tabPage8.Text = "Virtual Shell";
             tabPage8.UseVisualStyleBackColor = true;
@@ -1004,7 +1015,7 @@
             richTextBox1.Dock = DockStyle.Fill;
             richTextBox1.Location = new Point(3, 3);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(1000, 445);
+            richTextBox1.Size = new Size(1000, 449);
             richTextBox1.TabIndex = 0;
             richTextBox1.Text = "";
             richTextBox1.SelectionChanged += richTextBox1_SelectionChanged;
@@ -1017,7 +1028,7 @@
             tabPage9.Location = new Point(4, 24);
             tabPage9.Name = "tabPage9";
             tabPage9.Padding = new Padding(3);
-            tabPage9.Size = new Size(1006, 451);
+            tabPage9.Size = new Size(1006, 455);
             tabPage9.TabIndex = 1;
             tabPage9.Text = "Piped & PTY";
             tabPage9.UseVisualStyleBackColor = true;
@@ -1030,7 +1041,7 @@
             tabControl8.Location = new Point(3, 3);
             tabControl8.Name = "tabControl8";
             tabControl8.SelectedIndex = 0;
-            tabControl8.Size = new Size(1000, 445);
+            tabControl8.Size = new Size(1000, 449);
             tabControl8.TabIndex = 5;
             // 
             // tabPage10
@@ -1041,7 +1052,7 @@
             tabPage10.Location = new Point(4, 28);
             tabPage10.Name = "tabPage10";
             tabPage10.Padding = new Padding(3);
-            tabPage10.Size = new Size(992, 413);
+            tabPage10.Size = new Size(992, 417);
             tabPage10.TabIndex = 0;
             tabPage10.Text = "tabPage10";
             tabPage10.UseVisualStyleBackColor = true;
@@ -1055,7 +1066,7 @@
             webViewShell.Dock = DockStyle.Fill;
             webViewShell.Location = new Point(3, 43);
             webViewShell.Name = "webViewShell";
-            webViewShell.Size = new Size(986, 340);
+            webViewShell.Size = new Size(986, 344);
             webViewShell.TabIndex = 2;
             webViewShell.ZoomFactor = 1D;
             // 
@@ -1064,7 +1075,7 @@
             textBox5.BackColor = Color.Black;
             textBox5.Dock = DockStyle.Bottom;
             textBox5.ForeColor = Color.FromArgb(224, 224, 224);
-            textBox5.Location = new Point(3, 383);
+            textBox5.Location = new Point(3, 387);
             textBox5.Name = "textBox5";
             textBox5.Size = new Size(986, 27);
             textBox5.TabIndex = 5;
@@ -1111,7 +1122,7 @@
             tabPage19.Location = new Point(4, 24);
             tabPage19.Name = "tabPage19";
             tabPage19.Padding = new Padding(3);
-            tabPage19.Size = new Size(992, 413);
+            tabPage19.Size = new Size(992, 421);
             tabPage19.TabIndex = 1;
             tabPage19.Text = "tabPage19";
             // 
@@ -1123,7 +1134,7 @@
             webViewLinuxShell.DefaultBackgroundColor = Color.White;
             webViewLinuxShell.Location = new Point(6, 39);
             webViewLinuxShell.Name = "webViewLinuxShell";
-            webViewLinuxShell.Size = new Size(980, 368);
+            webViewLinuxShell.Size = new Size(980, 376);
             webViewLinuxShell.TabIndex = 7;
             webViewLinuxShell.ZoomFactor = 1D;
             // 
@@ -1475,7 +1486,7 @@
             tabPage12.Location = new Point(4, 24);
             tabPage12.Name = "tabPage12";
             tabPage12.Padding = new Padding(3);
-            tabPage12.Size = new Size(551, 451);
+            tabPage12.Size = new Size(551, 455);
             tabPage12.TabIndex = 1;
             tabPage12.Text = "POST";
             tabPage12.UseVisualStyleBackColor = true;
@@ -2263,5 +2274,6 @@
         private ToolStripMenuItem toolStripMenuItem36;
         private ToolStripMenuItem toolStripMenuItem37;
         private ToolStripStatusLabel toolStripStatusLabel6;
+        private ToolStripButton toolStripButton9;
     }
 }
