@@ -2609,33 +2609,85 @@ namespace Alien
         }
 
         // RegistryTree.Rename
-        private void toolStripMenuItem39_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem39_Click(object sender, EventArgs e)
         {
-            
+            TreeNode node = treeView5.SelectedNode;
+            if (node == null)
+                return;
+
+            string szNewName = Interaction.InputBox("New name:", "Rename", string.Empty);
+            string szBasePath = node.FullPath.Replace("Computer\\", string.Empty);
+            bool bVal = await m_winReg.fnbRenameKey(Path.Combine(szBasePath, node.Text), Path.Combine(szBasePath, szNewName));
+            if (!bVal)
+            {
+                MessageBox.Show("Cannot rename: " + node.Text);
+                return;
+            }
+
+            node.Nodes.Clear();
+            listView3.Items.Clear();
+
+            node.Text = szNewName;
+
+            treeView5.SelectedNode = null;
+            treeView5.SelectedNode = node;
         }
 
         // RegistryTree.Export
-        private void toolStripMenuItem43_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem43_Click(object sender, EventArgs e)
         {
+            TreeNode node = treeView5.SelectedNode;
+            if (node == null)
+                return;
 
+            string szBasePath = node.FullPath.Replace("Computer\\", string.Empty);
+            var result = await m_winReg.fnExport(szBasePath);
+            if (!result.bSuccess)
+            {
+                MessageBox.Show(result.szErrorMsg, "Export", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllText(sfd.FileName, result.Output);
+            }
         }
 
-        // RegistryTree.Expand
+        // RegistryTree.ExpandAll
         private void toolStripMenuItem41_Click(object sender, EventArgs e)
         {
-
+            treeView5.ExpandAll();
         }
 
-        // RegistryTree.Collapse
+        // RegistryTree.CollapseAll
         private void toolStripMenuItem40_Click(object sender, EventArgs e)
         {
-
+            treeView5.CollapseAll();
         }
 
         // RegistryTree.Delete
-        private void toolStripMenuItem42_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem42_Click(object sender, EventArgs e)
         {
+            TreeNode node = treeView5.SelectedNode;
+            if (node == null)
+                return;
 
+            string szBasePath = node.FullPath.Replace("Computer\\", string.Empty);
+            var result = await m_winReg.fnDeleteKey(szBasePath);
+            if (!result.bSuccess)
+            {
+                MessageBox.Show(result.szErrorMsg, "DeleteValue", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            listView3.Items.Clear();
+
+            TreeNode nodeParent = node.Parent;
+            treeView5.SelectedNode = null;
+            treeView5.Nodes.Remove(node);
+            treeView5.SelectedNode = nodeParent;
         }
     }
 }

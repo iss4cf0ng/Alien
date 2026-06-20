@@ -51,6 +51,18 @@ namespace Alien
             public List<string> lsOutput { get; set; } = new List<string>();
         }
 
+        public class clsRegistryActionText
+        {
+            [JsonProperty("success")]
+            public bool bSuccess { get; set; } = false;
+
+            [JsonProperty("error")]
+            public string szErrorMsg { get; set; } = string.Empty;
+
+            [JsonProperty("output")]
+            public string Output { get; set; } = string.Empty;
+        }
+
         public struct stRegItem
         {
             public string szName { get; set; }
@@ -164,7 +176,7 @@ namespace Alien
                 return false;
             }
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
             {
                 MessageBox.Show("JSON deserialization is failed!", "fnbRenameValue", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -189,7 +201,7 @@ namespace Alien
                 return false;
             }
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
             {
                 MessageBox.Show("JSON deserialization is failed!", "fnbSetValue", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -205,46 +217,46 @@ namespace Alien
             return true;
         }
 
-        public async Task<clsRegistryActionResult> fnDeleteKey(string szBasePath)
+        public async Task<clsRegistryActionText> fnDeleteKey(string szBasePath)
         {
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "del_key", szBasePath });
             if (string.IsNullOrEmpty(szResp))
                 throw new Exception("DeleteKey Error://HTTP response is null or empty");
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
                 throw new Exception("JSON deserialization is failed");
 
             return result;
         }
 
-        public async Task<clsRegistryActionResult> fnDeleteValue(string szBasePath, string szName)
+        public async Task<clsRegistryActionText> fnDeleteValue(string szBasePath, string szName)
         {
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "del_value", szBasePath, szName });
             if (string.IsNullOrEmpty(szResp))
                 throw new Exception("DeleteValue Error://HTTP response is null or empty");
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
                 throw new Exception("JSON deserialization is failed");
 
             return result;
         }
 
-        public async Task<clsRegistryActionResult?> fnNewKey(string szBasePath)
+        public async Task<clsRegistryActionText> fnNewKey(string szBasePath)
         {
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "new_key", szBasePath });
             if (string.IsNullOrEmpty(szResp))
                 throw new Exception("NewKey Error://HTTP response is null or empty");
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
                 throw new Exception("JSON deserialization is failed");
 
             return result;
         }
 
-        public async Task<clsRegistryActionResult> fnNewValue(string szBasePath, string szName, string szDataType)
+        public async Task<clsRegistryActionText> fnNewValue(string szBasePath, string szName, string szDataType)
         {
             string szInitValue = string.Empty;
             if (szDataType.Contains("WORD"))
@@ -254,33 +266,33 @@ namespace Alien
             if (string.IsNullOrEmpty(szResp))
                 throw new Exception("NewValue Error://HTTP response is null or empty");
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
                 throw new Exception("JSON deserialization is failed");
 
             return result;
         }
 
-        public async Task<clsRegistryActionResult> fnExport(string szBasePath)
+        public async Task<clsRegistryActionText> fnExport(string szBasePath)
         {
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "export", szBasePath });
             if (string.IsNullOrEmpty(szResp))
                 throw new Exception("Export Error://HTTP response is null or empty");
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
                 throw new Exception("JSON deserialization is failed");
 
             return result;
         }
 
-        public async Task<clsRegistryActionResult> fnImport(string szContent)
+        public async Task<clsRegistryActionText> fnImport(string szContent)
         {
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "import", szContent });
             if (string.IsNullOrEmpty(szResp))
                 throw new Exception("Import Error://HTTP response is null or empty");
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionText>(szResp);
             if (result == null)
                 throw new Exception("JSON deserialization is failed");
 
