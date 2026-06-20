@@ -1138,7 +1138,7 @@
             tabPage19.Location = new Point(4, 24);
             tabPage19.Name = "tabPage19";
             tabPage19.Padding = new Padding(3);
-            tabPage19.Size = new Size(992, 421);
+            tabPage19.Size = new Size(992, 417);
             tabPage19.TabIndex = 1;
             tabPage19.Text = "tabPage19";
             // 
@@ -1150,7 +1150,7 @@
             webViewLinuxShell.DefaultBackgroundColor = Color.White;
             webViewLinuxShell.Location = new Point(6, 39);
             webViewLinuxShell.Name = "webViewLinuxShell";
-            webViewLinuxShell.Size = new Size(980, 376);
+            webViewLinuxShell.Size = new Size(980, 372);
             webViewLinuxShell.TabIndex = 7;
             webViewLinuxShell.ZoomFactor = 1D;
             // 
@@ -1527,9 +1527,9 @@
             // tabPage16
             // 
             tabPage16.Controls.Add(tabControl7);
-            tabPage16.Location = new Point(4, 24);
+            tabPage16.Location = new Point(4, 28);
             tabPage16.Name = "tabPage16";
-            tabPage16.Size = new Size(1014, 483);
+            tabPage16.Size = new Size(1014, 479);
             tabPage16.TabIndex = 6;
             tabPage16.Text = "Windows";
             tabPage16.UseVisualStyleBackColor = true;
@@ -1543,7 +1543,7 @@
             tabControl7.Location = new Point(0, 0);
             tabControl7.Name = "tabControl7";
             tabControl7.SelectedIndex = 0;
-            tabControl7.Size = new Size(1014, 483);
+            tabControl7.Size = new Size(1014, 479);
             tabControl7.SizeMode = TabSizeMode.Fixed;
             tabControl7.TabIndex = 0;
             // 
@@ -1555,7 +1555,7 @@
             tabPage17.Location = new Point(4, 28);
             tabPage17.Name = "tabPage17";
             tabPage17.Padding = new Padding(3);
-            tabPage17.Size = new Size(1006, 451);
+            tabPage17.Size = new Size(1006, 447);
             tabPage17.TabIndex = 0;
             tabPage17.Text = "Users";
             tabPage17.UseVisualStyleBackColor = true;
@@ -1572,7 +1572,7 @@
             tabControl9.Location = new Point(3, 28);
             tabControl9.Name = "tabControl9";
             tabControl9.SelectedIndex = 0;
-            tabControl9.Size = new Size(1000, 396);
+            tabControl9.Size = new Size(1000, 392);
             tabControl9.TabIndex = 3;
             // 
             // tabPage22
@@ -1581,7 +1581,7 @@
             tabPage22.Location = new Point(4, 28);
             tabPage22.Name = "tabPage22";
             tabPage22.Padding = new Padding(3);
-            tabPage22.Size = new Size(992, 364);
+            tabPage22.Size = new Size(992, 360);
             tabPage22.TabIndex = 0;
             tabPage22.Text = "Accounts";
             tabPage22.UseVisualStyleBackColor = true;
@@ -1591,7 +1591,7 @@
             listView5.Dock = DockStyle.Fill;
             listView5.Location = new Point(3, 3);
             listView5.Name = "listView5";
-            listView5.Size = new Size(986, 358);
+            listView5.Size = new Size(986, 354);
             listView5.TabIndex = 2;
             listView5.UseCompatibleStateImageBehavior = false;
             listView5.View = View.Details;
@@ -1718,7 +1718,7 @@
             // 
             statusStrip6.Font = new Font("Microsoft JhengHei UI", 11.25F);
             statusStrip6.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel5 });
-            statusStrip6.Location = new Point(3, 424);
+            statusStrip6.Location = new Point(3, 420);
             statusStrip6.Name = "statusStrip6";
             statusStrip6.Size = new Size(1000, 24);
             statusStrip6.TabIndex = 0;
@@ -2061,6 +2061,7 @@
             textBox8.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textBox8.Location = new Point(90, 3);
             textBox8.Name = "textBox8";
+            textBox8.ReadOnly = true;
             textBox8.Size = new Size(928, 27);
             textBox8.TabIndex = 1;
             // 

@@ -1113,7 +1113,8 @@ namespace Alien
         {
             void fnLoadWmiToListView(ListView listView, List<WmiRow> data)
             {
-                if (listView == null || data == null) return;
+                if (listView == null || data == null || data.Count == 0)
+                    return;
 
                 listView.BeginUpdate();
 
@@ -1122,36 +1123,42 @@ namespace Alien
                 listView.FullRowSelect = true;
                 listView.GridLines = true;
 
-                var columns = new HashSet<string>();
+                var templateRow = data.FirstOrDefault(r => r?.Data != null && r.Data.Count > 0);
 
-                foreach (var row in data)
+                if (templateRow == null)
                 {
-                    foreach (var key in row.Data.Keys)
-                        columns.Add(key);
+                    listView.EndUpdate();
+                    return;
                 }
 
-                var columnList = columns.OrderBy(x => x).ToList();
+                var columnList = templateRow.Data.Keys.ToList();
 
                 foreach (var col in columnList)
-                {
                     listView.Columns.Add(col);
-                }
 
                 foreach (var row in data)
                 {
+                    if (row?.Data == null || row.Data.Count == 0)
+                        continue;
+
                     var item = new ListViewItem();
+                    bool hasValue = false;
 
                     for (int i = 0; i < columnList.Count; i++)
                     {
                         row.Data.TryGetValue(columnList[i], out string? value);
+                        value ??= "";
+
+                        if (value != "") hasValue = true;
 
                         if (i == 0)
-                            item.Text = value ?? "";
+                            item.Text = value;
                         else
-                            item.SubItems.Add(value ?? "");
+                            item.SubItems.Add(value);
                     }
 
-                    listView.Items.Add(item);
+                    if (hasValue)
+                        listView.Items.Add(item);
                 }
 
                 listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
@@ -1161,6 +1168,8 @@ namespace Alien
 
             try
             {
+                toolStripStatusLabel5.Text = "Loading...";
+
                 listView5.View = View.Details;
                 listView6.View = View.Details;
                 listView7.View = View.Details;
@@ -1190,6 +1199,8 @@ namespace Alien
                 fnLoadWmiToListView(listView8, result.GroupUsers);
                 fnLoadWmiToListView(listView9, result.LoggedOn);
                 fnLoadWmiToListView(listView10, result.LogonSession);
+
+                toolStripStatusLabel5.Text = "Action successfully.";
             }
             catch (Exception ex)
             {
@@ -1299,6 +1310,7 @@ namespace Alien
             }
 
             // Clear status labels
+            toolStripStatusLabel5.Text = string.Empty;
             toolStripStatusLabel6.Text = string.Empty;
 
             textBox8.Text = m_victim.ShellURL;
@@ -2379,7 +2391,10 @@ namespace Alien
 
             string szNewName = Interaction.InputBox("Name: ", "Rename", string.Empty).Trim();
             if (string.IsNullOrEmpty(szNewName))
+            {
+                MessageBox.Show("Value name cannot be null or empty.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
+            }
 
             bool bVal = await m_winReg.fnbRenameValue(m_winReg.m_szCurrentPath, regItem.szName, szNewName);
             if (!bVal)
@@ -2616,6 +2631,12 @@ namespace Alien
                 return;
 
             string szNewName = Interaction.InputBox("New name:", "Rename", string.Empty);
+            if (string.IsNullOrEmpty(szNewName))
+            {
+                MessageBox.Show("Key name cannot be null or empty.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             string szBasePath = node.FullPath.Replace("Computer\\", string.Empty);
             bool bVal = await m_winReg.fnbRenameKey(Path.Combine(szBasePath, node.Text), Path.Combine(szBasePath, szNewName));
             if (!bVal)
