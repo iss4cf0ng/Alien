@@ -70,6 +70,10 @@ namespace Alien
 
         public string szEncoding;
 
+        public bool bTamper;
+        public string szTamperScript;
+        public bool bTamperRaw;
+
         public DateTime dtCreateDate;
         public DateTime dtLastModified;
         public DateTime dtLastAccessed;

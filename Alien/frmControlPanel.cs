@@ -18,9 +18,10 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using System.Web;
 using System.Runtime.InteropServices.Marshalling;
-using static Alien.clsfnWinUser;
 using Newtonsoft.Json.Linq;
 using Microsoft.VisualBasic;
+using ICSharpCode.TextEditor.Document;
+using ICSharpCode.TextEditor.Src.Document.FoldingStrategy;
 
 namespace Alien
 {
@@ -43,6 +44,34 @@ namespace Alien
         private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
         private TextEditorControlEx m_ctrlEvalEditor = new TextEditorControlEx();
         private TextEditorControlEx m_ctrlPostEditor = new TextEditorControlEx();
+
+        private Dictionary<enLanguage, Func<string, string>> m_dicEvalScript = new Dictionary<enLanguage, Func<string, string>>()
+        {
+            { 
+                enLanguage.PHP,  
+                (method) =>
+                {
+                    return "phpinfo();";
+                }
+            },
+            { 
+                enLanguage.ASP,
+                (method) =>
+                {
+                    return "Response.Write \"ASP\"";
+                }
+            },
+            {
+                enLanguage.ASPX,
+                (method) =>
+                {
+                    if (method == "JScript")
+                        return "Response.Write(\"JScript ASPX\");";
+                    else
+                        return "Response.Write(\"CSharp ASP.NET\");";
+                }
+            }
+        };
 
         private string[] m_asImageExt =
         {
@@ -1097,11 +1126,6 @@ namespace Alien
         }
 
         #endregion
-        #region Run Code
-
-
-
-        #endregion
         #region Linux
 
         #endregion
@@ -1111,7 +1135,7 @@ namespace Alien
 
         async Task fnWinUserInit()
         {
-            void fnLoadWmiToListView(ListView listView, List<WmiRow> data)
+            void fnLoadWmiToListView(ListView listView, List<clsfnWinUser.WmiRow> data)
             {
                 if (listView == null || data == null || data.Count == 0)
                     return;
@@ -1521,6 +1545,9 @@ namespace Alien
             {
                 draggedTab = null;
             };
+
+            // Eval Script
+            noteTextEditor.Document.FoldingManager.FoldingStrategy = null;
 
             if (m_victim.m_bUnixLike)
             {

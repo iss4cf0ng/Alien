@@ -51,6 +51,7 @@
             comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
+            checkBox2 = new CheckBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -236,6 +237,7 @@
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(checkBox2);
             groupBox2.Controls.Add(groupBox3);
             groupBox2.Controls.Add(checkBox1);
             groupBox2.Location = new Point(12, 286);
@@ -275,13 +277,23 @@
             // checkBox1
             // 
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(8, 26);
+            checkBox1.Location = new Point(87, 26);
             checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(63, 23);
+            checkBox1.Size = new Size(58, 23);
             checkBox1.TabIndex = 9;
-            checkBox1.Text = "RAW";
+            checkBox1.Text = "Raw";
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            // 
+            // checkBox2
+            // 
+            checkBox2.AutoSize = true;
+            checkBox2.Location = new Point(10, 26);
+            checkBox2.Name = "checkBox2";
+            checkBox2.Size = new Size(74, 23);
+            checkBox2.TabIndex = 11;
+            checkBox2.Text = "Enable";
+            checkBox2.UseVisualStyleBackColor = true;
             // 
             // frmEditShell
             // 
@@ -332,5 +344,6 @@
         private Label label8;
         private ComboBox comboBox6;
         private Button button3;
+        private CheckBox checkBox2;
     }
 }
