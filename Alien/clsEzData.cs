@@ -25,7 +25,7 @@ namespace Alien
         }
 
         public static string fnszStre2b64(string szData) => Convert.ToBase64String(Encoding.UTF8.GetBytes(szData));
-        public static string fnszB64d2str(string szData) => Encoding.UTF8.GetString(Convert.FromBase64String(szData));
+        public static string fnszB64d2str(string szData) { try { return Encoding.UTF8.GetString(Convert.FromBase64String(szData)); } catch { return string.Empty; } }
         public static string fnszLs2b64str(List<string> lInput, string szSplitter = ",") => string.Join(szSplitter, lInput.Select(x => fnszStre2b64(x)));
         public static List<string> fnlsB64d2str(string szInput, string szSpliter = ",") => szInput.Split(szSpliter).Select(x => fnszB64d2str(x)).ToList();
     

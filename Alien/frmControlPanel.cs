@@ -20,6 +20,7 @@ using System.Web;
 using System.Runtime.InteropServices.Marshalling;
 using static Alien.clsfnWinUser;
 using Newtonsoft.Json.Linq;
+using Microsoft.VisualBasic;
 
 namespace Alien
 {
@@ -2363,8 +2364,8 @@ namespace Alien
                 fnRegSetValue(regItem.szName, regItem.szType, regItem.szData);
         }
 
-        // Registry.Rename
-        private void toolStripMenuItem30_Click(object sender, EventArgs e)
+        // Registry.RenameValue
+        private async void toolStripMenuItem30_Click(object sender, EventArgs e)
         {
             ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
             if (items.Length == 0)
@@ -2376,16 +2377,51 @@ namespace Alien
 
             var regItem = (clsfnWinReg.stRegItem)item.Tag;
 
-        }
-
-        // Registry.Delete
-        private void toolStripMenuItem31_Click(object sender, EventArgs e)
-        {
-            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
-            if (items.Length == 0)
+            string szNewName = Interaction.InputBox("Name: ", "Rename", string.Empty).Trim();
+            if (string.IsNullOrEmpty(szNewName))
                 return;
 
+            bool bVal = await m_winReg.fnbRenameValue(m_winReg.m_szCurrentPath, regItem.szName, szNewName);
+            if (!bVal)
+            {
+                MessageBox.Show("Cannot delete: " + regItem.szName, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
+            fnRegRefresh();
+        }
+
+        // Registry.DeleteValue
+        private async void toolStripMenuItem31_Click(object sender, EventArgs e)
+        {
+            int nCount = listView3.SelectedItems.Cast<ListViewItem>().ToList().Count;
+            if (nCount == 0)
+                return;
+
+            DialogResult dr = MessageBox.Show($"Are you sure to delete {nCount} value{(nCount == 0 ? string.Empty : "s")}?", "Sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dr != DialogResult.Yes)
+                return;
+
+            foreach (ListViewItem item in listView3.SelectedItems)
+            {
+                if (item.Tag == null)
+                    continue;
+
+                try
+                {
+                    var regItem = (clsfnWinReg.stRegItem)item.Tag;
+                    var result = await m_winReg.fnDeleteValue(m_winReg.m_szCurrentPath, regItem.szName);
+
+                    if (!result.bSuccess)
+                        throw new Exception($"Cannot delete: {regItem.szName}\n{result.szErrorMsg}");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+
+            fnRegRefresh();
         }
 
         private async void toolStripButton8_Click(object sender, EventArgs e)
@@ -2400,8 +2436,6 @@ namespace Alien
 
         private void toolStripMenuItem32_Click(object sender, EventArgs e)
         {
-
-
             foreach (ListViewItem item in listView2.SelectedItems)
             {
                 var stEntry = fnFileGetItemTag(item);
@@ -2529,6 +2563,79 @@ namespace Alien
                 fnRegSetValue(regItem.szName, regItem.szType, regItem.asData);
             else
                 fnRegSetValue(regItem.szName, regItem.szType, regItem.szData);
+        }
+
+        // RegistryTree.CopyKeyName
+        private void toolStripMenuItem38_Click(object sender, EventArgs e)
+        {
+            TreeNode node = treeView5.SelectedNode;
+            if (node == null)
+                return;
+
+            Clipboard.SetText(node.Text);
+        }
+
+        // Registry.CopyName
+        private void toolStripMenuItem45_Click(object sender, EventArgs e)
+        {
+            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
+            if (items.Length == 0)
+                return;
+
+            string szText = string.Join(Environment.NewLine, items.Select(x => x.Text).ToArray());
+            Clipboard.SetText(szText);
+        }
+
+        // Registry.CopyType
+        private void toolStripMenuItem46_Click(object sender, EventArgs e)
+        {
+            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
+            if (items.Length == 0)
+                return;
+
+            string szText = string.Join(Environment.NewLine, items.Select(x => x.SubItems[1].Text).ToArray());
+            Clipboard.SetText(szText);
+        }
+
+        // Registry.CopyData
+        private void toolStripMenuItem47_Click(object sender, EventArgs e)
+        {
+            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
+            if (items.Length == 0)
+                return;
+
+            string szText = string.Join(Environment.NewLine, items.Select(x => x.SubItems[2].Text).ToArray());
+            Clipboard.SetText(szText);
+        }
+
+        // RegistryTree.Rename
+        private void toolStripMenuItem39_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        // RegistryTree.Export
+        private void toolStripMenuItem43_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // RegistryTree.Expand
+        private void toolStripMenuItem41_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // RegistryTree.Collapse
+        private void toolStripMenuItem40_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // RegistryTree.Delete
+        private void toolStripMenuItem42_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -134,12 +134,12 @@ namespace Alien
         {
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "rename_key", szOldPath, szNewPath });
             if (string.IsNullOrEmpty(szResp))
-            {
+            {   
                 MessageBox.Show("HTTP response is null or empty.", "fnbRenameKey", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
-            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult?>(szResp);
             if (result == null)
             {
                 MessageBox.Show("JSON deserialization is failed!", "fnbRenameKey", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -203,6 +203,88 @@ namespace Alien
             }
 
             return true;
+        }
+
+        public async Task<clsRegistryActionResult> fnDeleteKey(string szBasePath)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "del_key", szBasePath });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("DeleteKey Error://HTTP response is null or empty");
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+                throw new Exception("JSON deserialization is failed");
+
+            return result;
+        }
+
+        public async Task<clsRegistryActionResult> fnDeleteValue(string szBasePath, string szName)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "del_value", szBasePath, szName });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("DeleteValue Error://HTTP response is null or empty");
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+                throw new Exception("JSON deserialization is failed");
+
+            return result;
+        }
+
+        public async Task<clsRegistryActionResult?> fnNewKey(string szBasePath)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "new_key", szBasePath });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("NewKey Error://HTTP response is null or empty");
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+                throw new Exception("JSON deserialization is failed");
+
+            return result;
+        }
+
+        public async Task<clsRegistryActionResult> fnNewValue(string szBasePath, string szName, string szDataType)
+        {
+            string szInitValue = string.Empty;
+            if (szDataType.Contains("WORD"))
+                szInitValue = "0";
+
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "new_val", szBasePath, szName, szDataType, szInitValue });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("NewValue Error://HTTP response is null or empty");
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+                throw new Exception("JSON deserialization is failed");
+
+            return result;
+        }
+
+        public async Task<clsRegistryActionResult> fnExport(string szBasePath)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "export", szBasePath });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("Export Error://HTTP response is null or empty");
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+                throw new Exception("JSON deserialization is failed");
+
+            return result;
+        }
+
+        public async Task<clsRegistryActionResult> fnImport(string szContent)
+        {
+            string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "import", szContent });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("Import Error://HTTP response is null or empty");
+
+            var result = JsonConvert.DeserializeObject<clsRegistryActionResult>(szResp);
+            if (result == null)
+                throw new Exception("JSON deserialization is failed");
+
+            return result;
         }
     }
 }
