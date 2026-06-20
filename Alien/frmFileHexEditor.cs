@@ -100,7 +100,30 @@ namespace Alien
                 {
                     if (e.KeyCode == Keys.W)
                     {
+                        TabPage? page = tabControl1.SelectedTab;
+                        if (page == null)
+                            return;
 
+                        if (page.Text.Contains("*"))
+                        {
+                            DialogResult dr = MessageBox.Show("The data is modified. Close anyway?", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                            if (dr != DialogResult.Yes)
+                                return;
+                        }
+
+                        int nIdx = tabControl1.SelectedIndex;
+                        if (nIdx < 0)
+                            return;
+
+                        if (tabControl1.TabPages.Count > 1)
+                        {
+                            if (nIdx > 0 && nIdx == tabControl1.TabPages.Count - 1)
+                                tabControl1.SelectedTab = tabControl1.TabPages[nIdx - 1];
+                            else
+                                tabControl1.SelectedTab = tabControl1.TabPages[nIdx + 1];
+                        }
+
+                        tabControl1.TabPages.Remove(page);
                     }
                     else if (e.KeyCode == Keys.S)
                     {

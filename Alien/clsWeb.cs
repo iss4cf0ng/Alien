@@ -90,8 +90,6 @@ namespace Alien
             { enLanguage.JSP, szInput => szInput } // nop
         };
 
-
-
         public clsWeb(clsVictim victim)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

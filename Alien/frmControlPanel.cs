@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using System.Web;
 using System.Runtime.InteropServices.Marshalling;
 using static Alien.clsfnWinUser;
+using Newtonsoft.Json.Linq;
 
 namespace Alien
 {
@@ -34,7 +35,7 @@ namespace Alien
         public clsfnShell m_rShell { get; set; }
         public clsfnDb m_dbMgr { get; init; }
         public clsfnRunScript m_runScript { get; init; }
-        public clsfnReg m_winReg { get; init; }
+        public clsfnWinReg m_winReg { get; init; }
         public clsfnWinUser m_winUser { get; init; }
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
@@ -59,7 +60,7 @@ namespace Alien
             m_rShell = new clsfnShell(web);
             m_runScript = new clsfnRunScript(web);
 
-            m_winReg = new clsfnReg(web);
+            m_winReg = new clsfnWinReg(web);
             m_winUser = new clsfnWinUser(web);
 
             m_dbMgr = new clsfnDb(web, "db.sqlite");
@@ -1226,6 +1227,59 @@ namespace Alien
             nodePC.Expand();
         }
 
+        private void fnRegRefresh()
+        {
+            if (string.IsNullOrEmpty(m_winReg.m_szCurrentPath))
+                return;
+
+            string szFullPath = "Computer\\" + m_winReg.m_szCurrentPath;
+            TreeNode node = fnFindNodeWithFullPath(treeView5.Nodes, szFullPath);
+            if (node == null)
+                return;
+
+            listView3.Items.Clear();
+            treeView5.SelectedNode = null;
+            treeView5.SelectedNode = node;
+        }
+
+
+        private void fnRegSetValue(string szName, string szType, string szValue)
+        {
+            frmRegEditString f = new frmRegEditString(m_winReg, m_winReg.m_szCurrentPath, szName, szType, szValue);
+            f.Text = "Edit Value";
+
+            f.ShowDialog();
+
+            fnRegRefresh();
+        }
+        private void fnRegSetValue(string szName, string szType, ulong nValue)
+        {
+            frmRegEditWord f = new frmRegEditWord(m_winReg, m_winReg.m_szCurrentPath, szName, szType, nValue);
+            f.Text = "Edit Value";
+
+            f.ShowDialog();
+
+            fnRegRefresh();
+        }
+        private void fnRegSetValue(string szName, string szType, byte[] abValue)
+        {
+            frmRegEditBytes f = new frmRegEditBytes(m_winReg, m_winReg.m_szCurrentPath, szName, szType, abValue);
+            f.Text = "Edit Bytes";
+
+            f.ShowDialog();
+
+            fnRegRefresh();
+        }
+        private void fnRegSetValue(string szName, string szType, string[] asData)
+        {
+            frmRegEditMultiString f = new frmRegEditMultiString(m_winReg, m_winReg.m_szCurrentPath, szName, szType, asData);
+            f.Text = "Edit Value";
+
+            f.ShowDialog();
+
+            fnRegRefresh();
+        }
+
         #endregion
 
         #endregion
@@ -2209,7 +2263,7 @@ namespace Alien
                 var subkeys = result.Subkeys;
                 foreach (string szSubKey in subkeys)
                 {
-                    if (fnFindNodeWithFullPath(nodeSelected.Nodes, szSubKey) != null)
+                    if (fnFindNodeWithFullPath(treeView5.Nodes, "Computer\\" + szSubKey) != null)
                         continue;
 
                     TreeNode node = new TreeNode(szSubKey.Replace(nodeSelected.FullPath.Replace("Computer\\", string.Empty) + "\\", string.Empty));
@@ -2228,11 +2282,33 @@ namespace Alien
                 {
                     ListViewItem item = new ListViewItem(value.Name);
                     item.SubItems.Add(value.Type);
-                    item.SubItems.Add(clsfnReg.fnFormatRegistryValue(value.Type, value.Data));
+                    item.SubItems.Add(clsfnWinReg.fnFormatRegistryValue(value.Type, value.Data));
                     item.ImageKey = value.Type.Contains("SZ") ? "reg_ab" : "reg_01";
 
                     listView3.Items.Add(item);
+
+                    clsfnWinReg.stRegItem regItem = new clsfnWinReg.stRegItem();
+                    regItem.szName = value.Name;
+                    regItem.szType = value.Type;
+
+                    if (value.Type.Contains("BINARY"))
+                        regItem.abData = value.Data;
+                    else if (value.Type.Contains("DWORD"))
+                        regItem.nData = BitConverter.ToUInt32(value.Data, 0);
+                    else if (value.Type.Contains("QWORD"))
+                        regItem.nData = BitConverter.ToUInt64(value.Data, 0);
+                    else if (value.Type.Contains("MULTI"))
+                        regItem.asData = Encoding.Unicode.GetString(value.Data)
+                            .TrimEnd('\0')
+                            .Split('\0', StringSplitOptions.RemoveEmptyEntries);
+                    else
+                        regItem.szData = Encoding.Unicode.GetString(value.Data).TrimEnd('\0');
+
+                    item.Tag = regItem;
                 }
+
+                string szBasePath = nodeSelected.FullPath.Replace("Computer\\", string.Empty);
+                m_winReg.m_szCurrentPath = szBasePath;
 
                 toolStripStatusLabel4.Text = $"Action successfully | Key[{nodeSelected.Nodes.Count}] Value [{listView3.Items.Count}]";
             }
@@ -2265,18 +2341,50 @@ namespace Alien
             fnClose();
         }
 
+        // Registry.Edit
         private void toolStripMenuItem29_Click(object sender, EventArgs e)
         {
+            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
+            if (items.Length == 0)
+                return;
 
+            ListViewItem item = items.First();
+            if (item.Tag == null)
+                return;
+
+            var regItem = (clsfnWinReg.stRegItem)item.Tag;
+            if (regItem.szType.Contains("BINARY"))
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.abData);
+            else if (regItem.szType.Contains("WORD"))
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.nData);
+            else if (regItem.szType.Contains("MULTI"))
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.asData);
+            else
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.szData);
         }
 
+        // Registry.Rename
         private void toolStripMenuItem30_Click(object sender, EventArgs e)
         {
+            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
+            if (items.Length == 0)
+                return;
+
+            ListViewItem item = items.First();
+            if (item.Tag == null)
+                return;
+
+            var regItem = (clsfnWinReg.stRegItem)item.Tag;
 
         }
 
+        // Registry.Delete
         private void toolStripMenuItem31_Click(object sender, EventArgs e)
         {
+            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
+            if (items.Length == 0)
+                return;
+
 
         }
 
@@ -2400,6 +2508,27 @@ namespace Alien
                 Directory.CreateDirectory(szLocalSaveDirPath);
 
             Process.Start("explorer.exe", szLocalSaveDirPath);
+        }
+
+        private void listView3_DoubleClick(object sender, EventArgs e)
+        {
+            ListViewItem[] items = listView3.SelectedItems.Cast<ListViewItem>().ToArray();
+            if (items.Length == 0)
+                return;
+
+            ListViewItem item = items.First();
+            if (item.Tag == null)
+                return;
+
+            var regItem = (clsfnWinReg.stRegItem)item.Tag;
+            if (regItem.szType.Contains("BINARY"))
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.abData);
+            else if (regItem.szType.Contains("WORD"))
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.nData);
+            else if (regItem.szType.Contains("MULTI"))
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.asData);
+            else
+                fnRegSetValue(regItem.szName, regItem.szType, regItem.szData);
         }
     }
 }

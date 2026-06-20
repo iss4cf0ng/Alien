@@ -1,6 +1,6 @@
 ﻿namespace Alien
 {
-    partial class frmRegEditString
+    partial class frmRegEditMultiString
     {
         /// <summary>
         /// Required designer variable.
@@ -30,17 +30,16 @@
         {
             label1 = new Label();
             textBox1 = new TextBox();
-            button1 = new Button();
-            button2 = new Button();
             textBox2 = new TextBox();
             label2 = new Label();
+            button1 = new Button();
+            button2 = new Button();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(13, 9);
-            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Location = new Point(12, 9);
             label1.Name = "label1";
             label1.Size = new Size(58, 19);
             label1.TabIndex = 0;
@@ -48,69 +47,69 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(13, 32);
-            textBox1.Margin = new Padding(4);
+            textBox1.Location = new Point(12, 31);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(383, 27);
+            textBox1.Size = new Size(445, 27);
             textBox1.TabIndex = 1;
+            // 
+            // textBox2
+            // 
+            textBox2.Location = new Point(12, 106);
+            textBox2.Multiline = true;
+            textBox2.Name = "textBox2";
+            textBox2.ScrollBars = ScrollBars.Both;
+            textBox2.Size = new Size(445, 201);
+            textBox2.TabIndex = 3;
+            textBox2.WordWrap = false;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 84);
+            label2.Name = "label2";
+            label2.Size = new Size(55, 19);
+            label2.TabIndex = 2;
+            label2.Text = "Value :";
             // 
             // button1
             // 
-            button1.Location = new Point(13, 136);
+            button1.Location = new Point(12, 313);
             button1.Name = "button1";
-            button1.Size = new Size(178, 43);
-            button1.TabIndex = 2;
+            button1.Size = new Size(211, 49);
+            button1.TabIndex = 4;
             button1.Text = "Save";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // button2
             // 
-            button2.Location = new Point(218, 136);
+            button2.Location = new Point(246, 313);
             button2.Name = "button2";
-            button2.Size = new Size(178, 43);
-            button2.TabIndex = 3;
+            button2.Size = new Size(211, 49);
+            button2.TabIndex = 5;
             button2.Text = "Cancel";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
-            // textBox2
-            // 
-            textBox2.Location = new Point(13, 102);
-            textBox2.Margin = new Padding(4);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(383, 27);
-            textBox2.TabIndex = 5;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(13, 79);
-            label2.Margin = new Padding(4, 0, 4, 0);
-            label2.Name = "label2";
-            label2.Size = new Size(55, 19);
-            label2.TabIndex = 4;
-            label2.Text = "Value :";
-            // 
-            // frmRegEditString
+            // frmRegEditMultiString
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(411, 192);
-            Controls.Add(textBox2);
-            Controls.Add(label2);
+            ClientSize = new Size(471, 371);
             Controls.Add(button2);
             Controls.Add(button1);
+            Controls.Add(textBox2);
+            Controls.Add(label2);
             Controls.Add(textBox1);
             Controls.Add(label1);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Margin = new Padding(4);
             MaximizeBox = false;
-            Name = "frmRegEditString";
+            Name = "frmRegEditMultiString";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmRegEditString";
-            Load += frmRegEditString_Load;
+            Text = "frmRegEditMultiString";
+            Load += frmRegEditMultiString_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -119,9 +118,9 @@
 
         private Label label1;
         private TextBox textBox1;
-        private Button button1;
-        private Button button2;
         private TextBox textBox2;
         private Label label2;
+        private Button button1;
+        private Button button2;
     }
 }

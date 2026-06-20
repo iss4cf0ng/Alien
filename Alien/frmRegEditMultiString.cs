@@ -10,24 +10,26 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmRegEditString : Form
+    public partial class frmRegEditMultiString : Form
     {
         private clsfnWinReg m_winReg { get; init; }
-        private string m_szPath { get; init; }
+
+        private string m_szBasePath { get; init; }
         private string m_szName { get; init; }
         private string m_szType { get; init; }
-        private string m_szValue { get; init; }
+        private string[] m_asData { get; init; }
 
-        public frmRegEditString(clsfnWinReg winReg, string szPath, string szName, string szType, string szValue)
+        public frmRegEditMultiString(clsfnWinReg winReg, string szBasePath, string szName, string szType, string[] asData)
         {
             InitializeComponent();
 
             m_winReg = winReg;
 
-            m_szPath = szPath;
+            m_szBasePath = szBasePath;
+
             m_szName = szName;
             m_szType = szType;
-            m_szValue = szValue;
+            m_asData = asData;
         }
 
         void fnSetup()
@@ -35,19 +37,19 @@ namespace Alien
             textBox1.ReadOnly = true;
             textBox1.Text = m_szName;
 
-            textBox2.Text = m_szValue;
+            textBox2.Text = string.Join(Environment.NewLine, m_asData);
         }
 
-        private void frmRegEditString_Load(object sender, EventArgs e)
+        private void frmRegEditMultiString_Load(object sender, EventArgs e)
         {
             fnSetup();
         }
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            string szValue = textBox2.Text;
+            string szValue = string.Join(",", textBox2.Text.Trim().Split(Environment.NewLine).Where(x => !string.IsNullOrEmpty(x)));
 
-            bool bVal = await m_winReg.fnbSetValue(m_szPath, m_szName, m_szType, szValue);
+            bool bVal = await m_winReg.fnbSetValue(m_szBasePath, m_szName, m_szType, szValue);
             if (!bVal)
             {
                 MessageBox.Show("Cannot set value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

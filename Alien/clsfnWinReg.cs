@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    public class clsfnReg
+    public class clsfnWinReg
     {
         private clsWeb m_web { get; init; }
+        public string m_szCurrentPath { get; set; } = string.Empty;
 
-        public clsfnReg(clsWeb web)
+        public clsfnWinReg(clsWeb web)
         {
             m_web = web;
         }
@@ -48,6 +49,17 @@ namespace Alien
 
             [JsonProperty("output")]
             public List<string> lsOutput { get; set; } = new List<string>();
+        }
+
+        public struct stRegItem
+        {
+            public string szName { get; set; }
+            public string szType { get; set; }
+
+            public string szData { get; set; }
+            public string[] asData { get; set; }
+            public ulong nData { get; set; }
+            public byte[] abData { get; set; }
         }
 
         public static string fnFormatRegistryValue(string szType, byte[] abData)
