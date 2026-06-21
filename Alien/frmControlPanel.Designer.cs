@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            TreeNode treeNode5 = new TreeNode("Upload");
+            TreeNode treeNode6 = new TreeNode("Download");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
-            TreeNode treeNode1 = new TreeNode("Upload");
-            TreeNode treeNode2 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -160,8 +160,11 @@
             tabPage11 = new TabPage();
             toolStrip7 = new ToolStrip();
             toolStripButton7 = new ToolStripButton();
+            toolStripButton13 = new ToolStripButton();
             tabPage12 = new TabPage();
             toolStrip8 = new ToolStrip();
+            toolStripButton11 = new ToolStripButton();
+            toolStripButton12 = new ToolStripButton();
             tabPage15 = new TabPage();
             tabPage16 = new TabPage();
             tabControl7 = new TabControl();
@@ -219,7 +222,9 @@
             tabPage29 = new TabPage();
             tabPage30 = new TabPage();
             tabPage28 = new TabPage();
-            noteTextEditor = new ICSharpCode.TextEditor.TextEditorControlEx();
+            textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
+            statusStrip7 = new StatusStrip();
+            toolStripStatusLabel7 = new ToolStripStatusLabel();
             toolStrip12 = new ToolStrip();
             toolStripButton10 = new ToolStripButton();
             fileImageList = new ImageList(components);
@@ -233,9 +238,7 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
-            toolStripButton11 = new ToolStripButton();
-            toolStripButton12 = new ToolStripButton();
-            toolStripButton13 = new ToolStripButton();
+            textBox11 = new TextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -319,6 +322,7 @@
             statusStrip5.SuspendLayout();
             toolStrip10.SuspendLayout();
             tabPage28.SuspendLayout();
+            statusStrip7.SuspendLayout();
             toolStrip12.SuspendLayout();
             menuDbTable.SuspendLayout();
             panel2.SuspendLayout();
@@ -497,11 +501,11 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode1.Name = "Node0";
-            treeNode1.Text = "Upload";
-            treeNode2.Name = "Node1";
-            treeNode2.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
+            treeNode5.Name = "Node0";
+            treeNode5.Text = "Upload";
+            treeNode6.Name = "Node1";
+            treeNode6.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode5, treeNode6 });
             treeView4.Size = new Size(246, 324);
             treeView4.TabIndex = 0;
             // 
@@ -1512,9 +1516,20 @@
             toolStripButton7.Text = "Execute";
             toolStripButton7.Click += toolStripButton7_Click;
             // 
+            // toolStripButton13
+            // 
+            toolStripButton13.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton13.Image = (Image)resources.GetObject("toolStripButton13.Image");
+            toolStripButton13.ImageTransparentColor = Color.Magenta;
+            toolStripButton13.Name = "toolStripButton13";
+            toolStripButton13.Size = new Size(46, 23);
+            toolStripButton13.Text = "Save";
+            toolStripButton13.Click += toolStripButton13_Click;
+            // 
             // tabPage12
             // 
             tabPage12.Controls.Add(toolStrip8);
+            tabPage12.Controls.Add(textBox11);
             tabPage12.Location = new Point(4, 28);
             tabPage12.Name = "tabPage12";
             tabPage12.Padding = new Padding(3);
@@ -1527,11 +1542,31 @@
             // 
             toolStrip8.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             toolStrip8.Items.AddRange(new ToolStripItem[] { toolStripButton11, toolStripButton12 });
-            toolStrip8.Location = new Point(3, 3);
+            toolStrip8.Location = new Point(3, 30);
             toolStrip8.Name = "toolStrip8";
             toolStrip8.Size = new Size(545, 26);
             toolStrip8.TabIndex = 0;
             toolStrip8.Text = "toolStrip8";
+            // 
+            // toolStripButton11
+            // 
+            toolStripButton11.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton11.Image = (Image)resources.GetObject("toolStripButton11.Image");
+            toolStripButton11.ImageTransparentColor = Color.Magenta;
+            toolStripButton11.Name = "toolStripButton11";
+            toolStripButton11.Size = new Size(43, 23);
+            toolStripButton11.Text = "Post";
+            toolStripButton11.Click += toolStripButton11_Click;
+            // 
+            // toolStripButton12
+            // 
+            toolStripButton12.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton12.Image = (Image)resources.GetObject("toolStripButton12.Image");
+            toolStripButton12.ImageTransparentColor = Color.Magenta;
+            toolStripButton12.Name = "toolStripButton12";
+            toolStripButton12.Size = new Size(46, 23);
+            toolStripButton12.Text = "Save";
+            toolStripButton12.Click += toolStripButton12_Click;
             // 
             // tabPage15
             // 
@@ -2032,7 +2067,8 @@
             // 
             // tabPage28
             // 
-            tabPage28.Controls.Add(noteTextEditor);
+            tabPage28.Controls.Add(textEditorControl1);
+            tabPage28.Controls.Add(statusStrip7);
             tabPage28.Controls.Add(toolStrip12);
             tabPage28.Location = new Point(4, 28);
             tabPage28.Name = "tabPage28";
@@ -2041,16 +2077,32 @@
             tabPage28.Text = "Note";
             tabPage28.UseVisualStyleBackColor = true;
             // 
-            // noteTextEditor
+            // textEditorControl1
             // 
-            noteTextEditor.Dock = DockStyle.Fill;
-            noteTextEditor.FoldingStrategy = null;
-            noteTextEditor.Font = new Font("Courier New", 10F);
-            noteTextEditor.Location = new Point(0, 26);
-            noteTextEditor.Name = "noteTextEditor";
-            noteTextEditor.Size = new Size(1014, 453);
-            noteTextEditor.SyntaxHighlighting = null;
-            noteTextEditor.TabIndex = 0;
+            textEditorControl1.Dock = DockStyle.Fill;
+            textEditorControl1.Font = new Font("Courier New", 10F);
+            textEditorControl1.IsReadOnly = false;
+            textEditorControl1.Location = new Point(0, 26);
+            textEditorControl1.Name = "textEditorControl1";
+            textEditorControl1.Size = new Size(1014, 429);
+            textEditorControl1.TabIndex = 2;
+            textEditorControl1.KeyDown += textEditorControl1_KeyDown;
+            // 
+            // statusStrip7
+            // 
+            statusStrip7.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            statusStrip7.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel7 });
+            statusStrip7.Location = new Point(0, 455);
+            statusStrip7.Name = "statusStrip7";
+            statusStrip7.Size = new Size(1014, 24);
+            statusStrip7.TabIndex = 3;
+            statusStrip7.Text = "statusStrip7";
+            // 
+            // toolStripStatusLabel7
+            // 
+            toolStripStatusLabel7.Name = "toolStripStatusLabel7";
+            toolStripStatusLabel7.Size = new Size(158, 19);
+            toolStripStatusLabel7.Text = "toolStripStatusLabel7";
             // 
             // toolStrip12
             // 
@@ -2070,6 +2122,7 @@
             toolStripButton10.Name = "toolStripButton10";
             toolStripButton10.Size = new Size(46, 23);
             toolStripButton10.Text = "Save";
+            toolStripButton10.Click += toolStripButton10_Click;
             // 
             // fileImageList
             // 
@@ -2151,32 +2204,14 @@
             label1.TabIndex = 0;
             label1.Text = "Webshell :";
             // 
-            // toolStripButton11
+            // textBox11
             // 
-            toolStripButton11.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton11.Image = (Image)resources.GetObject("toolStripButton11.Image");
-            toolStripButton11.ImageTransparentColor = Color.Magenta;
-            toolStripButton11.Name = "toolStripButton11";
-            toolStripButton11.Size = new Size(43, 23);
-            toolStripButton11.Text = "Post";
-            // 
-            // toolStripButton12
-            // 
-            toolStripButton12.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton12.Image = (Image)resources.GetObject("toolStripButton12.Image");
-            toolStripButton12.ImageTransparentColor = Color.Magenta;
-            toolStripButton12.Name = "toolStripButton12";
-            toolStripButton12.Size = new Size(46, 23);
-            toolStripButton12.Text = "Save";
-            // 
-            // toolStripButton13
-            // 
-            toolStripButton13.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton13.Image = (Image)resources.GetObject("toolStripButton13.Image");
-            toolStripButton13.ImageTransparentColor = Color.Magenta;
-            toolStripButton13.Name = "toolStripButton13";
-            toolStripButton13.Size = new Size(46, 23);
-            toolStripButton13.Text = "Save";
+            textBox11.Dock = DockStyle.Top;
+            textBox11.Location = new Point(3, 3);
+            textBox11.Name = "textBox11";
+            textBox11.Size = new Size(545, 27);
+            textBox11.TabIndex = 1;
+            textBox11.KeyDown += textBox11_KeyDown;
             // 
             // frmControlPanel
             // 
@@ -2311,6 +2346,8 @@
             toolStrip10.PerformLayout();
             tabPage28.ResumeLayout(false);
             tabPage28.PerformLayout();
+            statusStrip7.ResumeLayout(false);
+            statusStrip7.PerformLayout();
             toolStrip12.ResumeLayout(false);
             toolStrip12.PerformLayout();
             menuDbTable.ResumeLayout(false);
@@ -2385,7 +2422,6 @@
         private ToolStripDropDownButton toolStripDropDownButton1;
         private ToolStripMenuItem toolStripMenuItem15;
         private ToolStripMenuItem toolStripMenuItem16;
-        private ICSharpCode.TextEditor.TextEditorControlEx noteTextEditor;
         private SplitContainer splitContainer4;
         private ToolStrip toolStrip7;
         private TabControl tabControl5;
@@ -2525,5 +2561,9 @@
         private ToolStripButton toolStripButton13;
         private ToolStripButton toolStripButton11;
         private ToolStripButton toolStripButton12;
+        private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
+        private StatusStrip statusStrip7;
+        private ToolStripStatusLabel toolStripStatusLabel7;
+        private TextBox textBox11;
     }
 }

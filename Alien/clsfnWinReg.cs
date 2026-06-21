@@ -76,18 +76,25 @@ namespace Alien
 
         public static string fnFormatRegistryValue(string szType, byte[] abData)
         {
-            if (abData == null)
+            if (abData == null || abData.Length == 0)
                 return string.Empty;
+
+            if (abData.Length >= 3 && abData[0] == 0xEF && abData[1] == 0xBB && abData[2] == 0xBF)
+            {
+                byte[] temp = new byte[abData.Length - 3];
+                Buffer.BlockCopy(abData, 3, temp, 0, temp.Length);
+                abData = temp;
+            }
 
             switch (szType)
             {
                 case "REG_SZ":
                 case "REG_EXPAND_SZ":
-                    return Encoding.Unicode.GetString(abData).TrimEnd('\0');
+                    return Encoding.UTF8.GetString(abData).TrimEnd('\0');
 
                 case "REG_MULTI_SZ":
                     return string.Join(", ",
-                        Encoding.Unicode.GetString(abData)
+                        Encoding.UTF8.GetString(abData)
                             .TrimEnd('\0')
                             .Split('\0', StringSplitOptions.RemoveEmptyEntries));
 

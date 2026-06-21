@@ -47,14 +47,14 @@ namespace Alien
 
         private Dictionary<enLanguage, Func<string, string>> m_dicEvalScript = new Dictionary<enLanguage, Func<string, string>>()
         {
-            { 
-                enLanguage.PHP,  
+            {
+                enLanguage.PHP,
                 (method) =>
                 {
                     return "phpinfo();";
                 }
             },
-            { 
+            {
                 enLanguage.ASP,
                 (method) =>
                 {
@@ -1336,6 +1336,7 @@ namespace Alien
             // Clear status labels
             toolStripStatusLabel5.Text = string.Empty;
             toolStripStatusLabel6.Text = string.Empty;
+            toolStripStatusLabel7.Text = string.Empty;
 
             textBox8.Text = m_victim.ShellURL;
             Text = m_victim.ShellURL.Split('/')[2];
@@ -1546,9 +1547,6 @@ namespace Alien
                 draggedTab = null;
             };
 
-            // Eval Script
-            noteTextEditor.Document.FoldingManager.FoldingStrategy = null;
-
             if (m_victim.m_bUnixLike)
             {
                 // Linux
@@ -1565,6 +1563,24 @@ namespace Alien
 
                 await fnWinUserInit();
                 await fnRegInit();
+            }
+
+            // Note
+            try
+            {
+                string szFilePath = Path.Combine(m_victim.m_szPortfolio, "note.txt");
+                string szContent = Path.Exists(szFilePath) ? File.ReadAllText(szFilePath) : string.Empty;
+
+                textEditorControl1.Text = szContent;
+
+                textEditorControl1.TextChanged += (s, e) =>
+                {
+                    toolStripStatusLabel7.Text = "Have not saved (Please save it before you close the control panel)";
+                };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -2736,6 +2752,84 @@ namespace Alien
             treeView5.SelectedNode = null;
             treeView5.Nodes.Remove(node);
             treeView5.SelectedNode = nodeParent;
+        }
+
+        private void toolStripButton10_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string szFilePath = Path.Combine(m_victim.m_szPortfolio, "note.txt");
+                File.WriteAllText(szFilePath, textEditorControl1.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void textEditorControl1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Modifiers == Keys.Control)
+            {
+                if (e.Modifiers == Keys.S)
+                {
+                    try
+                    {
+                        string szFilePath = Path.Combine(m_victim.m_szPortfolio, "note.txt");
+                        File.WriteAllText(szFilePath, textEditorControl1.Text);
+
+                        toolStripStatusLabel7.Text = "Saved";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void toolStripButton13_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.FileName = "eval_" + clsTool.fnszGenerateFileNameWithDateTime();
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    File.WriteAllText(sfd.FileName, m_ctrlEvalEditor.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void toolStripButton11_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton12_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.FileName = "post_" + clsTool.fnszGenerateFileNameWithDateTime();
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    File.WriteAllText(sfd.FileName, m_ctrlEvalEditor.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void textBox11_KeyDown(object sender, KeyEventArgs e)
+        {
+
         }
     }
 }

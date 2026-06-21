@@ -13,7 +13,24 @@ namespace Alien
         public clsTool() { }
 
         public static List<ListViewItem> fnExtractListViewSelectedItems(ListView lv) => lv.SelectedItems.Cast<ListViewItem>().ToList();
-        
+
+        public static T? fnFindForm<T>(clsWeb web) where T : Form => fnFindForm<T>(web.m_victim);
+        public static T? fnFindForm<T>(clsVictim victim) where T : Form
+        {
+            foreach (T form in Application.OpenForms.OfType<T>())
+            {
+                var prop = form.GetType().GetProperty("m_victim", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                if (prop == null)
+                    continue;
+
+                var value = prop.GetValue(form);
+                if (value is clsVictim && ((clsVictim)value).ShellID == victim.ShellID)
+                    return form;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Normalize bytes length.
         /// </summary>

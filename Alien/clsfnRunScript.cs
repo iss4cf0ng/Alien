@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,10 +16,51 @@ namespace Alien
             m_web = web;
         }
 
+        public class clsHttpResponse
+        {
+            public string status { get; set; }
+            public string action { get; set; }
+            public string data { get; set; }
+        }
+
         public async Task<string> fnszRunScript(string szCode)
         {
-            string szPost = await m_web.fnszSendPayload("eval", new string[] { szCode });
-            return szPost;
+            try
+            {
+                string szPost = await m_web.fnszSendPayload("eval", new string[] { szCode });
+                return szPost;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return string.Empty;
+            }
+        }
+
+        public async Task<string> fnHttpGET(string szUrl)
+        {
+            string szResp = await m_web.fnszSendPayload("get", new string[] { "get", szUrl });
+            var resp = JsonConvert.DeserializeObject<clsHttpResponse>(szResp);
+            if (resp == null)
+                throw new Exception("JSON deserialization is failed.");
+
+            if (resp.status == "error")
+                throw new Exception(resp.data);
+
+            return resp.data;
+        }
+
+        public async Task<string> fnHttpPOST(string szUrl, string szData)
+        {
+            string szResp = await m_web.fnszSendPayload("get", new string[] { "post", szUrl, szData });
+            var resp = JsonConvert.DeserializeObject<clsHttpResponse>(szResp);
+            if (resp == null)
+                throw new Exception("JSON deserialization is failed.");
+
+            if (resp.status == "error")
+                throw new Exception(resp.data);
+
+            return resp.data;
         }
     }
 }

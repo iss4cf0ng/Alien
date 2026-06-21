@@ -47,11 +47,12 @@
             label3 = new Label();
             comboBox1 = new ComboBox();
             groupBox2 = new GroupBox();
+            checkBox2 = new CheckBox();
             groupBox3 = new GroupBox();
             comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
-            checkBox2 = new CheckBox();
+            textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -75,9 +76,9 @@
             // 
             // button1
             // 
-            button1.Location = new Point(12, 502);
+            button1.Location = new Point(12, 533);
             button1.Name = "button1";
-            button1.Size = new Size(195, 47);
+            button1.Size = new Size(231, 47);
             button1.TabIndex = 2;
             button1.Text = "Test Shell";
             button1.UseVisualStyleBackColor = true;
@@ -85,9 +86,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(213, 502);
+            button2.Location = new Point(249, 533);
             button2.Name = "button2";
-            button2.Size = new Size(195, 47);
+            button2.Size = new Size(237, 47);
             button2.TabIndex = 3;
             button2.Text = "Save";
             button2.UseVisualStyleBackColor = true;
@@ -242,18 +243,29 @@
             groupBox2.Controls.Add(checkBox1);
             groupBox2.Location = new Point(12, 286);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(474, 210);
+            groupBox2.Size = new Size(474, 241);
             groupBox2.TabIndex = 8;
             groupBox2.TabStop = false;
             groupBox2.Text = "Cryptography Tamper";
             // 
+            // checkBox2
+            // 
+            checkBox2.AutoSize = true;
+            checkBox2.Location = new Point(10, 26);
+            checkBox2.Name = "checkBox2";
+            checkBox2.Size = new Size(74, 23);
+            checkBox2.TabIndex = 11;
+            checkBox2.Text = "Enable";
+            checkBox2.UseVisualStyleBackColor = true;
+            // 
             // groupBox3
             // 
+            groupBox3.Controls.Add(textEditorControl1);
             groupBox3.Controls.Add(comboBox2);
             groupBox3.Controls.Add(label4);
             groupBox3.Location = new Point(8, 55);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(460, 146);
+            groupBox3.Size = new Size(460, 180);
             groupBox3.TabIndex = 10;
             groupBox3.TabStop = false;
             // 
@@ -285,21 +297,21 @@
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
-            // checkBox2
+            // textEditorControl1
             // 
-            checkBox2.AutoSize = true;
-            checkBox2.Location = new Point(10, 26);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(74, 23);
-            checkBox2.TabIndex = 11;
-            checkBox2.Text = "Enable";
-            checkBox2.UseVisualStyleBackColor = true;
+            textEditorControl1.Font = new Font("Courier New", 10F);
+            textEditorControl1.IsReadOnly = false;
+            textEditorControl1.Location = new Point(6, 53);
+            textEditorControl1.Name = "textEditorControl1";
+            textEditorControl1.Size = new Size(448, 121);
+            textEditorControl1.TabIndex = 3;
+            textEditorControl1.Text = "textEditorControl1";
             // 
             // frmEditShell
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(498, 561);
+            ClientSize = new Size(498, 592);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(button2);
@@ -345,5 +357,6 @@
         private ComboBox comboBox6;
         private Button button3;
         private CheckBox checkBox2;
+        private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
     }
 }

