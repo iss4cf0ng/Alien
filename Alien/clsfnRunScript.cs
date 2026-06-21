@@ -20,6 +20,7 @@ namespace Alien
         {
             public string status { get; set; }
             public string action { get; set; }
+            public int http_code { get; set; }
             public string data { get; set; }
         }
 
@@ -37,9 +38,9 @@ namespace Alien
             }
         }
 
-        public async Task<string> fnHttpGET(string szUrl)
+        public async Task<clsHttpResponse> fnHttpGET(string szUrl)
         {
-            string szResp = await m_web.fnszSendPayload("get", new string[] { "get", szUrl });
+            string szResp = await m_web.fnszSendPayload("http", new string[] { "get", szUrl });
             var resp = JsonConvert.DeserializeObject<clsHttpResponse>(szResp);
             if (resp == null)
                 throw new Exception("JSON deserialization is failed.");
@@ -47,12 +48,12 @@ namespace Alien
             if (resp.status == "error")
                 throw new Exception(resp.data);
 
-            return resp.data;
+            return resp;
         }
 
-        public async Task<string> fnHttpPOST(string szUrl, string szData)
+        public async Task<clsHttpResponse> fnHttpPOST(string szUrl, string szData)
         {
-            string szResp = await m_web.fnszSendPayload("get", new string[] { "post", szUrl, szData });
+            string szResp = await m_web.fnszSendPayload("http", new string[] { "post", szUrl, szData });
             var resp = JsonConvert.DeserializeObject<clsHttpResponse>(szResp);
             if (resp == null)
                 throw new Exception("JSON deserialization is failed.");
@@ -60,7 +61,7 @@ namespace Alien
             if (resp.status == "error")
                 throw new Exception(resp.data);
 
-            return resp.data;
+            return resp;
         }
     }
 }

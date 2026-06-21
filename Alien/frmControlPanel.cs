@@ -2792,6 +2792,7 @@ namespace Alien
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.FileName = "eval_" + clsTool.fnszGenerateFileNameWithDateTime();
+            sfd.InitialDirectory = m_victim.m_szPortfolio;
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -2805,20 +2806,31 @@ namespace Alien
             }
         }
 
-        private void toolStripButton11_Click(object sender, EventArgs e)
+        private async void toolStripButton11_Click(object sender, EventArgs e)
         {
+            try
+            {
+                var resp = await m_runScript.fnHttpPOST(textBox11.Text, m_ctrlPostEditor.Text);
+                m_ctrlEvalBrowser.DocumentText = resp.data;
 
+                toolStripStatusLabel3.Text = $"Status: {resp.http_code} | Length: {resp.data.Length}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void toolStripButton12_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.FileName = "post_" + clsTool.fnszGenerateFileNameWithDateTime();
+            sfd.InitialDirectory = m_victim.m_szPortfolio;
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    File.WriteAllText(sfd.FileName, m_ctrlEvalEditor.Text);
+                    File.WriteAllText(sfd.FileName, m_ctrlPostEditor.Text);
                 }
                 catch (Exception ex)
                 {
@@ -2827,9 +2839,22 @@ namespace Alien
             }
         }
 
-        private void textBox11_KeyDown(object sender, KeyEventArgs e)
+        private async void textBox11_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.Enter)
+            {
+                try
+                {
+                    var resp = await m_runScript.fnHttpGET(textBox11.Text);
+                    m_ctrlEvalBrowser.DocumentText = resp.data;
 
+                    toolStripStatusLabel3.Text = $"Status: {resp.http_code} | Length: {resp.data.Length}";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }

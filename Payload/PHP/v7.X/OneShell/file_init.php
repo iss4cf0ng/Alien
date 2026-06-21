@@ -1,14 +1,14 @@
 <?php
 
 $szCurrentDir = getcwd();
-$bUnixLike = str_contains($szCurrentDir, '/');
+$bUnixLike = (strpos($szCurrentDir, '/') !== false);
 
-echo($szCurrentDir);
-echo('|');
+echo $szCurrentDir;
+echo '|';
 
 if ($bUnixLike)
 {
-    echo('/');
+    echo '/';
 }
 else
 {
@@ -47,7 +47,7 @@ else
         }
     }
 
-    echo(join(',', $aResult));
+    echo implode(',', $aResult);
 }
 
 ?>

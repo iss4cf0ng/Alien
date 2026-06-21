@@ -25,7 +25,7 @@ checks.Add "MongoDB", False ' no standard COM provider
 
 Dim key
 For Each key In checks.Keys
-    Response.Write key & ":" & Abs(CInt(checks(key))) & ","
+    Echo key & ":" & Abs(CInt(checks(key))) & ","
 Next
 
 %>
