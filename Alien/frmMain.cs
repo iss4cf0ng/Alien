@@ -88,6 +88,8 @@ namespace Alien
                 item.SubItems.Add(config.dtLastModified.ToString("F"));
                 item.SubItems.Add(config.dtLastAccessed.ToString("F"));
 
+                item.ImageKey = "unknown";
+
                 clsVictim victim = new clsVictim(m_sqlConn, config, false);
                 victim.fnbBuildPortfolio();
                 clsWeb web = new clsWeb(victim, m_tamper);
@@ -319,15 +321,47 @@ namespace Alien
             fnUpdateState();
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private async void toolStripButton1_Click(object sender, EventArgs e)
         {
             try
             {
-                int nThread = int.Parse(Interaction.InputBox("Thread Count:", "Check Alive", "3"));
+                int nThread = int.Parse(Interaction.InputBox("Thread count:", "Check Alive", "3"));
                 if (nThread <= 0)
                     throw new Exception("Invalid number.");
 
+                toolStripProgressBar1.Value = 0;
+                toolStripProgressBar1.Maximum = listView1.Items.Count;
 
+                Dictionary <clsWeb, ListViewItem> dic = new Dictionary<clsWeb, ListViewItem>();
+                foreach (ListViewItem item in listView1.Items)
+                    dic.Add(fnGetVictimTag(item), item);
+
+                var semaphore = new SemaphoreSlim(nThread);
+                List<Task> lsTask = new List<Task>();
+                
+                foreach (clsWeb web in dic.Keys)
+                {
+                    lsTask.Add(Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync();
+
+                        try
+                        {
+                            bool bAlive = await web.fnbTestWebConnection() && await web.fnbTestShellConnection();
+                            Invoke(() => dic[web].ImageKey = bAlive ? "yes" : "no");
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+
+                            Invoke(() => toolStripProgressBar1.Increment(1));
+                        }
+                    }));
+                }
+
+                await Task.WhenAll(lsTask);
+
+                MessageBox.Show("Completed, please check.", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {

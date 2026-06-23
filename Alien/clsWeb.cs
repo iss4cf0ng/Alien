@@ -586,7 +586,7 @@ namespace Alien
         /// Do HTTP web connection to check alive.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> fnbTestWebConnection()
+        public async Task<bool> fnbTestWebConnection(bool bShowError = true)
         {
             try
             {
@@ -605,7 +605,9 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "fnbTestWebConnection()");
+                if (!bShowError)
+                    MessageBox.Show(ex.Message, "fnbTestWebConnection()");
+
                 return false;
             }
         }
@@ -614,7 +616,7 @@ namespace Alien
         /// Execute test payload.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> fnbTestShellConnection()
+        public async Task<bool> fnbTestShellConnection(bool bShowError = true)
         {
             try
             {
@@ -627,7 +629,9 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "fnbTestShellConnection()");
+                if (!bShowError)
+                    MessageBox.Show(ex.Message, "fnbTestShellConnection()");
+
                 return false;
             }
         }
@@ -859,7 +863,6 @@ namespace Alien
                 "  # TODO: Add Ruby encryption logic here\r\n" +
                 "  return data\r\n" +
                 "end" : szEncryptor) + "\r\n\r\n" +
-                "# 劫持標準輸出到 StringIO 記憶體緩衝區\r\n" +
                 "old_stdout = $stdout;\r\n" +
                 "$stdout = StringIO.new;\r\n\r\n";
 

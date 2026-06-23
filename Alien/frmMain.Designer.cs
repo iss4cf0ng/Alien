@@ -59,9 +59,10 @@
             toolStripMenuItem4 = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             toolStripMenuItem5 = new ToolStripMenuItem();
+            imageList1 = new ImageList(components);
             textBox1 = new TextBox();
             timer1 = new System.Windows.Forms.Timer(components);
-            imageList1 = new ImageList(components);
+            toolStripProgressBar1 = new ToolStripProgressBar();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -137,7 +138,7 @@
             // statusStrip1
             // 
             statusStrip1.Font = new Font("Microsoft JhengHei", 11.25F);
-            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1, toolStripStatusLabel2, toolStripStatusLabel3 });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1, toolStripStatusLabel2, toolStripStatusLabel3 });
             statusStrip1.Location = new Point(0, 478);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new Padding(1, 0, 18, 0);
@@ -154,7 +155,7 @@
             // toolStripStatusLabel2
             // 
             toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            toolStripStatusLabel2.Size = new Size(728, 19);
+            toolStripStatusLabel2.Size = new Size(545, 19);
             toolStripStatusLabel2.Spring = true;
             // 
             // toolStripStatusLabel3
@@ -298,6 +299,15 @@
             toolStripMenuItem5.Text = "Folder";
             toolStripMenuItem5.Click += toolStripMenuItem5_Click;
             // 
+            // imageList1
+            // 
+            imageList1.ColorDepth = ColorDepth.Depth32Bit;
+            imageList1.ImageStream = (ImageListStreamer)resources.GetObject("imageList1.ImageStream");
+            imageList1.TransparentColor = Color.Transparent;
+            imageList1.Images.SetKeyName(0, "unknown");
+            imageList1.Images.SetKeyName(1, "yes");
+            imageList1.Images.SetKeyName(2, "no");
+            // 
             // textBox1
             // 
             textBox1.Dock = DockStyle.Bottom;
@@ -307,11 +317,10 @@
             textBox1.TabIndex = 1;
             textBox1.KeyDown += textBox1_KeyDown;
             // 
-            // imageList1
+            // toolStripProgressBar1
             // 
-            imageList1.ColorDepth = ColorDepth.Depth32Bit;
-            imageList1.ImageSize = new Size(16, 16);
-            imageList1.TransparentColor = Color.Transparent;
+            toolStripProgressBar1.Name = "toolStripProgressBar1";
+            toolStripProgressBar1.Size = new Size(150, 18);
             // 
             // frmMain
             // 
@@ -377,5 +386,6 @@
         private System.Windows.Forms.Timer timer1;
         private ToolStripButton toolStripButton1;
         private ImageList imageList1;
+        private ToolStripProgressBar toolStripProgressBar1;
     }
 }
