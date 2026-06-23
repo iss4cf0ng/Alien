@@ -25,6 +25,7 @@ namespace Alien
         Ruby,
         Perl,
         Python,
+        CFM,
     }
 
     public enum enPayloadType

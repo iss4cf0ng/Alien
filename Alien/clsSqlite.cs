@@ -156,11 +156,11 @@ namespace Alien
         #endregion
         #region Shell
 
-        public bool ShellExists(string szUrl)
+        public bool ShellExists(string szID)
         {
             try
             {
-                string szQuery = $"SELECT 1 FROM `Shell` WHERE URL = \"{szUrl}\";";
+                string szQuery = $"SELECT 1 FROM `Shell` WHERE ID = \"{szID}\";";
                 DataTable dtResult = fnSqlQuery(szQuery);
                 if (dtResult.Rows.Count == 0)
                     return false;
@@ -181,7 +181,7 @@ namespace Alien
         {
             try
             {
-                bool bShellExists = ShellExists(config.szUrl);
+                bool bShellExists = ShellExists(config.ID);
                 string szQuery = "";
                 DateTime dt = DateTime.Now;
                 string szDt = dt.ToString("F");
