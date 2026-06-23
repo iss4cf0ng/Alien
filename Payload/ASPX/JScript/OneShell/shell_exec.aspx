@@ -1,4 +1,5 @@
 <%
+
 function getCurrentCharset() {
     var charset = this.Response.Charset;
 

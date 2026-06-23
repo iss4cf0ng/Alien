@@ -1,5 +1,6 @@
 <%
 
+Server.CharSet = "UTF-8"
 var fso = Server.CreateObject("Scripting.FileSystemObject");
 
 var workDir = Server.MapPath(".");

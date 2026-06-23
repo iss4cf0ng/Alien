@@ -101,7 +101,6 @@ Select Case actionType
         chunkStream.Write rawCmd
         chunkStream.Close
         
-        ' CRITICAL: Free the COM pointer immediately to drop the lock!
         Set chunkStream = Nothing
         
         Response.Write "{""status"":""success"",""msg"":""Input buffer queued.""}"
@@ -120,7 +119,6 @@ Select Case actionType
                 tsStream.Close
             End If
             
-            ' Clear the output file immediately so next polling iteration grabs new chunks
             If readContent <> "" Then
                 Set tsStream = fso.OpenTextFile(outFile, 2, True, -2)
                 tsStream.Write ""
@@ -145,11 +143,8 @@ Select Case actionType
             binStream.Position = 0
             binStream.Type = 1 ' Binary
             
-            ' DYNAMIC BOM DETECTOR: Only skip 3 bytes if the classic UTF-8 header EF BB BF is detected
             If binStream.Size >= 3 Then
                 firstBytes = binStream.Read(3)
-                ' If it matches the EF BB BF hex sequence (rendered as characters or byte strings depending on platform context)
-                ' We reset position based on presence verification
                 binStream.Position = 0
                 Dim testStream, checkStr
                 Set testStream = Server.CreateObject("ADODB.Stream")
@@ -162,7 +157,6 @@ Select Case actionType
                 checkStr = testStream.ReadText
                 testStream.Close
                 
-                ' Fallback safe inspection: If the first characters match known BOM translation signatures
                 If InStr(checkStr, "ï»¿") > 0 Then
                     binStream.Position = 3
                 Else
@@ -195,4 +189,5 @@ Select Case actionType
 End Select
 
 Set fso = Nothing
+
 %>

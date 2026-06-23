@@ -4,7 +4,6 @@ Function GetCurrentCharset()
     Dim charset
     charset = Response.CharSet
     
-    ' If Response.CharSet is empty, map it based on Session.CodePage
     If charset = "" Then
         Select Case Session.CodePage
             Case 65001 : charset = "utf-8"
@@ -61,8 +60,6 @@ If nRetVal = 0 Then
 
     For Each line In result
         If Trim(line) <> "" Then
-            ' ASP has no real mb_convert_encoding
-            ' assume system output is already UTF-8 compatible
             Response.Write line & vbCrLf
         End If
     Next

