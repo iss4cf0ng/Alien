@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            TreeNode treeNode5 = new TreeNode("Upload");
-            TreeNode treeNode6 = new TreeNode("Download");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
+            TreeNode treeNode1 = new TreeNode("Upload");
+            TreeNode treeNode2 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -165,6 +165,7 @@
             toolStrip8 = new ToolStrip();
             toolStripButton11 = new ToolStripButton();
             toolStripButton12 = new ToolStripButton();
+            textBox11 = new TextBox();
             tabPage15 = new TabPage();
             tabPage16 = new TabPage();
             tabControl7 = new TabControl();
@@ -238,7 +239,6 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
-            textBox11 = new TextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -501,11 +501,11 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode5.Name = "Node0";
-            treeNode5.Text = "Upload";
-            treeNode6.Name = "Node1";
-            treeNode6.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode5, treeNode6 });
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "Upload";
+            treeNode2.Name = "Node1";
+            treeNode2.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
             treeView4.Size = new Size(246, 324);
             treeView4.TabIndex = 0;
             // 
@@ -1530,10 +1530,10 @@
             // 
             tabPage12.Controls.Add(toolStrip8);
             tabPage12.Controls.Add(textBox11);
-            tabPage12.Location = new Point(4, 28);
+            tabPage12.Location = new Point(4, 24);
             tabPage12.Name = "tabPage12";
             tabPage12.Padding = new Padding(3);
-            tabPage12.Size = new Size(551, 447);
+            tabPage12.Size = new Size(551, 451);
             tabPage12.TabIndex = 1;
             tabPage12.Text = "POST";
             tabPage12.UseVisualStyleBackColor = true;
@@ -1567,6 +1567,15 @@
             toolStripButton12.Size = new Size(46, 23);
             toolStripButton12.Text = "Save";
             toolStripButton12.Click += toolStripButton12_Click;
+            // 
+            // textBox11
+            // 
+            textBox11.Dock = DockStyle.Top;
+            textBox11.Location = new Point(3, 3);
+            textBox11.Name = "textBox11";
+            textBox11.Size = new Size(545, 27);
+            textBox11.TabIndex = 1;
+            textBox11.KeyDown += textBox11_KeyDown;
             // 
             // tabPage15
             // 
@@ -2204,15 +2213,6 @@
             label1.TabIndex = 0;
             label1.Text = "Webshell :";
             // 
-            // textBox11
-            // 
-            textBox11.Dock = DockStyle.Top;
-            textBox11.Location = new Point(3, 3);
-            textBox11.Name = "textBox11";
-            textBox11.Size = new Size(545, 27);
-            textBox11.TabIndex = 1;
-            textBox11.KeyDown += textBox11_KeyDown;
-            // 
             // frmControlPanel
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -2221,6 +2221,7 @@
             Controls.Add(tabControl1);
             Controls.Add(panel2);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             Name = "frmControlPanel";
             StartPosition = FormStartPosition.CenterScreen;

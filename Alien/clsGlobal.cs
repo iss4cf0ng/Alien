@@ -22,7 +22,7 @@ namespace Alien
         ASHX,
         JSP,
         JSPX,
-        CGI,
+        Ruby,
         Perl,
         Python,
     }

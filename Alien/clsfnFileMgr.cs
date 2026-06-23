@@ -216,7 +216,7 @@ namespace Alien
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show(ex.Message);
+                    MessageBox.Show(ex.Message);
                 }
             }
 

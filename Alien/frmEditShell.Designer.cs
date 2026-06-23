@@ -49,10 +49,12 @@
             groupBox2 = new GroupBox();
             checkBox2 = new CheckBox();
             groupBox3 = new GroupBox();
+            textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
             comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
-            textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
+            label9 = new Label();
+            textBox3 = new TextBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -73,10 +75,11 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(370, 27);
             textBox1.TabIndex = 1;
+            textBox1.TextChanged += textBox1_TextChanged;
             // 
             // button1
             // 
-            button1.Location = new Point(12, 533);
+            button1.Location = new Point(12, 548);
             button1.Name = "button1";
             button1.Size = new Size(231, 47);
             button1.TabIndex = 2;
@@ -86,7 +89,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(249, 533);
+            button2.Location = new Point(249, 548);
             button2.Name = "button2";
             button2.Size = new Size(237, 47);
             button2.TabIndex = 3;
@@ -112,6 +115,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(textBox3);
+            groupBox1.Controls.Add(label9);
             groupBox1.Controls.Add(button3);
             groupBox1.Controls.Add(label8);
             groupBox1.Controls.Add(comboBox6);
@@ -129,7 +134,7 @@
             groupBox1.Controls.Add(textBox2);
             groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(474, 268);
+            groupBox1.Size = new Size(474, 289);
             groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Shell";
@@ -241,7 +246,7 @@
             groupBox2.Controls.Add(checkBox2);
             groupBox2.Controls.Add(groupBox3);
             groupBox2.Controls.Add(checkBox1);
-            groupBox2.Location = new Point(12, 286);
+            groupBox2.Location = new Point(12, 307);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(474, 241);
             groupBox2.TabIndex = 8;
@@ -268,6 +273,16 @@
             groupBox3.Size = new Size(460, 180);
             groupBox3.TabIndex = 10;
             groupBox3.TabStop = false;
+            // 
+            // textEditorControl1
+            // 
+            textEditorControl1.Font = new Font("Courier New", 10F);
+            textEditorControl1.IsReadOnly = false;
+            textEditorControl1.Location = new Point(6, 53);
+            textEditorControl1.Name = "textEditorControl1";
+            textEditorControl1.Size = new Size(448, 121);
+            textEditorControl1.TabIndex = 3;
+            textEditorControl1.Text = "textEditorControl1";
             // 
             // comboBox2
             // 
@@ -297,21 +312,27 @@
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
-            // textEditorControl1
+            // label9
             // 
-            textEditorControl1.Font = new Font("Courier New", 10F);
-            textEditorControl1.IsReadOnly = false;
-            textEditorControl1.Location = new Point(6, 53);
-            textEditorControl1.Name = "textEditorControl1";
-            textEditorControl1.Size = new Size(448, 121);
-            textEditorControl1.TabIndex = 3;
-            textEditorControl1.Text = "textEditorControl1";
+            label9.AutoSize = true;
+            label9.Location = new Point(43, 256);
+            label9.Name = "label9";
+            label9.Size = new Size(49, 19);
+            label9.TabIndex = 17;
+            label9.Text = "Desc :";
+            // 
+            // textBox3
+            // 
+            textBox3.Location = new Point(98, 253);
+            textBox3.Name = "textBox3";
+            textBox3.Size = new Size(370, 27);
+            textBox3.TabIndex = 18;
             // 
             // frmEditShell
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(498, 592);
+            ClientSize = new Size(498, 602);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(button2);
@@ -358,5 +379,7 @@
         private Button button3;
         private CheckBox checkBox2;
         private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
+        private TextBox textBox3;
+        private Label label9;
     }
 }

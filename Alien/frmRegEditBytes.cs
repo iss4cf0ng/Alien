@@ -37,6 +37,7 @@ namespace Alien
         void fnSetup()
         {
             textBox1.ReadOnly = true;
+            textBox1.Text = m_szName;
 
             panel1.Controls.Add(m_hexBox);
             m_hexBox.Dock = DockStyle.Fill;

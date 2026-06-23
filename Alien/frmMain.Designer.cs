@@ -35,6 +35,7 @@
             toolStripMenuItem7 = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripMenuItem();
             toolStripButton2 = new ToolStripButton();
+            toolStripButton1 = new ToolStripButton();
             toolStripButton3 = new ToolStripButton();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
@@ -72,7 +73,7 @@
             // toolStrip1
             // 
             toolStrip1.Font = new Font("Microsoft JhengHei", 11.25F);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton2, toolStripButton3 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton2, toolStripButton1, toolStripButton3 });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(1063, 26);
@@ -111,6 +112,16 @@
             toolStripButton2.Size = new Size(63, 23);
             toolStripButton2.Text = "Setting";
             toolStripButton2.Click += toolStripButton2_Click;
+            // 
+            // toolStripButton1
+            // 
+            toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton1.Image = (Image)resources.GetObject("toolStripButton1.Image");
+            toolStripButton1.ImageTransparentColor = Color.Magenta;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(93, 23);
+            toolStripButton1.Text = "Check Alive";
+            toolStripButton1.Click += toolStripButton1_Click;
             // 
             // toolStripButton3
             // 
@@ -303,6 +314,7 @@
             Controls.Add(statusStrip1);
             Controls.Add(toolStrip1);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             Name = "frmMain";
             StartPosition = FormStartPosition.CenterScreen;
@@ -355,5 +367,6 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.Timer timer1;
+        private ToolStripButton toolStripButton1;
     }
 }

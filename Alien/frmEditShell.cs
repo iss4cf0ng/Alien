@@ -19,6 +19,8 @@ namespace Alien
         private bool m_bNewShell { get; init; }
         private List<string> m_lsGroupName { get; init; }
 
+        private Dictionary<string, enLanguage> m_dicLang = clsWeb.m_dicSuffix.ToDictionary(x => x.Value, x => x.Key);
+
         private string[] m_asEncoding =
         {
             "ASCII",
@@ -197,6 +199,39 @@ namespace Alien
             frmEditGroup f = new frmEditGroup(m_sqlConn);
 
             f.ShowDialog();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(textBox1.Text))
+                return;
+
+            string szExtension = textBox1.Text.Split('?').First().Split('.').Last().ToLower();
+            if (!m_dicLang.ContainsKey(szExtension))
+                return;
+
+            if (comboBox1.Text == Enum.GetName(typeof(enLanguage), m_dicLang[szExtension]))
+                return;
+
+            try
+            {
+                for (int i = 0; i < comboBox1.Items.Count; i++)
+                {
+                    string? szLang = Enum.GetName(typeof(enLanguage), m_dicLang[szExtension]);
+                    if (string.IsNullOrEmpty(szLang))
+                        continue;
+
+                    if (string.Equals(comboBox1.Items[i]?.ToString(), szLang))
+                    {
+                        comboBox1.SelectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+
+            }
         }
     }
 }

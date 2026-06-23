@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic;
 using System.Text.RegularExpressions;
 
 namespace Alien
@@ -169,7 +170,11 @@ namespace Alien
 
                 if (await web.fnbTestWebConnection() && await web.fnbTestShellConnection())
                 {
+                    string szDomain = item.SubItems[1].Text.Split('/')[2];
+
                     frmControlPanel f = new frmControlPanel(web);
+                    f.Text = $"{szDomain} | {Enum.GetName(typeof(enLanguage), web.m_victim.ShellLanguage)} | {Enum.GetName(typeof(enPayloadType), web.m_victim.ShellPayloadType)} | {web.m_victim.m_ShellConfig.szMethod}";
+
                     f.Show();
                 }
             }
@@ -312,6 +317,22 @@ namespace Alien
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
             fnUpdateState();
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int nThread = int.Parse(Interaction.InputBox("Thread Count:", "Check Alive", "3"));
+                if (nThread <= 0)
+                    throw new Exception("Invalid number.");
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

