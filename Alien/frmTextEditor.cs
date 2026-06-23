@@ -206,7 +206,12 @@ namespace Alien
 
                             frmControlPanel f = (frmControlPanel)Owner;
                             if (await f.fnbFileWrite(szFilePath, szContent))
+                            {
                                 page.Text = page.Text.Replace("*", string.Empty);
+
+                                if (!string.Equals(Path.GetFileName(szFilePath), page.Text))
+                                    page.Text = Path.GetFileName(szFilePath);
+                            }
                         }
 
                         break;
