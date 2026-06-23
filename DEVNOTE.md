@@ -54,4 +54,23 @@ Notes of developing Alien webshell management tool.
       - Dragging tabpages
     - Database manager
       - Dragging tabpages
-
+- 2026-6-20 -> 20
+  (Forgot to write...)
+- 2026-6-23
+  - Perl webshell
+  - ASP
+    - Registry
+    - Windows users
+    - Write file
+    - Read file
+    - Read hex
+    - Interactive shell
+  - ASPX (JScript)
+    - Registry
+    - Windows users
+    - Write file
+    - Read file
+  - Perl
+    - Information
+    - Scan directory
+      
