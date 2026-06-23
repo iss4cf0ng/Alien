@@ -61,6 +61,7 @@
             toolStripMenuItem5 = new ToolStripMenuItem();
             textBox1 = new TextBox();
             timer1 = new System.Windows.Forms.Timer(components);
+            imageList1 = new ImageList(components);
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -208,6 +209,7 @@
             listView1.Location = new Point(0, 0);
             listView1.Name = "listView1";
             listView1.Size = new Size(794, 425);
+            listView1.SmallImageList = imageList1;
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -305,6 +307,12 @@
             textBox1.TabIndex = 1;
             textBox1.KeyDown += textBox1_KeyDown;
             // 
+            // imageList1
+            // 
+            imageList1.ColorDepth = ColorDepth.Depth32Bit;
+            imageList1.ImageSize = new Size(16, 16);
+            imageList1.TransparentColor = Color.Transparent;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -368,5 +376,6 @@
         private ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.Timer timer1;
         private ToolStripButton toolStripButton1;
+        private ImageList imageList1;
     }
 }

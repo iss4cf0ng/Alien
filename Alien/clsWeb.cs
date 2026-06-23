@@ -74,6 +74,13 @@ namespace Alien
                 {
                     _ => fnWrapPerl,
                 }
+            },
+            {
+                enLanguage.Ruby,
+                type => type switch
+                {
+                    _ => fnWrapRuby,
+                }
             }
         };
 
@@ -838,6 +845,32 @@ namespace Alien
                 "print Encrypt($globalStringOutput);\r\n";
 
             string szProcessed = szOriginalPayload;
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
+        private static string fnWrapRuby(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader =
+                "\r\n" +
+                "require 'stringio';\r\n" +
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "def encrypt(data)\r\n" +
+                "  # TODO: Add Ruby encryption logic here\r\n" +
+                "  return data\r\n" +
+                "end" : szEncryptor) + "\r\n\r\n" +
+                "# 劫持標準輸出到 StringIO 記憶體緩衝區\r\n" +
+                "old_stdout = $stdout;\r\n" +
+                "$stdout = StringIO.new;\r\n\r\n";
+
+            string szFooter =
+                "\r\n\r\n" +
+                "globalStringOutput = $stdout.string;\r\n" +
+                "$stdout = old_stdout;\r\n" +
+                "print encrypt(globalStringOutput);\r\n";
+
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "print", RegexOptions.IgnoreCase);
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }

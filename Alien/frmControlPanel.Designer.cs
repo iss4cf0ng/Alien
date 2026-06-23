@@ -239,6 +239,7 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
+            toolStripButton14 = new ToolStripButton();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -754,7 +755,7 @@
             // toolStrip1
             // 
             toolStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton1, toolStripButton2, toolStripButton9 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton14, toolStripDropDownButton1, toolStripButton1, toolStripButton2, toolStripButton9 });
             toolStrip1.Location = new Point(3, 3);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(994, 26);
@@ -2213,6 +2214,15 @@
             label1.TabIndex = 0;
             label1.Text = "Webshell :";
             // 
+            // toolStripButton14
+            // 
+            toolStripButton14.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton14.Image = (Image)resources.GetObject("toolStripButton14.Image");
+            toolStripButton14.ImageTransparentColor = Color.Magenta;
+            toolStripButton14.Name = "toolStripButton14";
+            toolStripButton14.Size = new Size(62, 23);
+            toolStripButton14.Text = "Reload";
+            // 
             // frmControlPanel
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -2566,5 +2576,6 @@
         private StatusStrip statusStrip7;
         private ToolStripStatusLabel toolStripStatusLabel7;
         private TextBox textBox11;
+        private ToolStripButton toolStripButton14;
     }
 }
