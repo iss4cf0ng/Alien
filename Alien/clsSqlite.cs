@@ -238,7 +238,7 @@ namespace Alien
 
                 fnSqlQuery(szQuery); //Execute write operation.
 
-                return ShellExists(config.szUrl); //Check successed.
+                return ShellExists(config.ID); //Check successed.
             }
             catch (Exception ex)
             {
