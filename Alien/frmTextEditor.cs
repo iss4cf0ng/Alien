@@ -17,6 +17,8 @@ namespace Alien
         public frmTextEditor()
         {
             InitializeComponent();
+
+            Text = "Text Editor";
         }
 
         public class clsTabColor
@@ -27,7 +29,7 @@ namespace Alien
 
         #region Tool
 
-        (TabPage page, TextEditorControlEx editorEx, TextBox tbPath, TextBox tbSearch) fnGetTabControl(TabPage page = null)
+        (TabPage? page, TextEditorControlEx? editorEx, TextBox? tbPath, TextBox? tbSearch) fnGetTabControl(TabPage? page = null)
         {
             if (page == null)
                 page = tabControl1.SelectedTab;
@@ -43,7 +45,7 @@ namespace Alien
             return (page, editorEx, tbPath, tbSearch);
         }
 
-        private bool fnbIsModified(TabPage page = null)
+        private bool fnbIsModified(TabPage? page = null)
         {
             if (page == null)
                 page = tabControl1.SelectedTab;

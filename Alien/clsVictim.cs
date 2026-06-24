@@ -18,7 +18,7 @@ namespace Alien
         public enLanguage ShellLanguage { get { return m_ShellConfig.language; } }
         public string ShellMethod { get { return m_ShellConfig.szMethod; } }
         public enPayloadType ShellPayloadType { get { return m_ShellConfig.payloadType; } }
-        public string m_szShellDomain { get { return ShellURL.Split('/')[2]; } }
+        public string m_szShellDomain { get { return ShellURL.Split('/')[2].Replace(":", "_"); } }
         public string m_szPortfolio { get { return Path.Combine(new string[] { Application.StartupPath, "Victim", m_szShellDomain.Replace(":", "_") }); } }
         public bool m_bUnixLike { get; set; }
 
