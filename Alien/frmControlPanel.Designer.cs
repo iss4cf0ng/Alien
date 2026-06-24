@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            TreeNode treeNode3 = new TreeNode("Upload");
+            TreeNode treeNode4 = new TreeNode("Download");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
-            TreeNode treeNode1 = new TreeNode("Upload");
-            TreeNode treeNode2 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -82,6 +82,7 @@
             toolStripStatusLabel2 = new ToolStripStatusLabel();
             textBox1 = new TextBox();
             toolStrip1 = new ToolStrip();
+            toolStripButton14 = new ToolStripButton();
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             toolStripMenuItem15 = new ToolStripMenuItem();
             toolStripMenuItem16 = new ToolStripMenuItem();
@@ -239,7 +240,7 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
-            toolStripButton14 = new ToolStripButton();
+            toolStripButton15 = new ToolStripButton();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -502,11 +503,11 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode1.Name = "Node0";
-            treeNode1.Text = "Upload";
-            treeNode2.Name = "Node1";
-            treeNode2.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
+            treeNode3.Name = "Node0";
+            treeNode3.Text = "Upload";
+            treeNode4.Name = "Node1";
+            treeNode4.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode3, treeNode4 });
             treeView4.Size = new Size(246, 324);
             treeView4.TabIndex = 0;
             // 
@@ -700,7 +701,7 @@
             // toolStrip9
             // 
             toolStrip9.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            toolStrip9.Items.AddRange(new ToolStripItem[] { toolStripButton5, toolStripButton6 });
+            toolStrip9.Items.AddRange(new ToolStripItem[] { toolStripButton15, toolStripButton5, toolStripButton6 });
             toolStrip9.Location = new Point(0, 0);
             toolStrip9.Name = "toolStrip9";
             toolStrip9.Size = new Size(730, 26);
@@ -761,6 +762,16 @@
             toolStrip1.Size = new Size(994, 26);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButton14
+            // 
+            toolStripButton14.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton14.Image = (Image)resources.GetObject("toolStripButton14.Image");
+            toolStripButton14.ImageTransparentColor = Color.Magenta;
+            toolStripButton14.Name = "toolStripButton14";
+            toolStripButton14.Size = new Size(62, 23);
+            toolStripButton14.Text = "Reload";
+            toolStripButton14.Click += toolStripButton14_Click;
             // 
             // toolStripDropDownButton1
             // 
@@ -2214,14 +2225,15 @@
             label1.TabIndex = 0;
             label1.Text = "Webshell :";
             // 
-            // toolStripButton14
+            // toolStripButton15
             // 
-            toolStripButton14.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton14.Image = (Image)resources.GetObject("toolStripButton14.Image");
-            toolStripButton14.ImageTransparentColor = Color.Magenta;
-            toolStripButton14.Name = "toolStripButton14";
-            toolStripButton14.Size = new Size(62, 23);
-            toolStripButton14.Text = "Reload";
+            toolStripButton15.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton15.Image = (Image)resources.GetObject("toolStripButton15.Image");
+            toolStripButton15.ImageTransparentColor = Color.Magenta;
+            toolStripButton15.Name = "toolStripButton15";
+            toolStripButton15.Size = new Size(66, 23);
+            toolStripButton15.Text = "Refresh";
+            toolStripButton15.Click += toolStripButton15_Click;
             // 
             // frmControlPanel
             // 
@@ -2577,5 +2589,6 @@
         private ToolStripStatusLabel toolStripStatusLabel7;
         private TextBox textBox11;
         private ToolStripButton toolStripButton14;
+        private ToolStripButton toolStripButton15;
     }
 }

@@ -237,6 +237,7 @@ namespace Alien
             m_clnt = new HttpClient(handler)
             {
                 BaseAddress = new Uri(m_victim.ShellURL),
+                Timeout = TimeSpan.FromMilliseconds(5000),
             };
         }
 
@@ -454,13 +455,26 @@ namespace Alien
                 {
                     szSplitter = $"[{szSplitter}]";
 
-                    if (resp.IsSuccessStatusCode && szRespContent.Contains(szSplitter))
+                    try
                     {
-                        return szRespContent.Split(szSplitter)[1];
+                        if (resp.IsSuccessStatusCode && szRespContent.Contains(szSplitter))
+                        {
+                            string[] splits = szRespContent.Split(szSplitter);
+                            if (splits.Length != 3)
+                                throw new Exception();
+    
+                            return splits[1];
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
                     }
-                    else
+                    catch
                     {
                         frmMsgBox f = new frmMsgBox(resp.StatusCode.ToString(), szRespContent);
+                        f.ShowDialog();
+
                         return string.Empty;
                     }
                 }
@@ -592,8 +606,8 @@ namespace Alien
             {
                 using (HttpResponseMessage resp = await m_clnt.GetAsync(string.Empty))
                 {
-                    int statusCode = (int)resp.StatusCode;      // e.g. 200
-                    HttpStatusCode code = resp.StatusCode;      // e.g. HttpStatusCode.OK
+                    int statusCode = (int)resp.StatusCode;
+                    HttpStatusCode code = resp.StatusCode;
 
                     if (resp.IsSuccessStatusCode)
                     {
@@ -605,7 +619,7 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                if (!bShowError)
+                if (bShowError)
                     MessageBox.Show(ex.Message, "fnbTestWebConnection()");
 
                 return false;
@@ -629,7 +643,7 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                if (!bShowError)
+                if (bShowError)
                     MessageBox.Show(ex.Message, "fnbTestShellConnection()");
 
                 return false;

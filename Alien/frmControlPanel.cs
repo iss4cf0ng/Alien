@@ -1335,6 +1335,8 @@ namespace Alien
             }
 
             // Clear status labels
+            toolStripStatusLabel1.Text = string.Empty;
+            toolStripStatusLabel2.Text = string.Empty;
             toolStripStatusLabel5.Text = string.Empty;
             toolStripStatusLabel6.Text = string.Empty;
             toolStripStatusLabel7.Text = string.Empty;
@@ -2883,6 +2885,34 @@ namespace Alien
                     MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void toolStripButton15_Click(object sender, EventArgs e)
+        {
+            fnFileMgrRefresh();
+        }
+
+        private async void toolStripButton14_Click(object sender, EventArgs e)
+        {
+            listView2.Items.Clear();
+            treeView3.Nodes.Clear();
+
+            var fileInit = await m_fileMgr.fnszInit();
+
+            textBox1.Text = fileInit.szCurrentDir;
+            m_web.m_victim.m_bUnixLike = fileInit.bUnixLike;
+            foreach (string szName in fileInit.lsLogicalDrive)
+            {
+                TreeNode node = new TreeNode(szName);
+                node.ImageKey = "harddrive";
+                treeView3.Nodes.Add(node);
+            }
+
+            fnFileAddPathToTreeView(fileInit.szCurrentDir);
+            treeView3.ExpandAll();
+
+            TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
+            treeView3.SelectedNode = cdNode;
         }
     }
 }

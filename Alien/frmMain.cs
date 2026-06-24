@@ -123,6 +123,9 @@ namespace Alien
 
         async Task fnSetup()
         {
+            toolStripStatusLabel1.Text = string.Empty;
+            toolStripStatusLabel4.Text = string.Empty;
+
             clsSqlite sqlConn = new clsSqlite("data.sqlite");
             m_sqlConn = sqlConn;
 
@@ -133,10 +136,14 @@ namespace Alien
             treeView1.Nodes.Add(node);
             treeView1.ExpandAll();
 
+            toolStripStatusLabel4.Text = "Loading...";
+
             fnLoadShell();
 
             m_tamper = new clsTamper("http://127.0.0.1:8000", "python", "Tamper\\server.py");
             await m_tamper.fnInitializeServerAsync();
+
+            toolStripStatusLabel4.Text = "Action successfully";
 
             return;
 
@@ -162,6 +169,8 @@ namespace Alien
         {
             foreach (ListViewItem item in listView1.SelectedItems)
             {
+                toolStripStatusLabel4.Text = "Loading...";
+
                 clsWeb web = fnGetVictimTag(item);
                 frmControlPanel? frmOpened = clsTool.fnFindForm<frmControlPanel>(web);
                 if (frmOpened != null)
@@ -179,6 +188,8 @@ namespace Alien
 
                     f.Show();
                 }
+
+                toolStripStatusLabel4.Text = "Action successfully";
             }
         }
 
@@ -325,6 +336,8 @@ namespace Alien
         {
             try
             {
+                toolStripStatusLabel4.Text = "Loading...";
+
                 int nThread = int.Parse(Interaction.InputBox("Thread count:", "Check Alive", "3"));
                 if (nThread <= 0)
                     throw new Exception("Invalid number.");
@@ -347,7 +360,7 @@ namespace Alien
 
                         try
                         {
-                            bool bAlive = await web.fnbTestWebConnection() && await web.fnbTestShellConnection();
+                            bool bAlive = await web.fnbTestWebConnection(false) && await web.fnbTestShellConnection(false);
                             Invoke(() => dic[web].ImageKey = bAlive ? "yes" : "no");
                         }
                         finally
@@ -366,6 +379,10 @@ namespace Alien
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                toolStripStatusLabel4.Text = "Tasks are finished";
             }
         }
     }
