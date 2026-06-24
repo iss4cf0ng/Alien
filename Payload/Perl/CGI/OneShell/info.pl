@@ -38,10 +38,7 @@ sub test_com_obj {
 }
 
 sub get_architecture {
-    my $arch = $ENV{PROCESSOR_ARCHITECTURE}
-            || $ENV{HOSTTYPE}
-            || $Config{archname}
-            || "UNKNOWN";
+    my $arch = $ENV{PROCESSOR_ARCHITECTURE} || $ENV{HOSTTYPE} || $Config{archname} || "UNKNOWN";
 
     if ($is_windows && -d "C:\\Program Files (x86)") {
         $arch .= " (64-bit Windows Environment)";

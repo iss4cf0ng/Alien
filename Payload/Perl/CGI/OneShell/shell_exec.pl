@@ -24,8 +24,8 @@ if ($szCommand) {
             print $szLine;
         }
     } else {
-        print "ret=$nRetVal\n";
+        print "ret=$nRetVal";
     }
 } else {
-    print "No command provided.\n";
+    print "No command provided.";
 }
