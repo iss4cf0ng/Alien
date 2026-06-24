@@ -1,7 +1,5 @@
 <%
 
-// registry_manager.java (100% 修正 % 符號顯示 Bug、多語言完美對齊版)
-
 var paramMap = request.getParameterMap();
 var action = "";
 var encoding = "UTF-8";
@@ -97,10 +95,6 @@ try {
     Echo(JSON.stringify(responseJson));
 }
 
-// ────────────────────────────────────────────────────────
-// 🛠️ 核心修正版函式群
-// ────────────────────────────────────────────────────────
-
 function scanRegistry(basePath) {
     var result = { "success": false, "error": null, "subkeys": [], "values": [] };
     var cmdRes = runRegCommand(["query", basePath]);
@@ -127,7 +121,6 @@ function scanRegistry(basePath) {
             continue;
         }
         
-        // 🚀 修正解析：精準對齊你的 Ruby 正則切割邏輯，防範包含空白與 % 的路徑損壞
         var parts = line.split(/\s{2,}/);
         if (parts.length >= 2) {
             var vName = parts[0].replace(/^\s+|\s+$/g, '');
@@ -146,7 +139,6 @@ function scanRegistry(basePath) {
             }
             
             if (vType.indexOf("REG_") === 0) {
-                // 🎯 完美複刻 Ruby：直接將文字內容安全轉成原始位元組，不再經過可能吞掉 % 的格式化
                 var rawBytes = registryValueToBytes(vData, vType);
                 result.values.push({
                     "name": vName,
@@ -179,15 +171,9 @@ function registryValueToBytes(valueStr, type) {
         }
         return data;
     } else {
-        // 🚀 對齊你的 Ruby 機制：REG_SZ / REG_EXPAND_SZ 直球吐回原始 UTF-8 Byte 陣列
-        // 絕不經過 String.format 或任何可能干擾 % 符號的底層轉碼，確保 C# 完美收發！
         return valueStr.getBytes("UTF-8");
     }
 }
-
-// ────────────────────────────────────────────────────────
-// 📦 剩餘基礎函式保持原狀 (移除所有 URLDecoder 的潛在威脅)
-// ────────────────────────────────────────────────────────
 
 function setValue(path, name, type, data) {
     var formattedData = data;
