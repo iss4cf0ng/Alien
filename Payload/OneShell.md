@@ -38,6 +38,7 @@
 # Java
 ## JSP
 
+Nashorn:
 ```JSP
 <%@ page import="javax.script.*" %>
 <%
@@ -60,8 +61,16 @@
 %>
 ```
 
+---
+
+ClassLoader:
+```
+
+```
+
 ## JSPX
 
+Nashorn:
 ```XML
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
@@ -88,6 +97,13 @@
         ]]>
     </jsp:scriptlet>
 </jsp:root>
+```
+
+---
+
+ClassLoader:
+```
+
 ```
  
 # Perl
