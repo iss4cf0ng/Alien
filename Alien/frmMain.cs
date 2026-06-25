@@ -18,10 +18,7 @@ namespace Alien
                 if (treeView1.Nodes.Count == 0)
                     return new List<string>();
 
-                return treeView1.Nodes[0].Nodes
-                    .Cast<TreeNode>()
-                    .Select(n => n.Text)
-                    .ToList();
+                return treeView1.Nodes[0].Nodes.Cast<TreeNode>().Select(n => n.Text).ToList();
             }
         }
 

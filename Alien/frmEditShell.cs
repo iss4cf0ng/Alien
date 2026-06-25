@@ -154,6 +154,7 @@ namespace Alien
             if (m_sqlConn.SaveShell(config))
             {
                 MessageBox.Show("Save webshell successfully.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Close();
             }
             else
             {

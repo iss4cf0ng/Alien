@@ -42,7 +42,8 @@ namespace Alien
             { enLanguage.JSPX, "jspx" },
             { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
-            { enLanguage.Ruby, "rb" }
+            { enLanguage.Ruby, "rb" },
+            //{ enLanguage.CFM, "cfm" }
         };
 
         public static Dictionary<enLanguage, string> m_dicPayloadExtension = new Dictionary<enLanguage, string>()
@@ -56,7 +57,8 @@ namespace Alien
             { enLanguage.JSPX, "jspx" },
             { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
-            { enLanguage.Ruby, "rb" }
+            { enLanguage.Ruby, "rb" },
+            //{ enLanguage.CFM, "cfm" }
         };
 
         private readonly Dictionary<enLanguage, Func<string, Func<string, string, string>>> m_dicWrapper = new()
@@ -104,7 +106,7 @@ namespace Alien
                 {
                     _ => fnWrapJSP
                 }
-            }
+            },
         };
 
         /// <summary>
@@ -153,7 +155,7 @@ namespace Alien
                 {
                     "<%", "%>",
                 }
-            }
+            },
         };
 
         /*
@@ -220,14 +222,6 @@ namespace Alien
                 }
             },
             {
-                enLanguage.CFM, (type) =>
-                {
-
-
-                    return null;
-                }
-            },
-            {
                 enLanguage.JSP, (type) =>
                 {
 
@@ -246,7 +240,8 @@ namespace Alien
             { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" },
             { enLanguage.Perl, "print \"[SPLITTER]\";" },
             { enLanguage.Ruby, "print \"[SPLITTER]\";" },
-            { enLanguage.JSP, "echo(\"[SPLITTER]\");" }
+            { enLanguage.JSP, "echo(\"[SPLITTER]\");" },
+            //{ enLanguage.CFM, "writeOutput(\"[SPLITTER]\");" }
         };
 
         private Dictionary<enLanguage, Func<string, string>> m_dicEncapusulator = new Dictionary<enLanguage, Func<string, string>>()
@@ -1007,12 +1002,35 @@ namespace Alien
                 ";null;\r\n";
 
             string szProcessed = szOriginalPayload;
-
-            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
-            szProcessed = Regex.Replace(szProcessed, @"\bprint\b", "Echo", RegexOptions.IgnoreCase);
             szProcessed = Regex.Replace(szProcessed, @"\becho\s*\(", "Echo(", RegexOptions.IgnoreCase);
-
             szProcessed = Regex.Replace(szProcessed, @"\becho[ \t]+", "Echo ", RegexOptions.IgnoreCase);
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
+        private static string fnWrapCFM(string szOriginalPayload, string szEncryptor)
+        {
+            string szHeader = "[ ";
+            string szFooter = " ]";
+
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\bwriteOutput\s*\(", "writeOutput(", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\s*\(", "writeOutput(", RegexOptions.IgnoreCase);
+
+            szProcessed = Regex.Replace(szProcessed, @"\b([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;?=\r\n]+)", "($1 = $2)", RegexOptions.IgnoreCase);
+
+            szProcessed = szProcessed.Replace("\r", " ").Replace("\n", " ");
+            szProcessed = szProcessed.Replace(";", " , ");
+
+            szProcessed = Regex.Replace(szProcessed, @"(\s*,\s*)+", " , ");
+            szProcessed = Regex.Replace(szProcessed, @"[ \t]+", " ");
+            szProcessed = szProcessed.Trim();
+
+            if (szProcessed.EndsWith(","))
+                szProcessed = szProcessed.Substring(0, szProcessed.Length - 1).Trim();
+
+            if (szProcessed.EndsWith(", "))
+                szProcessed = szProcessed.Substring(0, szProcessed.Length - 2).Trim();
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }
