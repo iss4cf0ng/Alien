@@ -74,3 +74,14 @@ Notes of developing Alien webshell management tool.
     - Information
     - Scan directory
   - Ruby webshell
+- 2024-6-24
+  (Forgot to write...)
+- 2026-6-25
+  - JSP ClassLoader webshell
+  - .NET reflective webshell
+    - ASPX
+    - ASHX
+    - ASMX
+  - OneShell
+    - ASHX (JScript)
+    - ASMX (JScript)
