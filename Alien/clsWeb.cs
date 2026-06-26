@@ -82,7 +82,6 @@ namespace Alien
                 type => type switch
                 {
                     "JScript" => fnWrapJScript,
-                    "CSharp"  => fnWrapCSharp,
                     _ => throw new NotSupportedException()
                 }
             },
