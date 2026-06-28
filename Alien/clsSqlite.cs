@@ -32,6 +32,12 @@ namespace Alien
                     "CreateDate",
                     "LastModified",
                     "LastAccessed",
+
+                    // The following fields are not showned in ShellEdit panel
+                    "UserAgent",
+                    "EventHorizon", // Tamper
+                    "Wormhole", // Pivoting
+
                 }
             },
             {

