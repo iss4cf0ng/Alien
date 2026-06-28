@@ -30,10 +30,12 @@ namespace Alien
 
     public enum enPayloadType
     {
+        // Plaintext or obfuscated
         OneShell,
 
-        // Protected
+        // Protected via cryptographic algorithm
         ECDH,
+        NebulaPulsar,
     }
 
     public enum enLogMsgType
