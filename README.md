@@ -25,7 +25,6 @@ Alien is a C#-based webshell management tool for penetration testing.
   - JSPX
   - CGI
 - Features
-  - File Manager
   - Virtual Terminal
   - Database
     - MySQL
@@ -33,8 +32,15 @@ Alien is a C#-based webshell management tool for penetration testing.
     - SqlServer
     - PostgreSQL
     - SQLite
-  - Run Custom Code
   - Encrypted Communication for bypassing WAF
+
+## NebulaPulsar and DarkMatter
+
+
+## EventHorizon
+
+
+## WormHole
 
 # Debug
 
