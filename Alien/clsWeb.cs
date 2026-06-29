@@ -846,7 +846,7 @@ namespace Alien
             
             bool bIsJava = m_victim.ShellLanguage == enLanguage.JSP || m_victim.ShellLanguage == enLanguage.JSPX || m_victim.ShellLanguage == enLanguage.CFM;
 
-            string szPath = Path.Combine(Application.StartupPath, "Payloads", szLang, m_victim.ShellMethod, "NebulaPulsar." + (bIsJava ? "java" : "dll"));
+            string szPath = Path.Combine(Application.StartupPath, "Payloads", szLang, m_victim.ShellMethod, "NebulaPulsar." + (bIsJava ? "class" : "dll"));
             if (!Path.Exists(szPath))
                 return null;
 
@@ -865,7 +865,7 @@ namespace Alien
 
             bool bIsJava = m_victim.ShellLanguage == enLanguage.JSP || m_victim.ShellLanguage == enLanguage.JSPX || m_victim.ShellLanguage == enLanguage.CFM;
             
-            string szPath = Path.Combine(Application.StartupPath, "Payloads", szLang, m_victim.ShellMethod, szName + "." + (bIsJava ? "java" : "dll"));
+            string szPath = Path.Combine(Application.StartupPath, "Payloads", szLang, m_victim.ShellMethod, szName + "." + (bIsJava ? "class" : "dll"));
             if (!Path.Exists(szPath))
                 return null;
 
