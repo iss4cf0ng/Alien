@@ -108,6 +108,10 @@ namespace Alien
                 comboBox1.Text = m_stShellConfig.language.ToString();
                 comboBox4.Text = m_stShellConfig.szMethod;
                 comboBox3.Text = m_stShellConfig.payloadType.ToString();
+
+                textBox4.Text = m_stShellConfig.szUserAgent;
+                comboBox2.Text = m_stShellConfig.szEventHorizonScript;
+                textEditorControl1.Text = m_stShellConfig.szEventHorizonConfig;
             }
         }
 
@@ -127,6 +131,11 @@ namespace Alien
                 szMethod = comboBox4.Text,
                 language = (enLanguage)Enum.Parse(typeof(enLanguage), comboBox1.Text),
                 payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), comboBox3.Text),
+
+                szUserAgent = textBox4.Text,
+                bEHEnable = checkBox1.Checked,
+                szEventHorizonScript = comboBox2.Text,
+                szEventHorizonConfig = textEditorControl1.Text,
             };
 
             clsVictim victim = new clsVictim(m_sqlConn, config, false);
@@ -153,6 +162,10 @@ namespace Alien
             config.language = (enLanguage)Enum.Parse(typeof(enLanguage), comboBox1.Text);
             config.szMethod = comboBox4.Text;
             config.payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), comboBox3.Text);
+            config.szUserAgent = textBox4.Text;
+            config.bEHEnable = checkBox1.Checked;
+            config.szEventHorizonScript = comboBox2.Text;
+            config.szEventHorizonConfig = textEditorControl1.Text;
 
             if (m_sqlConn.SaveShell(config))
             {

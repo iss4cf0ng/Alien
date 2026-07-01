@@ -35,8 +35,9 @@ namespace Alien
 
                     "Description",
                     "UserAgent",
-                    "EHEnable",
-                    "EventHorizon", // Tamper
+                    "EHEnable", // Tamper
+                    "EventHorizonScript",
+                    "EventHorizonConfig",
                     "WHEnable",
                     "Wormhole", // Pivoting
                 }
@@ -155,6 +156,11 @@ namespace Alien
                 dtCreateDate = DateTime.Parse(dr["CreateDate"].ToString()),
                 dtLastModified = DateTime.Parse(dr["LastModified"].ToString()),
                 dtLastAccessed = DateTime.Parse(dr["LastAccessed"].ToString()),
+
+                szUserAgent = dr["UserAgent"].ToString(),
+                bEHEnable = dr["EHEnable"].ToString() == "1",
+                szEventHorizonScript = dr["EventHorizonScript"].ToString(),
+                szEventHorizonConfig = dr["EventHorizonConfig"].ToString(),
             };
 
             return config;
@@ -190,65 +196,60 @@ namespace Alien
             {
                 bool bShellExists = ShellExists(config.ID);
                 string szQuery = "";
-                DateTime dt = DateTime.Now;
-                string szDt = dt.ToString("F");
+                string szDt = DateTime.Now.ToString("F");
+
+                // Helper local function to make string SQL-safe for SQLite
+                string SqlEscape(string value) => value?.Replace("'", "''") ?? "";
 
                 if (bShellExists)
                 {
-                    //Update shell config.
-
                     szQuery = $"UPDATE \"Shell\" SET " +
-                        $"GroupName=\"{config.szGroupName}\"," +
-                        $"URL=\"{config.szUrl}\"," +
-                        $"Password=\"{config.szPassword}\"," +
-                        $"Encoding=\"{config.szEncoding}\"," +
-                        $"Language=\"{config.language}\"," +
-                        $"Method=\"{config.szMethod}\"," +
-                        $"Type=\"{config.payloadType}\"," +
-                        $"LastModified=\"{DateTime.Now.ToString("F")}\" " +
-                        $"WHERE ID=\"{config.ID}\";";
+                        $"GroupName='{SqlEscape(config.szGroupName)}'," +
+                        $"URL='{SqlEscape(config.szUrl)}'," +
+                        $"Password='{SqlEscape(config.szPassword)}'," +
+                        $"Encoding='{SqlEscape(config.szEncoding)}'," +
+                        $"Language='{SqlEscape(config.language.ToString())}'," +
+                        $"Method='{SqlEscape(config.szMethod)}'," +
+                        $"Type='{SqlEscape(Enum.GetName(typeof(enPayloadType), config.payloadType))}'," +
+                        $"UserAgent='{SqlEscape(config.szUserAgent)}'," +
+                        $"EHEnable='{(config.bEHEnable ? 1 : 0)}'," +
+                        $"EventHorizonScript='{SqlEscape(config.szEventHorizonScript)}'," +
+                        $"EventHorizonConfig='{SqlEscape(config.szEventHorizonConfig)}'," +
+                        $"LastModified='{szDt}' " +
+                        $"WHERE ID='{SqlEscape(config.ID)}';";
                 }
                 else
                 {
-                    //Add shell config.
-
                     szQuery = $"INSERT INTO \"Shell\" (" +
-
-                        "ID," +
-                        "GroupName," +
-                        $"URL," +
-                        $"Password," +
-                        $"Encoding," +
-                        $"Language," +
-                        $"Method," +
-                        $"Type," +
-                        $"CreateDate," +
-                        $"LastModified," +
-                        $"LastAccessed" +
-
-                        $") VALUES (" +
-
-                        $"\"{config.ID}\"," +
-                        $"\"{config.szGroupName}\"," +
-                        $"\"{config.szUrl}\"," +
-                        $"\"{config.szPassword}\"," +
-                        $"\"{config.szEncoding}\"," +
-                        $"\"{config.language.ToString()}\"," +
-                        $"\"{config.szMethod}\"," +
-                        $"\"{config.payloadType}\"," +
-                        $"\"{szDt}\"," +
-                        $"\"{szDt}\"," +
-                        $"\"{szDt}\"" +
-
-                        $");";
+                        "ID, GroupName, URL, Password, Encoding, Language, Method, Type, " +
+                        "CreateDate, LastModified, LastAccessed, UserAgent, EHEnable, " +
+                        "EventHorizonScript, EventHorizonConfig" +
+                        ") VALUES (" +
+                        $"'{SqlEscape(config.ID)}'," +
+                        $"'{SqlEscape(config.szGroupName)}'," +
+                        $"'{SqlEscape(config.szUrl)}'," +
+                        $"'{SqlEscape(config.szPassword)}'," +
+                        $"'{SqlEscape(config.szEncoding)}'," +
+                        $"'{SqlEscape(config.language.ToString())}'," +
+                        $"'{SqlEscape(config.szMethod)}'," +
+                        $"'{SqlEscape(Enum.GetName(typeof(enPayloadType), config.payloadType))}'," +
+                        $"'{szDt}'," +
+                        $"'{szDt}'," +
+                        $"'{szDt}'," +
+                        $"'{SqlEscape(config.szUserAgent)}'," +
+                        $"{(config.bEHEnable ? 1 : 0)}," +
+                        $"'{SqlEscape(config.szEventHorizonScript)}'," +
+                        $"'{SqlEscape(config.szEventHorizonConfig)}'" +
+                        ");";
                 }
 
-                fnSqlQuery(szQuery); //Execute write operation.
+                fnSqlQuery(szQuery); // Execute write operation.
 
-                return ShellExists(config.ID); //Check successed.
+                return ShellExists(config.ID); // Check success.
             }
             catch (Exception ex)
             {
+                // Tip: Consider logging 'ex.Message' here during development so syntax errors don't hide!
                 return false;
             }
         }

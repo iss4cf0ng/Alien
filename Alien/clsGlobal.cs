@@ -73,13 +73,21 @@ namespace Alien
 
         public string szEncoding;
 
-        public bool bTamper;
-        public string szTamperScript;
-        public bool bTamperRaw;
-
         public DateTime dtCreateDate;
         public DateTime dtLastModified;
         public DateTime dtLastAccessed;
+
+        public string szUserAgent;
+
+        // EventHorizon
+        public bool bRaw;
+        public bool bEHEnable;
+        public string szEventHorizonScript;
+        public string szEventHorizonConfig; // JSON
+
+        // Wormhole
+        public bool bWHEnable;
+        public string szWormhole;
     }
 
     public struct stFileEntry

@@ -35,6 +35,8 @@
             textBox2 = new TextBox();
             label2 = new Label();
             groupBox1 = new GroupBox();
+            label10 = new Label();
+            textBox4 = new TextBox();
             textBox3 = new TextBox();
             label9 = new Label();
             button3 = new Button();
@@ -49,14 +51,11 @@
             label3 = new Label();
             comboBox1 = new ComboBox();
             groupBox2 = new GroupBox();
-            checkBox2 = new CheckBox();
             groupBox3 = new GroupBox();
             textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
             comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
-            label10 = new Label();
-            textBox4 = new TextBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -142,6 +141,22 @@
             groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Shell";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(2, 89);
+            label10.Name = "label10";
+            label10.Size = new Size(90, 19);
+            label10.TabIndex = 19;
+            label10.Text = "UserAgent :";
+            // 
+            // textBox4
+            // 
+            textBox4.Location = new Point(98, 86);
+            textBox4.Name = "textBox4";
+            textBox4.Size = new Size(370, 27);
+            textBox4.TabIndex = 20;
             // 
             // textBox3
             // 
@@ -263,7 +278,6 @@
             // 
             // groupBox2
             // 
-            groupBox2.Controls.Add(checkBox2);
             groupBox2.Controls.Add(groupBox3);
             groupBox2.Controls.Add(checkBox1);
             groupBox2.Location = new Point(12, 328);
@@ -271,26 +285,16 @@
             groupBox2.Size = new Size(474, 241);
             groupBox2.TabIndex = 8;
             groupBox2.TabStop = false;
-            groupBox2.Text = "Cryptography Tamper";
-            // 
-            // checkBox2
-            // 
-            checkBox2.AutoSize = true;
-            checkBox2.Location = new Point(10, 26);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(74, 23);
-            checkBox2.TabIndex = 11;
-            checkBox2.Text = "Enable";
-            checkBox2.UseVisualStyleBackColor = true;
+            groupBox2.Text = "EventHorizon";
             // 
             // groupBox3
             // 
             groupBox3.Controls.Add(textEditorControl1);
             groupBox3.Controls.Add(comboBox2);
             groupBox3.Controls.Add(label4);
-            groupBox3.Location = new Point(8, 55);
+            groupBox3.Location = new Point(8, 48);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(460, 180);
+            groupBox3.Size = new Size(460, 187);
             groupBox3.TabIndex = 10;
             groupBox3.TabStop = false;
             // 
@@ -325,29 +329,13 @@
             // checkBox1
             // 
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(87, 26);
+            checkBox1.Location = new Point(8, 26);
             checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(58, 23);
+            checkBox1.Size = new Size(74, 23);
             checkBox1.TabIndex = 9;
-            checkBox1.Text = "Raw";
+            checkBox1.Text = "Enable";
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Location = new Point(2, 89);
-            label10.Name = "label10";
-            label10.Size = new Size(90, 19);
-            label10.TabIndex = 19;
-            label10.Text = "UserAgent :";
-            // 
-            // textBox4
-            // 
-            textBox4.Location = new Point(98, 86);
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(370, 27);
-            textBox4.TabIndex = 20;
             // 
             // frmEditShell
             // 
@@ -398,7 +386,6 @@
         private Label label8;
         private ComboBox comboBox6;
         private Button button3;
-        private CheckBox checkBox2;
         private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
         private TextBox textBox3;
         private Label label9;
