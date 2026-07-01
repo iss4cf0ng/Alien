@@ -76,6 +76,9 @@ namespace Alien
             string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper\\Obfuscators");
             if (Directory.Exists(szTamperDirPath))
             {
+                comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;
+                textEditorControl1.Text = string.Empty;
+
                 foreach (string szFilePath in Directory.GetFiles(szTamperDirPath))
                     comboBox2.Items.Add(Path.GetFileNameWithoutExtension(szFilePath));
 
@@ -233,6 +236,19 @@ namespace Alien
             {
 
             }
+        }
+
+        private async void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string szScriptName = comboBox2.Text;
+            if (string.IsNullOrEmpty(szScriptName))
+                return;
+
+            string? szJson = await m_tamper.fnGetExample(szScriptName);
+            if (string.IsNullOrEmpty(szJson))
+                return;
+
+            textEditorControl1.Text = szJson;
         }
     }
 }

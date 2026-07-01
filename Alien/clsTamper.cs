@@ -135,6 +135,13 @@ namespace Alien
             return await fnSendRequest("deobfuscate", szScriptName, szObfuscatedPayload, dicParams);
         }
 
+        public async Task<string?> fnGetExample(string szScriptName)
+        {
+            Dictionary<string, object> dicParam = new Dictionary<string, object>();
+
+            return await fnSendRequest("example", szScriptName, string.Empty, dicParam);
+        }
+
         private async Task<string?> fnSendRequest(string szEndPoint, string szScriptName, string szPayload, Dictionary<string, object> dicParams)
         {
             var req_body = new

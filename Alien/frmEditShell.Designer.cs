@@ -35,6 +35,8 @@
             textBox2 = new TextBox();
             label2 = new Label();
             groupBox1 = new GroupBox();
+            textBox3 = new TextBox();
+            label9 = new Label();
             button3 = new Button();
             label8 = new Label();
             comboBox6 = new ComboBox();
@@ -53,8 +55,8 @@
             comboBox2 = new ComboBox();
             label4 = new Label();
             checkBox1 = new CheckBox();
-            label9 = new Label();
-            textBox3 = new TextBox();
+            label10 = new Label();
+            textBox4 = new TextBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -79,7 +81,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(12, 548);
+            button1.Location = new Point(12, 569);
             button1.Name = "button1";
             button1.Size = new Size(231, 47);
             button1.TabIndex = 2;
@@ -89,7 +91,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(249, 548);
+            button2.Location = new Point(249, 569);
             button2.Name = "button2";
             button2.Size = new Size(237, 47);
             button2.TabIndex = 3;
@@ -115,6 +117,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(label10);
+            groupBox1.Controls.Add(textBox4);
             groupBox1.Controls.Add(textBox3);
             groupBox1.Controls.Add(label9);
             groupBox1.Controls.Add(button3);
@@ -132,16 +136,32 @@
             groupBox1.Controls.Add(textBox1);
             groupBox1.Controls.Add(label2);
             groupBox1.Controls.Add(textBox2);
-            groupBox1.Location = new Point(12, 12);
+            groupBox1.Location = new Point(12, 5);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(474, 289);
+            groupBox1.Size = new Size(474, 317);
             groupBox1.TabIndex = 7;
             groupBox1.TabStop = false;
             groupBox1.Text = "Shell";
             // 
+            // textBox3
+            // 
+            textBox3.Location = new Point(98, 286);
+            textBox3.Name = "textBox3";
+            textBox3.Size = new Size(370, 27);
+            textBox3.TabIndex = 18;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(43, 289);
+            label9.Name = "label9";
+            label9.Size = new Size(49, 19);
+            label9.TabIndex = 17;
+            label9.Text = "Desc :";
+            // 
             // button3
             // 
-            button3.Location = new Point(368, 85);
+            button3.Location = new Point(368, 118);
             button3.Name = "button3";
             button3.Size = new Size(100, 28);
             button3.TabIndex = 16;
@@ -152,7 +172,7 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(32, 89);
+            label8.Location = new Point(32, 122);
             label8.Name = "label8";
             label8.Size = new Size(60, 19);
             label8.TabIndex = 15;
@@ -162,7 +182,7 @@
             // 
             comboBox6.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox6.FormattingEnabled = true;
-            comboBox6.Location = new Point(98, 86);
+            comboBox6.Location = new Point(98, 119);
             comboBox6.Name = "comboBox6";
             comboBox6.Size = new Size(264, 27);
             comboBox6.TabIndex = 14;
@@ -170,7 +190,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(10, 122);
+            label7.Location = new Point(10, 155);
             label7.Name = "label7";
             label7.Size = new Size(82, 19);
             label7.TabIndex = 13;
@@ -180,7 +200,7 @@
             // 
             comboBox5.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox5.FormattingEnabled = true;
-            comboBox5.Location = new Point(98, 119);
+            comboBox5.Location = new Point(98, 152);
             comboBox5.Name = "comboBox5";
             comboBox5.Size = new Size(370, 27);
             comboBox5.TabIndex = 12;
@@ -189,7 +209,7 @@
             // 
             comboBox4.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox4.FormattingEnabled = true;
-            comboBox4.Location = new Point(98, 185);
+            comboBox4.Location = new Point(98, 218);
             comboBox4.Name = "comboBox4";
             comboBox4.Size = new Size(370, 27);
             comboBox4.TabIndex = 11;
@@ -198,7 +218,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(21, 188);
+            label6.Location = new Point(21, 221);
             label6.Name = "label6";
             label6.Size = new Size(71, 19);
             label6.TabIndex = 10;
@@ -208,7 +228,7 @@
             // 
             comboBox3.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox3.FormattingEnabled = true;
-            comboBox3.Location = new Point(98, 218);
+            comboBox3.Location = new Point(98, 251);
             comboBox3.Name = "comboBox3";
             comboBox3.Size = new Size(370, 27);
             comboBox3.TabIndex = 9;
@@ -216,7 +236,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(43, 221);
+            label5.Location = new Point(43, 254);
             label5.Name = "label5";
             label5.Size = new Size(49, 19);
             label5.TabIndex = 8;
@@ -225,7 +245,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(6, 155);
+            label3.Location = new Point(6, 188);
             label3.Name = "label3";
             label3.Size = new Size(86, 19);
             label3.TabIndex = 7;
@@ -235,7 +255,7 @@
             // 
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(98, 152);
+            comboBox1.Location = new Point(98, 185);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(370, 27);
             comboBox1.TabIndex = 6;
@@ -246,7 +266,7 @@
             groupBox2.Controls.Add(checkBox2);
             groupBox2.Controls.Add(groupBox3);
             groupBox2.Controls.Add(checkBox1);
-            groupBox2.Location = new Point(12, 307);
+            groupBox2.Location = new Point(12, 328);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(474, 241);
             groupBox2.TabIndex = 8;
@@ -291,6 +311,7 @@
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(375, 27);
             comboBox2.TabIndex = 2;
+            comboBox2.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
             // 
             // label4
             // 
@@ -312,27 +333,27 @@
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
-            // label9
+            // label10
             // 
-            label9.AutoSize = true;
-            label9.Location = new Point(43, 256);
-            label9.Name = "label9";
-            label9.Size = new Size(49, 19);
-            label9.TabIndex = 17;
-            label9.Text = "Desc :";
+            label10.AutoSize = true;
+            label10.Location = new Point(2, 89);
+            label10.Name = "label10";
+            label10.Size = new Size(90, 19);
+            label10.TabIndex = 19;
+            label10.Text = "UserAgent :";
             // 
-            // textBox3
+            // textBox4
             // 
-            textBox3.Location = new Point(98, 253);
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(370, 27);
-            textBox3.TabIndex = 18;
+            textBox4.Location = new Point(98, 86);
+            textBox4.Name = "textBox4";
+            textBox4.Size = new Size(370, 27);
+            textBox4.TabIndex = 20;
             // 
             // frmEditShell
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(498, 602);
+            ClientSize = new Size(498, 628);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(button2);
@@ -381,5 +402,7 @@
         private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
         private TextBox textBox3;
         private Label label9;
+        private Label label10;
+        private TextBox textBox4;
     }
 }
