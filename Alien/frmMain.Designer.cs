@@ -65,6 +65,7 @@
             imageList1 = new ImageList(components);
             textBox1 = new TextBox();
             timer1 = new System.Windows.Forms.Timer(components);
+            columnHeader7 = new ColumnHeader();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -223,7 +224,7 @@
             // 
             // listView1
             // 
-            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4, columnHeader5, columnHeader6 });
+            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader7, columnHeader4, columnHeader5, columnHeader6 });
             listView1.ContextMenuStrip = contextMenuStrip1;
             listView1.Dock = DockStyle.Fill;
             listView1.FullRowSelect = true;
@@ -337,6 +338,11 @@
             textBox1.TabIndex = 1;
             textBox1.KeyDown += textBox1_KeyDown;
             // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "Description";
+            columnHeader7.Width = 200;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -404,5 +410,6 @@
         private ToolStripProgressBar toolStripProgressBar1;
         private ToolStripStatusLabel toolStripStatusLabel4;
         private ToolStripStatusLabel toolStripStatusLabel5;
+        private ColumnHeader columnHeader7;
     }
 }

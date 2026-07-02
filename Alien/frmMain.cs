@@ -81,6 +81,7 @@ namespace Alien
                 ListViewItem item = new ListViewItem(config.ID);
                 item.SubItems.Add(config.szUrl);
                 item.SubItems.Add(config.language.ToString());
+                item.SubItems.Add(config.szDescription);
                 item.SubItems.Add(config.dtCreateDate.ToString("F"));
                 item.SubItems.Add(config.dtLastModified.ToString("F"));
                 item.SubItems.Add(config.dtLastAccessed.ToString("F"));
