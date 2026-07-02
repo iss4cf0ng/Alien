@@ -35,7 +35,7 @@ namespace Alien
 
         // Protected via cryptographic algorithm
         ECDH,
-        NebulaPulsar,
+        DarkMatter,
     }
 
     public enum enLogMsgType
