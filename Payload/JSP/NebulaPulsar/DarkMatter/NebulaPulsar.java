@@ -3,7 +3,7 @@ import java.lang.reflect.Method;
 
 public class NebulaPulsar extends ClassLoader
 {
-    private static final String m_szKey = "NBPULSARDEADBEEF";
+    private static String m_szKey = "NBPULSARDEADBEEF";
 
     public NebulaPulsar(ClassLoader objParent) { super(objParent); }
     public NebulaPulsar() { super(NebulaPulsar.class.getClassLoader()); }

