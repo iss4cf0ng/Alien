@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            TreeNode treeNode3 = new TreeNode("Upload");
-            TreeNode treeNode4 = new TreeNode("Download");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
+            TreeNode treeNode1 = new TreeNode("Upload");
+            TreeNode treeNode2 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -76,6 +76,7 @@
             toolStripMenuItem12 = new ToolStripMenuItem();
             toolStripMenuItem13 = new ToolStripMenuItem();
             toolStrip9 = new ToolStrip();
+            toolStripButton15 = new ToolStripButton();
             toolStripButton5 = new ToolStripButton();
             toolStripButton6 = new ToolStripButton();
             statusStrip1 = new StatusStrip();
@@ -240,7 +241,6 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
-            toolStripButton15 = new ToolStripButton();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -503,11 +503,11 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode3.Name = "Node0";
-            treeNode3.Text = "Upload";
-            treeNode4.Name = "Node1";
-            treeNode4.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode3, treeNode4 });
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "Upload";
+            treeNode2.Name = "Node1";
+            treeNode2.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
             treeView4.Size = new Size(246, 324);
             treeView4.TabIndex = 0;
             // 
@@ -707,6 +707,16 @@
             toolStrip9.Size = new Size(730, 26);
             toolStrip9.TabIndex = 1;
             toolStrip9.Text = "toolStrip9";
+            // 
+            // toolStripButton15
+            // 
+            toolStripButton15.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton15.Image = (Image)resources.GetObject("toolStripButton15.Image");
+            toolStripButton15.ImageTransparentColor = Color.Magenta;
+            toolStripButton15.Name = "toolStripButton15";
+            toolStripButton15.Size = new Size(66, 23);
+            toolStripButton15.Text = "Refresh";
+            toolStripButton15.Click += toolStripButton15_Click;
             // 
             // toolStripButton5
             // 
@@ -1810,10 +1820,10 @@
             tabPage18.Controls.Add(textBox7);
             tabPage18.Controls.Add(statusStrip5);
             tabPage18.Controls.Add(toolStrip10);
-            tabPage18.Location = new Point(4, 24);
+            tabPage18.Location = new Point(4, 28);
             tabPage18.Name = "tabPage18";
             tabPage18.Padding = new Padding(3);
-            tabPage18.Size = new Size(1006, 451);
+            tabPage18.Size = new Size(1006, 447);
             tabPage18.TabIndex = 1;
             tabPage18.Text = "Registry";
             tabPage18.UseVisualStyleBackColor = true;
@@ -1832,7 +1842,7 @@
             // splitContainer6.Panel2
             // 
             splitContainer6.Panel2.Controls.Add(listView3);
-            splitContainer6.Size = new Size(1000, 368);
+            splitContainer6.Size = new Size(1000, 364);
             splitContainer6.SplitterDistance = 267;
             splitContainer6.TabIndex = 3;
             // 
@@ -1845,7 +1855,7 @@
             treeView5.Location = new Point(0, 0);
             treeView5.Name = "treeView5";
             treeView5.SelectedImageIndex = 0;
-            treeView5.Size = new Size(267, 368);
+            treeView5.Size = new Size(267, 364);
             treeView5.TabIndex = 0;
             treeView5.AfterSelect += treeView5_AfterSelect;
             // 
@@ -1932,7 +1942,7 @@
             listView3.GridLines = true;
             listView3.Location = new Point(0, 0);
             listView3.Name = "listView3";
-            listView3.Size = new Size(729, 368);
+            listView3.Size = new Size(729, 364);
             listView3.SmallImageList = regImageList;
             listView3.TabIndex = 0;
             listView3.UseCompatibleStateImageBehavior = false;
@@ -2027,7 +2037,7 @@
             // 
             statusStrip5.Font = new Font("Microsoft JhengHei UI", 11.25F);
             statusStrip5.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel4 });
-            statusStrip5.Location = new Point(3, 424);
+            statusStrip5.Location = new Point(3, 420);
             statusStrip5.Name = "statusStrip5";
             statusStrip5.Size = new Size(1000, 24);
             statusStrip5.TabIndex = 1;
@@ -2224,16 +2234,6 @@
             label1.Size = new Size(80, 19);
             label1.TabIndex = 0;
             label1.Text = "Webshell :";
-            // 
-            // toolStripButton15
-            // 
-            toolStripButton15.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton15.Image = (Image)resources.GetObject("toolStripButton15.Image");
-            toolStripButton15.ImageTransparentColor = Color.Magenta;
-            toolStripButton15.Name = "toolStripButton15";
-            toolStripButton15.Size = new Size(66, 23);
-            toolStripButton15.Text = "Refresh";
-            toolStripButton15.Click += toolStripButton15_Click;
             // 
             // frmControlPanel
             // 

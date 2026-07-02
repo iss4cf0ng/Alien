@@ -157,7 +157,9 @@ namespace Alien
                 dtLastModified = DateTime.Parse(dr["LastModified"].ToString()),
                 dtLastAccessed = DateTime.Parse(dr["LastAccessed"].ToString()),
 
+                szDescription = dr["Description"].ToString(),
                 szUserAgent = dr["UserAgent"].ToString(),
+
                 bEHEnable = dr["EHEnable"].ToString() == "1",
                 szEventHorizonScript = dr["EventHorizonScript"].ToString(),
                 szEventHorizonConfig = dr["EventHorizonConfig"].ToString(),
@@ -211,6 +213,7 @@ namespace Alien
                         $"Language='{SqlEscape(config.language.ToString())}'," +
                         $"Method='{SqlEscape(config.szMethod)}'," +
                         $"Type='{SqlEscape(Enum.GetName(typeof(enPayloadType), config.payloadType))}'," +
+                        $"Description='{SqlEscape(config.szDescription)}'," +
                         $"UserAgent='{SqlEscape(config.szUserAgent)}'," +
                         $"EHEnable='{(config.bEHEnable ? 1 : 0)}'," +
                         $"EventHorizonScript='{SqlEscape(config.szEventHorizonScript)}'," +
@@ -221,9 +224,9 @@ namespace Alien
                 else
                 {
                     szQuery = $"INSERT INTO \"Shell\" (" +
-                        "ID, GroupName, URL, Password, Encoding, Language, Method, Type, " +
-                        "CreateDate, LastModified, LastAccessed, UserAgent, EHEnable, " +
-                        "EventHorizonScript, EventHorizonConfig" +
+                        "ID, GroupName, URL, Password, Encoding, Language, Method, Type, CreateDate, LastModified, LastAccessed, " +
+                        "Description, UserAgent," +
+                        "EHEnable, EventHorizonScript, EventHorizonConfig" +
                         ") VALUES (" +
                         $"'{SqlEscape(config.ID)}'," +
                         $"'{SqlEscape(config.szGroupName)}'," +
@@ -235,7 +238,8 @@ namespace Alien
                         $"'{SqlEscape(Enum.GetName(typeof(enPayloadType), config.payloadType))}'," +
                         $"'{szDt}'," +
                         $"'{szDt}'," +
-                        $"'{szDt}'," +
+                        $"'{szDt}'" +
+                        $"'{SqlEscape(config.szDescription)}'," +
                         $"'{SqlEscape(config.szUserAgent)}'," +
                         $"{(config.bEHEnable ? 1 : 0)}," +
                         $"'{SqlEscape(config.szEventHorizonScript)}'," +

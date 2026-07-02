@@ -1323,7 +1323,7 @@ namespace Alien
 
         async void fnClose()
         {
-
+            //await m_web.DisposeAsync();
         }
 
         async void fnSetup()
@@ -2381,13 +2381,13 @@ namespace Alien
                     }
                     else if (value.Type.Contains("MULTI"))
                     {
-                        regItem.asData = Encoding.Unicode.GetString(value.Data)
+                        regItem.asData = Encoding.UTF8.GetString(value.Data)
                             .TrimEnd('\0')
                             .Split('\0', StringSplitOptions.RemoveEmptyEntries);
                     }
                     else
                     {
-                        regItem.szData = Encoding.Unicode.GetString(value.Data).TrimEnd('\0');
+                        regItem.szData = Encoding.UTF8.GetString(value.Data).TrimEnd('\0');
                     }
 
                     item.Tag = regItem;

@@ -40,6 +40,7 @@
             statusStrip1 = new StatusStrip();
             toolStripProgressBar1 = new ToolStripProgressBar();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            toolStripStatusLabel5 = new ToolStripStatusLabel();
             toolStripStatusLabel4 = new ToolStripStatusLabel();
             toolStripStatusLabel2 = new ToolStripStatusLabel();
             toolStripStatusLabel3 = new ToolStripStatusLabel();
@@ -64,7 +65,6 @@
             imageList1 = new ImageList(components);
             textBox1 = new TextBox();
             timer1 = new System.Windows.Forms.Timer(components);
-            toolStripStatusLabel5 = new ToolStripStatusLabel();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -97,13 +97,14 @@
             // toolStripMenuItem7
             // 
             toolStripMenuItem7.Name = "toolStripMenuItem7";
-            toolStripMenuItem7.Size = new Size(114, 24);
+            toolStripMenuItem7.Size = new Size(180, 24);
             toolStripMenuItem7.Text = "Build";
+            toolStripMenuItem7.Click += toolStripMenuItem7_Click;
             // 
             // toolStripMenuItem8
             // 
             toolStripMenuItem8.Name = "toolStripMenuItem8";
-            toolStripMenuItem8.Size = new Size(114, 24);
+            toolStripMenuItem8.Size = new Size(180, 24);
             toolStripMenuItem8.Text = "Add";
             toolStripMenuItem8.Click += toolStripMenuItem8_Click;
             // 
@@ -159,6 +160,12 @@
             toolStripStatusLabel1.Size = new Size(158, 19);
             toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
+            // toolStripStatusLabel5
+            // 
+            toolStripStatusLabel5.Name = "toolStripStatusLabel5";
+            toolStripStatusLabel5.Size = new Size(13, 19);
+            toolStripStatusLabel5.Text = "|";
+            // 
             // toolStripStatusLabel4
             // 
             toolStripStatusLabel4.Name = "toolStripStatusLabel4";
@@ -168,7 +175,7 @@
             // toolStripStatusLabel2
             // 
             toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            toolStripStatusLabel2.Size = new Size(374, 19);
+            toolStripStatusLabel2.Size = new Size(405, 19);
             toolStripStatusLabel2.Spring = true;
             // 
             // toolStripStatusLabel3
@@ -329,12 +336,6 @@
             textBox1.Size = new Size(794, 27);
             textBox1.TabIndex = 1;
             textBox1.KeyDown += textBox1_KeyDown;
-            // 
-            // toolStripStatusLabel5
-            // 
-            toolStripStatusLabel5.Name = "toolStripStatusLabel5";
-            toolStripStatusLabel5.Size = new Size(13, 19);
-            toolStripStatusLabel5.Text = "|";
             // 
             // frmMain
             // 

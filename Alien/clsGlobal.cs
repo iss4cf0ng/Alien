@@ -77,6 +77,7 @@ namespace Alien
         public DateTime dtLastModified;
         public DateTime dtLastAccessed;
 
+        public string szDescription;
         public string szUserAgent;
 
         // EventHorizon

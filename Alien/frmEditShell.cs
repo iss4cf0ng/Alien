@@ -109,6 +109,7 @@ namespace Alien
                 comboBox4.Text = m_stShellConfig.szMethod;
                 comboBox3.Text = m_stShellConfig.payloadType.ToString();
 
+                textBox3.Text = m_stShellConfig.szDescription;
                 textBox4.Text = m_stShellConfig.szUserAgent;
                 comboBox2.Text = m_stShellConfig.szEventHorizonScript;
                 textEditorControl1.Text = m_stShellConfig.szEventHorizonConfig;
@@ -132,6 +133,7 @@ namespace Alien
                 language = (enLanguage)Enum.Parse(typeof(enLanguage), comboBox1.Text),
                 payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), comboBox3.Text),
 
+                szDescription = textBox3.Text,
                 szUserAgent = textBox4.Text,
                 bEHEnable = checkBox1.Checked,
                 szEventHorizonScript = comboBox2.Text,
@@ -162,6 +164,7 @@ namespace Alien
             config.language = (enLanguage)Enum.Parse(typeof(enLanguage), comboBox1.Text);
             config.szMethod = comboBox4.Text;
             config.payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), comboBox3.Text);
+            config.szDescription = textBox3.Text;
             config.szUserAgent = textBox4.Text;
             config.bEHEnable = checkBox1.Checked;
             config.szEventHorizonScript = comboBox2.Text;

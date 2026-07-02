@@ -342,13 +342,13 @@ namespace Alien
                 toolStripProgressBar1.Value = 0;
                 toolStripProgressBar1.Maximum = listView1.Items.Count;
 
-                Dictionary <clsWeb, ListViewItem> dic = new Dictionary<clsWeb, ListViewItem>();
+                Dictionary<clsWeb, ListViewItem> dic = new Dictionary<clsWeb, ListViewItem>();
                 foreach (ListViewItem item in listView1.Items)
                     dic.Add(fnGetVictimTag(item), item);
 
                 var semaphore = new SemaphoreSlim(nThread);
                 List<Task> lsTask = new List<Task>();
-                
+
                 foreach (clsWeb web in dic.Keys)
                 {
                     lsTask.Add(Task.Run(async () =>
@@ -381,6 +381,11 @@ namespace Alien
             {
                 toolStripStatusLabel4.Text = "Tasks are finished";
             }
+        }
+
+        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
