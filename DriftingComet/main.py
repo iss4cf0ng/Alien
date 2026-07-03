@@ -5,7 +5,7 @@ URL: https://github.com/iss4cf0ng/Alien
 
 Description:
     This script is a specialized subproject of Alien webshell management tool.
-    This algorithm is a proof-of-ceoncept for its multi-hop webshell routing module.
+    This algorithm is a proof-of-concept for its multi-hop webshell routing module.
 
     HTTP request:   [Alien] -> [Hop1] -> [Hop2] -> [Hop3] -> ... -> [HopN] -> [Target web server]
     HTTP response:  [Alien] <- [Hop1] <- [Hop2] <- [Hop3] <- ... <- [HopN] <- [Target web server]
