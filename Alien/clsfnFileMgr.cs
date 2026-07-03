@@ -411,6 +411,38 @@ namespace Alien
             }
         }
 
+        public async Task<bool> fnbCopy(string szSrcPath, string szDstPath)
+        {
+            string szResp = await m_web.fnszSendPayload("file_copy", new string[] { szSrcPath, szDstPath });
+            string[] split = szResp.Split('|');
+            int nCode = int.Parse(split[0]);
+            string szMsg = split[1];
+
+            if (nCode == 0)
+            {
+                MessageBox.Show(szMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> fnbMove(string szSrcPath, string szDstPath)
+        {
+            string szResp = await m_web.fnszSendPayload("file_move", new string[] { szSrcPath, szDstPath });
+            string[] split = szResp.Split('|');
+            int nCode = int.Parse(split[0]);
+            string szMsg = split[1];
+
+            if (nCode == 0)
+            {
+                MessageBox.Show(szMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<bool> fnbDelete(string szDestEntry)
         {
             try

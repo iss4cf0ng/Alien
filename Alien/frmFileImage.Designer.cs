@@ -69,10 +69,10 @@
             // 
             statusStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F);
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 477);
+            statusStrip1.Location = new Point(0, 524);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new Padding(1, 0, 18, 0);
-            statusStrip1.Size = new Size(854, 29);
+            statusStrip1.Size = new Size(943, 29);
             statusStrip1.TabIndex = 0;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -93,7 +93,7 @@
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2 });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(854, 26);
+            toolStrip1.Size = new Size(943, 26);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -181,7 +181,7 @@
             tabControl1.Margin = new Padding(4);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(854, 451);
+            tabControl1.Size = new Size(943, 498);
             tabControl1.TabIndex = 2;
             tabControl1.KeyDown += tabControl1_KeyDown;
             // 
@@ -192,7 +192,7 @@
             tabPage1.Margin = new Padding(4);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(4);
-            tabPage1.Size = new Size(846, 419);
+            tabPage1.Size = new Size(935, 466);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Images";
             tabPage1.UseVisualStyleBackColor = true;
@@ -204,7 +204,7 @@
             listView1.Location = new Point(4, 4);
             listView1.Margin = new Padding(4);
             listView1.Name = "listView1";
-            listView1.Size = new Size(838, 411);
+            listView1.Size = new Size(927, 458);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.DoubleClick += listView1_DoubleClick;
@@ -276,7 +276,7 @@
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(854, 506);
+            ClientSize = new Size(943, 553);
             Controls.Add(tabControl1);
             Controls.Add(toolStrip1);
             Controls.Add(statusStrip1);

@@ -39,7 +39,7 @@ namespace Alien
                     "EventHorizonScript",
                     "EventHorizonConfig",
                     "WHEnable",
-                    "Wormhole", // Pivoting
+                    "DriftingComet", // Pivoting
                 }
             },
             {
@@ -218,6 +218,7 @@ namespace Alien
                         $"EHEnable='{(config.bEHEnable ? 1 : 0)}'," +
                         $"EventHorizonScript='{SqlEscape(config.szEventHorizonScript)}'," +
                         $"EventHorizonConfig='{SqlEscape(config.szEventHorizonConfig)}'," +
+                        $"DriftingComet=''," +
                         $"LastModified='{szDt}' " +
                         $"WHERE ID='{SqlEscape(config.ID)}';";
                 }
@@ -226,7 +227,8 @@ namespace Alien
                     szQuery = $"INSERT INTO \"Shell\" (" +
                         "ID, GroupName, URL, Password, Encoding, Language, Method, Type, CreateDate, LastModified, LastAccessed, " +
                         "Description, UserAgent," +
-                        "EHEnable, EventHorizonScript, EventHorizonConfig" +
+                        "EHEnable, EventHorizonScript, EventHorizonConfig," +
+                        "DriftingComet" +
                         ") VALUES (" +
                         $"'{SqlEscape(config.ID)}'," +
                         $"'{SqlEscape(config.szGroupName)}'," +
@@ -238,12 +240,13 @@ namespace Alien
                         $"'{SqlEscape(Enum.GetName(typeof(enPayloadType), config.payloadType))}'," +
                         $"'{szDt}'," +
                         $"'{szDt}'," +
-                        $"'{szDt}'" +
+                        $"'{szDt}'," +
                         $"'{SqlEscape(config.szDescription)}'," +
                         $"'{SqlEscape(config.szUserAgent)}'," +
                         $"{(config.bEHEnable ? 1 : 0)}," +
                         $"'{SqlEscape(config.szEventHorizonScript)}'," +
-                        $"'{SqlEscape(config.szEventHorizonConfig)}'" +
+                        $"'{SqlEscape(config.szEventHorizonConfig)}'," +
+                        $"''" +
                         ");";
                 }
 
