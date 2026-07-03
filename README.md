@@ -40,7 +40,8 @@ Alien is a C#-based webshell management tool for penetration testing.
 ## EventHorizon
 
 
-## WormHole
+## DriftingComet
+
 
 # Debug
 
