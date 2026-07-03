@@ -479,12 +479,9 @@ namespace Alien
             }
         }
 
-        public async Task<clsWGET> fnbWGET(string szUrl)
+        public async Task<clsWGET> fnbWGET(string szUrl, string szSaveDir)
         {
-            string szResp = await m_web.fnszSendPayload("file_wget", new string[]
-            {
-                szUrl,
-            });
+            string szResp = await m_web.fnszSendPayload("file_wget", new string[] { szUrl, szSaveDir });
 
             if (string.IsNullOrEmpty(szResp))
                 throw new Exception("Response is null or empty");

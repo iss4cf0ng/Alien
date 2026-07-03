@@ -1840,7 +1840,7 @@ namespace Alien
         //WGET
         private void toolStripMenuItem10_Click(object sender, EventArgs e)
         {
-            frmWGET f = new frmWGET(m_fileMgr, this);
+            frmWGET f = new frmWGET(m_fileMgr, this, m_fileMgr.m_szCurrentPath);
             f.Show();
         }
 

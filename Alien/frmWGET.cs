@@ -15,15 +15,17 @@ namespace Alien
     {
         private clsfnFileMgr m_fileMgr { get; init; }
         private frmControlPanel m_frmCtrl { get; init; }
+        private string m_szSaveDir { get; init; }
 
         private bool m_bRun = false;
 
-        public frmWGET(clsfnFileMgr fileMgr, frmControlPanel frmCtrl)
+        public frmWGET(clsfnFileMgr fileMgr, frmControlPanel frmCtrl, string szSaveDir)
         {
             InitializeComponent();
 
             m_fileMgr = fileMgr;
             m_frmCtrl = frmCtrl;
+            m_szSaveDir = szSaveDir;
         }
 
         void fnSetup()
@@ -41,9 +43,9 @@ namespace Alien
         {
             try
             {
-                toolStripLabel1.Text = "Loading...";
+                toolStripStatusLabel1.Text = "Loading...";
 
-                int nThread = int.Parse(Interaction.InputBox("Thread count:", "Check Alive", "3"));
+                int nThread = int.Parse(toolStripComboBox1.Text);
                 if (nThread <= 0)
                     throw new Exception("Invalid number.");
 
@@ -56,6 +58,8 @@ namespace Alien
 
                 var semaphore = new SemaphoreSlim(nThread);
                 List<Task> lsTask = new List<Task>();
+
+                m_bRun = true;
 
                 foreach (string szURL in lsURL)
                 {
@@ -71,13 +75,17 @@ namespace Alien
 
                         try
                         {
-                            var wget = await m_fileMgr.fnbWGET(szURL);
+                            var wget = await m_fileMgr.fnbWGET(szURL, m_szSaveDir);
 
                             ListViewItem item = new ListViewItem(szURL);
                             item.SubItems.Add(wget.Filename);
                             item.SubItems.Add(wget.Success ? "OK" : wget.Message);
 
                             Invoke(() => listView1.Items.Add(item));
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         finally
                         {
