@@ -1,4 +1,0 @@
-http://172.23.240.1/webshell/test.php?name=ISSAC&identify=3478YHIOY69_asHOYNas92|artificial
-http://172.23.240.1/webshell/test.php?name=ISSAC&identify=3478YHIOY69_asHOYNas92|artificial
-http://172.23.240.1/webshell/test.php?name=ISSAC&identify=3478YHIOY69_asHOYNas92|artificial
-http://172.23.240.1/webshell/test.php?name=ISSAC&identify=3478YHIOY69_asHOYNas92|artificial
