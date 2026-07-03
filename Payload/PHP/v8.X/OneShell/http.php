@@ -46,9 +46,7 @@ function http_post($url, $data, &$http_code)
     return $response;
 }
 
-// ----------------------
 // Decode action
-// ----------------------
 $action = base64_decode($_POST['z0'] ?? '');
 
 $result = [
@@ -58,9 +56,7 @@ $result = [
     'data' => null
 ];
 
-// ----------------------
 // Route
-// ----------------------
 switch ($action) {
 
     case 'get':
@@ -101,7 +97,7 @@ switch ($action) {
         break;
 }
 
-// ----------------------
 // Output JSON
-// ----------------------
 echo json_encode($result);
+
+?>
