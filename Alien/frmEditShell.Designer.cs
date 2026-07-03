@@ -69,6 +69,7 @@
             numericUpDown1 = new NumericUpDown();
             label11 = new Label();
             tabPage2 = new TabPage();
+            tabPage3 = new TabPage();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox4.SuspendLayout();
@@ -379,6 +380,7 @@
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
             tabControl1.ItemSize = new Size(120, 24);
             tabControl1.Location = new Point(12, 3);
             tabControl1.Name = "tabControl1";
@@ -486,6 +488,15 @@
             tabPage2.Text = "EventHorizon";
             tabPage2.UseVisualStyleBackColor = true;
             // 
+            // tabPage3
+            // 
+            tabPage3.Location = new Point(4, 28);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(488, 412);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "DriftingComet";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
             // frmEditShell
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -558,5 +569,6 @@
         private Label label13;
         private GroupBox groupBox4;
         private RichTextBox richTextBox1;
+        private TabPage tabPage3;
     }
 }
