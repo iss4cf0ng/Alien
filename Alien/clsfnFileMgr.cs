@@ -290,7 +290,7 @@ namespace Alien
         {
             try
             {
-                string szResp = await m_web.fnszSendPayload("file_newFolder", new string[] { szDirPath });
+                string szResp = await m_web.fnszSendPayload("file_mkdir", new string[] { szDirPath });
                 if (!string.Equals(szResp, "1"))
                     throw new Exception(szResp);
 

@@ -1741,9 +1741,26 @@ namespace Alien
         }
 
         //File.NewFolder
-        private void toolStripMenuItem12_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem12_Click(object sender, EventArgs e)
         {
+            string szDirName = Interaction.InputBox("Dir Name: ", "Create New Directory");
+            if (string.IsNullOrEmpty(szDirName))
+            {
+                MessageBox.Show("Directory name cannot be null or empty.", "Empty", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
+            szDirName = Path.Combine(m_fileMgr.m_szCurrentPath, szDirName).Replace("\\", "/").Replace("//", "/");
+
+            if (await m_fileMgr.fnbNewFolder(szDirName))
+            {
+                MessageBox.Show("Created the directory successfully!", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                fnFileMgrRefresh();
+            }
+            else
+            {
+                MessageBox.Show("Failed to create a new directory.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void toolStripButton4_Click(object sender, EventArgs e)
