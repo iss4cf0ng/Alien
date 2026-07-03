@@ -30,8 +30,8 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
-            TreeNode treeNode3 = new TreeNode("Upload");
-            TreeNode treeNode4 = new TreeNode("Download");
+            TreeNode treeNode1 = new TreeNode("Upload");
+            TreeNode treeNode2 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -363,7 +363,7 @@
             tabControl1.Location = new Point(0, 36);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1022, 511);
+            tabControl1.Size = new Size(1192, 589);
             tabControl1.SizeMode = TabSizeMode.Fixed;
             tabControl1.TabIndex = 0;
             // 
@@ -374,7 +374,7 @@
             tabPage1.Location = new Point(4, 28);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1014, 479);
+            tabPage1.Size = new Size(1184, 557);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Information";
             tabPage1.UseVisualStyleBackColor = true;
@@ -383,9 +383,9 @@
             // 
             statusStrip2.Font = new Font("Microsoft JhengHei UI", 11.25F);
             statusStrip2.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip2.Location = new Point(3, 452);
+            statusStrip2.Location = new Point(3, 530);
             statusStrip2.Name = "statusStrip2";
-            statusStrip2.Size = new Size(1008, 24);
+            statusStrip2.Size = new Size(1178, 24);
             statusStrip2.TabIndex = 2;
             statusStrip2.Text = "statusStrip2";
             // 
@@ -401,7 +401,7 @@
             toolStrip2.Items.AddRange(new ToolStripItem[] { toolStripButton3 });
             toolStrip2.Location = new Point(3, 3);
             toolStrip2.Name = "toolStrip2";
-            toolStrip2.Size = new Size(1008, 26);
+            toolStrip2.Size = new Size(1178, 26);
             toolStrip2.TabIndex = 1;
             toolStrip2.Text = "toolStrip2";
             // 
@@ -519,11 +519,11 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode3.Name = "Node0";
-            treeNode3.Text = "Upload";
-            treeNode4.Name = "Node1";
-            treeNode4.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode3, treeNode4 });
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "Upload";
+            treeNode2.Name = "Node1";
+            treeNode2.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
             treeView4.Size = new Size(246, 324);
             treeView4.TabIndex = 0;
             // 
@@ -1629,7 +1629,7 @@
             tabPage16.Controls.Add(tabControl7);
             tabPage16.Location = new Point(4, 28);
             tabPage16.Name = "tabPage16";
-            tabPage16.Size = new Size(1014, 479);
+            tabPage16.Size = new Size(1184, 557);
             tabPage16.TabIndex = 6;
             tabPage16.Text = "Windows";
             tabPage16.UseVisualStyleBackColor = true;
@@ -1643,7 +1643,7 @@
             tabControl7.Location = new Point(0, 0);
             tabControl7.Name = "tabControl7";
             tabControl7.SelectedIndex = 0;
-            tabControl7.Size = new Size(1014, 479);
+            tabControl7.Size = new Size(1184, 557);
             tabControl7.SizeMode = TabSizeMode.Fixed;
             tabControl7.TabIndex = 0;
             // 
@@ -1655,7 +1655,7 @@
             tabPage17.Location = new Point(4, 28);
             tabPage17.Name = "tabPage17";
             tabPage17.Padding = new Padding(3);
-            tabPage17.Size = new Size(1006, 447);
+            tabPage17.Size = new Size(1176, 525);
             tabPage17.TabIndex = 0;
             tabPage17.Text = "Users";
             tabPage17.UseVisualStyleBackColor = true;
@@ -1672,7 +1672,7 @@
             tabControl9.Location = new Point(3, 28);
             tabControl9.Name = "tabControl9";
             tabControl9.SelectedIndex = 0;
-            tabControl9.Size = new Size(1000, 392);
+            tabControl9.Size = new Size(1170, 470);
             tabControl9.TabIndex = 3;
             // 
             // tabPage22
@@ -1681,7 +1681,7 @@
             tabPage22.Location = new Point(4, 28);
             tabPage22.Name = "tabPage22";
             tabPage22.Padding = new Padding(3);
-            tabPage22.Size = new Size(992, 360);
+            tabPage22.Size = new Size(1162, 438);
             tabPage22.TabIndex = 0;
             tabPage22.Text = "Accounts";
             tabPage22.UseVisualStyleBackColor = true;
@@ -1691,7 +1691,7 @@
             listView5.Dock = DockStyle.Fill;
             listView5.Location = new Point(3, 3);
             listView5.Name = "listView5";
-            listView5.Size = new Size(986, 354);
+            listView5.Size = new Size(1156, 432);
             listView5.TabIndex = 2;
             listView5.UseCompatibleStateImageBehavior = false;
             listView5.View = View.Details;
@@ -1803,7 +1803,7 @@
             toolStrip11.Items.AddRange(new ToolStripItem[] { toolStripLabel3 });
             toolStrip11.Location = new Point(3, 3);
             toolStrip11.Name = "toolStrip11";
-            toolStrip11.Size = new Size(1000, 25);
+            toolStrip11.Size = new Size(1170, 25);
             toolStrip11.TabIndex = 1;
             toolStrip11.Text = "toolStrip11";
             // 
@@ -1818,9 +1818,9 @@
             // 
             statusStrip6.Font = new Font("Microsoft JhengHei UI", 11.25F);
             statusStrip6.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel5 });
-            statusStrip6.Location = new Point(3, 420);
+            statusStrip6.Location = new Point(3, 498);
             statusStrip6.Name = "statusStrip6";
-            statusStrip6.Size = new Size(1000, 24);
+            statusStrip6.Size = new Size(1170, 24);
             statusStrip6.TabIndex = 0;
             statusStrip6.Text = "statusStrip6";
             // 
@@ -2185,7 +2185,7 @@
             // toolStripStatusLabel8
             // 
             toolStripStatusLabel8.Name = "toolStripStatusLabel8";
-            toolStripStatusLabel8.Size = new Size(128, 17);
+            toolStripStatusLabel8.Size = new Size(158, 19);
             toolStripStatusLabel8.Text = "toolStripStatusLabel8";
             // 
             // tabPage28
@@ -2306,7 +2306,7 @@
             panel2.Dock = DockStyle.Top;
             panel2.Location = new Point(0, 0);
             panel2.Name = "panel2";
-            panel2.Size = new Size(1022, 36);
+            panel2.Size = new Size(1192, 36);
             panel2.TabIndex = 4;
             // 
             // textBox8
@@ -2315,7 +2315,7 @@
             textBox8.Location = new Point(90, 3);
             textBox8.Name = "textBox8";
             textBox8.ReadOnly = true;
-            textBox8.Size = new Size(928, 27);
+            textBox8.Size = new Size(1098, 27);
             textBox8.TabIndex = 1;
             // 
             // label1
@@ -2331,7 +2331,7 @@
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1022, 547);
+            ClientSize = new Size(1192, 625);
             Controls.Add(tabControl1);
             Controls.Add(panel2);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);

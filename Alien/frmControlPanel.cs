@@ -461,6 +461,21 @@ namespace Alien
             var leFolder = le.Where(x => x.bIsDirectory).ToList();
             var leFile = le.Where(x => !x.bIsDirectory).ToList();
 
+            // TreeView
+            if (node.Nodes.Count > 0)
+            {
+                List<TreeNode> nodes = node.Nodes.Cast<TreeNode>().ToList();
+                var lsFolder = leFolder.Select(x => x.szEntryName);
+                foreach (var n in nodes)
+                {
+                    if (!lsFolder.Contains(n.Text))
+                    {
+                        treeView3.Nodes.Remove(n);
+                    }
+                }
+            }
+
+            // ListView
             foreach (var entry in leFolder.Concat(leFile))
             {
                 ListViewItem item = new ListViewItem(entry.szEntryName);

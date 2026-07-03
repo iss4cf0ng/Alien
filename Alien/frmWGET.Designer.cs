@@ -33,16 +33,17 @@
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             splitContainer1 = new SplitContainer();
             textBox1 = new TextBox();
+            toolStrip1 = new ToolStrip();
+            toolStripButton1 = new ToolStripButton();
+            toolStripButton2 = new ToolStripButton();
+            toolStripSeparator1 = new ToolStripSeparator();
+            toolStripLabel1 = new ToolStripLabel();
+            toolStripComboBox1 = new ToolStripComboBox();
             listView1 = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
             columnHeader3 = new ColumnHeader();
-            toolStrip1 = new ToolStrip();
-            toolStripLabel1 = new ToolStripLabel();
-            toolStripComboBox1 = new ToolStripComboBox();
-            toolStripSeparator1 = new ToolStripSeparator();
-            toolStripButton1 = new ToolStripButton();
-            toolStripButton2 = new ToolStripButton();
+            toolStripProgressBar1 = new ToolStripProgressBar();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -54,7 +55,7 @@
             // statusStrip1
             // 
             statusStrip1.Font = new Font("Microsoft JhengHei", 11.25F);
-            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripProgressBar1, toolStripStatusLabel1 });
             statusStrip1.Location = new Point(0, 456);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(530, 24);
@@ -97,6 +98,53 @@
             textBox1.TabIndex = 0;
             textBox1.WordWrap = false;
             // 
+            // toolStrip1
+            // 
+            toolStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton1, toolStripButton2, toolStripSeparator1, toolStripLabel1, toolStripComboBox1 });
+            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new Size(530, 26);
+            toolStrip1.TabIndex = 2;
+            toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButton1
+            // 
+            toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton1.Image = (Image)resources.GetObject("toolStripButton1.Image");
+            toolStripButton1.ImageTransparentColor = Color.Magenta;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(46, 23);
+            toolStripButton1.Text = "Start";
+            toolStripButton1.Click += toolStripButton1_Click;
+            // 
+            // toolStripButton2
+            // 
+            toolStripButton2.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton2.Image = (Image)resources.GetObject("toolStripButton2.Image");
+            toolStripButton2.ImageTransparentColor = Color.Magenta;
+            toolStripButton2.Name = "toolStripButton2";
+            toolStripButton2.Size = new Size(45, 23);
+            toolStripButton2.Text = "Stop";
+            toolStripButton2.Click += toolStripButton2_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(6, 26);
+            // 
+            // toolStripLabel1
+            // 
+            toolStripLabel1.Name = "toolStripLabel1";
+            toolStripLabel1.Size = new Size(65, 23);
+            toolStripLabel1.Text = "Thread :";
+            // 
+            // toolStripComboBox1
+            // 
+            toolStripComboBox1.Items.AddRange(new object[] { "1", "3", "5", "10" });
+            toolStripComboBox1.Name = "toolStripComboBox1";
+            toolStripComboBox1.Size = new Size(121, 26);
+            // 
             // listView1
             // 
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
@@ -125,52 +173,10 @@
             columnHeader3.Text = "Status";
             columnHeader3.Width = 100;
             // 
-            // toolStrip1
+            // toolStripProgressBar1
             // 
-            toolStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton1, toolStripButton2, toolStripSeparator1, toolStripLabel1, toolStripComboBox1 });
-            toolStrip1.Location = new Point(0, 0);
-            toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(530, 26);
-            toolStrip1.TabIndex = 2;
-            toolStrip1.Text = "toolStrip1";
-            // 
-            // toolStripLabel1
-            // 
-            toolStripLabel1.Name = "toolStripLabel1";
-            toolStripLabel1.Size = new Size(65, 23);
-            toolStripLabel1.Text = "Thread :";
-            // 
-            // toolStripComboBox1
-            // 
-            toolStripComboBox1.Items.AddRange(new object[] { "1", "3", "5", "10" });
-            toolStripComboBox1.Name = "toolStripComboBox1";
-            toolStripComboBox1.Size = new Size(121, 26);
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(6, 26);
-            // 
-            // toolStripButton1
-            // 
-            toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton1.Image = (Image)resources.GetObject("toolStripButton1.Image");
-            toolStripButton1.ImageTransparentColor = Color.Magenta;
-            toolStripButton1.Name = "toolStripButton1";
-            toolStripButton1.Size = new Size(46, 23);
-            toolStripButton1.Text = "Start";
-            toolStripButton1.Click += toolStripButton1_Click;
-            // 
-            // toolStripButton2
-            // 
-            toolStripButton2.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton2.Image = (Image)resources.GetObject("toolStripButton2.Image");
-            toolStripButton2.ImageTransparentColor = Color.Magenta;
-            toolStripButton2.Name = "toolStripButton2";
-            toolStripButton2.Size = new Size(45, 23);
-            toolStripButton2.Text = "Stop";
-            toolStripButton2.Click += toolStripButton2_Click;
+            toolStripProgressBar1.Name = "toolStripProgressBar1";
+            toolStripProgressBar1.Size = new Size(200, 18);
             // 
             // frmWGET
             // 
@@ -215,5 +221,6 @@
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripLabel toolStripLabel1;
         private ToolStripComboBox toolStripComboBox1;
+        private ToolStripProgressBar toolStripProgressBar1;
     }
 }

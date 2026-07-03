@@ -1175,6 +1175,7 @@ namespace Alien
 
             string szProcessed = szOriginalPayload;
 
+            szProcessed = Regex.Replace(szProcessed, @"System\.Web\.HttpContext\.Current\.Response\.Write", "Echo", RegexOptions.IgnoreCase);
             szProcessed = Regex.Replace(szProcessed, @"Response\.Write", "Echo", RegexOptions.IgnoreCase);
             szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
 

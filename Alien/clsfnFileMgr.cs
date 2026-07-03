@@ -88,6 +88,18 @@ namespace Alien
             public string Msg { get; set; }
         }
 
+        public class clsWGET
+        {
+            [JsonProperty("success")]
+            public bool Success { get; set; }
+
+            [JsonProperty("filename")]
+            public string Filename { get; set; }
+
+            [JsonProperty("error")]
+            public string Message { get; set; }
+        }
+
         public async Task<stInit> fnszInit()
         {
             string szResp = await m_web.fnszSendPayload("file_init");
@@ -180,7 +192,7 @@ namespace Alien
                 MessageBox.Show(szResp, "fnleScandir()", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return l;
             }
-
+            
             foreach (string szEntry in szResp.Split('|'))
             {
                 try
@@ -216,7 +228,7 @@ namespace Alien
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    //MessageBox.Show(ex.Message);
                 }
             }
 
@@ -467,25 +479,21 @@ namespace Alien
             }
         }
 
-        public async Task<bool> fnbWGET(string szUrl)
+        public async Task<clsWGET> fnbWGET(string szUrl)
         {
-            try
+            string szResp = await m_web.fnszSendPayload("file_wget", new string[]
             {
-                string szResp = await m_web.fnszSendPayload("file_wget", new string[]
-                {
-                    szUrl,
-                });
+                szUrl,
+            });
 
-                if (!string.Equals(szResp, "1"))
-                    throw new Exception("WGET failed.");
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("Response is null or empty");
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "fnbWGET", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
+            clsWGET? wget = JsonConvert.DeserializeObject<clsWGET>(szResp);
+            if (wget == null)
+                throw new Exception("JSON deserialization failed.");
+
+            return wget;
         }
     }
 }
