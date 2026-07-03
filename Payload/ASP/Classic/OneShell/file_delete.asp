@@ -1,5 +1,7 @@
 <%
 
+On Error Resume Next
+
 Function GetCurrentCharset()
     Dim charset
     charset = Response.CharSet
@@ -16,12 +18,17 @@ Function GetCurrentCharset()
     GetCurrentCharset = charset
 End Function
 
-Function Base64Decode(str)
+Function DecodeBase64(base64Str)
+    If Trim(base64Str) = "" Then
+        DecodeBase64 = ""
+        Exit Function
+    End If
+    
     Dim xml, node, stream
     Set xml = Server.CreateObject("MSXML2.DOMDocument.3.0")
     Set node = xml.createElement("b64")
     node.dataType = "bin.base64"
-    node.text = str
+    node.text = base64Str
 
     Set stream = Server.CreateObject("ADODB.Stream")
     stream.Type = 1
@@ -31,7 +38,7 @@ Function Base64Decode(str)
     stream.Type = 2
     stream.Charset = GetCurrentCharset()
 
-    Base64Decode = stream.ReadText
+    DecodeBase64 = stream.ReadText
 
     stream.Close
     Set stream = Nothing
@@ -63,7 +70,6 @@ Else
     Response.Write "0"
 End If
 
-On Error GoTo 0 ' Restore normal error handling
 Set fso = Nothing
 
 %>
