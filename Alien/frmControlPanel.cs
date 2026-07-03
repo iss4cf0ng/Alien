@@ -812,13 +812,11 @@ namespace Alien
             f.fnShowContent(szFilePath, string.Empty);
         }
 
-        public async void fnFileDelete(string szDstEntry)
+        public async Task<bool> fnbFileDelete(string szDstEntry)
         {
-            bool bRet = await m_fileMgr.fnbDelete(szDstEntry);
-            if (bRet)
-                fnFileMgrRefresh();
+            return await m_fileMgr.fnbDelete(szDstEntry);
         }
-        public void fnFileDelete(clsfnFileMgr.stEntry entry) => fnFileDelete((entry.bIsDirectory ? entry.szEntryPath + "/" : entry.szEntryPath).Replace("\\", "/"));
+        public async Task<bool> fnbFileDelete(clsfnFileMgr.stEntry entry) => await fnbFileDelete((entry.bIsDirectory ? entry.szEntryPath + "/" : entry.szEntryPath).Replace("\\", "/"));
 
         #endregion
         #region Shell
@@ -1852,12 +1850,29 @@ namespace Alien
         }
 
         //Delete
-        private void toolStripMenuItem17_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem17_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in listView2.SelectedItems)
+            List<clsfnFileMgr.stEntry> lsEntry = listView2.SelectedItems.Cast<ListViewItem>().Select(x => fnFileGetItemTag(x)).ToList();
+            if (lsEntry.Count == 0)
+                return;
+
+            if (DialogResult.Yes != MessageBox.Show($"Are you sure to delete {lsEntry.Count} file{(lsEntry.Count > 1 ? "s" : string.Empty)}?", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                return;
+
+            bool bFlag = true;
+            foreach (var entry in lsEntry)
             {
-                var entry = fnFileGetItemTag(item);
-                fnFileDelete(entry);
+                if (!await fnbFileDelete(entry))
+                {
+                    bFlag = false;
+                    MessageBox.Show("Failed to delete: " + entry.szEntryPath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            if (bFlag)
+            {
+                MessageBox.Show($"Delete {lsEntry.Count} file{(lsEntry.Count > 1 ? "s" : string.Empty)} successfully.", "OK!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                fnFileMgrRefresh();
             }
         }
 

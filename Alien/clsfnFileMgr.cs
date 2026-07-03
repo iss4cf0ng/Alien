@@ -291,8 +291,11 @@ namespace Alien
             try
             {
                 string szResp = await m_web.fnszSendPayload("file_mkdir", new string[] { szDirPath });
-                if (!string.Equals(szResp, "1"))
-                    throw new Exception(szResp);
+                string[] split = szResp.Split('|');
+                int nCode = int.Parse(split[0]);
+                string szMsg = split[1];
+                if (nCode == 0)
+                    throw new Exception(szMsg);
 
                 return true;
             }
