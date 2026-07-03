@@ -39,9 +39,11 @@ Alien is a C#-based webshell management tool for penetration testing.
 
 ## EventHorizon
 
+EventHorizon is a module within Alien that provides tampering features for evasion.
 
 ## DriftingComet
 
+DriftingComet is one of the modules used by Alien. It provides a multi-hopping feature.
 
 # Debug
 
