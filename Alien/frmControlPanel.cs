@@ -2914,5 +2914,10 @@ namespace Alien
             TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
             treeView3.SelectedNode = cdNode;
         }
+
+        private void splitContainer7_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+
+        }
     }
 }
