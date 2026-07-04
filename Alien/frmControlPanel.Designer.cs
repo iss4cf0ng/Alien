@@ -30,8 +30,8 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
-            TreeNode treeNode1 = new TreeNode("Upload");
-            TreeNode treeNode2 = new TreeNode("Download");
+            TreeNode treeNode3 = new TreeNode("Upload");
+            TreeNode treeNode4 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -225,9 +225,7 @@
             tabPage30 = new TabPage();
             splitContainer7 = new SplitContainer();
             treeView1 = new TreeView();
-            splitContainer8 = new SplitContainer();
-            webView21 = new Microsoft.Web.WebView2.WinForms.WebView2();
-            richTextBox3 = new RichTextBox();
+            webViewPlugin = new Microsoft.Web.WebView2.WinForms.WebView2();
             statusStrip8 = new StatusStrip();
             toolStripStatusLabel8 = new ToolStripStatusLabel();
             tabPage28 = new TabPage();
@@ -247,6 +245,7 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
+            textBox12 = new TextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -334,11 +333,7 @@
             splitContainer7.Panel1.SuspendLayout();
             splitContainer7.Panel2.SuspendLayout();
             splitContainer7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)splitContainer8).BeginInit();
-            splitContainer8.Panel1.SuspendLayout();
-            splitContainer8.Panel2.SuspendLayout();
-            splitContainer8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)webView21).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)webViewPlugin).BeginInit();
             statusStrip8.SuspendLayout();
             tabPage28.SuspendLayout();
             statusStrip7.SuspendLayout();
@@ -421,7 +416,7 @@
             tabPage2.Location = new Point(4, 28);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1014, 479);
+            tabPage2.Size = new Size(1184, 557);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "File";
             tabPage2.UseVisualStyleBackColor = true;
@@ -434,7 +429,7 @@
             tabControl2.Location = new Point(3, 3);
             tabControl2.Name = "tabControl2";
             tabControl2.SelectedIndex = 0;
-            tabControl2.Size = new Size(1008, 473);
+            tabControl2.Size = new Size(1178, 551);
             tabControl2.SizeMode = TabSizeMode.Fixed;
             tabControl2.TabIndex = 0;
             // 
@@ -447,7 +442,7 @@
             tabPage6.Location = new Point(4, 28);
             tabPage6.Name = "tabPage6";
             tabPage6.Padding = new Padding(3);
-            tabPage6.Size = new Size(1000, 441);
+            tabPage6.Size = new Size(1170, 519);
             tabPage6.TabIndex = 0;
             tabPage6.Text = "Manager";
             tabPage6.UseVisualStyleBackColor = true;
@@ -467,7 +462,7 @@
             // 
             splitContainer1.Panel2.Controls.Add(listView2);
             splitContainer1.Panel2.Controls.Add(toolStrip9);
-            splitContainer1.Size = new Size(994, 358);
+            splitContainer1.Size = new Size(1164, 436);
             splitContainer1.SplitterDistance = 260;
             splitContainer1.TabIndex = 2;
             // 
@@ -479,7 +474,7 @@
             tabControl6.Location = new Point(0, 0);
             tabControl6.Name = "tabControl6";
             tabControl6.SelectedIndex = 0;
-            tabControl6.Size = new Size(260, 358);
+            tabControl6.Size = new Size(260, 436);
             tabControl6.SizeMode = TabSizeMode.Fixed;
             tabControl6.TabIndex = 1;
             // 
@@ -489,7 +484,7 @@
             tabPage13.Location = new Point(4, 28);
             tabPage13.Name = "tabPage13";
             tabPage13.Padding = new Padding(3);
-            tabPage13.Size = new Size(252, 326);
+            tabPage13.Size = new Size(252, 404);
             tabPage13.TabIndex = 0;
             tabPage13.Text = "Explorer";
             tabPage13.UseVisualStyleBackColor = true;
@@ -499,7 +494,7 @@
             treeView3.Dock = DockStyle.Fill;
             treeView3.Location = new Point(3, 3);
             treeView3.Name = "treeView3";
-            treeView3.Size = new Size(246, 320);
+            treeView3.Size = new Size(246, 398);
             treeView3.TabIndex = 0;
             treeView3.AfterSelect += treeView3_AfterSelect;
             // 
@@ -509,7 +504,7 @@
             tabPage14.Location = new Point(4, 24);
             tabPage14.Name = "tabPage14";
             tabPage14.Padding = new Padding(3);
-            tabPage14.Size = new Size(252, 330);
+            tabPage14.Size = new Size(252, 408);
             tabPage14.TabIndex = 1;
             tabPage14.Text = "Task";
             tabPage14.UseVisualStyleBackColor = true;
@@ -519,12 +514,12 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode1.Name = "Node0";
-            treeNode1.Text = "Upload";
-            treeNode2.Name = "Node1";
-            treeNode2.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
-            treeView4.Size = new Size(246, 324);
+            treeNode3.Name = "Node0";
+            treeNode3.Text = "Upload";
+            treeNode4.Name = "Node1";
+            treeNode4.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode3, treeNode4 });
+            treeView4.Size = new Size(246, 402);
             treeView4.TabIndex = 0;
             // 
             // listView2
@@ -535,7 +530,7 @@
             listView2.FullRowSelect = true;
             listView2.Location = new Point(0, 26);
             listView2.Name = "listView2";
-            listView2.Size = new Size(730, 332);
+            listView2.Size = new Size(900, 410);
             listView2.TabIndex = 0;
             listView2.UseCompatibleStateImageBehavior = false;
             listView2.View = View.Details;
@@ -720,7 +715,7 @@
             toolStrip9.Items.AddRange(new ToolStripItem[] { toolStripButton15, toolStripButton5, toolStripButton6 });
             toolStrip9.Location = new Point(0, 0);
             toolStrip9.Name = "toolStrip9";
-            toolStrip9.Size = new Size(730, 26);
+            toolStrip9.Size = new Size(900, 26);
             toolStrip9.TabIndex = 1;
             toolStrip9.Text = "toolStrip9";
             // 
@@ -758,9 +753,9 @@
             // 
             statusStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F);
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel2 });
-            statusStrip1.Location = new Point(3, 414);
+            statusStrip1.Location = new Point(3, 492);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(994, 24);
+            statusStrip1.Size = new Size(1164, 24);
             statusStrip1.TabIndex = 1;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -775,7 +770,7 @@
             textBox1.Dock = DockStyle.Top;
             textBox1.Location = new Point(3, 29);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(994, 27);
+            textBox1.Size = new Size(1164, 27);
             textBox1.TabIndex = 3;
             textBox1.KeyDown += textBox1_KeyDown;
             // 
@@ -785,7 +780,7 @@
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton14, toolStripDropDownButton1, toolStripButton1, toolStripButton2, toolStripButton9 });
             toolStrip1.Location = new Point(3, 3);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(994, 26);
+            toolStrip1.Size = new Size(1164, 26);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -861,7 +856,7 @@
             tabPage7.Location = new Point(4, 24);
             tabPage7.Name = "tabPage7";
             tabPage7.Padding = new Padding(3);
-            tabPage7.Size = new Size(1000, 445);
+            tabPage7.Size = new Size(1170, 523);
             tabPage7.TabIndex = 1;
             tabPage7.Text = "Find";
             tabPage7.UseVisualStyleBackColor = true;
@@ -881,7 +876,7 @@
             // 
             splitContainer2.Panel2.Controls.Add(listView1);
             splitContainer2.Panel2.Controls.Add(textBox10);
-            splitContainer2.Size = new Size(994, 389);
+            splitContainer2.Size = new Size(1164, 467);
             splitContainer2.SplitterDistance = 286;
             splitContainer2.TabIndex = 2;
             // 
@@ -891,7 +886,7 @@
             textBox9.Location = new Point(0, 0);
             textBox9.Multiline = true;
             textBox9.Name = "textBox9";
-            textBox9.Size = new Size(286, 389);
+            textBox9.Size = new Size(286, 467);
             textBox9.TabIndex = 0;
             // 
             // listView1
@@ -902,7 +897,7 @@
             listView1.FullRowSelect = true;
             listView1.Location = new Point(0, 27);
             listView1.Name = "listView1";
-            listView1.Size = new Size(704, 362);
+            listView1.Size = new Size(874, 440);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -978,16 +973,16 @@
             textBox10.Dock = DockStyle.Top;
             textBox10.Location = new Point(0, 0);
             textBox10.Name = "textBox10";
-            textBox10.Size = new Size(704, 27);
+            textBox10.Size = new Size(874, 27);
             textBox10.TabIndex = 1;
             // 
             // statusStrip3
             // 
             statusStrip3.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             statusStrip3.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel6 });
-            statusStrip3.Location = new Point(3, 418);
+            statusStrip3.Location = new Point(3, 496);
             statusStrip3.Name = "statusStrip3";
-            statusStrip3.Size = new Size(994, 24);
+            statusStrip3.Size = new Size(1164, 24);
             statusStrip3.TabIndex = 1;
             statusStrip3.Text = "statusStrip3";
             // 
@@ -1002,7 +997,7 @@
             toolStrip3.Items.AddRange(new ToolStripItem[] { toolStripButton4 });
             toolStrip3.Location = new Point(3, 3);
             toolStrip3.Name = "toolStrip3";
-            toolStrip3.Size = new Size(994, 26);
+            toolStrip3.Size = new Size(1164, 26);
             toolStrip3.TabIndex = 0;
             toolStrip3.Text = "toolStrip3";
             // 
@@ -1022,7 +1017,7 @@
             tabPage3.Controls.Add(tabControl3);
             tabPage3.Location = new Point(4, 28);
             tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(1014, 479);
+            tabPage3.Size = new Size(1184, 557);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Shell";
             tabPage3.UseVisualStyleBackColor = true;
@@ -1036,7 +1031,7 @@
             tabControl3.Location = new Point(0, 0);
             tabControl3.Name = "tabControl3";
             tabControl3.SelectedIndex = 0;
-            tabControl3.Size = new Size(1014, 479);
+            tabControl3.Size = new Size(1184, 557);
             tabControl3.SizeMode = TabSizeMode.Fixed;
             tabControl3.TabIndex = 0;
             // 
@@ -1046,7 +1041,7 @@
             tabPage20.Controls.Add(textBox3);
             tabPage20.Location = new Point(4, 28);
             tabPage20.Name = "tabPage20";
-            tabPage20.Size = new Size(1006, 447);
+            tabPage20.Size = new Size(1176, 525);
             tabPage20.TabIndex = 2;
             tabPage20.Text = "Exec Shell";
             tabPage20.UseVisualStyleBackColor = true;
@@ -1058,7 +1053,7 @@
             richTextBox2.ForeColor = Color.Lime;
             richTextBox2.Location = new Point(0, 27);
             richTextBox2.Name = "richTextBox2";
-            richTextBox2.Size = new Size(1006, 420);
+            richTextBox2.Size = new Size(1176, 498);
             richTextBox2.TabIndex = 1;
             richTextBox2.Text = "";
             // 
@@ -1069,7 +1064,7 @@
             textBox3.ForeColor = Color.Lime;
             textBox3.Location = new Point(0, 0);
             textBox3.Name = "textBox3";
-            textBox3.Size = new Size(1006, 27);
+            textBox3.Size = new Size(1176, 27);
             textBox3.TabIndex = 0;
             textBox3.KeyDown += textBox3_KeyDown;
             // 
@@ -1079,7 +1074,7 @@
             tabPage8.Location = new Point(4, 24);
             tabPage8.Name = "tabPage8";
             tabPage8.Padding = new Padding(3);
-            tabPage8.Size = new Size(1006, 451);
+            tabPage8.Size = new Size(1176, 529);
             tabPage8.TabIndex = 0;
             tabPage8.Text = "Virtual Shell";
             tabPage8.UseVisualStyleBackColor = true;
@@ -1089,7 +1084,7 @@
             richTextBox1.Dock = DockStyle.Fill;
             richTextBox1.Location = new Point(3, 3);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(1000, 445);
+            richTextBox1.Size = new Size(1170, 523);
             richTextBox1.TabIndex = 0;
             richTextBox1.Text = "";
             richTextBox1.SelectionChanged += richTextBox1_SelectionChanged;
@@ -1102,7 +1097,7 @@
             tabPage9.Location = new Point(4, 24);
             tabPage9.Name = "tabPage9";
             tabPage9.Padding = new Padding(3);
-            tabPage9.Size = new Size(1006, 451);
+            tabPage9.Size = new Size(1176, 529);
             tabPage9.TabIndex = 1;
             tabPage9.Text = "Piped & PTY";
             tabPage9.UseVisualStyleBackColor = true;
@@ -1115,7 +1110,7 @@
             tabControl8.Location = new Point(3, 3);
             tabControl8.Name = "tabControl8";
             tabControl8.SelectedIndex = 0;
-            tabControl8.Size = new Size(1000, 445);
+            tabControl8.Size = new Size(1170, 523);
             tabControl8.TabIndex = 5;
             // 
             // tabPage10
@@ -1126,7 +1121,7 @@
             tabPage10.Location = new Point(4, 28);
             tabPage10.Name = "tabPage10";
             tabPage10.Padding = new Padding(3);
-            tabPage10.Size = new Size(992, 413);
+            tabPage10.Size = new Size(1162, 491);
             tabPage10.TabIndex = 0;
             tabPage10.Text = "tabPage10";
             tabPage10.UseVisualStyleBackColor = true;
@@ -1140,7 +1135,7 @@
             webViewShell.Dock = DockStyle.Fill;
             webViewShell.Location = new Point(3, 43);
             webViewShell.Name = "webViewShell";
-            webViewShell.Size = new Size(986, 340);
+            webViewShell.Size = new Size(1156, 418);
             webViewShell.TabIndex = 2;
             webViewShell.ZoomFactor = 1D;
             // 
@@ -1149,9 +1144,9 @@
             textBox5.BackColor = Color.Black;
             textBox5.Dock = DockStyle.Bottom;
             textBox5.ForeColor = Color.FromArgb(224, 224, 224);
-            textBox5.Location = new Point(3, 383);
+            textBox5.Location = new Point(3, 461);
             textBox5.Name = "textBox5";
-            textBox5.Size = new Size(986, 27);
+            textBox5.Size = new Size(1156, 27);
             textBox5.TabIndex = 5;
             textBox5.KeyDown += textBox5_KeyDown;
             // 
@@ -1163,7 +1158,7 @@
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(3, 3);
             panel1.Name = "panel1";
-            panel1.Size = new Size(986, 40);
+            panel1.Size = new Size(1156, 40);
             panel1.TabIndex = 6;
             // 
             // textBox4
@@ -1196,7 +1191,7 @@
             tabPage19.Location = new Point(4, 24);
             tabPage19.Name = "tabPage19";
             tabPage19.Padding = new Padding(3);
-            tabPage19.Size = new Size(992, 417);
+            tabPage19.Size = new Size(1162, 495);
             tabPage19.TabIndex = 1;
             tabPage19.Text = "tabPage19";
             // 
@@ -1208,7 +1203,7 @@
             webViewLinuxShell.DefaultBackgroundColor = Color.White;
             webViewLinuxShell.Location = new Point(6, 39);
             webViewLinuxShell.Name = "webViewLinuxShell";
-            webViewLinuxShell.Size = new Size(980, 372);
+            webViewLinuxShell.Size = new Size(1150, 450);
             webViewLinuxShell.TabIndex = 7;
             webViewLinuxShell.ZoomFactor = 1D;
             // 
@@ -1240,7 +1235,7 @@
             tabPage4.Controls.Add(toolStrip4);
             tabPage4.Location = new Point(4, 28);
             tabPage4.Name = "tabPage4";
-            tabPage4.Size = new Size(1014, 479);
+            tabPage4.Size = new Size(1184, 557);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "Database";
             tabPage4.UseVisualStyleBackColor = true;
@@ -1261,7 +1256,7 @@
             // 
             splitContainer3.Panel2.Controls.Add(tabControl4);
             splitContainer3.Panel2.Controls.Add(toolStrip6);
-            splitContainer3.Size = new Size(1014, 426);
+            splitContainer3.Size = new Size(1184, 504);
             splitContainer3.SplitterDistance = 256;
             splitContainer3.TabIndex = 1;
             // 
@@ -1280,8 +1275,8 @@
             // splitContainer5.Panel2
             // 
             splitContainer5.Panel2.Controls.Add(listView4);
-            splitContainer5.Size = new Size(256, 401);
-            splitContainer5.SplitterDistance = 188;
+            splitContainer5.Size = new Size(256, 479);
+            splitContainer5.SplitterDistance = 266;
             splitContainer5.TabIndex = 2;
             // 
             // treeView2
@@ -1293,7 +1288,7 @@
             treeView2.Location = new Point(0, 0);
             treeView2.Name = "treeView2";
             treeView2.SelectedImageIndex = 0;
-            treeView2.Size = new Size(256, 188);
+            treeView2.Size = new Size(256, 266);
             treeView2.TabIndex = 1;
             treeView2.AfterSelect += treeView2_AfterSelect;
             treeView2.DoubleClick += treeView2_DoubleClick;
@@ -1386,7 +1381,7 @@
             toolStrip5.Dock = DockStyle.Bottom;
             toolStrip5.Font = new Font("Microsoft JhengHei UI", 11.25F);
             toolStrip5.Items.AddRange(new ToolStripItem[] { toolStripLabel1 });
-            toolStrip5.Location = new Point(0, 401);
+            toolStrip5.Location = new Point(0, 479);
             toolStrip5.Name = "toolStrip5";
             toolStrip5.Size = new Size(256, 25);
             toolStrip5.TabIndex = 0;
@@ -1405,7 +1400,7 @@
             tabControl4.Location = new Point(0, 0);
             tabControl4.Name = "tabControl4";
             tabControl4.SelectedIndex = 0;
-            tabControl4.Size = new Size(754, 401);
+            tabControl4.Size = new Size(924, 479);
             tabControl4.TabIndex = 2;
             // 
             // toolStrip6
@@ -1413,9 +1408,9 @@
             toolStrip6.Dock = DockStyle.Bottom;
             toolStrip6.Font = new Font("Microsoft JhengHei UI", 11.25F);
             toolStrip6.Items.AddRange(new ToolStripItem[] { toolStripLabel2 });
-            toolStrip6.Location = new Point(0, 401);
+            toolStrip6.Location = new Point(0, 479);
             toolStrip6.Name = "toolStrip6";
-            toolStrip6.Size = new Size(754, 25);
+            toolStrip6.Size = new Size(924, 25);
             toolStrip6.TabIndex = 0;
             toolStrip6.Text = "toolStrip6";
             // 
@@ -1430,7 +1425,7 @@
             textBox2.Dock = DockStyle.Top;
             textBox2.Location = new Point(0, 26);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(1014, 27);
+            textBox2.Size = new Size(1184, 27);
             textBox2.TabIndex = 3;
             // 
             // toolStrip4
@@ -1439,7 +1434,7 @@
             toolStrip4.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton2 });
             toolStrip4.Location = new Point(0, 0);
             toolStrip4.Name = "toolStrip4";
-            toolStrip4.Size = new Size(1014, 26);
+            toolStrip4.Size = new Size(1184, 26);
             toolStrip4.TabIndex = 0;
             toolStrip4.Text = "toolStrip4";
             // 
@@ -1472,7 +1467,7 @@
             tabPage5.Controls.Add(splitContainer4);
             tabPage5.Location = new Point(4, 28);
             tabPage5.Name = "tabPage5";
-            tabPage5.Size = new Size(1014, 479);
+            tabPage5.Size = new Size(1184, 557);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "Code Exec";
             tabPage5.UseVisualStyleBackColor = true;
@@ -1491,7 +1486,7 @@
             // splitContainer4.Panel2
             // 
             splitContainer4.Panel2.Controls.Add(tabControl5);
-            splitContainer4.Size = new Size(1014, 479);
+            splitContainer4.Size = new Size(1184, 557);
             splitContainer4.SplitterDistance = 451;
             splitContainer4.TabIndex = 1;
             // 
@@ -1499,7 +1494,7 @@
             // 
             statusStrip4.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             statusStrip4.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel3 });
-            statusStrip4.Location = new Point(0, 455);
+            statusStrip4.Location = new Point(0, 533);
             statusStrip4.Name = "statusStrip4";
             statusStrip4.Size = new Size(451, 24);
             statusStrip4.TabIndex = 0;
@@ -1519,7 +1514,7 @@
             tabControl5.Location = new Point(0, 0);
             tabControl5.Name = "tabControl5";
             tabControl5.SelectedIndex = 0;
-            tabControl5.Size = new Size(559, 479);
+            tabControl5.Size = new Size(729, 557);
             tabControl5.SizeMode = TabSizeMode.Fixed;
             tabControl5.TabIndex = 1;
             // 
@@ -1529,7 +1524,7 @@
             tabPage11.Location = new Point(4, 28);
             tabPage11.Name = "tabPage11";
             tabPage11.Padding = new Padding(3);
-            tabPage11.Size = new Size(551, 447);
+            tabPage11.Size = new Size(721, 525);
             tabPage11.TabIndex = 0;
             tabPage11.Text = "Eval";
             tabPage11.UseVisualStyleBackColor = true;
@@ -1540,7 +1535,7 @@
             toolStrip7.Items.AddRange(new ToolStripItem[] { toolStripButton7, toolStripButton13 });
             toolStrip7.Location = new Point(3, 3);
             toolStrip7.Name = "toolStrip7";
-            toolStrip7.Size = new Size(545, 26);
+            toolStrip7.Size = new Size(715, 26);
             toolStrip7.TabIndex = 0;
             toolStrip7.Text = "toolStrip7";
             // 
@@ -1571,7 +1566,7 @@
             tabPage12.Location = new Point(4, 24);
             tabPage12.Name = "tabPage12";
             tabPage12.Padding = new Padding(3);
-            tabPage12.Size = new Size(551, 451);
+            tabPage12.Size = new Size(721, 529);
             tabPage12.TabIndex = 1;
             tabPage12.Text = "POST";
             tabPage12.UseVisualStyleBackColor = true;
@@ -1582,7 +1577,7 @@
             toolStrip8.Items.AddRange(new ToolStripItem[] { toolStripButton11, toolStripButton12 });
             toolStrip8.Location = new Point(3, 30);
             toolStrip8.Name = "toolStrip8";
-            toolStrip8.Size = new Size(545, 26);
+            toolStrip8.Size = new Size(715, 26);
             toolStrip8.TabIndex = 0;
             toolStrip8.Text = "toolStrip8";
             // 
@@ -1611,7 +1606,7 @@
             textBox11.Dock = DockStyle.Top;
             textBox11.Location = new Point(3, 3);
             textBox11.Name = "textBox11";
-            textBox11.Size = new Size(545, 27);
+            textBox11.Size = new Size(715, 27);
             textBox11.TabIndex = 1;
             textBox11.KeyDown += textBox11_KeyDown;
             // 
@@ -1619,7 +1614,7 @@
             // 
             tabPage15.Location = new Point(4, 28);
             tabPage15.Name = "tabPage15";
-            tabPage15.Size = new Size(1014, 479);
+            tabPage15.Size = new Size(1184, 557);
             tabPage15.TabIndex = 5;
             tabPage15.Text = "Linux";
             tabPage15.UseVisualStyleBackColor = true;
@@ -1702,7 +1697,7 @@
             tabPage23.Location = new Point(4, 24);
             tabPage23.Name = "tabPage23";
             tabPage23.Padding = new Padding(3);
-            tabPage23.Size = new Size(992, 364);
+            tabPage23.Size = new Size(1162, 442);
             tabPage23.TabIndex = 1;
             tabPage23.Text = "Profiles";
             tabPage23.UseVisualStyleBackColor = true;
@@ -1712,7 +1707,7 @@
             listView6.Dock = DockStyle.Fill;
             listView6.Location = new Point(3, 3);
             listView6.Name = "listView6";
-            listView6.Size = new Size(986, 358);
+            listView6.Size = new Size(1156, 436);
             listView6.TabIndex = 0;
             listView6.UseCompatibleStateImageBehavior = false;
             listView6.View = View.Details;
@@ -1722,7 +1717,7 @@
             tabPage24.Controls.Add(listView7);
             tabPage24.Location = new Point(4, 24);
             tabPage24.Name = "tabPage24";
-            tabPage24.Size = new Size(992, 364);
+            tabPage24.Size = new Size(1162, 442);
             tabPage24.TabIndex = 2;
             tabPage24.Text = "Groups";
             tabPage24.UseVisualStyleBackColor = true;
@@ -1732,7 +1727,7 @@
             listView7.Dock = DockStyle.Fill;
             listView7.Location = new Point(0, 0);
             listView7.Name = "listView7";
-            listView7.Size = new Size(992, 364);
+            listView7.Size = new Size(1162, 442);
             listView7.TabIndex = 0;
             listView7.UseCompatibleStateImageBehavior = false;
             listView7.View = View.Details;
@@ -1742,7 +1737,7 @@
             tabPage25.Controls.Add(listView8);
             tabPage25.Location = new Point(4, 24);
             tabPage25.Name = "tabPage25";
-            tabPage25.Size = new Size(992, 364);
+            tabPage25.Size = new Size(1162, 442);
             tabPage25.TabIndex = 3;
             tabPage25.Text = "Group Users";
             tabPage25.UseVisualStyleBackColor = true;
@@ -1752,7 +1747,7 @@
             listView8.Dock = DockStyle.Fill;
             listView8.Location = new Point(0, 0);
             listView8.Name = "listView8";
-            listView8.Size = new Size(992, 364);
+            listView8.Size = new Size(1162, 442);
             listView8.TabIndex = 1;
             listView8.UseCompatibleStateImageBehavior = false;
             listView8.View = View.Details;
@@ -1762,7 +1757,7 @@
             tabPage26.Controls.Add(listView9);
             tabPage26.Location = new Point(4, 24);
             tabPage26.Name = "tabPage26";
-            tabPage26.Size = new Size(992, 364);
+            tabPage26.Size = new Size(1162, 442);
             tabPage26.TabIndex = 4;
             tabPage26.Text = "Logged On";
             tabPage26.UseVisualStyleBackColor = true;
@@ -1772,7 +1767,7 @@
             listView9.Dock = DockStyle.Fill;
             listView9.Location = new Point(0, 0);
             listView9.Name = "listView9";
-            listView9.Size = new Size(992, 364);
+            listView9.Size = new Size(1162, 442);
             listView9.TabIndex = 1;
             listView9.UseCompatibleStateImageBehavior = false;
             listView9.View = View.Details;
@@ -1782,7 +1777,7 @@
             tabPage27.Controls.Add(listView10);
             tabPage27.Location = new Point(4, 24);
             tabPage27.Name = "tabPage27";
-            tabPage27.Size = new Size(992, 364);
+            tabPage27.Size = new Size(1162, 442);
             tabPage27.TabIndex = 5;
             tabPage27.Text = "Loggon Session";
             tabPage27.UseVisualStyleBackColor = true;
@@ -1792,7 +1787,7 @@
             listView10.Dock = DockStyle.Fill;
             listView10.Location = new Point(0, 0);
             listView10.Name = "listView10";
-            listView10.Size = new Size(992, 364);
+            listView10.Size = new Size(1162, 442);
             listView10.TabIndex = 1;
             listView10.UseCompatibleStateImageBehavior = false;
             listView10.View = View.Details;
@@ -1839,7 +1834,7 @@
             tabPage18.Location = new Point(4, 24);
             tabPage18.Name = "tabPage18";
             tabPage18.Padding = new Padding(3);
-            tabPage18.Size = new Size(1006, 451);
+            tabPage18.Size = new Size(1176, 529);
             tabPage18.TabIndex = 1;
             tabPage18.Text = "Registry";
             tabPage18.UseVisualStyleBackColor = true;
@@ -1858,7 +1853,7 @@
             // splitContainer6.Panel2
             // 
             splitContainer6.Panel2.Controls.Add(listView3);
-            splitContainer6.Size = new Size(1000, 368);
+            splitContainer6.Size = new Size(1170, 446);
             splitContainer6.SplitterDistance = 267;
             splitContainer6.TabIndex = 3;
             // 
@@ -1871,7 +1866,7 @@
             treeView5.Location = new Point(0, 0);
             treeView5.Name = "treeView5";
             treeView5.SelectedImageIndex = 0;
-            treeView5.Size = new Size(267, 368);
+            treeView5.Size = new Size(267, 446);
             treeView5.TabIndex = 0;
             treeView5.AfterSelect += treeView5_AfterSelect;
             // 
@@ -1958,7 +1953,7 @@
             listView3.GridLines = true;
             listView3.Location = new Point(0, 0);
             listView3.Name = "listView3";
-            listView3.Size = new Size(729, 368);
+            listView3.Size = new Size(899, 446);
             listView3.SmallImageList = regImageList;
             listView3.TabIndex = 0;
             listView3.UseCompatibleStateImageBehavior = false;
@@ -2046,16 +2041,16 @@
             textBox7.Dock = DockStyle.Top;
             textBox7.Location = new Point(3, 29);
             textBox7.Name = "textBox7";
-            textBox7.Size = new Size(1000, 27);
+            textBox7.Size = new Size(1170, 27);
             textBox7.TabIndex = 2;
             // 
             // statusStrip5
             // 
             statusStrip5.Font = new Font("Microsoft JhengHei UI", 11.25F);
             statusStrip5.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel4 });
-            statusStrip5.Location = new Point(3, 424);
+            statusStrip5.Location = new Point(3, 502);
             statusStrip5.Name = "statusStrip5";
-            statusStrip5.Size = new Size(1000, 24);
+            statusStrip5.Size = new Size(1170, 24);
             statusStrip5.TabIndex = 1;
             statusStrip5.Text = "statusStrip5";
             // 
@@ -2071,7 +2066,7 @@
             toolStrip10.Items.AddRange(new ToolStripItem[] { toolStripButton8 });
             toolStrip10.Location = new Point(3, 3);
             toolStrip10.Name = "toolStrip10";
-            toolStrip10.Size = new Size(1000, 26);
+            toolStrip10.Size = new Size(1170, 26);
             toolStrip10.TabIndex = 0;
             toolStrip10.Text = "toolStrip10";
             // 
@@ -2089,7 +2084,7 @@
             // 
             tabPage21.Location = new Point(4, 24);
             tabPage21.Name = "tabPage21";
-            tabPage21.Size = new Size(1006, 451);
+            tabPage21.Size = new Size(1176, 529);
             tabPage21.TabIndex = 2;
             tabPage21.Text = "Application";
             tabPage21.UseVisualStyleBackColor = true;
@@ -2098,9 +2093,10 @@
             // 
             tabPage30.Controls.Add(splitContainer7);
             tabPage30.Controls.Add(statusStrip8);
+            tabPage30.Controls.Add(textBox12);
             tabPage30.Location = new Point(4, 28);
             tabPage30.Name = "tabPage30";
-            tabPage30.Size = new Size(1014, 479);
+            tabPage30.Size = new Size(1184, 557);
             tabPage30.TabIndex = 9;
             tabPage30.Text = "Plugins";
             tabPage30.UseVisualStyleBackColor = true;
@@ -2109,7 +2105,7 @@
             // 
             splitContainer7.Dock = DockStyle.Fill;
             splitContainer7.FixedPanel = FixedPanel.Panel1;
-            splitContainer7.Location = new Point(0, 0);
+            splitContainer7.Location = new Point(0, 27);
             splitContainer7.Name = "splitContainer7";
             // 
             // splitContainer7.Panel1
@@ -2118,8 +2114,8 @@
             // 
             // splitContainer7.Panel2
             // 
-            splitContainer7.Panel2.Controls.Add(splitContainer8);
-            splitContainer7.Size = new Size(1014, 455);
+            splitContainer7.Panel2.Controls.Add(webViewPlugin);
+            splitContainer7.Size = new Size(1184, 506);
             splitContainer7.SplitterDistance = 290;
             splitContainer7.TabIndex = 0;
             splitContainer7.SplitterMoved += splitContainer7_SplitterMoved;
@@ -2129,56 +2125,29 @@
             treeView1.Dock = DockStyle.Fill;
             treeView1.Location = new Point(0, 0);
             treeView1.Name = "treeView1";
-            treeView1.Size = new Size(290, 455);
+            treeView1.Size = new Size(290, 506);
             treeView1.TabIndex = 0;
+            treeView1.AfterSelect += treeView1_AfterSelect;
             // 
-            // splitContainer8
+            // webViewPlugin
             // 
-            splitContainer8.Dock = DockStyle.Fill;
-            splitContainer8.FixedPanel = FixedPanel.Panel2;
-            splitContainer8.Location = new Point(0, 0);
-            splitContainer8.Name = "splitContainer8";
-            splitContainer8.Orientation = Orientation.Horizontal;
-            // 
-            // splitContainer8.Panel1
-            // 
-            splitContainer8.Panel1.Controls.Add(webView21);
-            // 
-            // splitContainer8.Panel2
-            // 
-            splitContainer8.Panel2.Controls.Add(richTextBox3);
-            splitContainer8.Size = new Size(720, 455);
-            splitContainer8.SplitterDistance = 268;
-            splitContainer8.TabIndex = 0;
-            // 
-            // webView21
-            // 
-            webView21.AllowExternalDrop = true;
-            webView21.CreationProperties = null;
-            webView21.DefaultBackgroundColor = Color.White;
-            webView21.Dock = DockStyle.Fill;
-            webView21.Location = new Point(0, 0);
-            webView21.Name = "webView21";
-            webView21.Size = new Size(720, 268);
-            webView21.TabIndex = 0;
-            webView21.ZoomFactor = 1D;
-            // 
-            // richTextBox3
-            // 
-            richTextBox3.Dock = DockStyle.Fill;
-            richTextBox3.Location = new Point(0, 0);
-            richTextBox3.Name = "richTextBox3";
-            richTextBox3.Size = new Size(720, 183);
-            richTextBox3.TabIndex = 0;
-            richTextBox3.Text = "";
+            webViewPlugin.AllowExternalDrop = true;
+            webViewPlugin.CreationProperties = null;
+            webViewPlugin.DefaultBackgroundColor = Color.White;
+            webViewPlugin.Dock = DockStyle.Fill;
+            webViewPlugin.Location = new Point(0, 0);
+            webViewPlugin.Name = "webViewPlugin";
+            webViewPlugin.Size = new Size(890, 506);
+            webViewPlugin.TabIndex = 1;
+            webViewPlugin.ZoomFactor = 1D;
             // 
             // statusStrip8
             // 
             statusStrip8.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             statusStrip8.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel8 });
-            statusStrip8.Location = new Point(0, 455);
+            statusStrip8.Location = new Point(0, 533);
             statusStrip8.Name = "statusStrip8";
-            statusStrip8.Size = new Size(1014, 24);
+            statusStrip8.Size = new Size(1184, 24);
             statusStrip8.TabIndex = 1;
             statusStrip8.Text = "statusStrip8";
             // 
@@ -2195,7 +2164,7 @@
             tabPage28.Controls.Add(toolStrip12);
             tabPage28.Location = new Point(4, 28);
             tabPage28.Name = "tabPage28";
-            tabPage28.Size = new Size(1014, 479);
+            tabPage28.Size = new Size(1184, 557);
             tabPage28.TabIndex = 7;
             tabPage28.Text = "Note";
             tabPage28.UseVisualStyleBackColor = true;
@@ -2207,7 +2176,7 @@
             textEditorControl1.IsReadOnly = false;
             textEditorControl1.Location = new Point(0, 26);
             textEditorControl1.Name = "textEditorControl1";
-            textEditorControl1.Size = new Size(1014, 429);
+            textEditorControl1.Size = new Size(1184, 507);
             textEditorControl1.TabIndex = 2;
             textEditorControl1.KeyDown += textEditorControl1_KeyDown;
             // 
@@ -2215,9 +2184,9 @@
             // 
             statusStrip7.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             statusStrip7.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel7 });
-            statusStrip7.Location = new Point(0, 455);
+            statusStrip7.Location = new Point(0, 533);
             statusStrip7.Name = "statusStrip7";
-            statusStrip7.Size = new Size(1014, 24);
+            statusStrip7.Size = new Size(1184, 24);
             statusStrip7.TabIndex = 3;
             statusStrip7.Text = "statusStrip7";
             // 
@@ -2233,7 +2202,7 @@
             toolStrip12.Items.AddRange(new ToolStripItem[] { toolStripButton10 });
             toolStrip12.Location = new Point(0, 0);
             toolStrip12.Name = "toolStrip12";
-            toolStrip12.Size = new Size(1014, 26);
+            toolStrip12.Size = new Size(1184, 26);
             toolStrip12.TabIndex = 1;
             toolStrip12.Text = "toolStrip12";
             // 
@@ -2326,6 +2295,14 @@
             label1.Size = new Size(80, 19);
             label1.TabIndex = 0;
             label1.Text = "Webshell :";
+            // 
+            // textBox12
+            // 
+            textBox12.Dock = DockStyle.Top;
+            textBox12.Location = new Point(0, 0);
+            textBox12.Name = "textBox12";
+            textBox12.Size = new Size(1184, 27);
+            textBox12.TabIndex = 2;
             // 
             // frmControlPanel
             // 
@@ -2465,11 +2442,7 @@
             splitContainer7.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer7).EndInit();
             splitContainer7.ResumeLayout(false);
-            splitContainer8.Panel1.ResumeLayout(false);
-            splitContainer8.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)splitContainer8).EndInit();
-            splitContainer8.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)webView21).EndInit();
+            ((System.ComponentModel.ISupportInitialize)webViewPlugin).EndInit();
             statusStrip8.ResumeLayout(false);
             statusStrip8.PerformLayout();
             tabPage28.ResumeLayout(false);
@@ -2695,11 +2668,10 @@
         private ToolStripButton toolStripButton14;
         private ToolStripButton toolStripButton15;
         private SplitContainer splitContainer7;
-        private SplitContainer splitContainer8;
         private StatusStrip statusStrip8;
         private ToolStripStatusLabel toolStripStatusLabel8;
-        private Microsoft.Web.WebView2.WinForms.WebView2 webView21;
         private TreeView treeView1;
-        private RichTextBox richTextBox3;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webViewPlugin;
+        private TextBox textBox12;
     }
 }

@@ -40,6 +40,7 @@ namespace Alien
         public clsfnRunScript m_runScript { get; init; }
         public clsfnWinReg m_winReg { get; init; }
         public clsfnWinUser m_winUser { get; init; }
+        public clsfnPlugin m_plugin { get; init; }
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
         private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
@@ -93,6 +94,8 @@ namespace Alien
 
             m_winReg = new clsfnWinReg(web);
             m_winUser = new clsfnWinUser(web);
+
+            m_plugin = new clsfnPlugin(web);
 
             m_dbMgr = new clsfnDb(web, "db.sqlite");
         }
@@ -1353,6 +1356,7 @@ namespace Alien
             toolStripStatusLabel5.Text = string.Empty;
             toolStripStatusLabel6.Text = string.Empty;
             toolStripStatusLabel7.Text = string.Empty;
+            toolStripStatusLabel8.Text = "Loading...";
 
             textBox8.Text = m_victim.ShellURL;
 
@@ -1579,6 +1583,37 @@ namespace Alien
                 await fnWinUserInit();
                 await fnRegInit();
             }
+
+            // Plugins
+
+            /*
+              
+            var plugins = m_plugin.fnGetPlugins();
+            foreach (var plugin in plugins)
+            {
+                TreeNode node = new TreeNode(plugin.szPluginName);
+                node.Tag = plugin;
+
+                treeView1.Nodes.Add(node);
+            }
+
+            */
+
+            string szEnv = Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/");
+
+            await webViewPlugin.EnsureCoreWebView2Async(null);
+            webViewPlugin.CoreWebView2.AddHostObjectToScript("nativeBridge", new clsfnPlugin.clsBridge(m_web, szEnv));
+
+            string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
+            webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+
+            foreach (string szDir in Directory.GetDirectories(Path.Combine(Application.StartupPath, "Plugins")))
+            {
+                TreeNode node = new TreeNode(Path.GetFileName(szDir));
+                treeView1.Nodes.Add(node);
+            }
+
+            toolStripStatusLabel8.Text = $"Module[{treeView1.Nodes.Count}]";
 
             // Note
             try
@@ -2965,6 +3000,47 @@ namespace Alien
         private void splitContainer7_SplitterMoved(object sender, SplitterEventArgs e)
         {
 
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            TreeNode node = treeView1.SelectedNode;
+            if (node == null)
+                return;
+
+            string szDir = Path.Combine(Application.StartupPath, "Plugins", node.FullPath);
+
+            var manifest = m_plugin.fnLoadPluginManifest(szDir);
+            if (manifest == null || !manifest.HasValue)
+            {
+                string szIndexPath = Path.Combine(szDir, "index.html");
+                string[] nodes = node.Nodes.Cast<TreeNode>().Select(x => x.Text).ToArray();
+
+                foreach (string szDirName in Directory.GetDirectories(szDir))
+                {
+                    if (nodes.Contains(Path.GetFileName(szDirName)))
+                        continue;
+
+                    TreeNode nodeDir = new TreeNode(Path.GetFileName(szDirName));
+                    node.Nodes.Add(nodeDir);
+                }
+
+                node.Expand();
+
+                if (!File.Exists(szIndexPath))
+                    return;
+
+                webViewPlugin.CoreWebView2.Navigate(szIndexPath);
+
+                return;
+            }
+
+            var plugin = manifest.Value;
+
+            string szHtmlPath = Path.Combine(Application.StartupPath, "Plugins", node.FullPath, "index.html");
+            webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+
+            textBox12.Text = node.FullPath;
         }
     }
 }

