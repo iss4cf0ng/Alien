@@ -116,7 +116,7 @@ namespace Alien
         /// <summary>
         /// 
         /// </summary>
-        private Dictionary<enLanguage, string[]> m_dicRemoveSyntax = new Dictionary<enLanguage, string[]>()
+        public static Dictionary<enLanguage, string[]> m_dicRemoveSyntax = new Dictionary<enLanguage, string[]>()
         {
             {
                 enLanguage.PHP,

