@@ -66,6 +66,9 @@ namespace Alien
 
             comboBox5.SelectedIndex = 0;
 
+            comboBox7.SelectedIndex = 0;
+            comboBox7.DropDownStyle = ComboBoxStyle.DropDownList;
+
             // Load groups
 
             foreach (string szName in m_lsGroupName)
@@ -265,6 +268,12 @@ namespace Alien
                 return;
 
             textEditorControl1.Text = szJson;
+            textEditorControl1.Refresh();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("The User-Agent will be randomly selected if it is empty.", "What is this?", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

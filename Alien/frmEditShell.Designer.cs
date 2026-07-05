@@ -60,6 +60,7 @@
             label4 = new Label();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            button4 = new Button();
             textBox6 = new TextBox();
             label14 = new Label();
             comboBox7 = new ComboBox();
@@ -290,7 +291,7 @@
             // 
             textBox4.Location = new Point(104, 300);
             textBox4.Name = "textBox4";
-            textBox4.Size = new Size(370, 27);
+            textBox4.Size = new Size(306, 27);
             textBox4.TabIndex = 20;
             // 
             // groupBox2
@@ -391,6 +392,7 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(button4);
             tabPage1.Controls.Add(textBox6);
             tabPage1.Controls.Add(label14);
             tabPage1.Controls.Add(comboBox7);
@@ -409,6 +411,16 @@
             tabPage1.TabIndex = 0;
             tabPage1.Text = "General";
             tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            button4.Location = new Point(416, 300);
+            button4.Name = "button4";
+            button4.Size = new Size(64, 27);
+            button4.TabIndex = 29;
+            button4.Text = "?";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
             // 
             // textBox6
             // 
@@ -429,6 +441,7 @@
             // comboBox7
             // 
             comboBox7.FormattingEnabled = true;
+            comboBox7.Items.AddRange(new object[] { "Start", "End" });
             comboBox7.Location = new Point(322, 366);
             comboBox7.Name = "comboBox7";
             comboBox7.Size = new Size(152, 27);
@@ -570,5 +583,6 @@
         private GroupBox groupBox4;
         private RichTextBox richTextBox1;
         private TabPage tabPage3;
+        private Button button4;
     }
 }

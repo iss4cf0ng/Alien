@@ -93,11 +93,22 @@ namespace Alien
                 m_szEnvironment = szEnvironment;
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
             public string fnGetShellType()
             {
                 return m_szEnvironment;
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="szDirName"></param>
+            /// <param name="szEnv"></param>
+            /// <param name="szName"></param>
+            /// <returns></returns>
             public string fnGetPayload(string szDirName, string szEnv, string szName)
             {
                 string szPayloadPath = Path.Combine(szDirName, "payloads", szEnv, $"{szName}.{clsWeb.m_dicSuffix[m_web.m_victim.ShellLanguage]}").Replace("/", "\\");
@@ -112,6 +123,11 @@ namespace Alien
                 return szPayload;
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="szFilePath"></param>
+            /// <returns></returns>
             public string fnReadFileText(string szFilePath)
             {
                 if (!File.Exists(szFilePath))
@@ -120,6 +136,11 @@ namespace Alien
                 return File.ReadAllText(szFilePath);
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="szFilePath"></param>
+            /// <returns></returns>
             public string fnReadFileBytes(string szFilePath)
             {
                 if (!File.Exists(szFilePath))
@@ -128,6 +149,13 @@ namespace Alien
                 return Convert.ToBase64String(File.ReadAllBytes(szFilePath));
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="szJson"></param>
+            /// <param name="szPayload"></param>
+            /// <param name="szEnvironment"></param>
+            /// <returns></returns>
             public async Task<string> fnRun(string szJson, string szPayload, string szEnvironment)
             {
                 string szResp = await m_web.fnszSendPayload("eval", new string[] { szPayload, szJson });

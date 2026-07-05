@@ -47,10 +47,20 @@
             textEditorControl2 = new ICSharpCode.TextEditor.TextEditorControl();
             groupBox1 = new GroupBox();
             tabPage2 = new TabPage();
+            groupBox3 = new GroupBox();
+            textEditorControl3 = new ICSharpCode.TextEditor.TextEditorControl();
+            button7 = new Button();
+            button6 = new Button();
+            textBox4 = new TextBox();
+            label4 = new Label();
+            label3 = new Label();
+            comboBox3 = new ComboBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
+            tabPage2.SuspendLayout();
+            groupBox3.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -93,7 +103,7 @@
             button1.Name = "button1";
             button1.Size = new Size(253, 52);
             button1.TabIndex = 4;
-            button1.Text = "Build";
+            button1.Text = "Save";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
@@ -201,14 +211,14 @@
             label2.Location = new Point(268, 13);
             label2.Margin = new Padding(4, 0, 4, 0);
             label2.Name = "label2";
-            label2.Size = new Size(56, 19);
+            label2.Size = new Size(82, 19);
             label2.TabIndex = 7;
-            label2.Text = "Script :";
+            label2.Text = "Language:";
             // 
             // comboBox2
             // 
             comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(332, 10);
+            comboBox2.Location = new Point(358, 10);
             comboBox2.Margin = new Padding(4);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(154, 27);
@@ -249,13 +259,97 @@
             // 
             // tabPage2
             // 
-            tabPage2.Location = new Point(4, 24);
+            tabPage2.Controls.Add(groupBox3);
+            tabPage2.Controls.Add(button7);
+            tabPage2.Controls.Add(button6);
+            tabPage2.Controls.Add(textBox4);
+            tabPage2.Controls.Add(label4);
+            tabPage2.Controls.Add(label3);
+            tabPage2.Controls.Add(comboBox3);
+            tabPage2.Location = new Point(4, 28);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(792, 423);
+            tabPage2.Size = new Size(792, 419);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "NebulaPulsar";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(textEditorControl3);
+            groupBox3.Location = new Point(9, 41);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(775, 310);
+            groupBox3.TabIndex = 15;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Webshell";
+            // 
+            // textEditorControl3
+            // 
+            textEditorControl3.Dock = DockStyle.Fill;
+            textEditorControl3.Font = new Font("Courier New", 10F);
+            textEditorControl3.IsReadOnly = false;
+            textEditorControl3.Location = new Point(3, 23);
+            textEditorControl3.Name = "textEditorControl3";
+            textEditorControl3.Size = new Size(769, 284);
+            textEditorControl3.TabIndex = 0;
+            textEditorControl3.Text = "textEditorControl3";
+            // 
+            // button7
+            // 
+            button7.Location = new Point(406, 357);
+            button7.Name = "button7";
+            button7.Size = new Size(378, 54);
+            button7.TabIndex = 14;
+            button7.Text = "Save";
+            button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
+            // 
+            // button6
+            // 
+            button6.Location = new Point(9, 357);
+            button6.Name = "button6";
+            button6.Size = new Size(378, 54);
+            button6.TabIndex = 13;
+            button6.Text = "Copy";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
+            // textBox4
+            // 
+            textBox4.Location = new Point(370, 7);
+            textBox4.Name = "textBox4";
+            textBox4.Size = new Size(256, 27);
+            textBox4.TabIndex = 12;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(322, 10);
+            label4.Margin = new Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(41, 19);
+            label4.TabIndex = 11;
+            label4.Text = "Key :";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(9, 10);
+            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(82, 19);
+            label3.TabIndex = 9;
+            label3.Text = "Language:";
+            // 
+            // comboBox3
+            // 
+            comboBox3.FormattingEnabled = true;
+            comboBox3.Location = new Point(99, 7);
+            comboBox3.Margin = new Padding(4);
+            comboBox3.Name = "comboBox3";
+            comboBox3.Size = new Size(154, 27);
+            comboBox3.TabIndex = 10;
             // 
             // frmBuilder
             // 
@@ -275,6 +369,9 @@
             tabPage1.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
+            tabPage2.ResumeLayout(false);
+            tabPage2.PerformLayout();
+            groupBox3.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -299,5 +396,13 @@
         private Button button5;
         private Button button4;
         private TextBox textBox1;
+        private TextBox textBox4;
+        private Label label4;
+        private Label label3;
+        private ComboBox comboBox3;
+        private GroupBox groupBox3;
+        private ICSharpCode.TextEditor.TextEditorControl textEditorControl3;
+        private Button button7;
+        private Button button6;
     }
 }

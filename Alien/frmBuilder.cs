@@ -32,9 +32,11 @@ namespace Alien
                 return;
 
             var json = JsonConvert.DeserializeObject<Dictionary<string, object>>(textEditorControl1.Text);
-            if (json == null && bShowError)
+            if (json == null)
             {
-                MessageBox.Show("JSON deserialization is failed, please check your JSON!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (bShowError)
+                    MessageBox.Show("JSON deserialization is failed, please check your JSON!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return;
             }
 
@@ -59,6 +61,7 @@ namespace Alien
         {
             textEditorControl1.Text = string.Empty;
             textEditorControl2.Text = string.Empty;
+            textEditorControl3.Text = string.Empty;
 
             string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper\\Obfuscators");
             if (Directory.Exists(szTamperDirPath))
@@ -106,7 +109,14 @@ namespace Alien
             SaveFileDialog sfd = new SaveFileDialog();
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                File.WriteAllText(sfd.FileName, textEditorControl2.Text);
+                try
+                {
+                    File.WriteAllText(sfd.FileName, textEditorControl2.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -181,6 +191,27 @@ namespace Alien
         private async void textEditorControl1_TextChanged(object sender, EventArgs e)
         {
             await fnUpdateTamperPayload(false);
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(textEditorControl3.Text);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    File.WriteAllText(sfd.FileName, textEditorControl3.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }
