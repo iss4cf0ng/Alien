@@ -1339,6 +1339,8 @@ namespace Alien
 
         async void fnClose()
         {
+            timerShell.Stop();
+
             //await m_web.DisposeAsync();
         }
 
