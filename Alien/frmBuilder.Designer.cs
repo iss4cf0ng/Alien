@@ -49,7 +49,7 @@
             // 
             comboBox1.FormattingEnabled = true;
             comboBox1.Location = new Point(240, 61);
-            comboBox1.Margin = new Padding(4, 4, 4, 4);
+            comboBox1.Margin = new Padding(4);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(154, 27);
             comboBox1.TabIndex = 1;
@@ -57,7 +57,7 @@
             // textBox1
             // 
             textBox1.Location = new Point(240, 96);
-            textBox1.Margin = new Padding(4, 4, 4, 4);
+            textBox1.Margin = new Padding(4);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(127, 27);
             textBox1.TabIndex = 2;
@@ -67,7 +67,7 @@
             textEditorControl1.Font = new Font("Courier New", 10F);
             textEditorControl1.IsReadOnly = false;
             textEditorControl1.Location = new Point(114, 131);
-            textEditorControl1.Margin = new Padding(4, 4, 4, 4);
+            textEditorControl1.Margin = new Padding(4);
             textEditorControl1.Name = "textEditorControl1";
             textEditorControl1.Size = new Size(531, 215);
             textEditorControl1.TabIndex = 3;
@@ -76,7 +76,7 @@
             // button1
             // 
             button1.Location = new Point(114, 354);
-            button1.Margin = new Padding(4, 4, 4, 4);
+            button1.Margin = new Padding(4);
             button1.Name = "button1";
             button1.Size = new Size(316, 71);
             button1.TabIndex = 4;
@@ -94,9 +94,10 @@
             Controls.Add(comboBox1);
             Controls.Add(label1);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            Margin = new Padding(4, 4, 4, 4);
+            Margin = new Padding(4);
             Name = "frmBuilder";
             Text = "frmBuilder";
+            Load += frmBuilder_Load;
             ResumeLayout(false);
             PerformLayout();
         }

@@ -386,7 +386,8 @@ namespace Alien
 
         private void toolStripMenuItem7_Click(object sender, EventArgs e)
         {
-
+            frmBuilder f = new frmBuilder();
+            f.Show();
         }
     }
 }
