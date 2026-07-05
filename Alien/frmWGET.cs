@@ -101,6 +101,8 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            m_frmCtrl.fnFileMgrRefresh();
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
