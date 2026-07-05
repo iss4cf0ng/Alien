@@ -51,6 +51,7 @@
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
             columnHeader3 = new ColumnHeader();
+            columnHeader7 = new ColumnHeader();
             columnHeader4 = new ColumnHeader();
             columnHeader5 = new ColumnHeader();
             columnHeader6 = new ColumnHeader();
@@ -65,7 +66,6 @@
             imageList1 = new ImageList(components);
             textBox1 = new TextBox();
             timer1 = new System.Windows.Forms.Timer(components);
-            columnHeader7 = new ColumnHeader();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -98,14 +98,14 @@
             // toolStripMenuItem7
             // 
             toolStripMenuItem7.Name = "toolStripMenuItem7";
-            toolStripMenuItem7.Size = new Size(180, 24);
+            toolStripMenuItem7.Size = new Size(114, 24);
             toolStripMenuItem7.Text = "Build";
             toolStripMenuItem7.Click += toolStripMenuItem7_Click;
             // 
             // toolStripMenuItem8
             // 
             toolStripMenuItem8.Name = "toolStripMenuItem8";
-            toolStripMenuItem8.Size = new Size(180, 24);
+            toolStripMenuItem8.Size = new Size(114, 24);
             toolStripMenuItem8.Text = "Add";
             toolStripMenuItem8.Click += toolStripMenuItem8_Click;
             // 
@@ -253,6 +253,11 @@
             columnHeader3.Text = "Script";
             columnHeader3.Width = 100;
             // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "Description";
+            columnHeader7.Width = 200;
+            // 
             // columnHeader4
             // 
             columnHeader4.Text = "Creation Date";
@@ -338,11 +343,6 @@
             textBox1.TabIndex = 1;
             textBox1.KeyDown += textBox1_KeyDown;
             // 
-            // columnHeader7
-            // 
-            columnHeader7.Text = "Description";
-            columnHeader7.Width = 200;
-            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -357,6 +357,7 @@
             Name = "frmMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
+            FormClosing += frmMain_FormClosing;
             Load += Form1_Load;
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();

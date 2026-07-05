@@ -120,11 +120,6 @@ namespace Alien
             }
         }
 
-        public async Task<string?> fnBuildPayload(string szScriptName, Dictionary<string, object> dicParams = null)
-        {
-            return await fnSendRequest("build", szScriptName, string.Empty, dicParams);
-        }
-
         public async Task<string?> fnObfuscate(string szScriptName, string szPayload, Dictionary<string, object> dicParams = null)
         {
             return await fnSendRequest("obfuscate", szScriptName, szPayload, dicParams);
@@ -170,7 +165,9 @@ namespace Alien
                 if (!resp.IsSuccessStatusCode)
                 {
                     string szContent = await resp.Content.ReadAsStringAsync();
-                    throw new Exception($"Python engine error ({resp.StatusCode}): {szContent}");
+                    MessageBox.Show("Backend server return error: " + "\n" + szContent, $"HTTP {(int)resp.StatusCode} {resp.StatusCode.ToString()}", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                    return string.Empty;
                 }
 
                 string szJsonResult = await resp.Content.ReadAsStringAsync();

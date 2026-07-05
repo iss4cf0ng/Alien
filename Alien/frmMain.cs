@@ -386,8 +386,15 @@ namespace Alien
 
         private void toolStripMenuItem7_Click(object sender, EventArgs e)
         {
-            frmBuilder f = new frmBuilder();
+            frmBuilder f = new frmBuilder(m_tamper);
+            f.StartPosition = FormStartPosition.CenterScreen;
+
             f.Show();
+        }
+
+        private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            m_tamper.Dispose();
         }
     }
 }
