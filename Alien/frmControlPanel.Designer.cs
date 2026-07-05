@@ -30,8 +30,8 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmControlPanel));
-            TreeNode treeNode3 = new TreeNode("Upload");
-            TreeNode treeNode4 = new TreeNode("Download");
+            TreeNode treeNode1 = new TreeNode("Upload");
+            TreeNode treeNode2 = new TreeNode("Download");
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             statusStrip2 = new StatusStrip();
@@ -228,6 +228,7 @@
             webViewPlugin = new Microsoft.Web.WebView2.WinForms.WebView2();
             statusStrip8 = new StatusStrip();
             toolStripStatusLabel8 = new ToolStripStatusLabel();
+            textBox12 = new TextBox();
             tabPage28 = new TabPage();
             textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
             statusStrip7 = new StatusStrip();
@@ -245,7 +246,6 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
-            textBox12 = new TextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip2.SuspendLayout();
@@ -501,10 +501,10 @@
             // tabPage14
             // 
             tabPage14.Controls.Add(treeView4);
-            tabPage14.Location = new Point(4, 24);
+            tabPage14.Location = new Point(4, 28);
             tabPage14.Name = "tabPage14";
             tabPage14.Padding = new Padding(3);
-            tabPage14.Size = new Size(252, 408);
+            tabPage14.Size = new Size(252, 404);
             tabPage14.TabIndex = 1;
             tabPage14.Text = "Task";
             tabPage14.UseVisualStyleBackColor = true;
@@ -514,12 +514,12 @@
             treeView4.Dock = DockStyle.Fill;
             treeView4.Location = new Point(3, 3);
             treeView4.Name = "treeView4";
-            treeNode3.Name = "Node0";
-            treeNode3.Text = "Upload";
-            treeNode4.Name = "Node1";
-            treeNode4.Text = "Download";
-            treeView4.Nodes.AddRange(new TreeNode[] { treeNode3, treeNode4 });
-            treeView4.Size = new Size(246, 402);
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "Upload";
+            treeNode2.Name = "Node1";
+            treeNode2.Text = "Download";
+            treeView4.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2 });
+            treeView4.Size = new Size(246, 398);
             treeView4.TabIndex = 0;
             // 
             // listView2
@@ -2157,6 +2157,14 @@
             toolStripStatusLabel8.Size = new Size(158, 19);
             toolStripStatusLabel8.Text = "toolStripStatusLabel8";
             // 
+            // textBox12
+            // 
+            textBox12.Dock = DockStyle.Top;
+            textBox12.Location = new Point(0, 0);
+            textBox12.Name = "textBox12";
+            textBox12.Size = new Size(1184, 27);
+            textBox12.TabIndex = 2;
+            // 
             // tabPage28
             // 
             tabPage28.Controls.Add(textEditorControl1);
@@ -2295,14 +2303,6 @@
             label1.Size = new Size(80, 19);
             label1.TabIndex = 0;
             label1.Text = "Webshell :";
-            // 
-            // textBox12
-            // 
-            textBox12.Dock = DockStyle.Top;
-            textBox12.Location = new Point(0, 0);
-            textBox12.Name = "textBox12";
-            textBox12.Size = new Size(1184, 27);
-            textBox12.TabIndex = 2;
             // 
             // frmControlPanel
             // 

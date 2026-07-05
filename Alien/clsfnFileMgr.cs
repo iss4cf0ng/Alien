@@ -18,6 +18,10 @@ namespace Alien
         public string m_szCurrentPath { get; set; }
         public string m_szHomePath { get; set; }
 
+        public bool m_moveClipboard { get; set; } = false;
+        public List<stEntry> m_dirClipboard { get; set; } = new List<stEntry>();
+        public List<stEntry> m_fileClipboard { get; set; } = new List<stEntry>();
+
         public clsfnFileMgr(clsWeb web)
         {
             m_web = web;

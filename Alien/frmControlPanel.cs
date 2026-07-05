@@ -1673,12 +1673,24 @@ namespace Alien
         //File.Copy
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
         {
+            var lsEntry = listView2.SelectedItems.Cast<ListViewItem>().Select(x => fnFileGetItemTag(x)).ToList();
+            var lsDir = lsEntry.Where(x => x.bIsDirectory).ToList();
+            var lsFile = lsEntry.Where(x => !x.bIsDirectory).ToList();
 
+            m_fileMgr.m_dirClipboard = lsDir;
+            m_fileMgr.m_fileClipboard = lsFile;
+            m_fileMgr.m_moveClipboard = false;
         }
         //File.Cut
         private void toolStripMenuItem4_Click(object sender, EventArgs e)
         {
+            var lsEntry = listView2.SelectedItems.Cast<ListViewItem>().Select(x => fnFileGetItemTag(x)).ToList();
+            var lsDir = lsEntry.Where(x => x.bIsDirectory).ToList();
+            var lsFile = lsEntry.Where(x => !x.bIsDirectory).ToList();
 
+            m_fileMgr.m_dirClipboard = lsDir;
+            m_fileMgr.m_fileClipboard = lsFile;
+            m_fileMgr.m_moveClipboard = true;
         }
         //File.Paste
         private void toolStripMenuItem5_Click(object sender, EventArgs e)

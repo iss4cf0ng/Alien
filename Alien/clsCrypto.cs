@@ -21,7 +21,7 @@ namespace Alien
             byte[] abInput = Encoding.UTF8.GetBytes(szInput);
             byte[] abHash = MD5.HashData(abInput);
 
-            string szHash = Convert.ToHexString(abHash);
+            string szHash = Convert.ToHexString(abHash).ToLower();
 
             return szHash[^16..];
         }
