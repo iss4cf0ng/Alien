@@ -1697,6 +1697,8 @@ namespace Alien
         {
             frmFileCopyMoveProgress f = new frmFileCopyMoveProgress(m_fileMgr, m_fileMgr.m_szCurrentPath);
             f.ShowDialog();
+
+            fnFileMgrRefresh();
         }
         //File.Image.ShowAll
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
@@ -1782,9 +1784,26 @@ namespace Alien
         }
 
         //File.NewFolder
-        private void toolStripMenuItem15_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem15_Click(object sender, EventArgs e)
         {
+            string szDirName = Interaction.InputBox("Dir Name: ", "Create New Directory", $"Folder_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
+            if (string.IsNullOrEmpty(szDirName))
+            {
+                MessageBox.Show("Directory name cannot be null or empty.", "Empty", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
+            szDirName = Path.Combine(m_fileMgr.m_szCurrentPath, szDirName).Replace("\\", "/").Replace("//", "/");
+
+            if (await m_fileMgr.fnbNewFolder(szDirName))
+            {
+                MessageBox.Show("Created the directory successfully!", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                fnFileMgrRefresh();
+            }
+            else
+            {
+                MessageBox.Show("Failed to create a new directory.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         //File.NewFile
         private void toolStripMenuItem16_Click(object sender, EventArgs e)
@@ -1806,7 +1825,7 @@ namespace Alien
         //File.NewFolder
         private async void toolStripMenuItem12_Click(object sender, EventArgs e)
         {
-            string szDirName = Interaction.InputBox("Dir Name: ", "Create New Directory");
+            string szDirName = Interaction.InputBox("Dir Name: ", "Create New Directory", $"Folder_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
             if (string.IsNullOrEmpty(szDirName))
             {
                 MessageBox.Show("Directory name cannot be null or empty.", "Empty", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -2685,6 +2704,38 @@ namespace Alien
 
             tabControl2.SelectedIndex = 0;
             treeView3.SelectedNode = node;
+
+            Task.Run(() =>
+            {
+                string szFileName = string.Empty;
+                Dictionary<ListViewItem, clsfnFileMgr.stEntry> dic = new Dictionary<ListViewItem, clsfnFileMgr.stEntry>();
+
+                Invoke(() =>
+                {
+                    szFileName = item.SubItems[0].Text;
+                    var items = listView2.Items.Cast<ListViewItem>()
+                            .Select(item => new { Item = item, Entry = fnFileGetItemTag(item) })
+                            .Where(x => !x.Entry.bIsDirectory)
+                            .ToList();
+
+                    foreach (var x in items)
+                        dic[x.Item] = x.Entry;
+                });
+
+                foreach (var item in dic.Keys)
+                {
+                    if (string.Equals(dic[item].szEntryName, szFileName))
+                    {
+                        Invoke(() =>
+                        {
+                            item.Selected = true;
+                            item.EnsureVisible();
+                        });
+
+                        break;
+                    }
+                }
+            });
         }
 
         private void toolStripMenuItem34_Click(object sender, EventArgs e)

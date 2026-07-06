@@ -47,6 +47,7 @@
             textEditorControl2 = new ICSharpCode.TextEditor.TextEditorControl();
             groupBox1 = new GroupBox();
             tabPage2 = new TabPage();
+            checkBox1 = new CheckBox();
             groupBox3 = new GroupBox();
             textEditorControl3 = new ICSharpCode.TextEditor.TextEditorControl();
             button7 = new Button();
@@ -55,6 +56,7 @@
             label4 = new Label();
             label3 = new Label();
             comboBox3 = new ComboBox();
+            label5 = new Label();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -66,7 +68,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(22, 13);
+            label1.Location = new Point(21, 10);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new Size(56, 19);
@@ -76,7 +78,7 @@
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(86, 10);
+            comboBox1.Location = new Point(85, 7);
             comboBox1.Margin = new Padding(4);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(154, 27);
@@ -208,7 +210,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(268, 13);
+            label2.Location = new Point(267, 10);
             label2.Margin = new Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new Size(82, 19);
@@ -218,7 +220,7 @@
             // comboBox2
             // 
             comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(358, 10);
+            comboBox2.Location = new Point(357, 7);
             comboBox2.Margin = new Padding(4);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(154, 27);
@@ -259,6 +261,8 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(label5);
+            tabPage2.Controls.Add(checkBox1);
             tabPage2.Controls.Add(groupBox3);
             tabPage2.Controls.Add(button7);
             tabPage2.Controls.Add(button6);
@@ -274,12 +278,23 @@
             tabPage2.Text = "NebulaPulsar";
             tabPage2.UseVisualStyleBackColor = true;
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(616, 9);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(92, 23);
+            checkBox1.TabIndex = 16;
+            checkBox1.Text = "Minimize";
+            checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            // 
             // groupBox3
             // 
             groupBox3.Controls.Add(textEditorControl3);
             groupBox3.Location = new Point(9, 41);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(775, 310);
+            groupBox3.Size = new Size(775, 277);
             groupBox3.TabIndex = 15;
             groupBox3.TabStop = false;
             groupBox3.Text = "Webshell";
@@ -291,7 +306,7 @@
             textEditorControl3.IsReadOnly = false;
             textEditorControl3.Location = new Point(3, 23);
             textEditorControl3.Name = "textEditorControl3";
-            textEditorControl3.Size = new Size(769, 284);
+            textEditorControl3.Size = new Size(769, 251);
             textEditorControl3.TabIndex = 0;
             textEditorControl3.Text = "textEditorControl3";
             // 
@@ -317,7 +332,7 @@
             // 
             // textBox4
             // 
-            textBox4.Location = new Point(370, 7);
+            textBox4.Location = new Point(333, 7);
             textBox4.Name = "textBox4";
             textBox4.Size = new Size(256, 27);
             textBox4.TabIndex = 12;
@@ -326,7 +341,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(322, 10);
+            label4.Location = new Point(285, 10);
             label4.Margin = new Padding(4, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new Size(41, 19);
@@ -352,6 +367,15 @@
             comboBox3.Size = new Size(154, 27);
             comboBox3.TabIndex = 10;
             comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(9, 321);
+            label5.Name = "label5";
+            label5.Size = new Size(51, 19);
+            label5.TabIndex = 17;
+            label5.Text = "label5";
             // 
             // frmBuilder
             // 
@@ -406,5 +430,7 @@
         private ICSharpCode.TextEditor.TextEditorControl textEditorControl3;
         private Button button7;
         private Button button6;
+        private CheckBox checkBox1;
+        private Label label5;
     }
 }

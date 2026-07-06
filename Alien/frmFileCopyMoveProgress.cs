@@ -41,11 +41,11 @@ namespace Alien
 
                         try
                         {
-                            string szNewPath = Path.Combine(m_szDirName, Path.GetFileName(entry.szEntryPath));
+                            string szNewPath = Path.Combine(m_szDirName, Path.GetFileName(entry.szEntryPath)).Replace("\\", "/");
 
                             Invoke(() => $"{entry.szEntryPath} => {szNewPath}");
                             if (m_fileMgr.m_moveClipboard)
-                                await m_fileMgr.fnbMove(entry.szEntryName, szNewPath);
+                                await m_fileMgr.fnbMove(entry.szEntryPath, szNewPath);
                             else
                                 await m_fileMgr.fnbCopy(entry.szEntryPath, szNewPath);
                         }
@@ -68,7 +68,11 @@ namespace Alien
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            Invoke(() => label1.Text = "Done.");
+            Invoke(() =>
+            {
+                label1.Text = "Done.";
+                Close();
+            });
         }
 
         void fnSetup()
@@ -78,9 +82,11 @@ namespace Alien
             progressBar1.Value = 0;
             progressBar1.Maximum = m_fileMgr.m_dirClipboard.Count + m_fileMgr.m_fileClipboard.Count;
 
-            Thread.Sleep(2000);
-
-            Task.Run(() => fnStart());
+            Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+                fnStart();
+            });
         }
 
         private void frmFileCopyMoveProgress_Load(object sender, EventArgs e)

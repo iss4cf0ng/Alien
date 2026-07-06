@@ -127,7 +127,6 @@ namespace Alien
             };
 
             config.szConnString = clsfnDb.fnBuildConnURL(config);
-            MessageBox.Show(config.szConnString);
 
             bool bRet = await m_db.fnDbTest(config);
             if (bRet)

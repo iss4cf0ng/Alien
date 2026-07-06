@@ -63,7 +63,13 @@ namespace Alien
             try
             {
                 textEditorControl3.Text = File.ReadAllText(m_lsNbPayload[comboBox3.SelectedIndex]).Replace("[NBPULSARDEADBEEF]", clsCrypto.fnGetMD5Last16(textBox4.Text));
+
+                if (checkBox1.Checked)
+                    textEditorControl3.Text = textEditorControl3.Text.Replace("\r", string.Empty).Replace("\n", string.Empty).Replace("\t", string.Empty).Replace("  ", string.Empty);
+
                 textEditorControl3.Refresh();
+
+                label5.Text = $"Length: {textEditorControl3.Text.Length}";
             }
             catch (Exception ex)
             {
@@ -76,6 +82,8 @@ namespace Alien
             textEditorControl1.Text = string.Empty;
             textEditorControl2.Text = string.Empty;
             textEditorControl3.Text = string.Empty;
+
+            label5.Text = string.Empty;
 
             string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper\\Obfuscators");
             if (Directory.Exists(szTamperDirPath))
@@ -246,6 +254,11 @@ namespace Alien
         }
 
         private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            fnUpdateNbPayload();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             fnUpdateNbPayload();
         }
