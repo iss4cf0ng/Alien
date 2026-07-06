@@ -57,7 +57,10 @@ namespace Alien
                 switch (lang)
                 {
                     case enLanguage.PHP:
-                        szPayload = szPayload.Replace($"$_POST['z{i}']", $"\"{clsEzData.fnszStre2b64(asParams[i])}\"");
+                        szPayload = szPayload.Replace($"$_POST['z{i}']", $"\"{asParams[i]}\"");
+                        break;
+                    case enLanguage.ASP:
+                        szPayload = szPayload.Replace($"Request(\"z{i}\")", $"\"{clsEzData.fnszStre2b64(asParams[i])}\"");
                         break;
                 }
             }
