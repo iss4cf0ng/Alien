@@ -158,8 +158,8 @@ namespace Alien
             /// <returns></returns>
             public async Task<string> fnRun(string szJson, string szPayload, string szEnvironment)
             {
-                string szResp = await m_web.fnszSendPayload("eval", new string[] { szPayload, szJson });
-
+                string szResp = await m_web.fnszSendPayload("plugin", new string[] { szPayload, szJson });
+                
                 return szResp;
             }
         }

