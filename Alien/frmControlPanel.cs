@@ -2298,7 +2298,15 @@ namespace Alien
                 if (status != "success")
                     return;
 
+                Encoding encoding = Encoding.GetEncoding(m_victim.ShellEncoding);
+
                 string szb64Msg = objJson.msg;
+                byte[] abBuffer = Convert.FromBase64String(szb64Msg);
+
+                string szText = Encoding.UTF8.GetString(abBuffer);
+                byte[] abBytes = encoding.GetBytes(szText);
+
+                szb64Msg = Convert.ToBase64String(abBytes);
                 if (string.IsNullOrEmpty(szb64Msg))
                     return;
 

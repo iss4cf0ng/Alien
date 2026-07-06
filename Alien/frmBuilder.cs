@@ -15,6 +15,7 @@ namespace Alien
     public partial class frmBuilder : Form
     {
         private clsTamper m_tamper { get; init; }
+        private List<string> m_lsNbPayload = new List<string>();
 
         public frmBuilder(clsTamper tamper)
         {
@@ -57,6 +58,19 @@ namespace Alien
             }
         }
 
+        void fnUpdateNbPayload()
+        {
+            try
+            {
+                textEditorControl3.Text = File.ReadAllText(m_lsNbPayload[comboBox3.SelectedIndex]).Replace("[NBPULSARDEADBEEF]", clsCrypto.fnGetMD5Last16(textBox4.Text));
+                textEditorControl3.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         void fnSetup()
         {
             textEditorControl1.Text = string.Empty;
@@ -87,6 +101,18 @@ namespace Alien
             comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;
             if (comboBox2.Items.Count > 0)
                 comboBox2.SelectedIndex = 0;
+
+            string szNbPayload = Path.Combine(Application.StartupPath, "Builder", "NebulaPulsar");
+            comboBox3.DropDownStyle = ComboBoxStyle.DropDownList;
+            foreach (string payload in Directory.GetFiles(szNbPayload))
+            {
+                comboBox3.Items.Add(Path.GetFileName(payload).Split('.').Last().ToUpper());
+                m_lsNbPayload.Add(payload);
+            }
+
+            comboBox3.SelectedIndex = 0;
+
+            textBox4.Text = "iss4cf0ng";
         }
 
         private void frmBuilder_Load(object sender, EventArgs e)
@@ -212,6 +238,16 @@ namespace Alien
                     MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            fnUpdateNbPayload();
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            fnUpdateNbPayload();
         }
     }
 }

@@ -321,6 +321,7 @@
             textBox4.Name = "textBox4";
             textBox4.Size = new Size(256, 27);
             textBox4.TabIndex = 12;
+            textBox4.TextChanged += textBox4_TextChanged;
             // 
             // label4
             // 
@@ -350,6 +351,7 @@
             comboBox3.Name = "comboBox3";
             comboBox3.Size = new Size(154, 27);
             comboBox3.TabIndex = 10;
+            comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
             // 
             // frmBuilder
             // 

