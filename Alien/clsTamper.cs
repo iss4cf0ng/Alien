@@ -23,7 +23,7 @@ namespace Alien
         public clsTamper(string szPySrvUri, string szPyExecutable, string szServer)
         {
             m_szPyServerUri = szPySrvUri;
-            m_client = new HttpClient() { Timeout = TimeSpan.FromSeconds(2) };
+            m_client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
 
             m_pyExecutable = szPyExecutable;
             m_dirModule = Path.Combine(Application.StartupPath, "Tamper");

@@ -17,6 +17,8 @@ namespace Alien
         private clsfnFileMgr m_fileMgr { get; init; }
         private string m_szDirName { get; init; }
 
+        private bool m_bRunning { get; set; } = false;
+
         public frmFileCopyMoveProgress(clsfnFileMgr fileMgr, string szDirName)
         {
             InitializeComponent();
@@ -35,6 +37,9 @@ namespace Alien
                 var lsEntry = m_fileMgr.m_dirClipboard.Concat(m_fileMgr.m_fileClipboard);
                 foreach (var entry in lsEntry)
                 {
+                    if (!m_bRunning)
+                        break;
+
                     lsTask.Add(Task.Run(async () =>
                     {
                         await semaphore.WaitAsync();
@@ -70,7 +75,7 @@ namespace Alien
 
             Invoke(() =>
             {
-                label1.Text = "Done.";
+                label1.Text = m_bRunning ? "Done." : "Interrupted.";
                 Close();
             });
         }
@@ -81,6 +86,8 @@ namespace Alien
 
             progressBar1.Value = 0;
             progressBar1.Maximum = m_fileMgr.m_dirClipboard.Count + m_fileMgr.m_fileClipboard.Count;
+
+            m_bRunning = true;
 
             Task.Run(() =>
             {
@@ -96,7 +103,7 @@ namespace Alien
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            
         }
     }
 }

@@ -17,10 +17,7 @@ begin
     f.binmode
     f.write(buffer)
   end
-
-  print "Content-Type: text/plain\r\n\r\n"
   print "1"
 rescue
-  print "Content-Type: text/plain\r\n\r\n"
   print "0"
 end
