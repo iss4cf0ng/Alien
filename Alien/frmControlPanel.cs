@@ -1638,7 +1638,14 @@ namespace Alien
 
         private void frmControlPanel_Load(object sender, EventArgs e)
         {
-            fnSetup();
+            try
+            {
+                fnSetup();
+            }
+            catch (InvalidOperationException)
+            {
+
+            }
         }
 
         private void treeView3_AfterSelect(object sender, TreeViewEventArgs e)

@@ -793,12 +793,14 @@ namespace Alien
                     int statusCode = (int)resp.StatusCode;
                     HttpStatusCode code = resp.StatusCode;
 
-                    if (resp.IsSuccessStatusCode)
-                    {
-                        string szResult = await resp.Content.ReadAsStringAsync();
-                    }
+                    resp.EnsureSuccessStatusCode();
 
-                    return statusCode != 404;
+                    string szResult = await resp.Content.ReadAsStringAsync();
+
+                    if (!resp.IsSuccessStatusCode)
+                        throw new Exception(szResult);
+
+                    return resp.IsSuccessStatusCode;
                 }
             }
             catch (Exception ex)
@@ -822,6 +824,8 @@ namespace Alien
                 string szResp = await fnszSendPayload("test", new string[] { szPattern });
 
                 bool bVal = string.Equals(szResp, szPattern);
+                if (!bVal)
+                    throw new Exception(szResp);
 
                 return bVal;
             }

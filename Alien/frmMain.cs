@@ -1,4 +1,6 @@
 using Microsoft.VisualBasic;
+using System.Collections;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Alien
@@ -127,6 +129,39 @@ namespace Alien
             clsSqlite sqlConn = new clsSqlite("data.sqlite");
             m_sqlConn = sqlConn;
 
+            ListViewColumnSorter lvwSorter = new ListViewColumnSorter();
+            listView1.ListViewItemSorter = lvwSorter;
+
+            int nIdx = listView1.Columns.Count - 1;
+            ListViewHeaderChanger.SortOrder defaultOrder = ListViewHeaderChanger.SortOrder.Descending;
+            
+            lvwSorter.SortColumn = nIdx;
+            lvwSorter.Order = defaultOrder == ListViewHeaderChanger.SortOrder.Descending ? SortOrder.Descending : SortOrder.Ascending;
+
+            listView1.Sort();
+            listView1.SetSortArrow(nIdx, defaultOrder);
+
+            listView1.ColumnClick += (s, e) =>
+            {
+                if (e.Column == lvwSorter.SortColumn)
+                {
+                    if (lvwSorter.Order == SortOrder.Ascending)
+                        lvwSorter.Order = SortOrder.Descending;
+                    else
+                        lvwSorter.Order = SortOrder.Ascending;
+                }
+                else
+                {
+                    lvwSorter.SortColumn = e.Column;
+                    lvwSorter.Order = SortOrder.Ascending;
+                }
+
+                listView1.Sort();
+
+                ListViewHeaderChanger.SortOrder arrowOrder = lvwSorter.Order == SortOrder.Ascending ? ListViewHeaderChanger.SortOrder.Ascending : ListViewHeaderChanger.SortOrder.Descending;
+                listView1.SetSortArrow(e.Column, arrowOrder);
+            };
+
             TreeNode node = new TreeNode("Group");
             node.Nodes.Add(new TreeNode("_All"));
             node.Nodes.Add(new TreeNode("_Orphan"));
@@ -180,7 +215,7 @@ namespace Alien
                     continue;
                 }
 
-                if (await web.fnbTestWebConnection() && await web.fnbTestShellConnection())
+                if (await web.fnbTestWebConnection(true) && await web.fnbTestShellConnection())
                 {
                     string szDomain = item.SubItems[1].Text.Split('/')[2];
 
@@ -191,6 +226,8 @@ namespace Alien
                         $"{web.m_victim.m_ShellConfig.szMethod}" + (web.m_victim.m_ShellConfig.bEHEnable ? " | " + web.m_victim.m_ShellConfig.szEventHorizonScript : string.Empty);
 
                     f.Show();
+
+                    m_sqlConn.fnbUpdateShellLastUsed(web.m_victim.m_ShellConfig);
                 }
 
                 toolStripStatusLabel4.Text = "Action successfully";
@@ -401,6 +438,104 @@ namespace Alien
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             m_tamper.Dispose();
+        }
+    }
+
+    public static class ListViewHeaderChanger
+    {
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, ref HDITEM lParam);
+
+        private const uint LVM_GETHEADER = 0x101F;
+        private const uint HDM_GETITEM = 0x120B;
+        private const uint HDM_SETITEM = 0x120C;
+
+        private const int HDI_FORMAT = 0x0004;
+        private const int HDF_SORTUP = 0x0400;
+        private const int HDF_SORTDOWN = 0x0200;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct HDITEM
+        {
+            public int mask;
+            public int cxy;
+            [MarshalAs(UnmanagedType.LPTStr)]
+            public string pszText;
+            public IntPtr hbm;
+            public int cchTextMax;
+            public int fmt;
+            public IntPtr lParam;
+            public int iImage;
+            public int iOrder;
+            public uint type;
+            public IntPtr pvFilter;
+            public uint state;
+        }
+
+        public enum SortOrder
+        {
+            None,
+            Ascending,
+            Descending
+        }
+
+        public static void SetSortArrow(this ListView listView, int columnIndex, SortOrder order)
+        {
+            HDITEM dummy = new HDITEM();
+            IntPtr headerWnd = SendMessage(listView.Handle, LVM_GETHEADER, IntPtr.Zero, ref dummy);
+
+            for (int i = 0; i < listView.Columns.Count; i++)
+            {
+                HDITEM item = new HDITEM();
+                item.mask = HDI_FORMAT;
+
+                SendMessage(headerWnd, HDM_GETITEM, new IntPtr(i), ref item);
+
+                item.fmt &= ~(HDF_SORTUP | HDF_SORTDOWN);
+
+                if (i == columnIndex)
+                {
+                    if (order == SortOrder.Ascending)
+                        item.fmt |= HDF_SORTUP;
+                    else if (order == SortOrder.Descending)
+                        item.fmt |= HDF_SORTDOWN;
+                }
+
+                SendMessage(headerWnd, HDM_SETITEM, new IntPtr(i), ref item);
+            }
+        }
+    }
+
+    public class ListViewColumnSorter : IComparer
+    {
+        public int SortColumn { get; set; } = 0;
+        public SortOrder Order { get; set; } = SortOrder.None;
+
+        public int Compare(object x, object y)
+        {
+            ListViewItem itemX = (ListViewItem)x;
+            ListViewItem itemY = (ListViewItem)y;
+
+            string textX = itemX.SubItems.Count > SortColumn ? itemX.SubItems[SortColumn].Text : "";
+            string textY = itemY.SubItems.Count > SortColumn ? itemY.SubItems[SortColumn].Text : "";
+
+            int compareResult;
+
+            if (DateTime.TryParse(textX, out DateTime dateX) && DateTime.TryParse(textY, out DateTime dateY))
+            {
+                compareResult = DateTime.Compare(dateX, dateY);
+            }
+            else
+            {
+                compareResult = string.Compare(textX, textY, StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (Order == SortOrder.Ascending)
+                return compareResult;
+            else if (Order == SortOrder.Descending)
+                return -compareResult;
+            else
+                return 0;
         }
     }
 }

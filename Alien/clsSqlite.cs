@@ -192,6 +192,30 @@ namespace Alien
             }
         }
 
+        public bool fnbUpdateShellLastUsed(stShellConfig config)
+        {
+            try
+            {
+                bool bShellExists = ShellExists(config.ID);
+                string szQuery = "";
+                string szDt = DateTime.Now.ToString("F");
+
+                string SqlEscape(string value) => value?.Replace("'", "''") ?? "";
+
+                szQuery = $"UPDATE \"Shell\" SET " +
+                        $"LastAccessed='{szDt}' " +
+                        $"WHERE ID='{SqlEscape(config.ID)}';";
+
+                fnSqlQuery(szQuery);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         public bool SaveShell(stShellConfig config)
         {
             try
