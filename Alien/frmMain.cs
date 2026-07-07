@@ -170,6 +170,9 @@ namespace Alien
                 toolStripStatusLabel4.Text = "Loading...";
 
                 clsWeb web = fnGetVictimTag(item);
+                if (web.m_tamper == null)
+                    web.m_tamper = m_tamper;
+
                 frmControlPanel? frmOpened = clsTool.fnFindForm<frmControlPanel>(web);
                 if (frmOpened != null)
                 {
@@ -182,7 +185,10 @@ namespace Alien
                     string szDomain = item.SubItems[1].Text.Split('/')[2];
 
                     frmControlPanel f = new frmControlPanel(web);
-                    f.Text = $"{szDomain} | {Enum.GetName(typeof(enLanguage), web.m_victim.ShellLanguage)} | {Enum.GetName(typeof(enPayloadType), web.m_victim.ShellPayloadType)} | {web.m_victim.m_ShellConfig.szMethod}";
+                    f.Text = $"{szDomain} | " +
+                        $"{Enum.GetName(typeof(enLanguage), web.m_victim.ShellLanguage)} | " +
+                        $"{Enum.GetName(typeof(enPayloadType), web.m_victim.ShellPayloadType)} | " +
+                        $"{web.m_victim.m_ShellConfig.szMethod}" + (web.m_victim.m_ShellConfig.bEHEnable ? " | " + web.m_victim.m_ShellConfig.szEventHorizonScript : string.Empty);
 
                     f.Show();
                 }

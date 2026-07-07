@@ -112,6 +112,7 @@ namespace Alien
                 comboBox4.Text = m_stShellConfig.szMethod;
                 comboBox3.Text = m_stShellConfig.payloadType.ToString();
 
+                checkBox1.Checked = m_stShellConfig.bEHEnable;
                 textBox3.Text = m_stShellConfig.szDescription;
                 textBox4.Text = m_stShellConfig.szUserAgent;
                 comboBox2.Text = m_stShellConfig.szEventHorizonScript;
@@ -186,7 +187,7 @@ namespace Alien
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            groupBox3.Enabled = !checkBox1.Checked;
+            groupBox3.Enabled = checkBox1.Checked;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
