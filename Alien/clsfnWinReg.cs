@@ -127,15 +127,22 @@ namespace Alien
             string szResp = await m_web.fnszSendPayload("win_reg", new string[] { "hive", m_web.m_victim.ShellEncoding });
             szResp = szResp.Trim();
 
-            var result = JsonConvert.DeserializeObject<Dictionary<string, bool>>(szResp);
-
-            if (result == null)
+            try
             {
-                MessageBox.Show("JSON deserialization is failed", "fnHives", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                var result = JsonConvert.DeserializeObject<Dictionary<string, bool>>(szResp);
+
+                if (result == null)
+                {
+                    MessageBox.Show("JSON deserialization is failed", "fnHives", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return new Dictionary<string, bool>();
+                }
+
+                return result;
+            }
+            catch
+            {
                 return new Dictionary<string, bool>();
             }
-
-            return result;
         }
 
         public async Task<clsRegistryQueryResult?> fnScan(string szBasePath)

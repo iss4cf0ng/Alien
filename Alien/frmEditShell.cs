@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualBasic;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -47,6 +49,15 @@ namespace Alien
             m_stShellConfig = config;
             m_bNewShell = bNewShell;
             m_lsGroupName = lsGroupName;
+        }
+
+        void fnUpdateComets()
+        {
+            List<ListViewItem> items = listView1.Items.Cast<ListViewItem>().ToList();
+            for (int i = 0; i < items.Count; i++)
+                items[i].Text = (i + 1).ToString();
+
+            listView1.Refresh();
         }
 
         void fnLoadComet(List<stShellConfig>? lsConfig = null)
@@ -127,6 +138,8 @@ namespace Alien
                 MessageBox.Show("Directory not found: " + szTamperDirPath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+            listView1.ListViewItemSorter = new ListViewNumericComparer(0);
+
             if (string.IsNullOrEmpty(m_stShellConfig.szUrl))
             {
                 //Add shell
@@ -149,6 +162,11 @@ namespace Alien
                 textBox4.Text = m_stShellConfig.szUserAgent;
                 comboBox2.Text = m_stShellConfig.szEventHorizonScript;
                 textEditorControl1.Text = m_stShellConfig.szEventHorizonConfig;
+
+                var lsComet = m_stShellConfig.lsCometShellID.Select(x => m_sqlConn.fnGetShellConfig(x)).ToList();
+                fnLoadComet(lsComet);
+
+                listView1.Sort();
             }
         }
 
@@ -318,7 +336,47 @@ namespace Alien
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
+            ListViewItem? item = listView1.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+            
+            if (item == null)
+                return;
 
+            List<ListViewItem> otherItems = listView1.Items.Cast<ListViewItem>()
+                .Where(x => x != item)
+                .OrderBy(x => int.Parse(x.Text))
+                .ToList();
+
+            string input = Interaction.InputBox("New Order", "Please enter an integer: ");
+            if (!int.TryParse(input, out int k) || k < 1)
+            {
+                MessageBox.Show("Invalid integer: " + input);
+                return;
+            }
+
+            int insertIndex = Math.Clamp(k - 1, 0, otherItems.Count);
+            otherItems.Insert(insertIndex, item);
+
+            Dictionary<ListViewItem, int> dicOrder = new Dictionary<ListViewItem, int>();
+
+            listView1.BeginUpdate();
+            try
+            {
+                for (int i = 0; i < otherItems.Count; i++)
+                {
+                    int newOrder = i + 1;
+                    ListViewItem currentItem = otherItems[i];
+
+                    currentItem.Text = newOrder.ToString();
+
+                    dicOrder.Add(currentItem, newOrder);
+                }
+
+            }
+            finally
+            {
+                listView1.EndUpdate();
+                listView1.Sort();
+            }
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -382,7 +440,8 @@ namespace Alien
         {
             if (e.Modifiers == Keys.Control)
             {
-
+                foreach (ListViewItem item in listView1.Items)
+                    item.Selected = true;
             }
             else
             {
@@ -390,7 +449,38 @@ namespace Alien
                 {
                     foreach (ListViewItem item in listView1.SelectedItems)
                         listView1.Items.Remove(item);
+
+                    listView1.Refresh();
+
+                    fnUpdateComets();
                 }
+            }
+        }
+
+        public class ListViewNumericComparer : IComparer
+        {
+            private int _column;
+
+            public ListViewNumericComparer(int column)
+            {
+                _column = column;
+            }
+
+            public int Compare(object x, object y)
+            {
+                ListViewItem itemX = x as ListViewItem;
+                ListViewItem itemY = y as ListViewItem;
+
+                if (itemX == null || itemY == null)
+                    return 0;
+
+                if (double.TryParse(itemX.SubItems[_column].Text, out double numX) &&
+                    double.TryParse(itemY.SubItems[_column].Text, out double numY))
+                {
+                    return numX.CompareTo(numY);
+                }
+
+                return string.Compare(itemX.SubItems[_column].Text, itemY.SubItems[_column].Text);
             }
         }
     }

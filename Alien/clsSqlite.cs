@@ -163,6 +163,8 @@ namespace Alien
                 bEHEnable = dr["EHEnable"].ToString() == "1",
                 szEventHorizonScript = dr["EventHorizonScript"].ToString(),
                 szEventHorizonConfig = dr["EventHorizonConfig"].ToString(),
+
+                szDriftingComet = dr["DriftingComet"].ToString(),
             };
 
             return config;
@@ -242,7 +244,7 @@ namespace Alien
                         $"EHEnable='{(config.bEHEnable ? 1 : 0)}'," +
                         $"EventHorizonScript='{SqlEscape(config.szEventHorizonScript)}'," +
                         $"EventHorizonConfig='{SqlEscape(config.szEventHorizonConfig)}'," +
-                        $"DriftingComet=''," +
+                        $"DriftingComet='{SqlEscape(config.szDriftingComet)}'," +
                         $"LastModified='{szDt}' " +
                         $"WHERE ID='{SqlEscape(config.ID)}';";
                 }
@@ -270,7 +272,7 @@ namespace Alien
                         $"{(config.bEHEnable ? 1 : 0)}," +
                         $"'{SqlEscape(config.szEventHorizonScript)}'," +
                         $"'{SqlEscape(config.szEventHorizonConfig)}'," +
-                        $"''" +
+                        $"'{SqlEscape(config.szDriftingComet)}'" +
                         ");";
                 }
 

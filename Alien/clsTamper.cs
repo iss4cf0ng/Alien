@@ -49,7 +49,7 @@ namespace Alien
             }
         }
 
-        public static string fnMergePayloadToOne(string szPayload, string[] asParams, enLanguage lang)
+        public static string fnMergePayloadToOne(stShellConfig config, string szPayload, string[] asParams, enLanguage lang)
         {
             for (int i = 0; i < asParams.Length; i++)
             {
@@ -74,7 +74,25 @@ namespace Alien
                 }
                 else if (lang == enLanguage.JSP || lang == enLanguage.JSPX)
                 {
+                    if (config.payloadType == enPayloadType.OneShell)
+                    {
+                        szPayload = szPayload.Replace($"request.getParameter(\"z{i}\")", $"\"{asParams[i]}\"");
+                    }
+                    else if (config.payloadType == enPayloadType.DarkMatter)
+                    {
 
+                    }
+                }
+                else if (lang == enLanguage.CFM)
+                {
+                    if (config.payloadType == enPayloadType.OneShell)
+                    {
+                        szPayload = szPayload.Replace($"request.getParameter(\"z{i}\")", $"\"{asParams[i]}\"");
+                    }
+                    else if (config.payloadType == enPayloadType.DarkMatter)
+                    {
+
+                    }
                 }
                 else if (lang == enLanguage.Perl)
                 {
