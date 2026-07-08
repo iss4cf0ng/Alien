@@ -71,6 +71,13 @@
             label11 = new Label();
             tabPage2 = new TabPage();
             tabPage3 = new TabPage();
+            progressBar1 = new ProgressBar();
+            listView1 = new ListView();
+            columnHeader1 = new ColumnHeader();
+            columnHeader2 = new ColumnHeader();
+            columnHeader3 = new ColumnHeader();
+            button6 = new Button();
+            button5 = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox4.SuspendLayout();
@@ -79,6 +86,7 @@
             tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             tabPage2.SuspendLayout();
+            tabPage3.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -503,12 +511,71 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(progressBar1);
+            tabPage3.Controls.Add(listView1);
+            tabPage3.Controls.Add(button6);
+            tabPage3.Controls.Add(button5);
             tabPage3.Location = new Point(4, 28);
             tabPage3.Name = "tabPage3";
             tabPage3.Size = new Size(488, 412);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "DriftingComet";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // progressBar1
+            // 
+            progressBar1.Location = new Point(3, 375);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(482, 34);
+            progressBar1.TabIndex = 4;
+            // 
+            // listView1
+            // 
+            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
+            listView1.FullRowSelect = true;
+            listView1.Location = new Point(3, 41);
+            listView1.Name = "listView1";
+            listView1.Size = new Size(482, 328);
+            listView1.TabIndex = 3;
+            listView1.UseCompatibleStateImageBehavior = false;
+            listView1.View = View.Details;
+            listView1.DoubleClick += listView1_DoubleClick;
+            listView1.KeyDown += listView1_KeyDown;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "Order";
+            columnHeader1.Width = 70;
+            // 
+            // columnHeader2
+            // 
+            columnHeader2.Text = "Shell URL";
+            columnHeader2.Width = 300;
+            // 
+            // columnHeader3
+            // 
+            columnHeader3.Text = "Script";
+            columnHeader3.Width = 100;
+            // 
+            // button6
+            // 
+            button6.Location = new Point(252, 3);
+            button6.Name = "button6";
+            button6.Size = new Size(233, 32);
+            button6.TabIndex = 1;
+            button6.Text = "Check";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(3, 3);
+            button5.Name = "button5";
+            button5.Size = new Size(233, 32);
+            button5.TabIndex = 0;
+            button5.Text = "Load";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
             // 
             // frmEditShell
             // 
@@ -536,6 +603,7 @@
             tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             tabPage2.ResumeLayout(false);
+            tabPage3.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -584,5 +652,12 @@
         private RichTextBox richTextBox1;
         private TabPage tabPage3;
         private Button button4;
+        private Button button6;
+        private Button button5;
+        private ListView listView1;
+        private ColumnHeader columnHeader1;
+        private ColumnHeader columnHeader2;
+        private ColumnHeader columnHeader3;
+        private ProgressBar progressBar1;
     }
 }

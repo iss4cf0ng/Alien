@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Alien
@@ -87,8 +89,9 @@ namespace Alien
         public string szEventHorizonConfig; // JSON
 
         // Wormhole
-        public bool bWHEnable;
-        public string szWormhole;
+        public bool bDCEnable { get { return lsCometShellID.Count > 0; } }
+        public string szDriftingComet;
+        public List<string> lsCometShellID { get { return string.IsNullOrEmpty(szDriftingComet) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(szDriftingComet) ?? new List<string>(); } }
     }
 
     public struct stFileEntry

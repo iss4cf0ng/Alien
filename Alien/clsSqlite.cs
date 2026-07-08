@@ -38,7 +38,7 @@ namespace Alien
                     "EHEnable", // Tamper
                     "EventHorizonScript",
                     "EventHorizonConfig",
-                    "WHEnable",
+                    "DCEnable",
                     "DriftingComet", // Pivoting
                 }
             },
@@ -301,9 +301,9 @@ namespace Alien
             }
         }
 
-        public stShellConfig fnGetShellConfig(string szUrl)
+        public stShellConfig fnGetShellConfig(string szID)
         {
-            string szQuery = $"SELECT * FROM \"Shell\" WHERE \"URL\" = \"{szUrl}\";";
+            string szQuery = $"SELECT * FROM \"Shell\" WHERE \"ID\" = \"{szID}\";";
             DataTable dt = fnSqlQuery(szQuery);
             DataRow dr = dt.Rows[0];
 

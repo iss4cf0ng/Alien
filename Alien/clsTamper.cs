@@ -59,8 +59,10 @@ namespace Alien
                 }
                 else if (lang == enLanguage.ASP)
                 {
-                    szPayload = szPayload.Replace($"Request.Form(\"z{i}\")", $"\"{asParams[i]}\"");
-                    szPayload = szPayload.Replace($"Request(\"z{i}\")", $"\"{asParams[i]}\"");
+                    szPayload = szPayload.Replace($"Request.Form(\"z{i}\")", $"\"{asParams[i]}\"", StringComparison.OrdinalIgnoreCase);
+                    szPayload = szPayload.Replace($"Request(\"z{i}\")", $"\"{asParams[i]}\"", StringComparison.OrdinalIgnoreCase);
+
+                    szPayload = szPayload.Replace($"Request.Form('z{i}')", $"\"{asParams[i]}\"", StringComparison.OrdinalIgnoreCase);
                 }
                 else if (lang == enLanguage.ASPX || lang == enLanguage.ASMX || lang == enLanguage.ASHX)
                 {

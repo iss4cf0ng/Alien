@@ -92,7 +92,7 @@ namespace Alien
 
                 clsVictim victim = new clsVictim(m_sqlConn, config, false);
                 victim.fnbBuildPortfolio();
-                clsWeb web = new clsWeb(victim, m_tamper);
+                clsWeb web = new clsWeb(victim, m_tamper, m_sqlConn);
 
                 item.Tag = web;
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -6,6 +7,8 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -44,6 +47,35 @@ namespace Alien
             m_stShellConfig = config;
             m_bNewShell = bNewShell;
             m_lsGroupName = lsGroupName;
+        }
+
+        void fnLoadComet(List<stShellConfig>? lsConfig = null)
+        {
+            listView1.Items.Clear();
+
+            Task.Run(() =>
+            {
+                var configs = lsConfig ?? m_sqlConn.fnGetAllShellConfig();
+
+                for (int i = 0; i < configs.Count; i++)
+                {
+                    var config = configs[i];
+                    string? szScript = Enum.GetName(typeof(enLanguage), config.language);
+                    if (string.IsNullOrEmpty(szScript))
+                        continue;
+
+                    clsVictim victim = new clsVictim(m_sqlConn, config, false);
+                    clsWeb web = new clsWeb(victim, m_tamper, m_sqlConn);
+
+                    ListViewItem item = new ListViewItem((i + 1).ToString());
+                    item.SubItems.Add(config.szUrl);
+                    item.SubItems.Add(szScript);
+                    item.Tag = web;
+
+                    Invoke(() => listView1.Items.Add(item));
+                }
+            });
+
         }
 
         void fnSetup()
@@ -128,6 +160,8 @@ namespace Alien
         //Test
         private async void button1_Click(object sender, EventArgs e)
         {
+            List<string> lsID = listView1.Items.Cast<ListViewItem>().Where(x => x.Tag != null).Select(x => (clsWeb)x.Tag).Select(x => x.m_victim.ShellID).ToList();
+
             stShellConfig config = new stShellConfig()
             {
                 szUrl = textBox1.Text,
@@ -142,10 +176,12 @@ namespace Alien
                 bEHEnable = checkBox1.Checked,
                 szEventHorizonScript = comboBox2.Text,
                 szEventHorizonConfig = textEditorControl1.Text,
+
+                szDriftingComet = JsonSerializer.Serialize(lsID),
             };
 
             clsVictim victim = new clsVictim(m_sqlConn, config, false);
-            clsWeb web = new clsWeb(victim, m_tamper);
+            clsWeb web = new clsWeb(victim, m_tamper, m_sqlConn);
 
             string szPattern = clsEzData.fnszGenerateRandomStr();
             string szResp = await web.fnszSendPayload("test", new string[] { szPattern });
@@ -159,6 +195,8 @@ namespace Alien
         //Save
         private void button2_Click(object sender, EventArgs e)
         {
+            List<string> lsID = listView1.Items.Cast<ListViewItem>().Where(x => x.Tag != null).Select(x => (clsWeb)x.Tag).Select(x => x.m_victim.ShellID).ToList();
+
             stShellConfig config = new stShellConfig();
             config.ID = m_bNewShell ? Guid.NewGuid().ToString() : m_stShellConfig.ID;
             config.szGroupName = comboBox6.Text;
@@ -173,6 +211,7 @@ namespace Alien
             config.bEHEnable = checkBox1.Checked;
             config.szEventHorizonScript = comboBox2.Text;
             config.szEventHorizonConfig = textEditorControl1.Text;
+            config.szDriftingComet = JsonSerializer.Serialize(lsID);
 
             if (m_sqlConn.SaveShell(config))
             {
@@ -275,6 +314,84 @@ namespace Alien
         private void button4_Click(object sender, EventArgs e)
         {
             MessageBox.Show("The User-Agent will be randomly selected if it is empty.", "What is this?", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void listView1_DoubleClick(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            fnLoadComet();
+        }
+
+        private async void button6_Click(object sender, EventArgs e)
+        {
+            int nThread = int.Parse(Interaction.InputBox("Thread count:", "Check Alive", "3"));
+            if (nThread <= 0)
+                throw new Exception("Invalid number.");
+
+            Dictionary<clsWeb, ListViewItem> dic = new Dictionary<clsWeb, ListViewItem>();
+            foreach (ListViewItem item in listView1.Items)
+            {
+                if (item.Tag == null)
+                    continue;
+
+                dic.Add((clsWeb)item.Tag, item);
+            }
+
+            progressBar1.Value = 0;
+            progressBar1.Maximum = dic.Count;
+
+            var semaphore = new SemaphoreSlim(nThread);
+            List<Task> lsTask = new List<Task>();
+
+            foreach (clsWeb web in dic.Keys)
+            {
+                lsTask.Add(Task.Run(async () =>
+                {
+                    await semaphore.WaitAsync();
+
+                    try
+                    {
+                        bool bAlive = await web.fnbTestWebConnection(false) && await web.fnbTestShellConnection(false);
+                        Invoke(() =>
+                        {
+                            if (!bAlive)
+                                dic.Remove(web);
+                        });
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+
+                        Invoke(() => progressBar1.Increment(1));
+                    }
+                }));
+            }
+
+            await Task.WhenAll(lsTask);
+
+            fnLoadComet(dic.Keys.Select(x => x.m_victim.m_ShellConfig).ToList());
+
+            MessageBox.Show("Completed, please check.", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void listView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Modifiers == Keys.Control)
+            {
+
+            }
+            else
+            {
+                if (e.KeyCode == Keys.Delete)
+                {
+                    foreach (ListViewItem item in listView1.SelectedItems)
+                        listView1.Items.Remove(item);
+                }
+            }
         }
     }
 }

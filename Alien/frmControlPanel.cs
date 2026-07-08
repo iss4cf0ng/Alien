@@ -1601,21 +1601,28 @@ namespace Alien
 
             */
 
-            string szEnv = Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/");
-
-            await webViewPlugin.EnsureCoreWebView2Async(null);
-            webViewPlugin.CoreWebView2.AddHostObjectToScript("nativeBridge", new clsfnPlugin.clsBridge(m_web, szEnv));
-
-            string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
-            webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
-
-            foreach (string szDir in Directory.GetDirectories(Path.Combine(Application.StartupPath, "Plugins")))
+            try
             {
-                TreeNode node = new TreeNode(Path.GetFileName(szDir));
-                treeView1.Nodes.Add(node);
-            }
+                string szEnv = Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/");
 
-            toolStripStatusLabel8.Text = $"Module[{treeView1.Nodes.Count}]";
+                await webViewPlugin.EnsureCoreWebView2Async(null);
+                webViewPlugin.CoreWebView2.AddHostObjectToScript("nativeBridge", new clsfnPlugin.clsBridge(m_web, szEnv));
+
+                string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
+                webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+
+                foreach (string szDir in Directory.GetDirectories(Path.Combine(Application.StartupPath, "Plugins")))
+                {
+                    TreeNode node = new TreeNode(Path.GetFileName(szDir));
+                    treeView1.Nodes.Add(node);
+                }
+
+                toolStripStatusLabel8.Text = $"Module[{treeView1.Nodes.Count}]";
+            }
+            catch
+            {
+                return;
+            }
 
             // Note
             try
@@ -1638,14 +1645,7 @@ namespace Alien
 
         private void frmControlPanel_Load(object sender, EventArgs e)
         {
-            try
-            {
-                fnSetup();
-            }
-            catch (InvalidOperationException)
-            {
-
-            }
+            fnSetup();
         }
 
         private void treeView3_AfterSelect(object sender, TreeViewEventArgs e)
@@ -3115,6 +3115,8 @@ namespace Alien
 
                 return;
             }
+
+            node.Expand();
 
             var plugin = manifest.Value;
 
