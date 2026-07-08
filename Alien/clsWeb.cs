@@ -646,9 +646,8 @@ namespace Alien
                         }
                     }
 
-                    if (config.bEHEnable && dicSplitter.Keys.Count == 0)
+                    if (m_victim.m_ShellConfig.bEHEnable)
                     {
-
                         var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(m_victim.m_ShellConfig.szEventHorizonConfig);
                         if (dicParam == null)
                             throw new Exception("Invalid JSON string");
