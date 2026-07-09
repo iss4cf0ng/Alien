@@ -77,6 +77,8 @@ namespace Alien
                     if (config.payloadType == enPayloadType.OneShell)
                     {
                         szPayload = szPayload.Replace($"request.getParameter(\"z{i}\")", $"\"{asParams[i]}\"");
+                        szPayload = szPayload.Replace($"paramMap.get(\"z{i}\")[0]", $"\"{asParams[i]}\"");
+                        szPayload = szPayload.Replace($"paramMap.get(\"z{i}\")", $"\"{asParams[i]}\"");
                     }
                     else if (config.payloadType == enPayloadType.DarkMatter)
                     {

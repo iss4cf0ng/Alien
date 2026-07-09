@@ -78,6 +78,7 @@
             columnHeader3 = new ColumnHeader();
             button6 = new Button();
             button5 = new Button();
+            button7 = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox4.SuspendLayout();
@@ -504,13 +505,14 @@
             tabPage2.Location = new Point(4, 28);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(488, 412);
+            tabPage2.Size = new Size(399, 412);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "EventHorizon";
             tabPage2.UseVisualStyleBackColor = true;
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(button7);
             tabPage3.Controls.Add(progressBar1);
             tabPage3.Controls.Add(listView1);
             tabPage3.Controls.Add(button6);
@@ -559,9 +561,9 @@
             // 
             // button6
             // 
-            button6.Location = new Point(252, 3);
+            button6.Location = new Point(164, 3);
             button6.Name = "button6";
-            button6.Size = new Size(233, 32);
+            button6.Size = new Size(160, 32);
             button6.TabIndex = 1;
             button6.Text = "Check";
             button6.UseVisualStyleBackColor = true;
@@ -571,11 +573,21 @@
             // 
             button5.Location = new Point(3, 3);
             button5.Name = "button5";
-            button5.Size = new Size(233, 32);
+            button5.Size = new Size(155, 32);
             button5.TabIndex = 0;
             button5.Text = "Load";
             button5.UseVisualStyleBackColor = true;
             button5.Click += button5_Click;
+            // 
+            // button7
+            // 
+            button7.Location = new Point(330, 3);
+            button7.Name = "button7";
+            button7.Size = new Size(155, 32);
+            button7.TabIndex = 5;
+            button7.Text = "Diagram";
+            button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
             // 
             // frmEditShell
             // 
@@ -659,5 +671,6 @@
         private ColumnHeader columnHeader2;
         private ColumnHeader columnHeader3;
         private ProgressBar progressBar1;
+        private Button button7;
     }
 }

@@ -337,7 +337,7 @@ namespace Alien
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
             ListViewItem? item = listView1.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
-            
+
             if (item == null)
                 return;
 
@@ -482,6 +482,11 @@ namespace Alien
 
                 return string.Compare(itemX.SubItems[_column].Text, itemY.SubItems[_column].Text);
             }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
