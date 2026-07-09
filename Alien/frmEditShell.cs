@@ -72,7 +72,7 @@ namespace Alien
                 {
                     var config = configs[i];
                     string? szScript = Enum.GetName(typeof(enLanguage), config.language);
-                    if (string.IsNullOrEmpty(szScript))
+                    if (string.IsNullOrEmpty(szScript) || config.payloadType != enPayloadType.OneShell)
                         continue;
 
                     clsVictim victim = new clsVictim(m_sqlConn, config, false);
@@ -196,6 +196,11 @@ namespace Alien
                 szEventHorizonConfig = textEditorControl1.Text,
 
                 szDriftingComet = JsonSerializer.Serialize(lsID),
+
+                nTimeout = (int)numericUpDown1.Value,
+                szCookie = textBox6.Text,
+                szExtraPost = textBox5.Text,
+                nExtraPostPosition = comboBox7.SelectedIndex,
             };
 
             clsVictim victim = new clsVictim(m_sqlConn, config, false);
@@ -273,6 +278,10 @@ namespace Alien
 
             if (comboBox3.Items.Count > 0)
                 comboBox3.SelectedIndex = 0;
+
+            bool bNbPulsar = comboBox4.Text.Equals("OneShell");
+            groupBox2.Enabled = bNbPulsar;
+            groupBox5.Enabled = bNbPulsar;
         }
 
         private void button3_Click(object sender, EventArgs e)

@@ -71,6 +71,7 @@
             label11 = new Label();
             tabPage2 = new TabPage();
             tabPage3 = new TabPage();
+            button7 = new Button();
             progressBar1 = new ProgressBar();
             listView1 = new ListView();
             columnHeader1 = new ColumnHeader();
@@ -78,7 +79,7 @@
             columnHeader3 = new ColumnHeader();
             button6 = new Button();
             button5 = new Button();
-            button7 = new Button();
+            groupBox5 = new GroupBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox4.SuspendLayout();
@@ -88,6 +89,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             tabPage2.SuspendLayout();
             tabPage3.SuspendLayout();
+            groupBox5.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -505,24 +507,31 @@
             tabPage2.Location = new Point(4, 28);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(399, 412);
+            tabPage2.Size = new Size(488, 412);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "EventHorizon";
             tabPage2.UseVisualStyleBackColor = true;
             // 
             // tabPage3
             // 
-            tabPage3.Controls.Add(button7);
+            tabPage3.Controls.Add(groupBox5);
             tabPage3.Controls.Add(progressBar1);
-            tabPage3.Controls.Add(listView1);
-            tabPage3.Controls.Add(button6);
-            tabPage3.Controls.Add(button5);
             tabPage3.Location = new Point(4, 28);
             tabPage3.Name = "tabPage3";
             tabPage3.Size = new Size(488, 412);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "DriftingComet";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // button7
+            // 
+            button7.Location = new Point(321, 26);
+            button7.Name = "button7";
+            button7.Size = new Size(155, 32);
+            button7.TabIndex = 5;
+            button7.Text = "Diagram";
+            button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
             // 
             // progressBar1
             // 
@@ -535,9 +544,9 @@
             // 
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
             listView1.FullRowSelect = true;
-            listView1.Location = new Point(3, 41);
+            listView1.Location = new Point(6, 64);
             listView1.Name = "listView1";
-            listView1.Size = new Size(482, 328);
+            listView1.Size = new Size(470, 296);
             listView1.TabIndex = 3;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -561,9 +570,9 @@
             // 
             // button6
             // 
-            button6.Location = new Point(164, 3);
+            button6.Location = new Point(167, 26);
             button6.Name = "button6";
-            button6.Size = new Size(160, 32);
+            button6.Size = new Size(148, 32);
             button6.TabIndex = 1;
             button6.Text = "Check";
             button6.UseVisualStyleBackColor = true;
@@ -571,7 +580,7 @@
             // 
             // button5
             // 
-            button5.Location = new Point(3, 3);
+            button5.Location = new Point(6, 26);
             button5.Name = "button5";
             button5.Size = new Size(155, 32);
             button5.TabIndex = 0;
@@ -579,15 +588,18 @@
             button5.UseVisualStyleBackColor = true;
             button5.Click += button5_Click;
             // 
-            // button7
+            // groupBox5
             // 
-            button7.Location = new Point(330, 3);
-            button7.Name = "button7";
-            button7.Size = new Size(155, 32);
-            button7.TabIndex = 5;
-            button7.Text = "Diagram";
-            button7.UseVisualStyleBackColor = true;
-            button7.Click += button7_Click;
+            groupBox5.Controls.Add(button5);
+            groupBox5.Controls.Add(button7);
+            groupBox5.Controls.Add(listView1);
+            groupBox5.Controls.Add(button6);
+            groupBox5.Location = new Point(3, 3);
+            groupBox5.Name = "groupBox5";
+            groupBox5.Size = new Size(482, 366);
+            groupBox5.TabIndex = 6;
+            groupBox5.TabStop = false;
+            groupBox5.Text = "Hopping";
             // 
             // frmEditShell
             // 
@@ -616,6 +628,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             tabPage2.ResumeLayout(false);
             tabPage3.ResumeLayout(false);
+            groupBox5.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -672,5 +685,6 @@
         private ColumnHeader columnHeader3;
         private ProgressBar progressBar1;
         private Button button7;
+        private GroupBox groupBox5;
     }
 }

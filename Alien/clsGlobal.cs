@@ -88,10 +88,15 @@ namespace Alien
         public string szEventHorizonScript;
         public string szEventHorizonConfig; // JSON
 
-        // Wormhole
+        // DriftingComet
         public bool bDCEnable { get { return lsCometShellID.Count > 0; } }
         public string szDriftingComet;
         public List<string> lsCometShellID { get { return string.IsNullOrEmpty(szDriftingComet) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(szDriftingComet) ?? new List<string>(); } }
+
+        public int nTimeout;
+        public string szCookie;
+        public string szExtraPost;
+        public int nExtraPostPosition;
     }
 
     public struct stFileEntry

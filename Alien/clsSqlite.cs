@@ -40,6 +40,11 @@ namespace Alien
                     "EventHorizonConfig",
                     "DCEnable",
                     "DriftingComet", // Pivoting
+
+                    "Cookie",
+                    "ExtraPost",
+                    "ExtraPostPosition",
+                    "Timeout",
                 }
             },
             {
