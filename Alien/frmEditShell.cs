@@ -284,7 +284,7 @@ namespace Alien
             if (comboBox3.Items.Count > 0)
                 comboBox3.SelectedIndex = 0;
 
-            bool bOneShell = comboBox4.Text.Equals("OneShell");
+            bool bOneShell = comboBox3.Text.Equals("OneShell");
             groupBox2.Enabled = bOneShell;
             groupBox5.Enabled = bOneShell;
         }

