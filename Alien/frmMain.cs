@@ -228,7 +228,13 @@ namespace Alien
 
                     f.Show();
 
+                    item.ImageKey = "yes";
+
                     m_sqlConn.fnbUpdateShellLastUsed(web.m_victim.m_ShellConfig);
+                }
+                else
+                {
+                    item.ImageKey = "no";
                 }
 
                 toolStripStatusLabel4.Text = "Action successfully";
