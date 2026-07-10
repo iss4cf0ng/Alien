@@ -72,7 +72,7 @@ namespace Alien
                 {
                     var config = configs[i];
                     string? szScript = Enum.GetName(typeof(enLanguage), config.language);
-                    if (string.IsNullOrEmpty(szScript) || config.payloadType != enPayloadType.OneShell)
+                    if (string.IsNullOrEmpty(szScript) || config.payloadType != enPayloadType.OneShell || string.Equals(textBox1.Text, config.szUrl, StringComparison.CurrentCultureIgnoreCase))
                         continue;
 
                     clsVictim victim = new clsVictim(m_sqlConn, config, false);
@@ -235,6 +235,10 @@ namespace Alien
             config.szEventHorizonScript = comboBox2.Text;
             config.szEventHorizonConfig = textEditorControl1.Text;
             config.szDriftingComet = JsonSerializer.Serialize(lsID);
+            config.nTimeout = (int)numericUpDown1.Value;
+            config.szCookie = textBox6.Text;
+            config.szExtraPost = textBox5.Text;
+            config.nExtraPostPosition = comboBox7.SelectedIndex;
 
             if (m_sqlConn.SaveShell(config))
             {
@@ -250,6 +254,7 @@ namespace Alien
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             groupBox3.Enabled = checkBox1.Checked;
+            textBox5.Enabled = !checkBox1.Checked && listView1.Items.Count == 0;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -279,9 +284,9 @@ namespace Alien
             if (comboBox3.Items.Count > 0)
                 comboBox3.SelectedIndex = 0;
 
-            bool bNbPulsar = comboBox4.Text.Equals("OneShell");
-            groupBox2.Enabled = bNbPulsar;
-            groupBox5.Enabled = bNbPulsar;
+            bool bOneShell = comboBox4.Text.Equals("OneShell");
+            groupBox2.Enabled = bOneShell;
+            groupBox5.Enabled = bOneShell;
         }
 
         private void button3_Click(object sender, EventArgs e)

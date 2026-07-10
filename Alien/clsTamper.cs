@@ -193,6 +193,15 @@ namespace Alien
             return await fnSendRequest("obfuscator", szScriptName, string.Empty, dicParam);
         }
 
+        public async Task<List<string>?> fnGetAvailableScript(string szScriptName)
+        {
+            string? szResp = await fnSendRequest("available", szScriptName, string.Empty, new Dictionary<string, object>());
+            if (string.IsNullOrEmpty(szResp))
+                return new List<string>();
+
+            return szResp.Replace(" ", string.Empty).Split(',').ToList();
+        }
+
         private async Task<string?> fnSendRequest(string szEndPoint, string szScriptName, string szPayload, Dictionary<string, object> dicParams)
         {
             var req_body = new

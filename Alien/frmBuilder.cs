@@ -167,6 +167,17 @@ namespace Alien
             textEditorControl1.Text = szJson;
             textEditorControl1.Refresh();
 
+            comboBox2.Items.Clear();
+
+            List<string>? lsScript = await m_tamper.fnGetAvailableScript(szScriptName);
+            if (lsScript == null || lsScript.Count == 0)
+                return;
+
+            foreach (string szScript in lsScript)
+                comboBox2.Items.Add(szScript);
+
+            comboBox2.SelectedIndex = 0;
+
             await fnUpdateTamperPayload();
         }
 

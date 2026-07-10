@@ -170,6 +170,11 @@ namespace Alien
                 szEventHorizonConfig = dr["EventHorizonConfig"].ToString(),
 
                 szDriftingComet = dr["DriftingComet"].ToString(),
+
+                nTimeout = int.Parse(dr["Timeout"].ToString()),
+                szCookie = dr["Cookie"].ToString(),
+                szExtraPost = dr["ExtraPost"].ToString(),
+                nExtraPostPosition = int.Parse(dr["ExtraPostPosition"].ToString()),
             };
 
             return config;
@@ -250,7 +255,11 @@ namespace Alien
                         $"EventHorizonScript='{SqlEscape(config.szEventHorizonScript)}'," +
                         $"EventHorizonConfig='{SqlEscape(config.szEventHorizonConfig)}'," +
                         $"DriftingComet='{SqlEscape(config.szDriftingComet)}'," +
-                        $"LastModified='{szDt}' " +
+                        $"LastModified='{szDt}'," +
+                        $"Timeout='{config.nTimeout.ToString()}'," +
+                        $"Cookie='{SqlEscape(config.szCookie)}'," +
+                        $"ExtraPost='{SqlEscape(config.szExtraPost)}'," +
+                        $"ExtraPostPosition='{SqlEscape(config.nExtraPostPosition.ToString())}' " +
                         $"WHERE ID='{SqlEscape(config.ID)}';";
                 }
                 else
@@ -259,7 +268,8 @@ namespace Alien
                         "ID, GroupName, URL, Password, Encoding, Language, Method, Type, CreateDate, LastModified, LastAccessed, " +
                         "Description, UserAgent," +
                         "EHEnable, EventHorizonScript, EventHorizonConfig," +
-                        "DriftingComet" +
+                        "DriftingComet," +
+                        "Timeout, Cookie, ExtraPost, ExtraPostPosition" +
                         ") VALUES (" +
                         $"'{SqlEscape(config.ID)}'," +
                         $"'{SqlEscape(config.szGroupName)}'," +
@@ -277,7 +287,11 @@ namespace Alien
                         $"{(config.bEHEnable ? 1 : 0)}," +
                         $"'{SqlEscape(config.szEventHorizonScript)}'," +
                         $"'{SqlEscape(config.szEventHorizonConfig)}'," +
-                        $"'{SqlEscape(config.szDriftingComet)}'" +
+                        $"'{SqlEscape(config.szDriftingComet)}'," +
+                        $"'{SqlEscape(config.nTimeout.ToString())}'," +
+                        $"'{SqlEscape(config.szCookie)}'," +
+                        $"'{SqlEscape(config.szExtraPost)}'," +
+                        $"'{SqlEscape(config.nExtraPostPosition.ToString())}'" +
                         ");";
                 }
 
