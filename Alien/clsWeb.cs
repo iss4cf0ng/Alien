@@ -1391,7 +1391,7 @@ namespace Alien
                 "    return s;\r\n" +
                 "}" : szEncryptor) + "\r\n\r\n";
 
-            string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput));\r\n";
+            string szFooter = "\r\n\r\nResponse.Write(String(Encrypt(globalStringOutput)));\r\n";
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }

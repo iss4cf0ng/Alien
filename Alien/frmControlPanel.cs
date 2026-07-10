@@ -2533,23 +2533,30 @@ namespace Alien
 
         private async void textBox3_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            try
             {
-                string szResp = await m_rShell.fnShellExec(textBox3.Text);
+                if (e.KeyCode == Keys.Enter)
+                {
+                    string szResp = await m_rShell.fnShellExec(textBox3.Text);
 
-                textBox3.Clear();
-                richTextBox2.Clear();
+                    textBox3.Clear();
+                    richTextBox2.Clear();
 
-                richTextBox2.AppendText(szResp);
-                richTextBox2.ScrollToCaret();
+                    richTextBox2.AppendText(szResp);
+                    richTextBox2.ScrollToCaret();
+                }
+                else if (e.KeyCode == Keys.Up)
+                {
+
+                }
+                else if (e.KeyCode == Keys.Down)
+                {
+
+                }
             }
-            else if (e.KeyCode == Keys.Up)
+            catch (Exception ex)
             {
-
-            }
-            else if (e.KeyCode == Keys.Down)
-            {
-
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
