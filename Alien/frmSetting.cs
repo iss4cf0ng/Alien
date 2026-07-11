@@ -16,5 +16,27 @@ namespace Alien
         {
             InitializeComponent();
         }
+
+        void fnSetup()
+        {
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox1.DisplayMember = nameof(clsLanguage.clsLanguageItem.Name);
+            comboBox1.ValueMember = nameof(clsLanguage.clsLanguageItem.Culture);
+            comboBox1.DataSource = clsLanguage.clsLanguageManager.Languages;
+        }
+
+        private void frmSetting_Load(object sender, EventArgs e)
+        {
+            fnSetup();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string? szLanguage = comboBox1.SelectedValue!.ToString();
+            if (!string.IsNullOrEmpty(szLanguage))
+            {
+                new clsIniManager("config.ini").Write("General", "Language", szLanguage);
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.ComponentModel;
 using System.Data;
 using System.Security.Cryptography.X509Certificates;
+using System.Globalization;
 
 namespace Alien
 {
@@ -210,7 +211,7 @@ namespace Alien
             {
                 bool bShellExists = ShellExists(config.ID);
                 string szQuery = "";
-                string szDt = DateTime.Now.ToString("F");
+                string szDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
                 string SqlEscape(string value) => value?.Replace("'", "''") ?? "";
 
@@ -234,7 +235,7 @@ namespace Alien
             {
                 bool bShellExists = ShellExists(config.ID);
                 string szQuery = "";
-                string szDt = DateTime.Now.ToString("F");
+                string szDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
                 // Helper local function to make string SQL-safe for SQLite
                 string SqlEscape(string value) => value?.Replace("'", "''") ?? "";

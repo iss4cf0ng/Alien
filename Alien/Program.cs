@@ -11,7 +11,9 @@ namespace Alien
         [STAThread]
         static void Main()
         {
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en");
+            var culture = new CultureInfo(new clsIniManager("config.ini").ReadString("General", "Language", "en"));
+
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
