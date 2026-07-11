@@ -257,7 +257,7 @@ namespace Alien
             textBox5.Enabled = !checkBox1.Checked && listView1.Items.Count == 0;
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             comboBox4.Items.Clear();
             string szDirPath = Path.Combine(new string[] { Application.StartupPath, "Payload", comboBox1.Text });
@@ -269,6 +269,30 @@ namespace Alien
 
             if (comboBox4.Items.Count > 0)
                 comboBox4.SelectedIndex = 0;
+
+            // EventHorizon
+            string? szLang = comboBox1.Text;
+            if (string.IsNullOrEmpty(szLang))
+                return;
+
+            var scripts = await m_tamper.fnGetAvailableTamper(szLang);
+            if (scripts == null)
+                return;
+
+            string szOriginal = comboBox2.Text;
+
+            comboBox2.Items.Clear();
+            foreach (var script in scripts)
+                comboBox2.Items.Add(script);
+
+            if (comboBox2.Items.Count == 0)
+                return;
+
+            if (string.IsNullOrEmpty(szOriginal))
+                comboBox2.SelectedIndex = 0;
+            else if (scripts.Contains(szOriginal))
+                comboBox2.Text = szOriginal;
+
         }
 
         private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
@@ -500,7 +524,34 @@ namespace Alien
 
         private void button7_Click(object sender, EventArgs e)
         {
+            List<string> lsID = listView1.Items.Cast<ListViewItem>().Where(x => x.Tag != null).Select(x => (clsWeb)x.Tag).Select(x => x.m_victim.ShellID).ToList();
+            stShellConfig config = new stShellConfig()
+            {
+                szUrl = textBox1.Text,
+                szPassword = textBox2.Text,
+                szEncoding = comboBox5.Text,
+                szMethod = comboBox4.Text,
+                language = (enLanguage)Enum.Parse(typeof(enLanguage), comboBox1.Text),
+                payloadType = (enPayloadType)Enum.Parse(typeof(enPayloadType), comboBox3.Text),
 
+                szDescription = textBox3.Text,
+                szUserAgent = textBox4.Text,
+                bEHEnable = checkBox1.Checked,
+                szEventHorizonScript = comboBox2.Text,
+                szEventHorizonConfig = textEditorControl1.Text,
+
+                szDriftingComet = JsonSerializer.Serialize(lsID),
+
+                nTimeout = (int)numericUpDown1.Value,
+                szCookie = textBox6.Text,
+                szExtraPost = textBox5.Text,
+                nExtraPostPosition = comboBox7.SelectedIndex,
+            };
+
+            clsVictim victim = new clsVictim(m_sqlConn, config, false);
+
+            frmCometDiagram f = new frmCometDiagram(m_sqlConn, victim);
+            f.Show();
         }
     }
 }

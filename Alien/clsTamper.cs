@@ -108,6 +108,14 @@ namespace Alien
                 {
                     szPayload = szPayload.Replace($"$q->param('z{i}')", $"\'{asParams[i]}\'");
                     szPayload = szPayload.Replace($"$q->param(\"z{i}\")", $"\"{asParams[i]}\"");
+
+                    szPayload = szPayload.Replace(
+                        "CGI->new;",
+                        "CGI->new('');");
+
+                    szPayload = szPayload.Replace(
+                        "CGI->new();",
+                        "CGI->new('');");
                 }
                 else if (lang == enLanguage.Ruby)
                 {
@@ -223,7 +231,7 @@ namespace Alien
         /// <returns></returns>
         public async Task<string?> fnBuild(string szScriptName, Dictionary<string, object> dicParam)
         {
-            return await fnSendRequest("build", szScriptName, string.Empty, dicParam);
+            return (await fnSendRequest("build", szScriptName, string.Empty, dicParam));
         }
 
         /// <summary>
@@ -238,7 +246,7 @@ namespace Alien
         }
 
         /// <summary>
-        /// Get available scripts.
+        /// Get available scripts from a specified tamper script.
         /// </summary>
         /// <param name="szScriptName"></param>
         /// <returns></returns>
@@ -249,6 +257,40 @@ namespace Alien
                 return new List<string>();
 
             return szResp.Replace(" ", string.Empty).Split(',').ToList();
+        }
+
+        public async Task<List<string>?> fnGetAvailableTamper(string szLanguage)
+        {
+            List<string> result = new List<string>();
+            List<string> lsTamper = new List<string>();
+
+            foreach (string szName in Directory.GetFiles(Path.Combine(m_dirModule, "obfuscators")))
+                lsTamper.Add(Path.GetFileName(szName).Split('.').First());
+
+            if (lsTamper.Count == 0)
+            {
+                MessageBox.Show("Cannot find any tamper script.", "Nothing!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return new List<string>();
+            }
+
+            foreach (var tamper in lsTamper)
+            {
+                try
+                {
+                    var scripts = await fnGetAvailableScript(tamper);
+                    if (scripts == null)
+                        continue;
+
+                    if (scripts.Contains(szLanguage))
+                        result.Add(tamper);
+                }
+                catch
+                {
+
+                }
+            }
+
+            return result;
         }
 
         /// <summary>

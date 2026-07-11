@@ -814,14 +814,9 @@ namespace Alien
                     int statusCode = (int)resp.StatusCode;
                     HttpStatusCode code = resp.StatusCode;
 
-                    resp.EnsureSuccessStatusCode();
-
                     string szResult = await resp.Content.ReadAsStringAsync();
 
-                    if (!resp.IsSuccessStatusCode)
-                        throw new Exception(szResult);
-
-                    return resp.IsSuccessStatusCode;
+                    return resp.StatusCode != HttpStatusCode.NotFound;
                 }
             }
             catch (Exception ex)
@@ -1411,19 +1406,13 @@ namespace Alien
                 "    return $data;\r\n" +
                 "}" : szEncryptor) + "\r\n\r\n" +
                 "my $globalStringOutput = '';\r\n" +
-                "my $oldout;\r\n" +
-                "sub start_capture {\r\n" +
-                "    open($oldout, '>&', STDOUT);\r\n" +
-                "    close(STDOUT);\r\n" +
-                "    open(STDOUT, '>', \\$globalStringOutput);\r\n" +
-                "}\r\n\r\n" +
-                "start_capture();\r\n";
+                "open(my $capture, '>', \\$globalStringOutput) or die $!;\r\n" +
+                "{\r\n" +
+                "    local *STDOUT = $capture;\r\n" +
+                "    local $ENV{CONTENT_LENGTH} = 0;\r\n";
 
             string szFooter =
-                "\r\n\r\n" +
-                "# Restore STDOUT and output encrypted data\r\n" +
-                "close(STDOUT);\r\n" +
-                "open(STDOUT, '>&', $oldout);\r\n" +
+                "}\r\n" +
                 "print Encrypt($globalStringOutput);\r\n";
 
             return szHeader + szProcessed + szFooter;
@@ -1441,7 +1430,7 @@ namespace Alien
                 "\r\n" +
                 "require 'stringio';\r\n" +
                 (string.IsNullOrEmpty(szEncryptor) ?
-                "def encrypt(data)\r\n" +
+                "def Encrypt(data)\r\n" +
                 "  # TODO: Add Ruby encryption logic here\r\n" +
                 "  return data\r\n" +
                 "end" : szEncryptor) + "\r\n\r\n" +
@@ -1452,7 +1441,7 @@ namespace Alien
                 "\r\n\r\n" +
                 "globalStringOutput = $stdout.string;\r\n" +
                 "$stdout = old_stdout;\r\n" +
-                "print encrypt(globalStringOutput);\r\n";
+                "print Encrypt(globalStringOutput);\r\n";
 
             return $"{szHeader}{szProcessed}{szFooter}";
         }

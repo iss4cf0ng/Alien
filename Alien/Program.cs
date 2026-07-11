@@ -11,7 +11,15 @@ namespace Alien
         [STAThread]
         static void Main()
         {
-            var culture = new CultureInfo(new clsIniManager("config.ini").ReadString("General", "Language", "en"));
+            CultureInfo? culture = null;
+            try
+            {
+                culture = new CultureInfo(new clsIniManager("config.ini").ReadString("General", "Language", "en"));
+            }
+            catch
+            {
+                culture = new CultureInfo("en");
+            }
 
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 

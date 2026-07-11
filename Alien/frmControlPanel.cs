@@ -2218,7 +2218,7 @@ namespace Alien
             while (node.Parent != null)
                 node = node.Parent;
 
-            DialogResult dr = MessageBox.Show($"Are you sure to remove \"{node.Text}\"? (Tips: This will only remove the local configuration rather than the remote database).", "Remove?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            DialogResult dr = MessageBox.Show($"Are you sure to remove \"{node.Text}\"? \n(Tips: This will only remove the local configuration and will not affect the remote database).", "Remove?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dr != DialogResult.Yes)
                 return;
 
