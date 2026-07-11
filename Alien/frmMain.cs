@@ -136,7 +136,7 @@ namespace Alien
 
             int nIdx = listView1.Columns.Count - 1;
             ListViewHeaderChanger.SortOrder defaultOrder = ListViewHeaderChanger.SortOrder.Descending;
-            
+
             lvwSorter.SortColumn = nIdx;
             lvwSorter.Order = defaultOrder == ListViewHeaderChanger.SortOrder.Descending ? SortOrder.Descending : SortOrder.Ascending;
 
@@ -475,6 +475,15 @@ namespace Alien
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             m_tamper.Dispose();
+        }
+
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in listView1.SelectedItems)
+            {
+                frmCometDiagram f = new frmCometDiagram(m_sqlConn, fnGetVictimTag(item).m_victim);
+                f.Show();
+            }
         }
     }
 

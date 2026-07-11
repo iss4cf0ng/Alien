@@ -124,8 +124,7 @@ namespace Alien
 
         public bool KeyExists(string section, string key)
         {
-            return m_dicData.TryGetValue(section, out var sec) &&
-                   sec.ContainsKey(key);
+            return m_dicData.TryGetValue(section, out var sec) && sec.ContainsKey(key);
         }
     }
 }

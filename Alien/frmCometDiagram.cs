@@ -23,58 +23,82 @@ namespace Alien
 
             m_sqlConn = sqlConn;
             m_victim = victim;
+
+            Text = "Comets";
         }
 
         async void fnSetup()
         {
-            TopologyGraph graph = new TopologyGraph();
-
-            var configs = m_victim.m_ShellConfig.lsCometShellID
-                .Select(x => m_sqlConn.fnGetShellConfig(x))
-                .ToList();
-
-            configs.Add(m_victim.m_ShellConfig);
-
-            // Nodes
-            foreach (var config in configs)
+            try
             {
+                textBox1.ReadOnly = true;
+                textBox1.Text = m_victim.ShellURL;
+
+                TopologyGraph graph = new TopologyGraph();
+
+                var configs = m_victim.m_ShellConfig.lsCometShellID.Select(x => m_sqlConn.fnGetShellConfig(x)).ToList();
+                configs.Add(m_victim.m_ShellConfig);
+
+                // Nodes
+
                 graph.nodes.Add(new TopologyNode
                 {
-                    id = config.szUrl.ToString(),
-                    name = config.szUrl.Split('/')[2],
-                    type = "host"
+                    id = "USER",
+                    name = "You",
+                    type = "malware",
                 });
-            }
 
-            // Chain edge
-            for (int i = 0; i < configs.Count - 1; i++)
-            {
+                foreach (var config in configs)
+                {
+                    graph.nodes.Add(new TopologyNode
+                    {
+                        id = config.szUrl.ToString(),
+                        name = config.szUrl.Split('/')[2] + $"({config.language.ToString()})",
+                        type = "host"
+                    });
+                }
+
+                // Chain edge
                 graph.edges.Add(new TopologyEdge
                 {
-                    from = configs[i].szUrl.ToString(),
-                    to = configs[i + 1].szUrl.ToString(),
-                    label = configs[i + 1].payloadType.ToString() + (configs[i + 1].bEHEnable ? $"({configs[i + 1].szEventHorizonScript})" : string.Empty)
+                    from = graph.nodes[0].id,
+                    to = configs[0].szUrl.ToString(),
+                    label = configs[0].payloadType.ToString() + (configs[0].bEHEnable ? $"({configs[0].szEventHorizonScript})" : string.Empty)
                 });
+
+                for (int i = 0; i < configs.Count - 1; i++)
+                {
+                    graph.edges.Add(new TopologyEdge
+                    {
+                        from = configs[i].szUrl.ToString(),
+                        to = configs[i + 1].szUrl.ToString(),
+                        label = configs[i + 1].payloadType.ToString() + (configs[i + 1].bEHEnable ? $"({configs[i + 1].szEventHorizonScript})" : string.Empty)
+                    });
+                }
+
+                string json = JsonSerializer.Serialize(graph, new JsonSerializerOptions { WriteIndented = true });
+
+                await webView21.EnsureCoreWebView2Async();
+
+                webView21.CoreWebView2.WebMessageReceived += (sender, e) =>
+                {
+                    string data = e.TryGetWebMessageAsString();
+                    MessageBox.Show(data);
+                };
+
+                webView21.NavigationCompleted += async (s, e) =>
+                {
+                    await webView21.ExecuteScriptAsync($"drawGraph({json})");
+                };
+
+                string szPath = Path.Combine(Application.StartupPath, "Tools", "topo", "graph.html");
+
+                webView21.Source = new Uri(szPath);
             }
-
-            string json = JsonSerializer.Serialize(graph, new JsonSerializerOptions { WriteIndented = true });
-
-            await webView21.EnsureCoreWebView2Async();
-
-            webView21.CoreWebView2.WebMessageReceived += (sender, e) =>
+            catch (Exception ex)
             {
-                string data = e.TryGetWebMessageAsString();
-                MessageBox.Show(data);
-            };
-
-            webView21.NavigationCompleted += async (s, e) =>
-            {
-                await webView21.ExecuteScriptAsync($"drawGraph({json})");
-            };
-
-            string szPath = Path.Combine(Application.StartupPath, "Tools", "topo", "graph.html");
-
-            webView21.Source = new Uri(szPath);
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void frmCometDiagram_Load(object sender, EventArgs e)
