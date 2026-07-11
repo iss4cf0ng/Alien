@@ -22,11 +22,6 @@ namespace Alien
             m_sqlConn = sqlConn;
         }
 
-        private void fnDeleteGroup()
-        {
-
-        }
-
         private async void fnSetup()
         {
             listView1.Items.Clear();
@@ -77,8 +72,14 @@ namespace Alien
         {
             try
             {
-                string szName = Interaction.InputBox("Name: ", "Rename Group");
+                var items = listView1.SelectedItems.Cast<ListViewItem>().ToList();
+                if (items.Count == 0)
+                    return;
 
+                ListViewItem item = items.First();
+
+                string szName = Interaction.InputBox("Name: ", "Rename Group");
+                m_sqlConn.fnRenameGroup(item.Text, szName);
             }
             catch (Exception ex)
             {
@@ -94,7 +95,7 @@ namespace Alien
                 return;
 
             ListViewItem item = items.First();
-            if (DialogResult.Yes != MessageBox.Show($"Are you sure to delete \"{item.Text}\"? All the shelles in this group will be deleted!", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+            if (DialogResult.Yes != MessageBox.Show($"Are you sure to delete \"{item.Text}\"? All the shells in this group will be deleted!", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                 return;
 
             try

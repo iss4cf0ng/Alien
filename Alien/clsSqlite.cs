@@ -372,12 +372,24 @@ namespace Alien
             return lsConfig;
         }
 
+        public bool fnbGroupExists(string szGroupName)
+        {
+            return fnGetShellWithGroupName(szGroupName).Count > 0;
+        }
+
         public void fnAddGroup(string szGroupName)
         {
             if (string.IsNullOrEmpty(szGroupName))
+                throw new Exception("Group name cannot be null or empty!");
+
+            if (fnbGroupExists(szGroupName))
+                throw new Exception("Group name already exists!");
+
+            const string szInvalid = "!@#$%^&*()-_+=/?`<>'\";~";
+            foreach (var c in szInvalid)
             {
-                MessageBox.Show("Group name cannot be null or empty!", "Invalid Group Name", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                if (szGroupName.Contains(c))
+                    throw new Exception("Group name should not contain invalid chars: " + szInvalid);
             }
 
             string szDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
@@ -386,26 +398,47 @@ namespace Alien
             fnSqlQuery(szQuery);
         }
 
+        public void fnRenameGroup(string szOldGroupName, string szNewGroupName)
+        {
+            if (szOldGroupName == "_All" || szOldGroupName == "_Orphan")
+                throw new Exception("This group is not allowed to rename: " + szOldGroupName);
+
+            if (fnbGroupExists(szNewGroupName))
+                throw new Exception("Group name already exists!");
+
+            const string szInvalid = "!@#$%^&*()-_+=/?`<>'\";~";
+            foreach (var c in szInvalid)
+            {
+                if (szNewGroupName.Contains(c))
+                    throw new Exception("Group name should not contain invalid chars: " + szInvalid);
+            }
+
+            var shells = fnGetShellWithGroupName(szOldGroupName);
+            foreach (var shell in shells)
+            {
+                var config = shell;
+                config.szGroupName = szNewGroupName;
+
+                SaveShell(config);
+            }
+
+            fnDeleteGroup(szOldGroupName);
+            fnAddGroup(szNewGroupName);
+        }
+
         public void fnDeleteGroup(string szGroupName)
         {
             if (szGroupName == "_All" || szGroupName == "_Orphan")
-            {
-                MessageBox.Show("Cannot delete group: " + szGroupName, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+                throw new Exception("This group is not allowed to delete: " + szGroupName);
 
-            var lShell = fnGetShellWithGroupName(szGroupName);
-            if (lShell.Count == 0)
-            {
-                MessageBox.Show("Cannot find group: " + szGroupName, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            if (!fnbGroupExists(szGroupName))
+                throw new Exception("Cannot find group name: " + szGroupName);
 
-            foreach (var config in lShell)
-            {
-                string szQuery = $"UPDATE \"Shell\" SET \"GroupName\"=\"All\" WHERE \"ID\"=\"{config.ID}\";";
-                fnSqlQuery(szQuery);
-            }
+            // Delete all shells
+            fnSqlQuery($"DELETE FROM \"Shell\" WHERE \"GroupName\"=\"{szGroupName}\";");
+
+            // Delete group name
+            fnSqlQuery($"DELETE FROM \"Group\" WHERE \"Name\"=\"{szGroupName}\";");
         }
 
         #endregion
