@@ -49,11 +49,18 @@ namespace Alien
                 }
             },
             {
+                "Group",
+                new string[]
+                {
+                    "Name",
+                    "CreationDate",
+                }
+            },
+            {
                 "Log",
                 new string[]
                 {
                     "Name",
-
                     "CreateDate",
                     "LastModified",
                     "LastAccessed",
@@ -367,12 +374,21 @@ namespace Alien
 
         public void fnAddGroup(string szGroupName)
         {
-            
+            if (string.IsNullOrEmpty(szGroupName))
+            {
+                MessageBox.Show("Group name cannot be null or empty!", "Invalid Group Name", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string szDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            string szQuery = $"INSERT INTO \"Group\" (Name, CreationDate) VALUES (\"{szGroupName}\", \"{szDt}\");";
+
+            fnSqlQuery(szQuery);
         }
 
         public void fnDeleteGroup(string szGroupName)
         {
-            if (szGroupName == "All")
+            if (szGroupName == "_All" || szGroupName == "_Orphan")
             {
                 MessageBox.Show("Cannot delete group: " + szGroupName, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;

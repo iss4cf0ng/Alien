@@ -117,10 +117,80 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>136, 17</value>
-  </metadata>
-  <metadata name="statusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>腳本 :</value>
+  </data>
+  <data name="comboBox1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>75, 7</value>
+  </data>
+  <data name="comboBox1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>164, 27</value>
+  </data>
+  <data name="button1.Text" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="tabPage1.Text" xml:space="preserve">
+    <value>事件視界</value>
+  </data>
+  <data name="button5.Text" xml:space="preserve">
+    <value>-&gt; 解密 -&gt;</value>
+  </data>
+  <data name="button4.Text" xml:space="preserve">
+    <value>-&gt; 加密 -&gt;</value>
+  </data>
+  <data name="button3.Text" xml:space="preserve">
+    <value>複製 Webshell</value>
+  </data>
+  <data name="button2.Text" xml:space="preserve">
+    <value>複製 JSON</value>
+  </data>
+  <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>303, 10</value>
+  </data>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>語言 :</value>
+  </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>參數 (JSON)</value>
+  </data>
+  <data name="tabPage2.Text" xml:space="preserve">
+    <value>星雲脈衝星</value>
+  </data>
+  <data name="checkBox1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>73, 23</value>
+  </data>
+  <data name="checkBox1.Text" xml:space="preserve">
+    <value>最小化</value>
+  </data>
+  <data name="button7.Text" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="button6.Text" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="label4.Location" type="System.Drawing.Point, System.Drawing">
+    <value>280, 10</value>
+  </data>
+  <data name="label4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label4.Text" xml:space="preserve">
+    <value>金鑰 :</value>
+  </data>
+  <data name="label3.Location" type="System.Drawing.Point, System.Drawing">
+    <value>45, 10</value>
+  </data>
+  <data name="label3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label3.Text" xml:space="preserve">
+    <value>語言 :</value>
+  </data>
 </root>

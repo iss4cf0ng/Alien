@@ -21,6 +21,7 @@ namespace Alien
         {
             InitializeComponent();
 
+            Text = "Builder";
             m_tamper = tamper;
         }
 

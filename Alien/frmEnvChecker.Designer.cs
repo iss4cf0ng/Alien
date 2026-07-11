@@ -28,72 +28,64 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmEnvChecker));
             richTextBox1 = new RichTextBox();
-            button1 = new Button();
-            button2 = new Button();
             progressBar1 = new ProgressBar();
+            pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // richTextBox1
             // 
-            richTextBox1.Location = new Point(15, 15);
-            richTextBox1.Margin = new Padding(4, 4, 4, 4);
+            richTextBox1.Location = new Point(15, 83);
+            richTextBox1.Margin = new Padding(4);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(611, 267);
+            richTextBox1.Size = new Size(499, 200);
             richTextBox1.TabIndex = 0;
             richTextBox1.Text = "";
-            // 
-            // button1
-            // 
-            button1.Location = new Point(15, 343);
-            button1.Margin = new Padding(4, 4, 4, 4);
-            button1.Name = "button1";
-            button1.Size = new Size(220, 60);
-            button1.TabIndex = 1;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            button2.Location = new Point(408, 343);
-            button2.Margin = new Padding(4, 4, 4, 4);
-            button2.Name = "button2";
-            button2.Size = new Size(220, 60);
-            button2.TabIndex = 2;
-            button2.Text = "button2";
-            button2.UseVisualStyleBackColor = true;
             // 
             // progressBar1
             // 
             progressBar1.Location = new Point(15, 291);
-            progressBar1.Margin = new Padding(4, 4, 4, 4);
+            progressBar1.Margin = new Padding(4);
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(612, 44);
+            progressBar1.Size = new Size(499, 35);
             progressBar1.TabIndex = 3;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(15, 12);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(498, 64);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 4;
+            pictureBox1.TabStop = false;
             // 
             // frmEnvChecker
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(645, 426);
+            ClientSize = new Size(525, 335);
+            Controls.Add(pictureBox1);
             Controls.Add(progressBar1);
-            Controls.Add(button2);
-            Controls.Add(button1);
             Controls.Add(richTextBox1);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            Margin = new Padding(4, 4, 4, 4);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            Margin = new Padding(4);
+            MaximizeBox = false;
             Name = "frmEnvChecker";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "frmEnvChecker";
             Load += frmEnvChecker_Load;
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
         private RichTextBox richTextBox1;
-        private Button button1;
-        private Button button2;
         private ProgressBar progressBar1;
+        private PictureBox pictureBox1;
     }
 }

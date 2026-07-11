@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -33,7 +34,7 @@ namespace Alien
             var lShell = m_sqlConn.fnGetAllShellConfig();
             foreach (var config in lShell)
             {
-                ListViewItem item = listView1.FindItemWithText(config.szGroupName);
+                ListViewItem? item = listView1.FindItemWithText(config.szGroupName);
                 if (item == null)
                 {
                     item = new ListViewItem(config.szGroupName);
@@ -51,31 +52,73 @@ namespace Alien
             fnSetup();
         }
 
-        //Refresh
-        private void button1_Click(object sender, EventArgs e)
+        // Refresh
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             fnSetup();
         }
-        //Delete
-        private void button3_Click(object sender, EventArgs e)
+
+        // Add
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in listView1.CheckedItems)
+            try
+            {
+                string szName = Interaction.InputBox("Name: ", "New Group");
+                m_sqlConn.fnAddGroup(szName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Rename
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string szName = Interaction.InputBox("Name: ", "Rename Group");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Delete
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            var items = listView1.SelectedItems.Cast<ListViewItem>().ToList();
+            if (items.Count == 0)
+                return;
+
+            ListViewItem item = items.First();
+            if (DialogResult.Yes != MessageBox.Show($"Are you sure to delete \"{item.Text}\"? All the shelles in this group will be deleted!", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                return;
+
+            try
+            {
                 m_sqlConn.fnDeleteGroup(item.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
-        //Add
-        private void button2_Click(object sender, EventArgs e)
+
+        // Check All
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
-            
+            foreach (ListViewItem item in listView1.Items)
+                item.Selected = true;
         }
-        //Check All
-        private void button4_Click(object sender, EventArgs e)
+
+        // Uncheck All
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
         {
-            listView1.Items.Cast<ListViewItem>().Select(x => x.Checked = true);
-        }
-        //Uncheck All
-        private void button5_Click(object sender, EventArgs e)
-        {
-            listView1.Items.Cast<ListViewItem>().Select(x => x.Checked = false);
+            foreach (ListViewItem item in listView1.Items)
+                item.Selected = false;
         }
     }
 }

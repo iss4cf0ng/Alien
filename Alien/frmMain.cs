@@ -125,6 +125,12 @@ namespace Alien
 
         async Task fnSetup()
         {
+            if (new frmEnvChecker().ShowDialog() != DialogResult.OK)
+            {
+                Close();
+                return;
+            }
+
             toolStripStatusLabel1.Text = string.Empty;
             toolStripStatusLabel4.Text = string.Empty;
 
@@ -174,6 +180,8 @@ namespace Alien
             toolStripStatusLabel4.Text = "Loading...";
 
             fnLoadShell();
+
+            toolStripStatusLabel4.Text = "Starting tamper script server...";
 
             m_tamper = new clsTamper("http://127.0.0.1:8000", "python", "Tamper\\server.py");
             await m_tamper.fnInitializeServerAsync();
@@ -474,7 +482,8 @@ namespace Alien
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            m_tamper.Dispose();
+            if (m_tamper != null)
+                m_tamper.Dispose();
         }
 
         private void toolStripMenuItem6_Click(object sender, EventArgs e)

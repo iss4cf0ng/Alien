@@ -307,10 +307,6 @@ namespace Alien
 
             if (comboBox3.Items.Count > 0)
                 comboBox3.SelectedIndex = 0;
-
-            bool bOneShell = comboBox3.Text.Equals("OneShell");
-            groupBox2.Enabled = bOneShell;
-            groupBox5.Enabled = bOneShell;
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -552,6 +548,13 @@ namespace Alien
 
             frmCometDiagram f = new frmCometDiagram(m_sqlConn, victim);
             f.Show();
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bool bOneShell = comboBox3.Text.Equals("OneShell");
+            groupBox2.Enabled = bOneShell;
+            groupBox5.Enabled = bOneShell;
         }
     }
 }
