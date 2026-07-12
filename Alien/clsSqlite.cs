@@ -374,7 +374,26 @@ namespace Alien
 
         public bool fnbGroupExists(string szGroupName)
         {
-            return fnGetShellWithGroupName(szGroupName).Count > 0;
+            string szQuery = $"SELECT 1 FROM \"Group\" WHERE \"Name\" = \"{szGroupName}\";";
+            DataTable dtResult = fnSqlQuery(szQuery);
+            if (dtResult.Rows.Count == 0)
+                return false;
+
+            int nVal = int.Parse(dtResult.Rows[0][0].ToString());
+
+            return nVal == 1;
+        }
+
+        public List<string> fnGetGroups()
+        {
+            var shells = fnGetAllShellConfig();
+            List<string> groups = new List<string>();
+
+            DataTable dt = fnSqlQuery($"SELECT \"Name\" FROM \"Group\";");
+            foreach (DataRow dr in dt.Rows)
+                groups.Add(dr[0].ToString());
+
+            return groups;
         }
 
         public void fnAddGroup(string szGroupName)
@@ -434,8 +453,14 @@ namespace Alien
             if (!fnbGroupExists(szGroupName))
                 throw new Exception("Cannot find group name: " + szGroupName);
 
-            // Delete all shells
-            fnSqlQuery($"DELETE FROM \"Shell\" WHERE \"GroupName\"=\"{szGroupName}\";");
+            // Move all shells to _Orphan
+            foreach (var config in fnGetShellWithGroupName(szGroupName))
+            {
+                var newConfig = config;
+                newConfig.szGroupName = "_Orphan";
+
+                SaveShell(newConfig);
+            }
 
             // Delete group name
             fnSqlQuery($"DELETE FROM \"Group\" WHERE \"Name\"=\"{szGroupName}\";");

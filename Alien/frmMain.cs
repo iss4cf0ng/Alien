@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Alien
 {
@@ -99,18 +100,24 @@ namespace Alien
                 item.Tag = web;
 
                 listView1.Items.Add(item);
-
-                // TreeView
-                TreeNode node = treeView1.Nodes[0];
-                var lsGroupName = m_lsGroupName;
-                if (!string.IsNullOrEmpty(config.szGroupName) && !lsGroupName.Contains(config.szGroupName))
-                {
-                    TreeNode nodeNew = new TreeNode(config.szGroupName);
-                    node.Nodes.Add(nodeNew);
-                }
             }
 
             fnUpdateState();
+        }
+
+        void fnLoadGroup()
+        {
+            TreeNode node = treeView1.Nodes[0];
+            node.Nodes.Clear();
+
+            node.Nodes.Add("_All");
+            node.Nodes.Add("_Orphan");
+
+            foreach (var group in m_sqlConn.fnGetGroups())
+                node.Nodes.Add(group);
+
+            node.Expand();
+            treeView1.Refresh();
         }
 
         void fnUpdateState()
@@ -125,7 +132,8 @@ namespace Alien
 
         async Task fnSetup()
         {
-            if (new frmEnvChecker().ShowDialog() != DialogResult.OK)
+            m_tamper = new clsTamper("http://127.0.0.1:8000", "python", "Tamper\\server.py");
+            if (new frmEnvChecker(m_tamper).ShowDialog() != DialogResult.OK)
             {
                 Close();
                 return;
@@ -175,16 +183,15 @@ namespace Alien
             node.Nodes.Add(new TreeNode("_Orphan"));
 
             treeView1.Nodes.Add(node);
+
             treeView1.ExpandAll();
 
-            toolStripStatusLabel4.Text = "Loading...";
+            toolStripStatusLabel4.Text = "Loading shells...";
 
             fnLoadShell();
 
-            toolStripStatusLabel4.Text = "Starting tamper script server...";
-
-            m_tamper = new clsTamper("http://127.0.0.1:8000", "python", "Tamper\\server.py");
-            await m_tamper.fnInitializeServerAsync();
+            // Add groups
+            fnLoadGroup();
 
             toolStripStatusLabel4.Text = "Action successfully";
 
@@ -259,6 +266,7 @@ namespace Alien
             f.ShowDialog();
 
             fnLoadShell();
+            fnLoadGroup();
         }
 
         private void toolStripMenuItem8_Click(object sender, EventArgs e)
@@ -270,6 +278,7 @@ namespace Alien
             f.ShowDialog();
 
             fnLoadShell();
+            fnLoadGroup();
         }
 
         private void listView1_KeyDown(object sender, KeyEventArgs e)
@@ -277,6 +286,7 @@ namespace Alien
             if (e.KeyCode == Keys.F5)
             {
                 fnLoadShell();
+                fnLoadGroup();
             }
             else if (e.KeyCode == Keys.Enter)
             {
@@ -294,6 +304,7 @@ namespace Alien
                 f.ShowDialog();
 
                 fnLoadShell();
+                fnLoadGroup();
             }
         }
 
@@ -492,6 +503,36 @@ namespace Alien
             {
                 frmCometDiagram f = new frmCometDiagram(m_sqlConn, fnGetVictimTag(item).m_victim);
                 f.Show();
+            }
+        }
+
+        private void toolStripMenuItem9_Click(object sender, EventArgs e)
+        {
+            frmEditGroup f = new frmEditGroup(m_sqlConn);
+            f.ShowDialog();
+
+            fnLoadShell();
+            fnLoadGroup();
+        }
+
+        private void treeView1_DoubleClick(object sender, EventArgs e)
+        {
+            TreeNode? node = treeView1.SelectedNode;
+            if (node == null)
+                return;
+
+            if (node.Parent == null)
+            {
+                MessageBox.Show("Group count: " + node.Nodes.Count, "Nihahahaha", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            else
+            {
+                frmEditGroup f = new frmEditGroup(m_sqlConn);
+                f.ShowDialog();
+
+                fnLoadShell();
+                fnLoadGroup();
             }
         }
     }

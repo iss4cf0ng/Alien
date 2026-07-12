@@ -17,11 +17,14 @@ namespace Alien
         /// Check prerequiste programs and environment variables
         /// </summary>
 
-        public frmEnvChecker()
+        private clsTamper m_tamper { get; init; }
+
+        public frmEnvChecker(clsTamper tamper)
         {
             InitializeComponent();
 
             Text = "Checking Your Environment...";
+            m_tamper = tamper;
         }
 
         void fnAddLog(string szMsg)
@@ -105,6 +108,13 @@ namespace Alien
             }
 
             fnAddLog("=> OK");
+
+            fnAddLog("Starting the tamper script server...");
+
+            await m_tamper.fnInitializeServerAsync();
+
+            fnAddLog("=> OK");
+
             fnAddLog("==========[ NICE! ]==========");
             fnAddLog("Starting the application, please wait...");
 

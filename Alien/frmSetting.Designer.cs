@@ -28,15 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSetting));
             label1 = new Label();
             comboBox1 = new ComboBox();
-            button1 = new Button();
+            tabControl1 = new TabControl();
+            tabPage1 = new TabPage();
+            tabPage2 = new TabPage();
+            toolStrip1 = new ToolStrip();
+            toolStripButton1 = new ToolStripButton();
+            tabControl1.SuspendLayout();
+            tabPage1.SuspendLayout();
+            toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(239, 165);
+            label1.Location = new Point(8, 10);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new Size(79, 19);
@@ -46,37 +54,87 @@
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(326, 162);
+            comboBox1.Location = new Point(95, 7);
             comboBox1.Margin = new Padding(4);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(154, 27);
             comboBox1.TabIndex = 1;
             // 
-            // button1
+            // tabControl1
             // 
-            button1.Location = new Point(239, 217);
-            button1.Margin = new Padding(4);
-            button1.Name = "button1";
-            button1.Size = new Size(256, 67);
-            button1.TabIndex = 2;
-            button1.Text = "Apply";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            tabControl1.Controls.Add(tabPage1);
+            tabControl1.Controls.Add(tabPage2);
+            tabControl1.Dock = DockStyle.Fill;
+            tabControl1.Location = new Point(0, 26);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(737, 321);
+            tabControl1.SizeMode = TabSizeMode.Fixed;
+            tabControl1.TabIndex = 3;
+            // 
+            // tabPage1
+            // 
+            tabPage1.Controls.Add(comboBox1);
+            tabPage1.Controls.Add(label1);
+            tabPage1.Location = new Point(4, 28);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(729, 289);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "General";
+            tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(729, 293);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Loader";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip1
+            // 
+            toolStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton1 });
+            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new Size(737, 26);
+            toolStrip1.TabIndex = 4;
+            toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButton1
+            // 
+            toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton1.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            toolStripButton1.Image = (Image)resources.GetObject("toolStripButton1.Image");
+            toolStripButton1.ImageTransparentColor = Color.Magenta;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(53, 23);
+            toolStripButton1.Text = "Apply";
+            toolStripButton1.Click += toolStripButton1_Click;
             // 
             // frmSetting
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(744, 349);
-            Controls.Add(button1);
-            Controls.Add(comboBox1);
-            Controls.Add(label1);
+            ClientSize = new Size(737, 347);
+            Controls.Add(tabControl1);
+            Controls.Add(toolStrip1);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Margin = new Padding(4);
+            MaximizeBox = false;
             Name = "frmSetting";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "frmSetting";
             Load += frmSetting_Load;
+            tabControl1.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
+            toolStrip1.ResumeLayout(false);
+            toolStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -85,6 +143,10 @@
 
         private Label label1;
         private ComboBox comboBox1;
-        private Button button1;
+        private TabControl tabControl1;
+        private TabPage tabPage1;
+        private TabPage tabPage2;
+        private ToolStrip toolStrip1;
+        private ToolStripButton toolStripButton1;
     }
 }

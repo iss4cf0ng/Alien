@@ -19,26 +19,21 @@ namespace Alien
         {
             InitializeComponent();
 
+            Text = "Group Manager";
             m_sqlConn = sqlConn;
         }
 
-        private async void fnSetup()
+        private void fnSetup()
         {
             listView1.Items.Clear();
 
-            var lShell = m_sqlConn.fnGetAllShellConfig();
-            foreach (var config in lShell)
+            foreach (var group in m_sqlConn.fnGetGroups())
             {
-                ListViewItem? item = listView1.FindItemWithText(config.szGroupName);
-                if (item == null)
-                {
-                    item = new ListViewItem(config.szGroupName);
-                    item.SubItems.Add("0");
+                int nCount = m_sqlConn.fnGetShellWithGroupName(group).Count;
+                ListViewItem item = new ListViewItem(group);
+                item.SubItems.Add(nCount.ToString());
 
-                    listView1.Items.Add(item);
-                }
-
-                item.SubItems[1].Text = (int.Parse(item.SubItems[1].Text) + 1).ToString();
+                listView1.Items.Add(item);
             }
         }
 
@@ -65,6 +60,8 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            fnSetup();
         }
 
         // Rename
@@ -85,6 +82,8 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            fnSetup();
         }
 
         // Delete
@@ -95,7 +94,7 @@ namespace Alien
                 return;
 
             ListViewItem item = items.First();
-            if (DialogResult.Yes != MessageBox.Show($"Are you sure to delete \"{item.Text}\"? All the shells in this group will be deleted!", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+            if (DialogResult.Yes != MessageBox.Show($"Are you sure to delete \"{item.Text}\"? All the shells in this group will be moved to \"_Orphan\"!", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                 return;
 
             try
@@ -106,16 +105,18 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            fnSetup();
         }
 
-        // Check All
+        // Select All
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView1.Items)
                 item.Selected = true;
         }
 
-        // Uncheck All
+        // Unselect All
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView1.Items)
