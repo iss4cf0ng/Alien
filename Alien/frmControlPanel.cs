@@ -38,6 +38,7 @@ namespace Alien
         public clsfnShell m_rShell { get; set; }
         public clsfnDb m_dbMgr { get; init; }
         public clsfnRunScript m_runScript { get; init; }
+        public clsfnLAN m_lan { get; init; }
         public clsfnWinReg m_winReg { get; init; }
         public clsfnWinUser m_winUser { get; init; }
         public clsfnPlugin m_plugin { get; init; }
@@ -91,7 +92,7 @@ namespace Alien
             m_fileMgr = new clsfnFileMgr(web);
             m_rShell = new clsfnShell(web);
             m_runScript = new clsfnRunScript(web);
-
+            m_lan = new clsfnLAN(web);
             m_winReg = new clsfnWinReg(web);
             m_winUser = new clsfnWinUser(web);
 
@@ -1572,14 +1573,14 @@ namespace Alien
             {
                 // Linux
 
-                TabPage page = tabControl1.TabPages[6];
+                TabPage page = tabPage15;
                 tabControl1.TabPages.Remove(page);
             }
             else
             {
                 // Windows
 
-                TabPage page = tabControl1.TabPages[5];
+                TabPage page = tabPage16;
                 tabControl1.TabPages.Remove(page);
 
                 await fnWinUserInit();
@@ -3131,6 +3132,83 @@ namespace Alien
             webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
 
             textBox12.Text = node.FullPath;
+        }
+
+        private async void toolStripMenuItem48_Click(object sender, EventArgs e)
+        {
+            frmScanHost f = new frmScanHost();
+            if (f.ShowDialog() != DialogResult.OK)
+                return;
+
+            if (string.IsNullOrEmpty(f.m_szPorts) || string.IsNullOrEmpty(f.m_szHosts))
+                return;
+
+            try
+            {
+                List<string> lsIP = clsfnLAN.fnParseIPRange(f.m_szHosts);
+                List<int> lsPort = f.m_szPorts.Split(',').Select(x => x.Trim()).Select(x => int.Parse(x)).ToList();
+
+                if (lsIP.Count == 0 || lsPort.Count == 0)
+                {
+                    richTextBox3.AppendText($"[-] Invalid pattern, please check the input hosts and ports\n");
+                    return;
+                }
+
+                richTextBox3.AppendText($"[*] Ready to scan: {lsIP.Count * lsPort.Count}\n");
+
+                m_lan.m_dicHost.Clear();
+                listView14.Items.Clear();
+
+                object lvLock = new object();
+                var callback = (string ip, int port) =>
+                {
+                    lock (lvLock)
+                    {
+                        bool bExists = false;
+                        Invoke(() => bExists = listView14.FindItemWithText(ip) != null);
+
+                        if (m_lan.m_dicHost.ContainsKey(ip))
+                            m_lan.m_dicHost[ip].Add(port);
+                        else
+                            m_lan.m_dicHost.Add(ip, new List<int> { port });
+
+                        if (!bExists)
+                        {
+                            ListViewItem item = new ListViewItem(ip);
+                            if (m_lan.m_dicHost[ip].Contains(139) || m_lan.m_dicHost[ip].Contains(445))
+                                item.ImageKey = "Windows";
+                            else if (m_lan.m_dicHost[ip].Contains(22))
+                                item.ImageKey = "Linux";
+                            else
+                                item.ImageKey = "Unknown";
+
+                            Invoke(() =>
+                            {
+                                listView14.Items.Add(item);
+                                richTextBox3.AppendText($"[*] Discovered new host: {ip}:{port}\n");
+                            });
+                        }
+                    }
+                };
+
+                int nThread = f.m_nThread;
+
+                await m_lan.fnStart(lsIP, lsPort, callback, () => Invoke(() => { richTextBox3.AppendText($"[+] Finished scanning\n"); }), nThread);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void toolStripMenuItem49_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem50_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

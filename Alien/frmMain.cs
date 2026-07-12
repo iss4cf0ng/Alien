@@ -125,7 +125,7 @@ namespace Alien
             treeView1.Refresh();
             listView1.Refresh();
 
-            Text = $"{m_szName} {m_szVersion} by {m_szAuthor} | Selected[{listView1.SelectedItems.Count}]";
+            Text = $"{m_szName} {m_szVersion} by {m_szAuthor} | Tamper sever: {m_tamper.m_szPyServerUri} | Selected[{listView1.SelectedItems.Count}]";
             toolStripStatusLabel1.Text = $"Shell[{listView1.Items.Count}]";
             toolStripStatusLabel3.Text = "iss4cf0ng/ISSAC";
         }

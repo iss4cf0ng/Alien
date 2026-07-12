@@ -83,6 +83,8 @@ namespace Alien
 
         private async Task fnSetup()
         {
+            progressBar1.Maximum = 3;
+
             fnAddLog("Checking environment variables...");
 
             bool envOK = await Task.Run(() => fnbCheckEnvVariables());
@@ -95,6 +97,7 @@ namespace Alien
             }
 
             fnAddLog("=> OK");
+            progressBar1.Increment(1);
 
             fnAddLog("Checking payloads...");
 
@@ -108,12 +111,14 @@ namespace Alien
             }
 
             fnAddLog("=> OK");
+            progressBar1.Increment(1);
 
             fnAddLog("Starting the tamper script server...");
 
             await m_tamper.fnInitializeServerAsync();
 
             fnAddLog("=> OK");
+            progressBar1.Increment(1);
 
             fnAddLog("==========[ NICE! ]==========");
             fnAddLog("Starting the application, please wait...");

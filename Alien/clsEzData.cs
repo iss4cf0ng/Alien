@@ -22,13 +22,23 @@ namespace Alien
             "Macintosh; Intel Mac OS X 11_12_0"
         };
 
-        public static string fnszGenerateRandomStr(int nLength = 10)
+        public static string fnszGenerateRandomStr(int nLength = 10, bool bStartsWithLetter = false)
         {
-            const string szPattern = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            if (nLength <= 0)
+                return string.Empty;
+
+            const string letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string chars = letters + "0123456789";
 
             StringBuilder sb = new StringBuilder(nLength);
-            for (int i = 0; i < nLength; i++)
-                sb.Append(szPattern[new Random().Next(0, szPattern.Length)]);
+
+            if (bStartsWithLetter)
+                sb.Append(letters[_random.Next(letters.Length)]);
+
+            int startIndex = sb.Length;
+
+            for (int i = startIndex; i < nLength; i++)
+                sb.Append(chars[_random.Next(chars.Length)]);
 
             return sb.ToString();
         }
@@ -84,7 +94,5 @@ namespace Alien
                     return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36";
             }
         }
-
-
     }
 }

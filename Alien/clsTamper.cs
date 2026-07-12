@@ -11,7 +11,7 @@ namespace Alien
     public class clsTamper : IDisposable
     {
         private readonly HttpClient m_client;
-        private readonly string m_szPyServerUri;
+        public readonly string m_szPyServerUri;
         private Process? m_serverProcess = null;
 
         private string m_pyExecutable { get; init; }
