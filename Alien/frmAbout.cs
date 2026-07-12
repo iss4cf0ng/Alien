@@ -18,9 +18,9 @@ namespace Alien
             "\n" +
             "Please do not use this tool for illegal purposes!\n" +
             "\n" +
-            "The previous releases (version 1 to 4) were removed by the author due to my early limited development experience.\n" +
-            "Alien v5.0.0 is much more powerful then the previous versions.\n" +
-            "Hope you like this tool, thanks for checking it out!";
+            "Previous versions (1–4) were removed by the author because I had limited experience at the time.\n" +
+            "Alien v5.0.0 is much more powerful than the previous versions.\n" +
+            "I hope you enjoy using this tool. Thanks for checking it out!";
 
         public frmAbout()
         {
