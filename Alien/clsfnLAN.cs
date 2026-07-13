@@ -198,5 +198,40 @@ namespace Alien
 
             return lsResult;
         }
+
+        public static List<int> fnParsePortList(string input)
+        {
+            var ports = new List<int>();
+
+            foreach (var item in input.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var part = item.Trim();
+
+                if (part.Contains('-'))
+                {
+                    var range = part.Split('-', StringSplitOptions.RemoveEmptyEntries);
+
+                    if (range.Length != 2 || !int.TryParse(range[0], out int start) || !int.TryParse(range[1], out int end))
+                        continue;
+
+                    if (start > end)
+                        (start, end) = (end, start);
+
+                    for (int i = start; i <= end; i++)
+                    {
+                        ports.Add(i);
+                    }
+                }
+                else
+                {
+                    if (!int.TryParse(part, out int port))
+                        continue;
+
+                    ports.Add(port);
+                }
+            }
+
+            return ports.Distinct().OrderBy(p => p).ToList();
+        }
     }
 }

@@ -42,7 +42,7 @@
             // 
             button1.Location = new Point(12, 111);
             button1.Name = "button1";
-            button1.Size = new Size(302, 42);
+            button1.Size = new Size(364, 42);
             button1.TabIndex = 0;
             button1.Text = "Go";
             button1.UseVisualStyleBackColor = true;
@@ -61,14 +61,14 @@
             // 
             textBox1.Location = new Point(83, 12);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(231, 27);
+            textBox1.Size = new Size(293, 27);
             textBox1.TabIndex = 2;
             // 
             // textBox2
             // 
             textBox2.Location = new Point(83, 45);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(231, 27);
+            textBox2.Size = new Size(293, 27);
             textBox2.TabIndex = 4;
             // 
             // label2
@@ -93,7 +93,7 @@
             // 
             numericUpDown1.Location = new Point(83, 78);
             numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(231, 27);
+            numericUpDown1.Size = new Size(293, 27);
             numericUpDown1.TabIndex = 6;
             numericUpDown1.Value = new decimal(new int[] { 3, 0, 0, 0 });
             // 
@@ -101,7 +101,7 @@
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(324, 165);
+            ClientSize = new Size(388, 165);
             Controls.Add(numericUpDown1);
             Controls.Add(label3);
             Controls.Add(textBox2);

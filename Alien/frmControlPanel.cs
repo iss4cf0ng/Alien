@@ -1356,6 +1356,9 @@ namespace Alien
         {
             timerShell.Stop();
 
+            m_lan.fnStop();
+            m_socks5.fnStop();
+
             //await m_web.DisposeAsync();
         }
 
@@ -1587,14 +1590,14 @@ namespace Alien
             {
                 // Linux
 
-                TabPage page = tabPage15;
+                TabPage page = tabPage16;
                 tabControl1.TabPages.Remove(page);
             }
             else
             {
                 // Windows
 
-                TabPage page = tabPage16;
+                TabPage page = tabPage15;
                 tabControl1.TabPages.Remove(page);
 
                 await fnWinUserInit();
@@ -1638,6 +1641,49 @@ namespace Alien
             {
                 return;
             }
+
+            // SOCKS5
+            listView13.FullRowSelect = true;
+            button4.Enabled = false;
+
+            m_socks5.OnConnected += (ip, port) =>
+            {
+                string szHost = $"{ip}:{port}";
+                string szDt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+                ListViewItem item = new ListViewItem(szHost);
+                item.SubItems.Add("SOCKS5");
+                item.SubItems.Add(szDt);
+
+                Invoke(() => listView13.Items.Add(item));
+            };
+            m_socks5.OnDisconnected += (ip, port) =>
+            {
+                string szHost = $"{ip}:{port}";
+                ListViewItem? item = null;
+                Invoke(() => item = listView13.FindItemWithText(szHost));
+
+                if (item == null)
+                    return;
+
+                Invoke(() => listView13.Items.Remove(item));
+            };
+            m_socks5.OnListened += (port) =>
+            {
+                Invoke(() =>
+                {
+                    button3.Enabled = false;
+                    button4.Enabled = true;
+                });
+            };
+            m_socks5.OnStopped += (port) =>
+            {
+                Invoke(() =>
+                {
+                    button3.Enabled = true;
+                    button4.Enabled = false;
+                });
+            };
 
             // Note
             try
@@ -3160,7 +3206,7 @@ namespace Alien
             try
             {
                 List<string> lsIP = clsfnLAN.fnParseIPRange(f.m_szHosts);
-                List<int> lsPort = f.m_szPorts.Split(',').Select(x => x.Trim()).Select(x => int.Parse(x)).ToList();
+                List<int> lsPort = clsfnLAN.fnParsePortList(f.m_szPorts);
 
                 if (lsIP.Count == 0 || lsPort.Count == 0)
                 {
@@ -3217,12 +3263,19 @@ namespace Alien
 
         private void toolStripMenuItem49_Click(object sender, EventArgs e)
         {
+            foreach (ListViewItem item in listView14.SelectedItems)
+            {
+                string szIP = item.Text;
+                var ports = m_lan.m_dicHost[szIP];
 
+                frmPortInfo f = new frmPortInfo(szIP, ports);
+                f.Show();
+            }
         }
 
         private void toolStripMenuItem50_Click(object sender, EventArgs e)
         {
-
+            listView14.Items.Clear();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -3250,8 +3303,6 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            button3.Enabled = m_socks5.m_bIsRunning;
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -3267,8 +3318,18 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
 
-            button3.Enabled = m_socks5.m_bIsRunning;
+        private void listView14_DoubleClick(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in listView14.SelectedItems)
+            {
+                string szIP = item.Text;
+                var ports = m_lan.m_dicHost[szIP];
+
+                frmPortInfo f = new frmPortInfo(szIP, ports);
+                f.Show();
+            }
         }
     }
 }

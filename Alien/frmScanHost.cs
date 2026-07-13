@@ -25,7 +25,7 @@ namespace Alien
 
         void fnSetup()
         {
-
+            textBox2.Text = "80-88,135,139,445,1433,3306,3389,8080,8088,8888";
         }
 
         private void frmScanHost_Load(object sender, EventArgs e)

@@ -205,7 +205,7 @@
             voidImageList = new ImageList(components);
             richTextBox3 = new RichTextBox();
             tabPage33 = new TabPage();
-            label4 = new Label();
+            button4 = new Button();
             listView13 = new ListView();
             columnHeader7 = new ColumnHeader();
             columnHeader8 = new ColumnHeader();
@@ -271,7 +271,6 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
-            button4 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -1547,6 +1546,7 @@
             listView14.LargeImageList = voidImageList;
             listView14.Name = "listView14";
             listView14.UseCompatibleStateImageBehavior = false;
+            listView14.DoubleClick += listView14_DoubleClick;
             // 
             // menuVoid
             // 
@@ -1591,7 +1591,6 @@
             // tabPage33
             // 
             tabPage33.Controls.Add(button4);
-            tabPage33.Controls.Add(label4);
             tabPage33.Controls.Add(listView13);
             tabPage33.Controls.Add(label3);
             tabPage33.Controls.Add(button3);
@@ -1600,10 +1599,12 @@
             tabPage33.Name = "tabPage33";
             tabPage33.UseVisualStyleBackColor = true;
             // 
-            // label4
+            // button4
             // 
-            resources.ApplyResources(label4, "label4");
-            label4.Name = "label4";
+            resources.ApplyResources(button4, "button4");
+            button4.Name = "button4";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
             // 
             // listView13
             // 
@@ -2032,13 +2033,6 @@
             resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
             // 
-            // button4
-            // 
-            resources.ApplyResources(button4, "button4");
-            button4.Name = "button4";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
-            // 
             // frmControlPanel
             // 
             resources.ApplyResources(this, "$this");
@@ -2438,7 +2432,6 @@
         private NumericUpDown numericUpDown1;
         private ListView listView14;
         private RichTextBox richTextBox3;
-        private Label label4;
         private ContextMenuStrip menuVoid;
         private ToolStripMenuItem toolStripMenuItem48;
         private ToolStripMenuItem toolStripMenuItem49;

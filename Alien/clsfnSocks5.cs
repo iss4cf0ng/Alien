@@ -14,12 +14,15 @@ namespace Alien
     {
         private clsWeb m_web { get; init; }
         private int m_nSessionId { get; set; }
+        private int m_nPort { get; set; }
         private TcpListener m_listener { get; set; }
         
         public bool m_bIsRunning = false;
 
         public event Action<string, int> OnConnected;
         public event Action<string, int> OnDisconnected;
+        public event Action<int> OnListened;
+        public event Action<int> OnStopped;
 
         public clsfnSocks5(clsWeb web)
         {
@@ -58,9 +61,11 @@ namespace Alien
 
             try
             {
-                m_listener = new TcpListener(IPAddress.Any, nPort);
+                m_listener = new TcpListener(IPAddress.Loopback, nPort);
                 m_listener.Start();
+
                 m_bIsRunning = true;
+                m_nPort = nPort;
             }
             catch (Exception ex)
             {
@@ -70,6 +75,8 @@ namespace Alien
 
             try
             {
+                OnListened?.Invoke(nPort);
+
                 while (m_bIsRunning)
                 {
                     TcpClient user_client = await m_listener.AcceptTcpClientAsync().ConfigureAwait(false);
@@ -88,6 +95,7 @@ namespace Alien
             try
             {
                 m_listener?.Stop();
+                OnStopped?.Invoke(m_nPort);
             }
             catch { }
         }
