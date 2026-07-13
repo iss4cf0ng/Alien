@@ -647,6 +647,16 @@ namespace Alien
         {
             DataTable dt = new DataTable();
             string szResp = await fnszSqlExec(config, szQuery);
+            if (string.IsNullOrEmpty(szResp))
+            {
+                return new clsSqlQueryExResult()
+                {
+                    bSuccess = false,
+                    szQuery = szQuery,
+                    szErrorMsg = "Responsed result is null or empty.",
+                    dtOutput = dt,
+                };
+            }
 
             clsQueryResponse? result = JsonSerializer.Deserialize<clsQueryResponse>(szResp);
             if (result == null)
@@ -655,7 +665,7 @@ namespace Alien
                 {
                     bSuccess = false,
                     szQuery = szQuery,
-                    szErrorMsg = "JSON deserialization is failed. Responsed result is null or empty.",
+                    szErrorMsg = "JSON deserialization is failed. Responsed result is invalid.",
                     dtOutput = dt,
                 };
             }

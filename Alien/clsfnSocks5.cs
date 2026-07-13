@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace Alien
 {
-    internal class clsfnSocks5
+    public class clsfnSocks5
     {
         private clsWeb m_web { get; init; }
         private int m_nSessionId { get; set; }
-        private int m_nPort { get; init; }
         private TcpListener m_listener { get; set; }
-        private CancellationTokenSource m_cts;
+        
+        public bool m_bIsRunning = false;
 
-        public event Action<string> OnLogReceived;
+        public event Action<string, int> OnConnected;
+        public event Action<string, int> OnDisconnected;
 
-        public clsfnSocks5(clsWeb web, int nPort = 1080)
+        public clsfnSocks5(clsWeb web)
         {
             m_web = web;
-            m_nPort = nPort;
             m_nSessionId = new Random().Next(1000, 9999);
         }
 
@@ -32,8 +32,7 @@ namespace Alien
             try
             {
                 string szResp = await m_web.fnszSendPayload("proxy", new string[] { "forward", m_nSessionId.ToString(), szIP, nPort.ToString(), Convert.ToBase64String(abData) });
-                if (string.IsNullOrEmpty(szResp))
-                    return null;
+                if (string.IsNullOrEmpty(szResp)) return null;
 
                 using (JsonDocument doc = JsonDocument.Parse(szResp))
                 {
@@ -48,35 +47,36 @@ namespace Alien
                     }
                 }
             }
-            catch (Exception ex)
-            {
-
-            }
-
+            catch { }
             return null;
         }
 
-        public async Task fnStartAsync()
+        public async Task fnStartAsync(int nPort)
         {
-            m_cts = new CancellationTokenSource();
-            m_listener = new TcpListener(IPAddress.Loopback, m_nPort);
-            m_listener.Start();
+            if (m_bIsRunning)
+                return;
 
             try
             {
-                while (!m_cts.Token.IsCancellationRequested)
-                {
-                    var client = m_listener.AcceptTcpClientAsync();
-                    await Task.WhenAny(client, Task.Delay(-1, m_cts.Token));
-
-                    if (m_cts.Token.IsCancellationRequested)
-                        break;
-
-                    TcpClient user_client = await client;
-                    _ = Task.Run(() => fnHandleClientAsync(user_client), m_cts.Token);
-                }
+                m_listener = new TcpListener(IPAddress.Any, nPort);
+                m_listener.Start();
+                m_bIsRunning = true;
             }
             catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                while (m_bIsRunning)
+                {
+                    TcpClient user_client = await m_listener.AcceptTcpClientAsync().ConfigureAwait(false);
+                    _ = Task.Run(() => fnHandleClientAsync(user_client));
+                }
+            }
+            catch
             {
 
             }
@@ -84,72 +84,107 @@ namespace Alien
 
         public void fnStop()
         {
-            m_cts?.Cancel();
-            m_listener?.Stop();
+            m_bIsRunning = false;
+            try
+            {
+                m_listener?.Stop();
+            }
+            catch { }
         }
 
         private async Task fnHandleClientAsync(TcpClient client)
         {
-            using (client)
+            client.NoDelay = true;
+
+            string szTargetIP = "Unknown";
+            int nPort = 0;
+            bool bIsEventTriggered = false;
+
+            try
             {
+                using (client)
                 using (NetworkStream ns = client.GetStream())
                 {
-                    byte[] abBuffer = new byte[8192];
-                    int nRead = await ns.ReadAsync(abBuffer, 0, abBuffer.Length);
-                    if (nRead < 2 || abBuffer[0] != 0x05)
+                    byte[] hdr = new byte[2];
+                    int nLen = await ns.ReadAsync(hdr, 0, 2).ConfigureAwait(false);
+                    if (nLen < 2 || hdr[0] != 0x05)
                         return;
 
-                    byte[] abAuthResp = new byte[] { 0x05, 0x00 };
-                    await ns.WriteAsync(abAuthResp, 0, abAuthResp.Length);
+                    int nMethods = hdr[1];
+                    byte[] abMethods = new byte[nMethods];
+                    await ns.ReadAsync(abMethods, 0, nMethods).ConfigureAwait(false);
 
-                    nRead = await ns.ReadAsync(abAuthResp, 0, abBuffer.Length);
-                    if (nRead < 4 || abBuffer[1] != 0x01)
+                    await ns.WriteAsync(new byte[] { 0x05, 0x00 }, 0, 2).ConfigureAwait(false);
+                    await ns.FlushAsync().ConfigureAwait(false);
+
+                    byte[] hdr2 = new byte[4];
+                    nLen = await ns.ReadAsync(hdr2, 0, 4).ConfigureAwait(false);
+                    if (nLen < 4 || hdr2[1] != 0x01)
                         return;
 
-                    byte type = abBuffer[3];
-                    string szTargetIP = string.Empty;
-                    int nPort = 0;
-                    int nOffset = 4;
+                    byte addressType = hdr2[3];
 
-                    if (type == 0x01) // IPv4
+                    if (addressType == 0x01) // IPv4
                     {
-                        szTargetIP = $"{abBuffer[nOffset]}.{abBuffer[nOffset + 1]}.{abBuffer[nOffset + 2]}.{abBuffer[nOffset + 3]}";
-                        nOffset += 4;
+                        byte[] abAddr = new byte[4];
+                        await ns.ReadAsync(abAddr, 0, 4).ConfigureAwait(false);
+                        szTargetIP = $"{abAddr[0]}.{abAddr[1]}.{abAddr[2]}.{abAddr[3]}";
                     }
-                    else if (type == 0x03) // Domain
+                    else if (addressType == 0x03) // Domain Name
                     {
-                        byte domainLength = abBuffer[nOffset];
-                        szTargetIP = Encoding.ASCII.GetString(abBuffer, nOffset + 1, domainLength);
-                        nOffset += domainLength + 1;
+                        int nDomainLen = ns.ReadByte();
+                        if (nDomainLen <= 0)
+                            return;
+
+                        byte[] abDomain = new byte[nDomainLen];
+                        await ns.ReadAsync(abDomain, 0, nDomainLen).ConfigureAwait(false);
+                        szTargetIP = Encoding.ASCII.GetString(abDomain);
                     }
                     else
                     {
-                        // Not support (ex. IPv6)
                         return;
                     }
 
-                    byte[] abResp = new byte[] { 0x05, 0x00, 0x00, 0x01, 0, 0, 0, 0, 0, 0 };
-                    await ns.WriteAsync(abResp, 0, abResp.Length);
+                    byte[] abPort = new byte[2];
+                    await ns.ReadAsync(abPort, 0, 2).ConfigureAwait(false);
+                    nPort = (abPort[0] << 8) | abPort[1];
 
-                    while (!m_cts.Token.IsCancellationRequested)
+                    OnConnected?.Invoke(szTargetIP, nPort);
+                    bIsEventTriggered = true;
+
+                    byte[] abSuccessResp = { 0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                    await ns.WriteAsync(abSuccessResp, 0, abSuccessResp.Length).ConfigureAwait(false);
+                    await ns.FlushAsync().ConfigureAwait(false);
+
+                    byte[] abPayloadBuf = new byte[8192];
+                    while (m_bIsRunning && client.Connected)
                     {
-                        int nReqLen = await ns.ReadAsync(abBuffer, 0, abBuffer.Length);
-                        if (nReqLen <= 0)
+                        int nPayloadLen = await ns.ReadAsync(abPayloadBuf, 0, abPayloadBuf.Length).ConfigureAwait(false);
+                        if (nPayloadLen <= 0)
                             break;
 
-                        byte[] abReqData = new byte[nReqLen];
-                        Array.Copy(abBuffer, 0, abReqData, 0, nReqLen);
+                        byte[] abReqData = new byte[nPayloadLen];
+                        Buffer.BlockCopy(abPayloadBuf, 0, abReqData, 0, nPayloadLen);
 
-                        byte[]? abRespData = await fnSendData(szTargetIP, nPort, abReqData);
+                        byte[]? abRespData = await fnSendData(szTargetIP, nPort, abReqData).ConfigureAwait(false);
+
                         if (abRespData != null && abRespData.Length > 0)
                         {
-                            await ns.WriteAsync(abRespData, 0, abRespData.Length);
-                        }
-                        else
-                        {
-                            break;
+                            await ns.WriteAsync(abRespData, 0, abRespData.Length).ConfigureAwait(false);
+                            await ns.FlushAsync().ConfigureAwait(false);
                         }
                     }
+                }
+            }
+            catch
+            {
+                
+            }
+            finally
+            {
+                if (bIsEventTriggered)
+                {
+                    OnDisconnected?.Invoke(szTargetIP, nPort);
                 }
             }
         }

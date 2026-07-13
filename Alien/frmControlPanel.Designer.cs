@@ -213,8 +213,6 @@
             label3 = new Label();
             button3 = new Button();
             numericUpDown1 = new NumericUpDown();
-            textBox13 = new TextBox();
-            label2 = new Label();
             tabPage15 = new TabPage();
             tabControl10 = new TabControl();
             tabPage29 = new TabPage();
@@ -273,6 +271,7 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
+            button4 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -1591,13 +1590,12 @@
             // 
             // tabPage33
             // 
+            tabPage33.Controls.Add(button4);
             tabPage33.Controls.Add(label4);
             tabPage33.Controls.Add(listView13);
             tabPage33.Controls.Add(label3);
             tabPage33.Controls.Add(button3);
             tabPage33.Controls.Add(numericUpDown1);
-            tabPage33.Controls.Add(textBox13);
-            tabPage33.Controls.Add(label2);
             resources.ApplyResources(tabPage33, "tabPage33");
             tabPage33.Name = "tabPage33";
             tabPage33.UseVisualStyleBackColor = true;
@@ -1637,21 +1635,14 @@
             resources.ApplyResources(button3, "button3");
             button3.Name = "button3";
             button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // numericUpDown1
             // 
             resources.ApplyResources(numericUpDown1, "numericUpDown1");
+            numericUpDown1.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
             numericUpDown1.Name = "numericUpDown1";
-            // 
-            // textBox13
-            // 
-            resources.ApplyResources(textBox13, "textBox13");
-            textBox13.Name = "textBox13";
-            // 
-            // label2
-            // 
-            resources.ApplyResources(label2, "label2");
-            label2.Name = "label2";
+            numericUpDown1.Value = new decimal(new int[] { 1080, 0, 0, 0 });
             // 
             // tabPage15
             // 
@@ -2040,6 +2031,13 @@
             // 
             resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
+            // 
+            // button4
+            // 
+            resources.ApplyResources(button4, "button4");
+            button4.Name = "button4";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
             // 
             // frmControlPanel
             // 
@@ -2438,8 +2436,6 @@
         private Label label3;
         private Button button3;
         private NumericUpDown numericUpDown1;
-        private TextBox textBox13;
-        private Label label2;
         private ListView listView14;
         private RichTextBox richTextBox3;
         private Label label4;
@@ -2448,5 +2444,6 @@
         private ToolStripMenuItem toolStripMenuItem49;
         private ToolStripMenuItem toolStripMenuItem50;
         private ImageList voidImageList;
+        private Button button4;
     }
 }

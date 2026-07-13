@@ -19,6 +19,8 @@ namespace Alien
         public frmScanHost()
         {
             InitializeComponent();
+
+            Text = "Scan Host";
         }
 
         void fnSetup()

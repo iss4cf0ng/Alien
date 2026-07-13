@@ -58,8 +58,9 @@
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             toolStripMenuItem7 = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripMenuItem();
-            toolStripButton2 = new ToolStripButton();
             toolStripButton1 = new ToolStripButton();
+            toolStripButton4 = new ToolStripButton();
+            toolStripButton2 = new ToolStripButton();
             toolStripButton3 = new ToolStripButton();
             statusStrip1 = new StatusStrip();
             toolStripProgressBar1 = new ToolStripProgressBar();
@@ -232,7 +233,7 @@
             // toolStrip1
             // 
             resources.ApplyResources(toolStrip1, "toolStrip1");
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton1, toolStripButton2, toolStripButton3 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton1, toolStripButton4, toolStripButton2, toolStripButton3 });
             toolStrip1.Name = "toolStrip1";
             // 
             // toolStripDropDownButton1
@@ -254,19 +255,26 @@
             resources.ApplyResources(toolStripMenuItem8, "toolStripMenuItem8");
             toolStripMenuItem8.Click += toolStripMenuItem8_Click;
             // 
-            // toolStripButton2
-            // 
-            toolStripButton2.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            resources.ApplyResources(toolStripButton2, "toolStripButton2");
-            toolStripButton2.Name = "toolStripButton2";
-            toolStripButton2.Click += toolStripButton2_Click;
-            // 
             // toolStripButton1
             // 
             toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
             resources.ApplyResources(toolStripButton1, "toolStripButton1");
             toolStripButton1.Name = "toolStripButton1";
             toolStripButton1.Click += toolStripButton1_Click;
+            // 
+            // toolStripButton4
+            // 
+            toolStripButton4.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton4, "toolStripButton4");
+            toolStripButton4.Name = "toolStripButton4";
+            toolStripButton4.Click += toolStripButton4_Click;
+            // 
+            // toolStripButton2
+            // 
+            toolStripButton2.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton2, "toolStripButton2");
+            toolStripButton2.Name = "toolStripButton2";
+            toolStripButton2.Click += toolStripButton2_Click;
             // 
             // toolStripButton3
             // 
@@ -379,5 +387,6 @@
         private ToolStripMenuItem toolStripMenuItem6;
         private ContextMenuStrip contextMenuStrip2;
         private ToolStripMenuItem toolStripMenuItem9;
+        private ToolStripButton toolStripButton4;
     }
 }

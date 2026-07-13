@@ -23,6 +23,7 @@ using Microsoft.VisualBasic;
 using ICSharpCode.TextEditor.Document;
 using ICSharpCode.TextEditor.Src.Document.FoldingStrategy;
 using System.Globalization;
+using System.Reflection.Metadata;
 
 namespace Alien
 {
@@ -42,6 +43,7 @@ namespace Alien
         public clsfnWinReg m_winReg { get; init; }
         public clsfnWinUser m_winUser { get; init; }
         public clsfnPlugin m_plugin { get; init; }
+        public clsfnSocks5 m_socks5 { get; init; }
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
         private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
@@ -70,8 +72,20 @@ namespace Alien
                 {
                     if (method == "JScript")
                         return "Response.Write(\"JScript ASPX\");";
-                    else
+                    else if (method == "NebulaPulsar")
                         return "Response.Write(\"CSharp ASP.NET\");";
+                    else
+                        return string.Empty;
+                }
+            },
+            {
+                enLanguage.JSP,
+                (method) =>
+                {
+                    if (method == "Nashorn")
+                        return string.Empty;
+                    else
+                        return string.Empty;
                 }
             }
         };
@@ -95,8 +109,8 @@ namespace Alien
             m_lan = new clsfnLAN(web);
             m_winReg = new clsfnWinReg(web);
             m_winUser = new clsfnWinUser(web);
-
             m_plugin = new clsfnPlugin(web);
+            m_socks5 = new clsfnSocks5(web);
 
             m_dbMgr = new clsfnDb(web, "db.sqlite");
         }
@@ -3209,6 +3223,52 @@ namespace Alien
         private void toolStripMenuItem50_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (m_socks5.m_bIsRunning)
+                    return;
+
+                int nPort = (int)numericUpDown1.Value;
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await m_socks5.fnStartAsync(nPort);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            button3.Enabled = m_socks5.m_bIsRunning;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!m_socks5.m_bIsRunning)
+                    return;
+
+                m_socks5.fnStop();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            button3.Enabled = m_socks5.m_bIsRunning;
         }
     }
 }

