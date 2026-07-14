@@ -4,6 +4,9 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import base64
 import importlib
+import argparse
+
+parser = argparse.ArgumentParser()
 
 class BridgeRequestHandler(BaseHTTPRequestHandler):
     
@@ -11,13 +14,18 @@ class BridgeRequestHandler(BaseHTTPRequestHandler):
         return 
 
     def do_POST(self):
-        # Update routing matrix to support the new 'build' action
         if self.path == "/obfuscate":
             action = "obfuscate"
         elif self.path == "/deobfuscate":
             action = "deobfuscate"
         elif self.path == "/build":
             action = "build"
+        elif self.path == '/obfuscator':
+            action = 'obfuscator'
+        elif self.path == '/example':
+            action = 'example'
+        elif self.path == '/available':
+            action = 'available'
         else:
             action = None
         
