@@ -110,25 +110,28 @@
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(165, 24);
+            toolStripMenuItem1.Size = new Size(180, 24);
             toolStripMenuItem1.Text = "Save";
+            toolStripMenuItem1.Click += toolStripMenuItem1_Click;
             // 
             // toolStripMenuItem2
             // 
             toolStripMenuItem2.Name = "toolStripMenuItem2";
-            toolStripMenuItem2.Size = new Size(165, 24);
+            toolStripMenuItem2.Size = new Size(180, 24);
             toolStripMenuItem2.Text = "Save All";
+            toolStripMenuItem2.Click += toolStripMenuItem2_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(162, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // toolStripMenuItem3
             // 
             toolStripMenuItem3.Name = "toolStripMenuItem3";
-            toolStripMenuItem3.Size = new Size(165, 24);
+            toolStripMenuItem3.Size = new Size(180, 24);
             toolStripMenuItem3.Text = "Open Folder";
+            toolStripMenuItem3.Click += toolStripMenuItem3_Click;
             // 
             // toolStripDropDownButton2
             // 
@@ -283,6 +286,7 @@
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             Margin = new Padding(4);
             Name = "frmFileImage";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "frmFileImage";
             FormClosed += frmFileImage_FormClosed;
             Load += frmFileImage_Load;

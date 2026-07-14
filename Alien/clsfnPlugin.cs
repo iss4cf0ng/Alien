@@ -115,7 +115,7 @@ namespace Alien
                 if (szEnv.Contains("NebulaPulsar"))
                 {
                     if (szEnv.Contains("JSP"))
-                        szExtension = "java";
+                        szExtension = "class";
                     else if (szEnv.Contains("ASPX") || szEnv.Contains("ASHX") || szEnv.Contains("ASMX"))
                         szExtension = "dll";
                 }
@@ -181,9 +181,11 @@ namespace Alien
             /// <returns></returns>
             public async Task<string> fnRun(string szJson, string szPayload, string szEnvironment)
             {
+                //MessageBox.Show(szJson);
                 string szResp = await m_web.fnszSendPayload("plugin", new string[] { szPayload, szJson });
-                MessageBox.Show(szResp);
-                
+                //MessageBox.Show(szResp);
+                //Clipboard.SetText(szResp);
+
                 return szResp;
             }
         }

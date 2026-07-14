@@ -564,7 +564,7 @@ namespace Alien
             frmFileImage? f = fnFindForm<frmFileImage>();
             if (f == null)
             {
-                f = new frmFileImage(lsImagePath.Count);
+                f = new frmFileImage(m_victim, lsImagePath.Count);
                 f.Text = "DisplayImage";
 
                 f.Show();

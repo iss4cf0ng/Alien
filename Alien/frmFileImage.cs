@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,18 +14,23 @@ namespace Alien
 {
     public partial class frmFileImage : Form
     {
-        private int m_nImageCount { get; set; }
-        private ImageList m_ImageList { get; set; }
+        private clsVictim m_victim { get; init; }
+        private int m_nImageCount { get; init; }
+        private ImageList m_ImageList { get; init; }
+        private string m_szImgDir { get; init; }
 
-        public frmFileImage(int nImageCount)
+        public frmFileImage(clsVictim victim, int nImageCount)
         {
             InitializeComponent();
 
+            m_victim = victim;
             m_nImageCount = nImageCount;
 
             m_ImageList = new ImageList();
             m_ImageList.ColorDepth = ColorDepth.Depth32Bit;
             m_ImageList.ImageSize = new Size(200, 200);
+
+            m_szImgDir = Path.Combine(victim.m_szPortfolio, "Images");
         }
 
         private struct stImageEntity
@@ -255,6 +261,34 @@ namespace Alien
             var lsName = lObj.Select(x => x.szFilePath);
 
             Clipboard.SetText(string.Join(Environment.NewLine, lsName));
+        }
+
+        // Save
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedIndex == 0)
+                return;
+
+
+        }
+
+        // Save All
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        // Open Folder
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            if (!Directory.Exists(m_szImgDir))
+                Directory.CreateDirectory(m_szImgDir);
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = m_szImgDir,
+                UseShellExecute = true,
+            });
         }
     }
 }
