@@ -2,40 +2,38 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>Reverse Shell Controller</title>
+    <title>Socket Packet Sender</title>
     <style>
-        /* Stark Monochrome Layout */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: #000000; /* Pure black */
-            color: #ffffff; /* Pure white */
+            background-color: #000000;
+            color: #ffffff;
             overflow-y: auto; 
             overflow-x: hidden;
         }
         body { 
             font-family: 'Courier New', Courier, monospace;
             display: flex;
-            justify-content: center;  
-            align-items: center;      
+            justify-content: center;
+            align-items: center;
         }
         
-        /* Rigid Wireframe Container */
         .container { 
             width: 100%;
             max-width: 650px; 
             background: #000000; 
             padding: 25px; 
-            border-radius: 0px; /* Sharp corners only */
-            border: 1px solid #ffffff; /* Stark 1px white border */
+            border-radius: 0px;
+            border: 1px solid #ffffff;
         }
         
         h2 { 
             color: #ffffff;
             margin-top: 0; 
             border-bottom: 1px solid #ffffff; 
-            padding-bottom: 10px;
+            padding-bottom: 10px; 
             font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -46,12 +44,12 @@
             padding: 10px; 
             margin-bottom: 20px; 
             font-size: 12px; 
-            border: 1px dashed #ffffff; /* Dashed line for system status */
+            border: 1px dashed #ffffff;
             text-transform: uppercase;
         }
         
         .badge { padding: 0px 4px; font-weight: bold; }
-        .badge-active { background: #ffffff; color: #000000; } /* Inverse for emphasis */
+        .badge-active { background: #ffffff; color: #000000; }
         .badge-error { border: 1px dashed #ffffff; background: transparent; color: #ffffff; }
         
         .form-row {
@@ -59,7 +57,9 @@
             gap: 15px;
             margin-bottom: 15px;
         }
+        
         .form-group { flex: 1; margin-bottom: 15px; }
+        .form-group.col-3 { flex: 0 0 120px; }
         .form-group.full-width { width: 100%; }
         
         label { 
@@ -71,8 +71,7 @@
             font-weight: bold;
         }
         
-        /* Wireframe Input & Select Fields */
-        input[type="text"], select { 
+        input[type="text"], textarea, select { 
             width: 100%; 
             background: #000000; 
             border: 1px solid #ffffff; 
@@ -83,28 +82,26 @@
             font-family: inherit;
             font-size: 13px;
         }
-        input[type="text"]:focus, select:focus {
+        
+        input[type="text"]:focus, textarea:focus, select:focus {
             outline: none;
-            background: #111111; 
+            background: #111111;
+        }
+
+        textarea {
+            height: 80px;
+            resize: vertical;
         }
         
-        /* Stylized Select Dropdown Indicator */
         select {
             appearance: none;
             -webkit-appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></path></svg>");
             background-repeat: no-repeat;
-            background-position-x: 98%;
+            background-position-x: 95%;
             background-position-y: 50%;
-            padding-right: 30px;
         }
         
-        select option {
-            background: #000000;
-            color: #ffffff;
-        }
-        
-        /* Stark Monochrome Button */
         button { 
             background-color: transparent; 
             color: #ffffff; 
@@ -113,13 +110,14 @@
             border: 1px solid #ffffff; 
             padding: 10px 25px; 
             cursor: pointer; 
-            border-radius: 0px;
+            border-radius: 0px; 
             text-transform: uppercase;
             letter-spacing: 1px;
+            width: 100%;
         }
         button:hover:not(:disabled) { 
             background-color: #ffffff; 
-            color: #000000; /* Inverse style on hover */
+            color: #000000;
         }
         button:disabled { 
             border-color: #444444; 
@@ -134,77 +132,95 @@
             margin-top: 25px;
         }
         
-        /* CRT Terminal Console */
         .console { 
             background: #000000; 
             border: 1px solid #ffffff; 
             padding: 15px; 
-            height: 220px; 
+            height: 180px; 
             overflow-y: auto; 
             white-space: pre-wrap;
             font-size: 13px;
             line-height: 1.5;
         }
 
-        /* Dynamic Token Styling */
         .msf-line { margin-bottom: 4px; color: #ffffff; } 
-        .msf-info { color: #3498db; font-weight: bold; }    
-        .msf-success { color: #2ecc71; font-weight: bold; } 
-        .msf-warn { color: #f1c40f; font-weight: bold; }    
-        .msf-error { color: #e74c3c; font-weight: bold; }   
+        .msf-info { color: #3498db; font-weight: bold; }
+        .msf-success { color: #2ecc71; font-weight: bold; }
+        .msf-warn { color: #f1c40f; font-weight: bold; }
+        .msf-error { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>[ ALIEN_MODULE: REVERSE_SHELL_CONTROLLER ]</h2>
+    <h2>[ Socket Packet Sender ]</h2>
     
     <div class="status-bar" id="statusBar">
-        [*] INITIALIZING INTERFACE... AWAITING HOST BRIDGE...
+        [*] Initializing socket controller... awaiting bridge connection...
     </div>
     
     <div class="form-row">
-        <div class="form-group" style="flex: 2;">
-            <label>> LHOST (REMOTE IP)</label>
-            <input type="text" id="txtLhost" value="127.0.0.1" placeholder="e.g. 192.168.1.50">
+        <div class="form-group">
+            <label>> Target Host IP</label>
+            <input type="text" id="uiHost" value="127.0.0.1" oninput="updateJsonConfig()">
         </div>
-        <div class="form-group" style="flex: 1;">
-            <label>> LPORT</label>
-            <input type="text" id="txtLport" value="4444" placeholder="4444">
+        <div class="form-group col-3">
+            <label>> Port</label>
+            <input type="text" id="uiPort" value="4444" oninput="updateJsonConfig()">
         </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group full-width">
-            <label>> PAYLOAD PLATFORM (COMBOBOX)</label>
-            <select id="selPayloadType">
-                <option value="meterpreter">METASPLOIT METERPRETER (REVERSE_TCP)</option>
-                <option value="cobaltstrike">COBALT STRIKE BEACON (REVERSE_HTTP)</option>
-                <option value="netcat">NETCAT (NC REVERSE_SHELL)</option>
+        <div class="form-group col-3">
+            <label>> Data Type</label>
+            <select id="uiDataType" onchange="updateJsonConfig()">
+                <option value="text">TEXT</option>
+                <option value="hex">HEX</option>
             </select>
         </div>
     </div>
 
-    <button id="btnConnect" onclick="executePlugin()" disabled>TRIGGER_REVERSE_SHELL</button>
+    <div class="form-group">
+        <label>> Raw Data Payload</label>
+        <textarea id="uiDataContent" oninput="updateJsonConfig()">Hello World!\n</textarea>
+    </div>
 
-    <h3>SYSTEM_LOG_OUTPUT</h3>
+    <div class="form-group">
+        <label>> Transmitted Config (JSON Target)</label>
+        <input type="text" id="targetJson" value="" readonly style="background: #111; color: #aaa; border-color: #444;">
+    </div>
+
+    <button id="sendBtn" onclick="executePlugin()" disabled>Transmit Packet</button>
+
+    <h3>Transmission Logs & Response</h3>
     <div class="console" id="consoleOutput"></div>
 </div>
 
 <script>
     const pluginManifest = {
         "supportedLangs": [
-            "PHP/v5.X/OneShell",
-            "PHP/v7.X/OneShell",
             "PHP/v8.X/OneShell",
-
-            "JSP/NebulaPulsar/DarkMatter",
-            "JSPX/NebulaPulsar/DarkMatter",
-            "CFM/NebulaPulsar/DarkMatter",
         ]
     };
 
     let currentShellType = "";
+
+    function updateJsonConfig() {
+        const host = document.getElementById('uiHost').value;
+        const port = document.getElementById('uiPort').value;
+        const dataType = document.getElementById('uiDataType').value;
+        let dataContent = document.getElementById('uiDataContent').value;
+
+        if (dataType === 'hex') {
+            dataContent = dataContent.replace(/[\s,:\x2D]/g, ""); 
+        }
+
+        const configObj = {
+            "host": host,
+            "port": port,
+            "type": dataType,
+            "data": dataContent
+        };
+
+        document.getElementById('targetJson').value = JSON.stringify(configObj);
+    }
 
     function appendLog(text) {
         const consoleOutput = document.getElementById('consoleOutput');
@@ -227,7 +243,7 @@
             } else if (line.startsWith('[!]')) {
                 div.innerHTML = `<span class="msf-warn">[!]</span> ${line.substring(3)}`;
             } else {
-                div.innerText = line; 
+                div.innerText = line;
             }
 
             consoleOutput.appendChild(div);
@@ -237,27 +253,29 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+        updateJsonConfig();
+
         const statusBar = document.getElementById('statusBar');
-        const btnConnect = document.getElementById('btnConnect');
+        const sendBtn = document.getElementById('sendBtn');
 
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
                 const bridge = window.chrome.webview.hostObjects.nativeBridge;
+                
                 currentShellType = await bridge.fnGetShellType();
 
                 if (pluginManifest.supportedLangs.includes(currentShellType)) {
-                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: READY`;
-                    btnConnect.disabled = false;
-                    appendLog("[*] CONNECTION ESTABLISHED TO WEB CONTEXT.");
-                    appendLog("[*] CORE PAYLOAD LISTENER MATRIX INITIALIZED.");
+                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: SOCKET READY`;
+                    sendBtn.disabled = false;
+                    appendLog("[*] LINK ESTABLISHED WITH NATIVE NODE BRIDGE.");
+                    appendLog("[*] PRE-FLIGHT COMPILER ACTIVE. READY TO SHIP BIND DATA.");
                 } else {
                     statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-error">${currentShellType.toUpperCase()}</span> // STATUS: INCOMPATIBLE`;
-                    appendLog(`[-] ABORTED. PLUGIN REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
-                    appendLog(`[-] DETECTED ENVIRONMENT: ${currentShellType}.`);
+                    appendLog(`[-] ABORTED. MODULE REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
                 }
             } else {
-                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. STANDALONE DRY-RUN MODE.");
-                btnConnect.disabled = false;
+                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. STANDALONE DRY-RUN MODE SIMULATION.");
+                sendBtn.disabled = false; // 為了方便本地除錯，沒 bridge 時也能看
             }
         } catch (e) {
             appendLog("[!] EXCEPTION_CAUGHT: " + e.message.toUpperCase());
@@ -265,34 +283,32 @@
     });
 
     async function executePlugin() {
-        const configParams = {
-            lhost: document.getElementById('txtLhost').value,
-            lport: document.getElementById('txtLport').value,
-            payloadType: document.getElementById('selPayloadType').value
-        };
-
-        appendLog(`[*] FETCHING CORE SHELL HANDLER FOR: ${currentShellType.toUpperCase() || "STANDALONE"}`);
-        appendLog(`[*] TARGET ENDPOINT SET -> ${configParams.lhost}:${configParams.lport}`);
-        appendLog(`[*] SELECTED ENGINES: [${configParams.payloadType.toUpperCase()}]`);
+        const jsonConfig = document.getElementById('targetJson').value;
+        const configParsed = JSON.parse(jsonConfig);
+        
+        appendLog(`[*] COMILING RAW DESCRIPTOR [TYPE: ${configParsed.type.toUpperCase()}]`);
+        appendLog(`[*] TARGET ENDPOINT INTERFACE -> ${configParsed.host}:${configParsed.port}`);
 
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
                 const bridge = window.chrome.webview.hostObjects.nativeBridge;
+                const currentDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
                 
-                const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1);
                 const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
                 
-                appendLog(`[+] DISPATCHING CONNECT-BACK COMMAND VIA ${configParams.payloadType.toUpperCase()}...`);
+                appendLog('[*] PIPING STREAM THROUGH BRIDGE LAYER...');
                 
-                const szJsonConfig = JSON.stringify(configParams);
-                const result = await bridge.fnRun(szJsonConfig, payloadCode, currentShellType);
+                const result = await bridge.fnRun(jsonConfig, payloadCode, currentShellType);
                 
                 appendLog(result.toUpperCase());
             } else {
-                appendLog(`[!] MOCK EXECUTING: SENDING ${configParams.payloadType.toUpperCase()} TO ${configParams.lhost}:${configParams.lport}`);
+                appendLog(`[!] MOCK TRANSMITTING TO ${configParsed.host}:${configParsed.port}...`);
+                setTimeout(() => {
+                    appendLog(`[+] MOCK STATUS: SUCCESS (SENT ${configParsed.data.length} BYTES)`);
+                }, 600);
             }
         } catch (e) {
-            appendLog("[-] EXECUTION FAILED: " + e.message.toUpperCase());
+            appendLog("[-] TRANSMISSION FAULT: " + e.message.toUpperCase());
         }
     }
 </script>

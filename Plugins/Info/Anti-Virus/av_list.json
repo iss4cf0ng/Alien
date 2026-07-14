@@ -1,0 +1,1754 @@
+{
+  "antivirus_list": [
+    {
+      "id": "av_001",
+      "name": "Microsoft Defender",
+      "company": "Microsoft",
+      "region": "Global",
+      "process_keywords": ["MsMpEng.exe", "NisSrv.exe", "WinDefend"]
+    },
+    {
+      "id": "av_002",
+      "name": "Trend Micro PC-cillin / Apex One",
+      "company": "Trend Micro",
+      "region": "Global",
+      "process_keywords": ["coreFrameworkHost.exe", "PccNTMon.exe", "TmListen.exe", "Ntrtscan.exe"]
+    },
+    {
+      "id": "av_003",
+      "name": "Kaspersky",
+      "company": "Kaspersky Lab",
+      "region": "Global",
+      "process_keywords": ["avp.exe", "avpui.exe"]
+    },
+    {
+      "id": "av_004",
+      "name": "Norton 360",
+      "company": "Gen Digital",
+      "region": "Global",
+      "process_keywords": ["Navw32.exe", "NortonSecurity.exe", "SymCorpUI.exe"]
+    },
+    {
+      "id": "av_005",
+      "name": "McAfee / Trellix",
+      "company": "McAfee / Trellix",
+      "region": "Global",
+      "process_keywords": ["mcshield.exe", "McCnfg.exe", "MfeAVSvc.exe", "masvc.exe"]
+    },
+    {
+      "id": "av_006",
+      "name": "Bitdefender",
+      "company": "Bitdefender",
+      "region": "Global",
+      "process_keywords": ["bdagent.exe", "vsserv.exe", "updatesrv.exe"]
+    },
+    {
+      "id": "av_007",
+      "name": "ESET NOD32",
+      "company": "ESET",
+      "region": "Global",
+      "process_keywords": ["egui.exe", "ekrn.exe"]
+    },
+    {
+      "id": "av_008",
+      "name": "Avast / AVG",
+      "company": "Gen Digital",
+      "region": "Global",
+      "process_keywords": ["AvastSvc.exe", "aswIdsAgent.exe", "avgwdsvc.exe"]
+    },
+    {
+      "id": "av_009",
+      "name": "Avira",
+      "company": "Gen Digital",
+      "region": "Global",
+      "process_keywords": ["avguard.exe", "sched.exe", "avshadow.exe"]
+    },
+    {
+      "id": "av_010",
+      "name": "Huorong Security",
+      "company": "Huorong Borui",
+      "region": "China",
+      "process_keywords": ["HipsMain.exe", "HipsDaemon.exe", "usysdiag.exe"]
+    },
+    {
+      "id": "av_011",
+      "name": "360 Total Security",
+      "company": "Qihoo 360",
+      "region": "China",
+      "process_keywords": ["360sd.exe", "360safebox.exe", "ZhuDongFangYu.exe"]
+    },
+    {
+      "id": "av_012",
+      "name": "Tencent PC Manager",
+      "company": "Tencent",
+      "region": "China",
+      "process_keywords": ["QQPCRTP.exe", "QQPCTray.exe", "TencentSecSvc.exe"]
+    },
+    {
+      "id": "av_013",
+      "name": "Kingsoft Duba",
+      "company": "Kingsoft",
+      "region": "China",
+      "process_keywords": ["kxetray.exe", "kismain.exe", "kwatch.exe"]
+    },
+    {
+      "id": "av_014",
+      "name": "Rising Antivirus",
+      "company": "Rising Information Technology",
+      "region": "China",
+      "process_keywords": ["RavMonD.exe", "Rising.exe", "RsAgent.exe"]
+    },
+    {
+      "id": "av_015",
+      "name": "CrowdStrike Falcon",
+      "company": "CrowdStrike",
+      "region": "Global",
+      "process_keywords": ["CSFalconService.exe"]
+    },
+    {
+      "id": "av_016",
+      "name": "Sophos Home / Intercept X",
+      "company": "Sophos",
+      "region": "Global",
+      "process_keywords": ["SophosFS.exe", "SophosHealth.exe", "SophosCleanService.exe"]
+    },
+    {
+      "id": "av_017",
+      "name": "Malwarebytes",
+      "company": "Malwarebytes",
+      "region": "Global",
+      "process_keywords": ["MBAMService.exe", "mbam.exe"]
+    },
+    {
+      "id": "av_018",
+      "name": "F-Secure",
+      "company": "F-Secure",
+      "region": "Global",
+      "process_keywords": ["fshoster.exe", "fsui.exe"]
+    },
+    {
+      "id": "av_019",
+      "name": "SentinelOne",
+      "company": "SentinelOne",
+      "region": "Global",
+      "process_keywords": ["SentinelServiceHost.exe", "SentinelMonitor.exe"]
+    },
+    {
+        "id": "av_020",
+        "name": "Panda Dome",
+        "company": "WatchGuard",
+        "region": "Global",
+        "process_keywords": ["PSANHost.exe", "PavFnSvr.exe", "AVENGINE.EXE", "PandaAgent.exe"]
+    },
+    {
+        "id": "av_021",
+        "name": "G DATA Antivirus",
+        "company": "G DATA",
+        "region": "Global",
+        "process_keywords": ["AVK.exe", "AVKWCtl.exe", "AVKService.exe", "GDSC.exe"]
+    },
+    {
+        "id": "av_022",
+        "name": "Comodo Internet Security",
+        "company": "Comodo",
+        "region": "Global",
+        "process_keywords": ["cmdagent.exe", "cis.exe", "cavwp.exe", "CisTray.exe"]
+    },
+    {
+        "id": "av_023",
+        "name": "VIPRE Antivirus",
+        "company": "VIPRE Security",
+        "region": "Global",
+        "process_keywords": ["SBAMSvc.exe", "VipreEdgeProtection.exe", "VIPREUI.exe"]
+    },
+    {
+        "id": "av_024",
+        "name": "Webroot SecureAnywhere",
+        "company": "OpenText",
+        "region": "Global",
+        "process_keywords": ["WRSA.exe", "WRCoreService.exe"]
+    },
+    {
+        "id": "av_025",
+        "name": "Emsisoft Anti-Malware",
+        "company": "Emsisoft",
+        "region": "Global",
+        "process_keywords": ["a2service.exe", "a2guard.exe", "a2start.exe"]
+    },
+    {
+        "id": "av_026",
+        "name": "ZoneAlarm",
+        "company": "Check Point",
+        "region": "Global",
+        "process_keywords": ["vsmon.exe", "zlclient.exe", "ZoneAlarm.exe"]
+    },
+    {
+        "id": "av_027",
+        "name": "Dr.Web Security Space",
+        "company": "Doctor Web",
+        "region": "Global",
+        "process_keywords": ["dwengine.exe", "dwservice.exe", "spideragent.exe", "drweb.exe"]
+    },
+    {
+        "id": "av_028",
+        "name": "AhnLab V3",
+        "company": "AhnLab",
+        "region": "South Korea",
+        "process_keywords": ["V3Svc.exe", "V3Lite.exe", "ASDSvc.exe", "V3UI.exe"]
+    },
+    {
+        "id": "av_029",
+        "name": "Quick Heal Total Security",
+        "company": "Quick Heal",
+        "region": "India",
+        "process_keywords": ["QHActiveDefense.exe", "QHSafeTray.exe", "Scan.exe", "QuickHeal.exe"]
+    },
+    {
+        "id": "av_030",
+        "name": "K7 Total Security",
+        "company": "K7 Computing",
+        "region": "India",
+        "process_keywords": ["K7TSecurity.exe", "K7RTScan.exe", "K7SysMon.exe"]
+    },
+    {
+        "id": "av_031",
+        "name": "eScan Antivirus",
+        "company": "MicroWorld",
+        "region": "India",
+        "process_keywords": ["mwagent.exe", "escanmon.exe", "MWAV.exe"]
+    },
+    {
+        "id": "av_032",
+        "name": "FortiClient",
+        "company": "Fortinet",
+        "region": "Global",
+        "process_keywords": ["FortiClient.exe", "FortiESNAC.exe", "FortiTray.exe", "FCDBLog.exe"]
+    },
+    {
+        "id": "av_033",
+        "name": "Symantec Endpoint Protection",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["ccSvcHst.exe", "Smc.exe", "SepMasterService.exe", "Rtvscan.exe"]
+    },
+    {
+        "id": "av_034",
+        "name": "VMware Carbon Black Cloud",
+        "company": "VMware",
+        "region": "Global",
+        "process_keywords": ["CbDefense.exe", "RepMgr.exe", "cb.exe", "cbdaemon.exe"]
+    },
+    {
+        "id": "av_035",
+        "name": "Elastic Endpoint Security",
+        "company": "Elastic",
+        "region": "Global",
+        "process_keywords": ["elastic-endpoint.exe", "elastic-agent.exe"]
+    },
+    {
+        "id": "av_036",
+        "name": "Cybereason Endpoint Protection",
+        "company": "Cybereason",
+        "region": "Global",
+        "process_keywords": ["CybereasonSensor.exe", "CybereasonService.exe", "CrAmService.exe"]
+    },
+    {
+        "id": "av_037",
+        "name": "Cisco Secure Endpoint",
+        "company": "Cisco",
+        "region": "Global",
+        "process_keywords": ["sfc.exe", "ampservice.exe", "ampagent.exe"]
+    },
+    {
+        "id": "av_038",
+        "name": "Trend Vision One Endpoint Security",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["EndpointBasecamp.exe", "TmCCSF.exe", "TmListen.exe", "Ntrtscan.exe"]
+    },
+    {
+        "id": "av_039",
+        "name": "Trellix Endpoint Security",
+        "company": "Trellix",
+        "region": "Global",
+        "process_keywords": ["mfetp.exe", "MfeESP.exe", "MfeAVSvc.exe", "masvc.exe"]
+    },
+    {
+        "id": "av_040",
+        "name": "Bitdefender GravityZone",
+        "company": "Bitdefender",
+        "region": "Global",
+        "process_keywords": ["EPProtectedService.exe", "bdservicehost.exe", "vsserv.exe", "bdagent.exe"]
+    },
+    {
+        "id": "av_041",
+        "name": "Palo Alto Cortex XDR",
+        "company": "Palo Alto Networks",
+        "region": "Global",
+        "process_keywords": ["cyserver.exe", "xdrhealth.exe", "cytray.exe"]
+    },
+    {
+        "id": "av_042",
+        "name": "WithSecure Elements Endpoint Protection",
+        "company": "WithSecure",
+        "region": "Global",
+        "process_keywords": ["fshoster.exe", "fsui.exe", "fsulhoster.exe"]
+    },
+    {
+        "id": "av_043",
+        "name": "SecureAPlus",
+        "company": "SecureAge",
+        "region": "Global",
+        "process_keywords": ["SecureAgeAgent.exe", "SecureAgeService.exe"]
+    },
+    {
+        "id": "av_044",
+        "name": "VIPRE Endpoint Security",
+        "company": "VIPRE Security",
+        "region": "Global",
+        "process_keywords": ["VipreBusinessAgent.exe", "SBAMSvc.exe"]
+    },
+    {
+        "id": "av_045",
+        "name": "Arcabit Antivirus",
+        "company": "Arcabit",
+        "region": "Europe",
+        "process_keywords": ["arcabit.exe", "ABService.exe", "ArcAgent.exe"]
+    },
+    {
+        "id": "av_046",
+        "name": "ClamWin Antivirus",
+        "company": "ClamWin",
+        "region": "Global",
+        "process_keywords": ["ClamWin.exe", "ClamTray.exe"]
+    },
+    {
+        "id": "av_047",
+        "name": "ClamAV",
+        "company": "Cisco",
+        "region": "Global",
+        "process_keywords": ["clamd.exe", "freshclam.exe"]
+    },
+    {
+        "id": "av_048",
+        "name": "FireEye Endpoint Security",
+        "company": "Trellix",
+        "region": "Global",
+        "process_keywords": ["xagt.exe", "xagtnotif.exe"]
+    },
+    {
+        "id": "av_049",
+        "name": "Deep Instinct Prevention Platform",
+        "company": "Deep Instinct",
+        "region": "Global",
+        "process_keywords": ["DeepInstinctAgent.exe", "dppsvc.exe"]
+    },
+    {
+        "id": "av_050",
+        "name": "CylancePROTECT",
+        "company": "BlackBerry",
+        "region": "Global",
+        "process_keywords": ["CylanceSvc.exe", "CylanceUI.exe", "CyOptics.exe"]
+    },
+    {
+        "id": "av_051",
+        "name": "Sophos Intercept X",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosFS.exe", "SophosHealth.exe", "SophosCleanService.exe", "SophosUI.exe", "SAVService.exe"]
+    },
+    {
+        "id": "av_052",
+        "name": "Malwarebytes Endpoint Protection",
+        "company": "Malwarebytes",
+        "region": "Global",
+        "process_keywords": ["MBAMService.exe", "mbam.exe", "MBAMTray.exe", "MBAMWsc.exe"]
+    },
+    {
+        "id": "av_053",
+        "name": "SentinelOne Singularity",
+        "company": "SentinelOne",
+        "region": "Global",
+        "process_keywords": ["SentinelServiceHost.exe", "SentinelAgent.exe", "SentinelMonitor.exe", "SentinelStaticEngine.exe"]
+    },
+    {
+        "id": "av_054",
+        "name": "CrowdStrike Falcon",
+        "company": "CrowdStrike",
+        "region": "Global",
+        "process_keywords": ["CSFalconService.exe", "CSFalconContainer.exe", "CSAgent.exe", "FalconSensor.exe"]
+    },
+    {
+        "id": "av_055",
+        "name": "Microsoft Defender for Endpoint",
+        "company": "Microsoft",
+        "region": "Global",
+        "process_keywords": ["MsSense.exe", "SenseIR.exe", "SenseNdr.exe", "MsMpEng.exe", "NisSrv.exe"]
+    },
+    {
+        "id": "av_056",
+        "name": "Check Point Harmony Endpoint",
+        "company": "Check Point",
+        "region": "Global",
+        "process_keywords": ["TracSrvWrapper.exe", "EPWD.exe", "CPInfo.exe", "cpextender.exe"]
+    },
+    {
+        "id": "av_057",
+        "name": "Sophos Central Endpoint",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosNtpService.exe", "SophosED.exe", "SophosFileScanner.exe"]
+    },
+    {
+        "id": "av_058",
+        "name": "Trend Micro Apex One",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["Ntrtscan.exe", "TmListen.exe", "TmCCSF.exe", "PccNTMon.exe", "TMBMSRV.exe"]
+    },
+    {
+        "id": "av_059",
+        "name": "ESET PROTECT",
+        "company": "ESET",
+        "region": "Global",
+        "process_keywords": ["ekrn.exe", "egui.exe", "ERAAgent.exe", "ESETService.exe"]
+    },
+    {
+        "id": "av_060",
+        "name": "Kaspersky Endpoint Security",
+        "company": "Kaspersky Lab",
+        "region": "Global",
+        "process_keywords": ["avp.exe", "avpui.exe", "klnagent.exe", "kavfswp.exe"]
+    },
+    {
+        "id": "av_061",
+        "name": "Avast Business Antivirus",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["AvastSvc.exe", "AvastUI.exe", "aswidsagent.exe", "wsc_proxy.exe"]
+    },
+    {
+        "id": "av_062",
+        "name": "AVG Business Antivirus",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["avgsvc.exe", "avgui.exe", "avgwdsvc.exe", "avgrsa.exe"]
+    },
+    {
+        "id": "av_063",
+        "name": "Avira Endpoint Security",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["avguard.exe", "avshadow.exe", "sched.exe", "Avira.ServiceHost.exe"]
+    },
+    {
+        "id": "av_064",
+        "name": "Norton Endpoint Security",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["NortonSecurity.exe", "NS.exe", "ccSvcHst.exe", "NortonSvc.exe"]
+    },
+    {
+        "id": "av_065",
+        "name": "McAfee Total Protection",
+        "company": "McAfee",
+        "region": "Global",
+        "process_keywords": ["mcshield.exe", "MfeAVSvc.exe", "McUICnt.exe", "mfevtps.exe"]
+    },
+    {
+        "id": "av_066",
+        "name": "McAfee ENS",
+        "company": "Trellix",
+        "region": "Global",
+        "process_keywords": ["mfetp.exe", "mfeesp.exe", "mfefire.exe", "masvc.exe"]
+    },
+    {
+        "id": "av_067",
+        "name": "Symantec Endpoint Protection Cloud",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["ccSvcHst.exe", "Smc.exe", "SepLiveUpdate.exe"]
+    },
+    {
+        "id": "av_068",
+        "name": "Broadcom Symantec Endpoint Security",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["SemSvc.exe", "ccSvcHst.exe", "Smc.exe"]
+    },
+    {
+        "id": "av_069",
+        "name": "VMware Carbon Black Endpoint",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["RepMgr.exe", "CbDefense.exe", "Cb.exe", "CarbonBlack.exe"]
+    },
+    {
+        "id": "av_070",
+        "name": "Rapid7 Insight Agent",
+        "company": "Rapid7",
+        "region": "Global",
+        "process_keywords": ["ir_agent.exe", "agent.exe", "InsightAgent.exe"]
+    },
+    {
+        "id": "av_071",
+        "name": "Tanium Client",
+        "company": "Tanium",
+        "region": "Global",
+        "process_keywords": ["TaniumClient.exe", "TaniumCX.exe"]
+    },
+    {
+        "id": "av_072",
+        "name": "Absolute Secure Endpoint",
+        "company": "Absolute Software",
+        "region": "Global",
+        "process_keywords": ["rpcnet.exe", "rpcnetp.exe", "AbsoluteAgent.exe"]
+    },
+    {
+        "id": "av_073",
+        "name": "BlackBerry Protect",
+        "company": "BlackBerry",
+        "region": "Global",
+        "process_keywords": ["CylanceSvc.exe", "CylanceUI.exe", "BlackBerryProtect.exe"]
+    },
+    {
+        "id": "av_074",
+        "name": "WatchGuard EPDR",
+        "company": "WatchGuard",
+        "region": "Global",
+        "process_keywords": ["PandaAgent.exe", "PSANHost.exe", "ProtectionAgent.exe"]
+    },
+    {
+        "id": "av_075",
+        "name": "Bitdefender Endpoint Security",
+        "company": "Bitdefender",
+        "region": "Global",
+        "process_keywords": ["bdservicehost.exe", "bdagent.exe", "updatesrv.exe", "epag.exe"]
+    },
+    {
+        "id": "av_076",
+        "name": "Palo Alto Cortex XDR Agent",
+        "company": "Palo Alto Networks",
+        "region": "Global",
+        "process_keywords": ["cyserver.exe", "cytray.exe", "cytool.exe", "xdrhealth.exe"]
+    },
+    {
+        "id": "av_077",
+        "name": "FortiEDR",
+        "company": "Fortinet",
+        "region": "Global",
+        "process_keywords": ["FortiEDR.exe", "FortiEDRAgent.exe", "FESAgent.exe"]
+    },
+    {
+        "id": "av_078",
+        "name": "FortiClient EMS Security",
+        "company": "Fortinet",
+        "region": "Global",
+        "process_keywords": ["FortiClient.exe", "FortiESNAC.exe", "FortiTray.exe"]
+    },
+    {
+        "id": "av_079",
+        "name": "Cisco Secure Endpoint Advanced",
+        "company": "Cisco",
+        "region": "Global",
+        "process_keywords": ["sfc.exe", "ampservice.exe", "sfcservice.exe", "ampagent.exe"]
+    },
+    {
+        "id": "av_080",
+        "name": "Microsoft Defender Antivirus",
+        "company": "Microsoft",
+        "region": "Global",
+        "process_keywords": ["MsMpEng.exe", "MpCmdRun.exe", "NisSrv.exe", "SecurityHealthService.exe"]
+    },
+    {
+        "id": "av_081",
+        "name": "Windows Defender Application Guard",
+        "company": "Microsoft",
+        "region": "Global",
+        "process_keywords": ["hvsimgr.exe", "vmcompute.exe", "MsMpEng.exe"]
+    },
+    {
+        "id": "av_082",
+        "name": "Deep Instinct Prevention",
+        "company": "Deep Instinct",
+        "region": "Global",
+        "process_keywords": ["DeepInstinctAgent.exe", "DIAgent.exe", "dppsvc.exe"]
+    },
+    {
+        "id": "av_083",
+        "name": "Trellix Endpoint Detection and Response",
+        "company": "Trellix",
+        "region": "Global",
+        "process_keywords": ["xagt.exe", "mfetp.exe", "mfeesp.exe", "mfevtps.exe"]
+    },
+    {
+        "id": "av_084",
+        "name": "FireEye HX Agent",
+        "company": "FireEye",
+        "region": "Global",
+        "process_keywords": ["xagt.exe", "xagtnotif.exe", "xagtservice.exe"]
+    },
+    {
+        "id": "av_085",
+        "name": "Carbon Black App Control",
+        "company": "VMware",
+        "region": "Global",
+        "process_keywords": ["cb.exe", "cbagent.exe", "Parity.exe"]
+    },
+    {
+        "id": "av_086",
+        "name": "Carbon Black Cloud Sensor",
+        "company": "VMware",
+        "region": "Global",
+        "process_keywords": ["RepMgr.exe", "CbDefense.exe", "cb.exe"]
+    },
+    {
+        "id": "av_087",
+        "name": "Trend Micro Worry-Free Business Security",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["Ntrtscan.exe", "TmListen.exe", "PccNTMon.exe", "TmCCSF.exe"]
+    },
+    {
+        "id": "av_088",
+        "name": "Trend Micro OfficeScan",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["Ntrtscan.exe", "TmProxy.exe", "PccNTMon.exe", "TmListen.exe"]
+    },
+    {
+        "id": "av_089",
+        "name": "ESET Endpoint Antivirus",
+        "company": "ESET",
+        "region": "Global",
+        "process_keywords": ["ekrn.exe", "egui.exe", "ecls.exe", "ESETService.exe"]
+    },
+    {
+        "id": "av_090",
+        "name": "Kaspersky Security Cloud",
+        "company": "Kaspersky Lab",
+        "region": "Global",
+        "process_keywords": ["avp.exe", "avpui.exe", "kavtray.exe", "kavsvc.exe"]
+    },
+    {
+        "id": "av_091",
+        "name": "Kaspersky Anti-Ransomware",
+        "company": "Kaspersky Lab",
+        "region": "Global",
+        "process_keywords": ["kavfs.exe", "avp.exe", "kavfsslp.exe"]
+    },
+    {
+        "id": "av_092",
+        "name": "Sophos XG Endpoint Agent",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosEndpointDefense.exe", "SophosNtpService.exe", "SophosFileScanner.exe"]
+    },
+    {
+        "id": "av_093",
+        "name": "Malwarebytes Anti-Malware",
+        "company": "Malwarebytes",
+        "region": "Global",
+        "process_keywords": ["mbam.exe", "MBAMService.exe", "MBAMTray.exe"]
+    },
+    {
+        "id": "av_094",
+        "name": "SentinelOne Endpoint Agent",
+        "company": "SentinelOne",
+        "region": "Global",
+        "process_keywords": ["SentinelAgent.exe", "SentinelServiceHost.exe", "SentinelMonitor.exe"]
+    },
+    {
+        "id": "av_095",
+        "name": "CrowdStrike Falcon Sensor",
+        "company": "CrowdStrike",
+        "region": "Global",
+        "process_keywords": ["CSFalconService.exe", "FalconSensor.exe", "CSAgent.exe"]
+    },
+    {
+        "id": "av_096",
+        "name": "Elastic Defend",
+        "company": "Elastic",
+        "region": "Global",
+        "process_keywords": ["elastic-agent.exe", "elastic-endpoint.exe", "endpoint-security.exe"]
+    },
+    {
+        "id": "av_097",
+        "name": "Osquery Security Agent",
+        "company": "Fleet",
+        "region": "Global",
+        "process_keywords": ["osqueryd.exe", "osqueryi.exe", "fleetd.exe"]
+    },
+    {
+        "id": "av_098",
+        "name": "Wazuh Agent",
+        "company": "Wazuh",
+        "region": "Global",
+        "process_keywords": ["wazuh-agent.exe", "ossec-agent.exe", "win32ui.exe"]
+    },
+    {
+        "id": "av_099",
+        "name": "AlienVault USM Agent",
+        "company": "AT&T Cybersecurity",
+        "region": "Global",
+        "process_keywords": ["alienvault-agent.exe", "ossec-agent.exe", "alienvault.exe"]
+    },
+    {
+        "id": "av_100",
+        "name": "Trend Micro Vision One XDR",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["TmListen.exe", "EndpointBasecamp.exe", "TMBMSRV.exe", "Ntrtscan.exe"]
+    },
+    {
+        "id": "av_101",
+        "name": "Qihoo 360 Total Security",
+        "company": "Qihoo 360",
+        "region": "China",
+        "process_keywords": ["360sd.exe", "360safebox.exe", "ZhuDongFangYu.exe", "360tray.exe"]
+    },
+    {
+        "id": "av_102",
+        "name": "Tencent PC Manager",
+        "company": "Tencent",
+        "region": "China",
+        "process_keywords": ["QQPCRTP.exe", "QQPCTray.exe", "TencentSecSvc.exe", "QQPCNetFlow.exe"]
+    },
+    {
+        "id": "av_103",
+        "name": "Huorong Internet Security",
+        "company": "Huorong Borui",
+        "region": "China",
+        "process_keywords": ["HipsMain.exe", "HipsDaemon.exe", "usysdiag.exe", "HipsTray.exe"]
+    },
+    {
+        "id": "av_104",
+        "name": "Kingsoft Duba Antivirus",
+        "company": "Kingsoft",
+        "region": "China",
+        "process_keywords": ["kxetray.exe", "kismain.exe", "kwatch.exe", "kxescore.exe"]
+    },
+    {
+        "id": "av_105",
+        "name": "Rising Antivirus",
+        "company": "Rising Information Technology",
+        "region": "China",
+        "process_keywords": ["RavMonD.exe", "Rising.exe", "RsAgent.exe", "RavTask.exe"]
+    },
+    {
+        "id": "av_106",
+        "name": "Baidu Antivirus",
+        "company": "Baidu",
+        "region": "China",
+        "process_keywords": ["BaiduAnTray.exe", "BaiduAnSvc.exe", "BavSvc.exe"]
+    },
+    {
+        "id": "av_107",
+        "name": "Dr.Web Enterprise Security",
+        "company": "Doctor Web",
+        "region": "Global",
+        "process_keywords": ["dwservice.exe", "dwengine.exe", "drweb32w.exe"]
+    },
+    {
+        "id": "av_108",
+        "name": "Acronis Cyber Protect",
+        "company": "Acronis",
+        "region": "Global",
+        "process_keywords": ["AcronisAgent.exe", "AcronisCyberProtect.exe", "schedul2.exe"]
+    },
+    {
+        "id": "av_109",
+        "name": "Acronis Cyber Protect Cloud",
+        "company": "Acronis",
+        "region": "Global",
+        "process_keywords": ["AcronisManagedMachineService.exe", "CyberProtection.exe"]
+    },
+    {
+        "id": "av_110",
+        "name": "Bitdefender BOX Security",
+        "company": "Bitdefender",
+        "region": "Global",
+        "process_keywords": ["bdservicehost.exe", "bdagent.exe", "BitdefenderAgent.exe"]
+    },
+    {
+        "id": "av_111",
+        "name": "N-able Endpoint Security",
+        "company": "N-able",
+        "region": "Global",
+        "process_keywords": ["NableAgent.exe", "AVDefender.exe", "BitdefenderAgent.exe"]
+    },
+    {
+        "id": "av_112",
+        "name": "Kaseya VSA Agent",
+        "company": "Kaseya",
+        "region": "Global",
+        "process_keywords": ["KaseyaAgent.exe", "AgentMon.exe", "KaseyaService.exe"]
+    },
+    {
+        "id": "av_113",
+        "name": "ConnectWise Automate Agent",
+        "company": "ConnectWise",
+        "region": "Global",
+        "process_keywords": ["LTSvc.exe", "LTTray.exe", "LabTech.exe"]
+    },
+    {
+        "id": "av_114",
+        "name": "Datto RMM Agent",
+        "company": "Datto",
+        "region": "Global",
+        "process_keywords": ["AEMAgent.exe", "CagService.exe", "AgentService.exe"]
+    },
+    {
+        "id": "av_115",
+        "name": "ManageEngine Endpoint Central Agent",
+        "company": "Zoho",
+        "region": "Global",
+        "process_keywords": ["dcagent.exe", "dcservice.exe", "UEMSAgent.exe"]
+    },
+    {
+        "id": "av_116",
+        "name": "Ivanti Endpoint Manager",
+        "company": "Ivanti",
+        "region": "Global",
+        "process_keywords": ["CBA8.exe", "LANDeskAgent.exe", "BrokerService.exe"]
+    },
+    {
+        "id": "av_117",
+        "name": "Ivanti Neurons Agent",
+        "company": "Ivanti",
+        "region": "Global",
+        "process_keywords": ["IvantiAgent.exe", "AgentMonitor.exe"]
+    },
+    {
+        "id": "av_118",
+        "name": "BeyondTrust Endpoint Privilege Management",
+        "company": "BeyondTrust",
+        "region": "Global",
+        "process_keywords": ["Avecto.Defendpoint.Service.exe", "PrivilegeManagement.exe"]
+    },
+    {
+        "id": "av_119",
+        "name": "CyberArk Endpoint Privilege Manager",
+        "company": "CyberArk",
+        "region": "Global",
+        "process_keywords": ["vf_agent.exe", "CyberArkEPMAgent.exe"]
+    },
+    {
+        "id": "av_120",
+        "name": "Symantec Data Center Security",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["sisipsservice.exe", "sisipsutil.exe"]
+    },
+    {
+        "id": "av_121",
+        "name": "Forcepoint DLP Endpoint",
+        "company": "Forcepoint",
+        "region": "Global",
+        "process_keywords": ["fppsvc.exe", "fpnetmon.exe", "fppolicy.exe"]
+    },
+    {
+        "id": "av_122",
+        "name": "Digital Guardian Endpoint",
+        "company": "Fortra",
+        "region": "Global",
+        "process_keywords": ["DGAgent.exe", "DGTray.exe", "DGService.exe"]
+    },
+    {
+        "id": "av_123",
+        "name": "Trellix DLP Endpoint",
+        "company": "Trellix",
+        "region": "Global",
+        "process_keywords": ["fcags.exe", "fcag.exe", "dlpagent.exe"]
+    },
+    {
+        "id": "av_124",
+        "name": "Symantec DLP Agent",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["edpa.exe", "WDP.exe", "SymantecDLPAgent.exe"]
+    },
+    {
+        "id": "av_125",
+        "name": "Forcepoint ONE Endpoint",
+        "company": "Forcepoint",
+        "region": "Global",
+        "process_keywords": ["fpclient.exe", "fppsvc.exe"]
+    },
+    {
+        "id": "av_126",
+        "name": "Secureworks Taegis Agent",
+        "company": "Secureworks",
+        "region": "Global",
+        "process_keywords": ["taegis-agent.exe", "RedCloak.exe"]
+    },
+    {
+        "id": "av_127",
+        "name": "Sophos MDR Agent",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosMCSAgent.exe", "SophosHealth.exe"]
+    },
+    {
+        "id": "av_128",
+        "name": "Arctic Wolf Agent",
+        "company": "Arctic Wolf",
+        "region": "Global",
+        "process_keywords": ["arcticwolfagent.exe", "osqueryd.exe"]
+    },
+    {
+        "id": "av_129",
+        "name": "Red Canary Atomic Agent",
+        "company": "Red Canary",
+        "region": "Global",
+        "process_keywords": ["redcanary.exe", "atomic-agent.exe"]
+    },
+    {
+        "id": "av_130",
+        "name": "Huntress Agent",
+        "company": "Huntress Labs",
+        "region": "Global",
+        "process_keywords": ["HuntressAgent.exe", "HuntressUpdater.exe"]
+    },
+    {
+        "id": "av_131",
+        "name": "OpenText EnCase Endpoint Security",
+        "company": "OpenText",
+        "region": "Global",
+        "process_keywords": ["EnCaseEndpoint.exe", "GuidanceSoftware.exe", "EnCaseSvc.exe"]
+    },
+    {
+        "id": "av_132",
+        "name": "VMware Carbon Black Workload",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["cbdaemon.exe", "cbagent.exe", "RepMgr.exe"]
+    },
+    {
+        "id": "av_133",
+        "name": "VMware Workspace ONE Intelligent Hub",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["AirwatchAgent.exe", "AWProcessCommands.exe", "IntelligentHub.exe"]
+    },
+    {
+        "id": "av_134",
+        "name": "Microsoft Intune Management Extension",
+        "company": "Microsoft",
+        "region": "Global",
+        "process_keywords": ["IntuneManagementExtension.exe", "IME.exe", "AgentExecutor.exe"]
+    },
+    {
+        "id": "av_135",
+        "name": "Microsoft Configuration Manager Client",
+        "company": "Microsoft",
+        "region": "Global",
+        "process_keywords": ["CcmExec.exe", "ccmsetup.exe", "smsexec.exe"]
+    },
+    {
+        "id": "av_136",
+        "name": "Microsoft Defender for Identity Sensor",
+        "company": "Microsoft",
+        "region": "Global",
+        "process_keywords": ["AzureADConnect.exe", "Sensor.exe", "Microsoft.Tri.Sensor.exe"]
+    },
+    {
+        "id": "av_137",
+        "name": "Google BeyondCorp Enterprise Agent",
+        "company": "Google",
+        "region": "Global",
+        "process_keywords": ["BeyondCorpAgent.exe", "gcagent.exe"]
+    },
+    {
+        "id": "av_138",
+        "name": "Zscaler Client Connector",
+        "company": "Zscaler",
+        "region": "Global",
+        "process_keywords": ["ZSATray.exe", "ZSAService.exe", "ZSATunnel.exe"]
+    },
+    {
+        "id": "av_139",
+        "name": "Cloudflare WARP",
+        "company": "Cloudflare",
+        "region": "Global",
+        "process_keywords": ["warp-svc.exe", "CloudflareWARP.exe"]
+    },
+    {
+        "id": "av_140",
+        "name": "Cisco Secure Client",
+        "company": "Cisco",
+        "region": "Global",
+        "process_keywords": ["csc_ui.exe", "vpnagent.exe", "csc_service.exe"]
+    },
+    {
+        "id": "av_141",
+        "name": "Palo Alto GlobalProtect",
+        "company": "Palo Alto Networks",
+        "region": "Global",
+        "process_keywords": ["PanGPA.exe", "PanGPS.exe", "GlobalProtect.exe"]
+    },
+    {
+        "id": "av_142",
+        "name": "Check Point Endpoint Security",
+        "company": "Check Point",
+        "region": "Global",
+        "process_keywords": ["cpextender.exe", "tracsrvwrapper.exe", "EPWD.exe"]
+    },
+    {
+        "id": "av_143",
+        "name": "Netskope Client",
+        "company": "Netskope",
+        "region": "Global",
+        "process_keywords": ["stAgentUI.exe", "stAgentSVC.exe", "nssvc.exe"]
+    },
+    {
+        "id": "av_144",
+        "name": "Forcepoint DLP Endpoint Agent",
+        "company": "Forcepoint",
+        "region": "Global",
+        "process_keywords": ["fppsvc.exe", "fpemu.exe", "fpclient.exe"]
+    },
+    {
+        "id": "av_145",
+        "name": "Tanium Protect",
+        "company": "Tanium",
+        "region": "Global",
+        "process_keywords": ["TaniumClient.exe", "TaniumCX.exe", "TaniumProtect.exe"]
+    },
+    {
+        "id": "av_146",
+        "name": "Rapid7 InsightIDR Agent",
+        "company": "Rapid7",
+        "region": "Global",
+        "process_keywords": ["ir_agent.exe", "collector.exe", "InsightAgent.exe"]
+    },
+    {
+        "id": "av_147",
+        "name": "Qualys Cloud Agent",
+        "company": "Qualys",
+        "region": "Global",
+        "process_keywords": ["QualysAgent.exe", "QualysCloudAgent.exe", "qualys-cloud-agent.exe"]
+    },
+    {
+        "id": "av_148",
+        "name": "Tenable Nessus Agent",
+        "company": "Tenable",
+        "region": "Global",
+        "process_keywords": ["nessusagent.exe", "nessusd.exe", "nessus-service.exe"]
+    },
+    {
+        "id": "av_149",
+        "name": "Lansweeper Agent",
+        "company": "Lansweeper",
+        "region": "Global",
+        "process_keywords": ["LansweeperAgent.exe", "LsAgent.exe"]
+    },
+    {
+        "id": "av_150",
+        "name": "Atera Agent",
+        "company": "Atera",
+        "region": "Global",
+        "process_keywords": ["AteraAgent.exe", "AgentPackage.exe", "AteraService.exe"]
+    },
+    {
+        "id": "av_151",
+        "name": "NinjaOne Agent",
+        "company": "NinjaOne",
+        "region": "Global",
+        "process_keywords": ["NinjaRMMAgent.exe", "NinjaAgent.exe", "NinjaOne.exe"]
+    },
+    {
+        "id": "av_152",
+        "name": "Syncro Agent",
+        "company": "Syncro",
+        "region": "Global",
+        "process_keywords": ["SyncroAgent.exe", "Syncro.Service.exe"]
+    },
+    {
+        "id": "av_153",
+        "name": "Pulseway Agent",
+        "company": "Pulseway",
+        "region": "Global",
+        "process_keywords": ["pcmon.exe", "PulsewayAgent.exe"]
+    },
+    {
+        "id": "av_154",
+        "name": "Datto Endpoint Backup",
+        "company": "Datto",
+        "region": "Global",
+        "process_keywords": ["BackupAgent.exe", "DattoBackup.exe"]
+    },
+    {
+        "id": "av_155",
+        "name": "Auvik Agent",
+        "company": "Auvik",
+        "region": "Global",
+        "process_keywords": ["AuvikAgent.exe", "AuvikService.exe"]
+    },
+    {
+        "id": "av_156",
+        "name": "ConnectWise SIEM Agent",
+        "company": "ConnectWise",
+        "region": "Global",
+        "process_keywords": ["ConnectWiseAgent.exe", "LTSvc.exe"]
+    },
+    {
+        "id": "av_157",
+        "name": "Elastic Agent Security",
+        "company": "Elastic",
+        "region": "Global",
+        "process_keywords": ["elastic-agent.exe", "elastic-endpoint.exe", "fleet-server.exe"]
+    },
+    {
+        "id": "av_158",
+        "name": "Wazuh Security Agent",
+        "company": "Wazuh",
+        "region": "Global",
+        "process_keywords": ["wazuh-agent.exe", "ossec-agent.exe", "agent-auth.exe"]
+    },
+    {
+        "id": "av_159",
+        "name": "AlienVault Agent",
+        "company": "AT&T Cybersecurity",
+        "region": "Global",
+        "process_keywords": ["alienvault-agent.exe", "ossec-agent.exe", "usm-agent.exe"]
+    },
+    {
+        "id": "av_160",
+        "name": "Graylog Sidecar Agent",
+        "company": "Graylog",
+        "region": "Global",
+        "process_keywords": ["graylog-sidecar.exe", "collector-sidecar.exe"]
+    },
+    {
+        "id": "av_161",
+        "name": "Trend Micro Endpoint Encryption",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["PolicyServer.exe", "TMEEAgent.exe", "TMEEMain.exe"]
+    },
+    {
+        "id": "av_162",
+        "name": "Trend Micro Deep Security Agent",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["ds_agent.exe", "dsa.exe", "ds_monitor.exe"]
+    },
+    {
+        "id": "av_163",
+        "name": "Apex One Security Agent",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["Ntrtscan.exe", "TmListen.exe", "TmCCSF.exe", "PccNTMon.exe"]
+    },
+    {
+        "id": "av_164",
+        "name": "Kaspersky Security Center Network Agent",
+        "company": "Kaspersky Lab",
+        "region": "Global",
+        "process_keywords": ["klnagent.exe", "kaspersky.exe", "avp.exe"]
+    },
+    {
+        "id": "av_165",
+        "name": "ESET Management Agent",
+        "company": "ESET",
+        "region": "Global",
+        "process_keywords": ["ERAAgent.exe", "ESETManagementAgent.exe", "ekrn.exe"]
+    },
+    {
+        "id": "av_166",
+        "name": "Bitdefender Security Server",
+        "company": "Bitdefender",
+        "region": "Global",
+        "process_keywords": ["bdservicehost.exe", "epsecurityservice.exe", "updatesrv.exe"]
+    },
+    {
+        "id": "av_167",
+        "name": "Sophos Device Encryption",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosSafeGuard.exe", "SGNAgent.exe", "SophosFS.exe"]
+    },
+    {
+        "id": "av_168",
+        "name": "Sophos Intercept X Advanced",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosED.exe", "SophosFileScanner.exe", "SophosHealth.exe"]
+    },
+    {
+        "id": "av_169",
+        "name": "Malwarebytes EDR",
+        "company": "Malwarebytes",
+        "region": "Global",
+        "process_keywords": ["MBAMService.exe", "MBEndpointAgent.exe", "mbamtray.exe"]
+    },
+    {
+        "id": "av_170",
+        "name": "SentinelOne Ranger",
+        "company": "SentinelOne",
+        "region": "Global",
+        "process_keywords": ["SentinelAgent.exe", "SentinelServiceHost.exe", "RangerService.exe"]
+    },
+    {
+        "id": "av_171",
+        "name": "CrowdStrike Falcon Identity Protection",
+        "company": "CrowdStrike",
+        "region": "Global",
+        "process_keywords": ["CSFalconService.exe", "FalconIdentitySensor.exe"]
+    },
+    {
+        "id": "av_172",
+        "name": "CrowdStrike Falcon Discover",
+        "company": "CrowdStrike",
+        "region": "Global",
+        "process_keywords": ["CSFalconService.exe", "FalconDiscover.exe"]
+    },
+    {
+        "id": "av_173",
+        "name": "Cynet 360 AutoXDR",
+        "company": "Cynet",
+        "region": "Global",
+        "process_keywords": ["Cynet.exe", "CyService.exe", "CynetAgent.exe"]
+    },
+    {
+        "id": "av_174",
+        "name": "Sophos MDR Connect",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosMCSAgent.exe", "SophosService.exe"]
+    },
+    {
+        "id": "av_175",
+        "name": "Guardicore Centra Security Agent",
+        "company": "Akamai",
+        "region": "Global",
+        "process_keywords": ["guardicore.exe", "gcsagent.exe"]
+    },
+    {
+        "id": "av_176",
+        "name": "Akamai Guardicore Segmentation Agent",
+        "company": "Akamai",
+        "region": "Global",
+        "process_keywords": ["guardicore-agent.exe", "gc-agent.exe"]
+    },
+    {
+        "id": "av_177",
+        "name": "Illumio Endpoint Agent",
+        "company": "Illumio",
+        "region": "Global",
+        "process_keywords": ["illumio-agent.exe", "illumio-service.exe"]
+    },
+    {
+        "id": "av_178",
+        "name": "Forescout SecureConnector",
+        "company": "Forescout",
+        "region": "Global",
+        "process_keywords": ["SecureConnector.exe", "fsck.exe"]
+    },
+    {
+        "id": "av_179",
+        "name": "Trellix ENS Firewall",
+        "company": "Trellix",
+        "region": "Global",
+        "process_keywords": ["mfefw.exe", "mfeesp.exe", "mfetp.exe"]
+    },
+    {
+        "id": "av_180",
+        "name": "Trellix Agent",
+        "company": "Trellix",
+        "region": "Global",
+        "process_keywords": ["macmnsvc.exe", "masvc.exe", "frmInst.exe"]
+    },
+    {
+        "id": "av_181",
+        "name": "Symantec Management Agent",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["AeXNSAgent.exe", "AeXAgentUtil.exe"]
+    },
+    {
+        "id": "av_182",
+        "name": "Broadcom DLP Endpoint",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["edpa.exe", "WDP.exe", "SymantecDLPAgent.exe"]
+    },
+    {
+        "id": "av_183",
+        "name": "Cisco Secure Endpoint Connector",
+        "company": "Cisco",
+        "region": "Global",
+        "process_keywords": ["sfc.exe", "ampservice.exe", "sfcservice.exe"]
+    },
+    {
+        "id": "av_184",
+        "name": "Cisco Secure Client Umbrella",
+        "company": "Cisco",
+        "region": "Global",
+        "process_keywords": ["Umbrella_RC.exe", "csc_ui.exe", "vpnagent.exe"]
+    },
+    {
+        "id": "av_185",
+        "name": "Zscaler Private Access Client",
+        "company": "Zscaler",
+        "region": "Global",
+        "process_keywords": ["ZSATunnel.exe", "ZSAService.exe", "ZSATray.exe"]
+    },
+    {
+        "id": "av_186",
+        "name": "Netskope Endpoint DLP",
+        "company": "Netskope",
+        "region": "Global",
+        "process_keywords": ["stAgentSVC.exe", "stAgentUI.exe", "nssvc.exe"]
+    },
+    {
+        "id": "av_187",
+        "name": "VMware Workspace ONE Assist",
+        "company": "Broadcom",
+        "region": "Global",
+        "process_keywords": ["WorkspaceONEAssist.exe", "AWService.exe"]
+    },
+    {
+        "id": "av_188",
+        "name": "Jamf Protect",
+        "company": "Jamf",
+        "region": "Global",
+        "process_keywords": ["jamfProtect.app", "jamfProtectDaemon"]
+    },
+    {
+        "id": "av_189",
+        "name": "Jamf Connect",
+        "company": "Jamf",
+        "region": "Global",
+        "process_keywords": ["jamfconnect.app", "jamfConnectLogin"]
+    },
+    {
+        "id": "av_190",
+        "name": "Mosyle Manager Agent",
+        "company": "Mosyle",
+        "region": "Global",
+        "process_keywords": ["MosyleManager.app", "MosyleAuth"]
+    },
+    {
+        "id": "av_191",
+        "name": "Kandji Agent",
+        "company": "Kandji",
+        "region": "Global",
+        "process_keywords": ["KandjiAgent", "KandjiDaemon"]
+    },
+    {
+        "id": "av_192",
+        "name": "Addigy Agent",
+        "company": "Addigy",
+        "region": "Global",
+        "process_keywords": ["AddigyAgent", "AddigyDaemon"]
+    },
+    {
+        "id": "av_193",
+        "name": "Automox Agent",
+        "company": "Automox",
+        "region": "Global",
+        "process_keywords": ["amagent.exe", "AutomoxAgent.exe"]
+    },
+    {
+        "id": "av_194",
+        "name": "Kolide Endpoint Agent",
+        "company": "Kolide",
+        "region": "Global",
+        "process_keywords": ["kolide.exe", "kolide-launcher.exe"]
+    },
+    {
+        "id": "av_195",
+        "name": "FleetDM Agent",
+        "company": "Fleet",
+        "region": "Global",
+        "process_keywords": ["fleetd.exe", "osqueryd.exe"]
+    },
+    {
+        "id": "av_196",
+        "name": "JumpCloud Agent",
+        "company": "JumpCloud",
+        "region": "Global",
+        "process_keywords": ["jumpcloud-agent.exe", "jbagent.exe"]
+    },
+    {
+        "id": "av_197",
+        "name": "Okta Verify Device Trust",
+        "company": "Okta",
+        "region": "Global",
+        "process_keywords": ["OktaVerify.exe", "OktaDeviceTrust.exe"]
+    },
+    {
+        "id": "av_198",
+        "name": "Duo Device Health Application",
+        "company": "Cisco Duo",
+        "region": "Global",
+        "process_keywords": ["DuoDeviceHealth.exe", "DuoDeviceHealthService.exe"]
+    },
+    {
+        "id": "av_199",
+        "name": "Absolute Secure Endpoint Agent",
+        "company": "Absolute Software",
+        "region": "Global",
+        "process_keywords": ["rpcnet.exe", "rpcnetp.exe", "AbsoluteAgent.exe"]
+    },
+    {
+        "id": "av_200",
+        "name": "Huntress Managed Security Agent",
+        "company": "Huntress Labs",
+        "region": "Global",
+        "process_keywords": ["HuntressAgent.exe", "HuntressUpdater.exe", "HuntressService.exe"]
+    },
+    {
+        "id": "av_201",
+        "name": "AhnLab EPP",
+        "company": "AhnLab",
+        "region": "South Korea",
+        "process_keywords": ["V3Svc.exe", "AhnSD.exe", "AhnLabEPP.exe", "V3UI.exe"]
+    },
+    {
+        "id": "av_202",
+        "name": "ESTsoft ALYac",
+        "company": "ESTsecurity",
+        "region": "South Korea",
+        "process_keywords": ["AYAgent.exe", "AYService.exe", "ALYac.exe"]
+    },
+    {
+        "id": "av_203",
+        "name": "V3 Internet Security",
+        "company": "AhnLab",
+        "region": "South Korea",
+        "process_keywords": ["V3Lite.exe", "V3Svc.exe", "ASDSvc.exe"]
+    },
+    {
+        "id": "av_204",
+        "name": "Naver V3 Security",
+        "company": "AhnLab",
+        "region": "South Korea",
+        "process_keywords": ["V3Svc.exe", "V3Tray.exe"]
+    },
+    {
+        "id": "av_205",
+        "name": "Kakao Security Agent",
+        "company": "Kakao",
+        "region": "South Korea",
+        "process_keywords": ["KakaoSecurity.exe", "KakaoAgent.exe"]
+    },
+    {
+        "id": "av_206",
+        "name": "Sophos Endpoint Agent for Linux",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["savd", "sophos-spl", "SophosScanD"]
+    },
+    {
+        "id": "av_207",
+        "name": "ESET Cyber Security",
+        "company": "ESET",
+        "region": "Global",
+        "process_keywords": ["ekrn", "egui", "ESETCyberSecurity"]
+    },
+    {
+        "id": "av_208",
+        "name": "Kaspersky Endpoint Security for Business",
+        "company": "Kaspersky Lab",
+        "region": "Global",
+        "process_keywords": ["avp.exe", "kavfs.exe", "klnagent.exe"]
+    },
+    {
+        "id": "av_209",
+        "name": "Bitdefender GravityZone EDR",
+        "company": "Bitdefender",
+        "region": "Global",
+        "process_keywords": ["bdservicehost.exe", "epag.exe", "bdredline.exe"]
+    },
+    {
+        "id": "av_210",
+        "name": "Avira Prime",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["Avira.ServiceHost.exe", "avguard.exe", "avshadow.exe"]
+    },
+    {
+        "id": "av_211",
+        "name": "G DATA Endpoint Protection",
+        "company": "G DATA",
+        "region": "Global",
+        "process_keywords": ["AVKService.exe", "AVKWCtl.exe", "GDFirewall.exe"]
+    },
+    {
+        "id": "av_212",
+        "name": "Comodo Advanced Endpoint Protection",
+        "company": "Comodo",
+        "region": "Global",
+        "process_keywords": ["cmdagent.exe", "cavwp.exe", "cis.exe"]
+    },
+    {
+        "id": "av_213",
+        "name": "Webroot Business Endpoint Protection",
+        "company": "OpenText",
+        "region": "Global",
+        "process_keywords": ["WRSA.exe", "WRCoreService.exe", "WRusr.dll"]
+    },
+    {
+        "id": "av_214",
+        "name": "F-Secure SAFE",
+        "company": "WithSecure",
+        "region": "Global",
+        "process_keywords": ["fsav.exe", "fshoster.exe", "fsui.exe"]
+    },
+    {
+        "id": "av_215",
+        "name": "F-Secure Business Suite",
+        "company": "WithSecure",
+        "region": "Global",
+        "process_keywords": ["fsms.exe", "fshoster.exe", "fsma.exe"]
+    },
+    {
+        "id": "av_216",
+        "name": "Panda Adaptive Defense",
+        "company": "WatchGuard",
+        "region": "Global",
+        "process_keywords": ["PandaAgent.exe", "PSANHost.exe", "PavSvc.exe"]
+    },
+    {
+        "id": "av_217",
+        "name": "WatchGuard Endpoint Security",
+        "company": "WatchGuard",
+        "region": "Global",
+        "process_keywords": ["EPD.exe", "PandaAgent.exe", "ProtectionAgent.exe"]
+    },
+    {
+        "id": "av_218",
+        "name": "ZoneAlarm Extreme Security",
+        "company": "Check Point",
+        "region": "Global",
+        "process_keywords": ["vsmon.exe", "zlclient.exe", "ZoneAlarm.exe"]
+    },
+    {
+        "id": "av_219",
+        "name": "Adaware Antivirus",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["AdAware.exe", "AdAwareService.exe"]
+    },
+    {
+        "id": "av_220",
+        "name": "TotalAV Antivirus",
+        "company": "Total Security",
+        "region": "Global",
+        "process_keywords": ["TotalAV.exe", "SecurityService.exe"]
+    },
+    {
+        "id": "av_221",
+        "name": "PC Matic",
+        "company": "PC Matic",
+        "region": "Global",
+        "process_keywords": ["pcmatic.exe", "PCMaticService.exe", "SuperShield.exe"]
+    },
+    {
+        "id": "av_222",
+        "name": "SUPERAntiSpyware",
+        "company": "SUPERAntiSpyware",
+        "region": "Global",
+        "process_keywords": ["SASCore.exe", "SAS.exe", "SASTray.exe"]
+    },
+    {
+        "id": "av_223",
+        "name": "Spybot Search and Destroy",
+        "company": "Safer Networking",
+        "region": "Global",
+        "process_keywords": ["SDTray.exe", "SDUpdate.exe", "TeaTimer.exe"]
+    },
+    {
+        "id": "av_224",
+        "name": "ReasonLabs RAV Antivirus",
+        "company": "ReasonLabs",
+        "region": "Global",
+        "process_keywords": ["RAVAntivirus.exe", "RAVService.exe", "RAVBg64.exe"]
+    },
+    {
+        "id": "av_225",
+        "name": "Immunet Antivirus",
+        "company": "Cisco",
+        "region": "Global",
+        "process_keywords": ["ImmunetProtect.exe", "sfc.exe"]
+    },
+    {
+        "id": "av_226",
+        "name": "Trend Micro HouseCall",
+        "company": "Trend Micro",
+        "region": "Global",
+        "process_keywords": ["HouseCall.exe", "TSC.exe"]
+    },
+    {
+        "id": "av_227",
+        "name": "Microsoft Safety Scanner",
+        "company": "Microsoft",
+        "region": "Global",
+        "process_keywords": ["msert.exe", "MSERT.exe"]
+    },
+    {
+        "id": "av_228",
+        "name": "Norton Power Eraser",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["NPE.exe", "NortonPowerEraser.exe"]
+    },
+    {
+        "id": "av_229",
+        "name": "Kaspersky Virus Removal Tool",
+        "company": "Kaspersky Lab",
+        "region": "Global",
+        "process_keywords": ["KVRT.exe", "avp.exe"]
+    },
+    {
+        "id": "av_230",
+        "name": "ESET Online Scanner",
+        "company": "ESET",
+        "region": "Global",
+        "process_keywords": ["OnlineScanner.exe", "ecls.exe"]
+    },
+    {
+        "id": "av_231",
+        "name": "McAfee Stinger",
+        "company": "McAfee",
+        "region": "Global",
+        "process_keywords": ["stinger.exe"]
+    },
+    {
+        "id": "av_232",
+        "name": "Sophos Scan & Clean",
+        "company": "Sophos",
+        "region": "Global",
+        "process_keywords": ["SophosClean.exe", "SophosScan.exe"]
+    },
+    {
+        "id": "av_233",
+        "name": "Avast Cleanup",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["TuneupSvc.exe", "AvastCleanup.exe"]
+    },
+    {
+        "id": "av_234",
+        "name": "AVG TuneUp Security",
+        "company": "Gen Digital",
+        "region": "Global",
+        "process_keywords": ["TuneupSvc.exe", "AVG TuneUp.exe"]
+    },
+    {
+        "id": "av_235",
+        "name": "IObit Malware Fighter",
+        "company": "IObit",
+        "region": "Global",
+        "process_keywords": ["IMF.exe", "IMFSvc.exe"]
+    },
+    {
+        "id": "av_236",
+        "name": "360 Total Security Enterprise",
+        "company": "Qihoo 360",
+        "region": "China",
+        "process_keywords": ["360EntClient.exe", "360sd.exe", "QHActiveDefense.exe"]
+    },
+    {
+        "id": "av_237",
+        "name": "Tencent Enterprise Security",
+        "company": "Tencent",
+        "region": "China",
+        "process_keywords": ["TencentSecSvc.exe", "QQPCTray.exe"]
+    },
+    {
+        "id": "av_238",
+        "name": "Kingsoft Enterprise Security",
+        "company": "Kingsoft",
+        "region": "China",
+        "process_keywords": ["kxescore.exe", "kxetray.exe", "kismain.exe"]
+    },
+    {
+        "id": "av_239",
+        "name": "Baidu Security",
+        "company": "Baidu",
+        "region": "China",
+        "process_keywords": ["BaiduAnSvc.exe", "BaiduAnTray.exe"]
+    },
+    {
+        "id": "av_240",
+        "name": "Rising Endpoint Security",
+        "company": "Rising",
+        "region": "China",
+        "process_keywords": ["RsAgent.exe", "RavMonD.exe", "Rising.exe"]
+    },
+    {
+        "id": "av_241",
+        "name": "Huorong Enterprise Security",
+        "company": "Huorong",
+        "region": "China",
+        "process_keywords": ["HipsMain.exe", "HipsDaemon.exe", "usysdiag.exe"]
+    },
+    {
+        "id": "av_242",
+        "name": "Dr.Web Enterprise Suite",
+        "company": "Doctor Web",
+        "region": "Global",
+        "process_keywords": ["drweb32w.exe", "dwengine.exe", "dwservice.exe"]
+    },
+    {
+        "id": "av_243",
+        "name": "Arcabit Security",
+        "company": "Arcabit",
+        "region": "Europe",
+        "process_keywords": ["ABService.exe", "arcabit.exe"]
+    },
+    {
+        "id": "av_244",
+        "name": "K7 Enterprise Security",
+        "company": "K7 Computing",
+        "region": "India",
+        "process_keywords": ["K7TSecurity.exe", "K7RTScan.exe"]
+    },
+    {
+        "id": "av_245",
+        "name": "Quick Heal Enterprise Security",
+        "company": "Quick Heal",
+        "region": "India",
+        "process_keywords": ["QHActiveDefense.exe", "QHSafeTray.exe"]
+    },
+    {
+        "id": "av_246",
+        "name": "eScan Enterprise Security",
+        "company": "MicroWorld",
+        "region": "India",
+        "process_keywords": ["mwagent.exe", "escanmon.exe"]
+    },
+    {
+        "id": "av_247",
+        "name": "Seqrite Endpoint Security",
+        "company": "Quick Heal",
+        "region": "India",
+        "process_keywords": ["SeqriteService.exe", "QHActiveDefense.exe"]
+    },
+    {
+        "id": "av_248",
+        "name": "Zillya Antivirus",
+        "company": "Zillya",
+        "region": "Europe",
+        "process_keywords": ["Zillya.exe", "ZillyaService.exe"]
+    },
+    {
+        "id": "av_249",
+        "name": "Max Secure Antivirus",
+        "company": "Max Secure Software",
+        "region": "India",
+        "process_keywords": ["MaxSecure.exe", "MaxSecureService.exe"]
+    },
+    {
+        "id": "av_250",
+        "name": "Baidu PC Faster Security",
+        "company": "Baidu",
+        "region": "China",
+        "process_keywords": ["PCFaster.exe", "BaiduAnSvc.exe"]
+    }
+  ]
+}

