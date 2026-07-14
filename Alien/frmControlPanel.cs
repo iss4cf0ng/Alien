@@ -3242,12 +3242,13 @@ namespace Alien
                             else
                                 item.ImageKey = "Unknown";
 
-                            Invoke(() =>
-                            {
-                                listView14.Items.Add(item);
-                                richTextBox3.AppendText($"[*] Discovered new host: {ip}:{port}\n");
-                            });
+                            Invoke(() => listView14.Items.Add(item));
                         }
+
+                        Invoke(() =>
+                        {
+                            richTextBox3.AppendText($"[*] Discovered new host: {ip}:{port}\n");
+                        });
                     }
                 };
 

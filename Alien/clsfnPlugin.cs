@@ -111,14 +111,37 @@ namespace Alien
             /// <returns></returns>
             public string fnGetPayload(string szDirName, string szEnv, string szName)
             {
-                string szPayloadPath = Path.Combine(szDirName, "payloads", szEnv, $"{szName}.{clsWeb.m_dicSuffix[m_web.m_victim.ShellLanguage]}").Replace("/", "\\");
+                string szExtension = string.Empty;
+                if (szEnv.Contains("NebulaPulsar"))
+                {
+                    if (szEnv.Contains("JSP"))
+                        szExtension = "java";
+                    else if (szEnv.Contains("ASPX") || szEnv.Contains("ASHX") || szEnv.Contains("ASMX"))
+                        szExtension = "dll";
+                }
+                else
+                {
+                    szExtension = clsWeb.m_dicPayloadExtension[m_web.m_victim.ShellLanguage];
+                }
+
+                string szPayloadPath = Path.Combine(szDirName, "payloads", szEnv, $"{szName}.{szExtension}").Replace("/", "\\");
                 if (!File.Exists(szPayloadPath))
                     return string.Empty;
 
-                string szPayload = File.ReadAllText(szPayloadPath);
+                string szPayload = string.Empty;
+                if (szPayloadPath.Contains("NebulaPulsar"))
+                {
+                    // NebulaPulsar, read binary
+                    szPayload = Convert.ToBase64String(File.ReadAllBytes(szPayloadPath));
+                }
+                else
+                {
+                    // OneShell, read text file
+                    szPayload = File.ReadAllText(szPayloadPath);
 
-                foreach (string s in clsWeb.m_dicRemoveSyntax[m_web.m_victim.ShellLanguage])
-                    szPayload = szPayload.Replace(s, string.Empty);
+                    foreach (string s in clsWeb.m_dicRemoveSyntax[m_web.m_victim.ShellLanguage])
+                        szPayload = szPayload.Replace(s, string.Empty);
+                }
 
                 return szPayload;
             }
@@ -159,6 +182,7 @@ namespace Alien
             public async Task<string> fnRun(string szJson, string szPayload, string szEnvironment)
             {
                 string szResp = await m_web.fnszSendPayload("plugin", new string[] { szPayload, szJson });
+                MessageBox.Show(szResp);
                 
                 return szResp;
             }
