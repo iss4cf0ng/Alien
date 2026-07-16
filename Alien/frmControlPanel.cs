@@ -92,7 +92,7 @@ namespace Alien
 
         private string[] m_asImageExt =
         {
-            "png", "jpg", "bmp",
+            "png", "jpg", "bmp", "ico",
         };
         private bool fnbIsImageFile(string szExtension) => m_asImageExt.Contains(szExtension.Replace(".", string.Empty));
 
@@ -1364,11 +1364,13 @@ namespace Alien
 
         async void fnSetup()
         {
+            /*
             if (!await fnbValidator())
             {
                 MessageBox.Show("Validation failed", "fnbValidator()", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            */
 
             // Clear status labels
             toolStripStatusLabel1.Text = string.Empty;

@@ -232,7 +232,8 @@ namespace Alien
                     continue;
                 }
 
-                if (await web.fnbTestWebConnection(true) && await web.fnbTestShellConnection())
+                //await web.fnbTestWebConnection(true) && await web.fnbTestShellConnection()
+                if (await web.fnbTestShellConnection())
                 {
                     string szDomain = item.SubItems[1].Text.Split('/')[2];
 

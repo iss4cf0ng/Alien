@@ -105,7 +105,9 @@ namespace Alien
             try
             {
                 string szResp = await m_web.fnszSendPayload("lan_tools", new string[] { "check", szIP, nPort.ToString() });
-                if (string.IsNullOrEmpty(szResp)) return false;
+                //MessageBox.Show(szResp);
+                if (string.IsNullOrEmpty(szResp))
+                    return false;
 
                 var json = JObject.Parse(szResp);
                 if (json["open"] != null)
