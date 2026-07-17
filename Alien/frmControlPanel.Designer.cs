@@ -273,6 +273,10 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
+            textBox13 = new TextBox();
+            toolStrip15 = new ToolStrip();
+            toolStripComboBox1 = new ToolStripComboBox();
+            toolStripLabel4 = new ToolStripLabel();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -380,6 +384,7 @@
             toolStrip12.SuspendLayout();
             menuDbTable.SuspendLayout();
             panel2.SuspendLayout();
+            toolStrip15.SuspendLayout();
             SuspendLayout();
             // 
             // splitContainer1
@@ -1133,6 +1138,7 @@
             // splitContainer7.Panel1
             // 
             splitContainer7.Panel1.Controls.Add(treeView1);
+            splitContainer7.Panel1.Controls.Add(textBox13);
             // 
             // splitContainer7.Panel2
             // 
@@ -1229,8 +1235,8 @@
             tabControl1.Controls.Add(tabPage33);
             tabControl1.Controls.Add(tabPage15);
             tabControl1.Controls.Add(tabPage16);
-            tabControl1.Controls.Add(tabPage30);
             tabControl1.Controls.Add(tabPage28);
+            tabControl1.Controls.Add(tabPage30);
             resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -1925,6 +1931,7 @@
             tabPage30.Controls.Add(splitContainer7);
             tabPage30.Controls.Add(statusStrip8);
             tabPage30.Controls.Add(textBox12);
+            tabPage30.Controls.Add(toolStrip15);
             resources.ApplyResources(tabPage30, "tabPage30");
             tabPage30.Name = "tabPage30";
             tabPage30.UseVisualStyleBackColor = true;
@@ -2050,6 +2057,27 @@
             resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
             // 
+            // textBox13
+            // 
+            resources.ApplyResources(textBox13, "textBox13");
+            textBox13.Name = "textBox13";
+            // 
+            // toolStrip15
+            // 
+            resources.ApplyResources(toolStrip15, "toolStrip15");
+            toolStrip15.Items.AddRange(new ToolStripItem[] { toolStripLabel4, toolStripComboBox1 });
+            toolStrip15.Name = "toolStrip15";
+            // 
+            // toolStripComboBox1
+            // 
+            toolStripComboBox1.Name = "toolStripComboBox1";
+            resources.ApplyResources(toolStripComboBox1, "toolStripComboBox1");
+            // 
+            // toolStripLabel4
+            // 
+            toolStripLabel4.Name = "toolStripLabel4";
+            resources.ApplyResources(toolStripLabel4, "toolStripLabel4");
+            // 
             // frmControlPanel
             // 
             resources.ApplyResources(this, "$this");
@@ -2116,6 +2144,7 @@
             menuRegTreeView.ResumeLayout(false);
             menuRegistry.ResumeLayout(false);
             splitContainer7.Panel1.ResumeLayout(false);
+            splitContainer7.Panel1.PerformLayout();
             splitContainer7.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer7).EndInit();
             splitContainer7.ResumeLayout(false);
@@ -2210,6 +2239,8 @@
             menuDbTable.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
+            toolStrip15.ResumeLayout(false);
+            toolStrip15.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -2458,5 +2489,9 @@
         private Button button4;
         private ContextMenuStrip menuFileTransfer;
         private ToolStripMenuItem toolStripMenuItem51;
+        private TextBox textBox13;
+        private ToolStrip toolStrip15;
+        private ToolStripLabel toolStripLabel4;
+        private ToolStripComboBox toolStripComboBox1;
     }
 }

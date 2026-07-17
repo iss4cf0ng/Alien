@@ -24,6 +24,7 @@ using ICSharpCode.TextEditor.Document;
 using ICSharpCode.TextEditor.Src.Document.FoldingStrategy;
 using System.Globalization;
 using System.Reflection.Metadata;
+using System.Data.Entity.Core.Metadata.Edm;
 
 namespace Alien
 {
@@ -119,6 +120,7 @@ namespace Alien
 
         private class clsDbTablePageControls
         {
+            public clsfnDb m_dbMgr { get; init; }
             public clsfnDb.stDbConfig m_config { get; init; }
             public TreeNode m_nodeRoot { get; init; }
             public TabPage page { get; init; }
@@ -131,8 +133,9 @@ namespace Alien
 
             private ImageList dbListImageList { get; init; }
 
-            public clsDbTablePageControls(clsfnDb.stDbConfig config, TreeNode nodeRoot, TabPage page, ImageList imageList, ContextMenuStrip menuTable)
+            public clsDbTablePageControls(clsfnDb dbMgr, clsfnDb.stDbConfig config, TreeNode nodeRoot, TabPage page, ImageList imageList, ContextMenuStrip menuTable)
             {
+                m_dbMgr = dbMgr;
                 m_config = config;
                 m_nodeRoot = nodeRoot;
 
@@ -181,10 +184,7 @@ namespace Alien
                 page.Controls.Add(lv);
                 page.Controls.Add(tb);
 
-                ts.Font = page.Font;
-                btnNew.Font = page.Font;
-                btnRefresh.Font = page.Font;
-                ts.Refresh();
+                ts.Font = new Font("Microsoft JhengHei", 11F, FontStyle.Regular);
 
                 ts.Dock = DockStyle.Top;
                 lv.Dock = DockStyle.Fill;
@@ -198,6 +198,58 @@ namespace Alien
 
                 // ImageList
                 lv.LargeImageList = dbListImageList;
+
+                btnRefresh.Click += async (s, e) =>
+                {
+                    try
+                    {
+                        string szDbName = nodeRoot.Text;
+                        var lsTables = await m_dbMgr.fnDbGetTables(config, szDbName);
+
+                        if (lsTables.Count == 0)
+                        {
+                            MessageBox.Show($"Cannot find any table in \"{szDbName}\"", "It is empty!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                            return;
+                        }
+
+                        lv.Items.Clear();
+
+                        foreach (string szTable in lsTables)
+                        {
+                            ListViewItem item = new ListViewItem(szTable);
+                            item.ImageKey = "table";
+
+                            lv.Items.Add(item);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+                btnNew.Click += (s, e) =>
+                {
+                    try
+                    {
+                        string szDbName = nodeRoot.Text;
+                        TabPage pageNewTable = new TabPage($"New Table ({szDbName})");
+
+                        if (page.Parent == null)
+                            return;
+
+                        TabControl control = (TabControl)page.Parent;
+                        control.TabPages.Add(pageNewTable);
+                        control.SelectedTab = pageNewTable;
+
+                        clsDbNewTableControls ctrlsNewTable = new clsDbNewTableControls(pageNewTable, config, m_dbMgr, szDbName);
+                        pageNewTable.Tag = ctrlsNewTable;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
             }
         }
         private class clsDbSqlResultControls
@@ -770,7 +822,27 @@ namespace Alien
                 dgvSchema.Columns.Add("ColName", "Column Name");
 
                 DataGridViewComboBoxColumn typeCol = new DataGridViewComboBoxColumn { Name = "ColType", HeaderText = "DataType" };
-                typeCol.Items.AddRange("VARCHAR", "INT", "BIGINT", "TEXT", "DATETIME", "DECIMAL", "BOOLEAN");
+                
+                switch (m_cfg.enDbType)
+                {
+                    case enDatabase.Oracle:
+                        typeCol.Items.AddRange("VARCHAR2", "NUMBER", "DATE", "CLOB", "TIMESTAMP");
+                        break;
+                    case enDatabase.SQLServer:
+                        typeCol.Items.AddRange("VARCHAR", "NVARCHAR", "INT", "BIGINT", "TEXT", "DATETIME", "DECIMAL", "BIT");
+                        break;
+                    case enDatabase.PostgreSQL:
+                        typeCol.Items.AddRange("VARCHAR", "INTEGER", "BIGINT", "TEXT", "TIMESTAMP", "NUMERIC", "BOOLEAN");
+                        break;
+                    case enDatabase.SQLite:
+                        typeCol.Items.AddRange("TEXT", "INTEGER", "REAL", "BLOB");
+                        break;
+                    case enDatabase.MySQL:
+                    default:
+                        typeCol.Items.AddRange("VARCHAR", "INT", "BIGINT", "TEXT", "DATETIME", "DECIMAL", "BOOLEAN");
+                        break;
+                }
+
                 dgvSchema.Columns.Add(typeCol);
 
                 dgvSchema.Columns.Add("ColLength", "Length");
@@ -825,7 +897,36 @@ namespace Alien
                 if (lsPK.Count > 0)
                     lsColumn.Add($"PRIMARY KEY ({string.Join(", ", lsPK)})");
 
-                string szQuery = $"CREATE TABLE `{m_szDbName}`.`{szTableName}` (\n{string.Join(",\n", lsColumn)}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+                string qTable = string.Empty;
+                switch (m_cfg.enDbType)
+                {
+                    case enDatabase.MySQL:
+                        qTable = $"`{m_szDbName}`.`{szTableName}`";
+                        break;
+                    case enDatabase.SQLServer:
+                        qTable = $"[{m_szDbName}].dbo.[{szTableName}]";
+                        break;
+                    case enDatabase.PostgreSQL:
+                    case enDatabase.Oracle:
+                    case enDatabase.SQLite:
+                        qTable = $"\"{szTableName}\"";
+                        break;
+                    default:
+                        qTable = szTableName;
+                        break;
+                }
+
+                string szQuery = string.Empty;
+                if (m_cfg.enDbType == enDatabase.MySQL)
+                {
+                    // MySQL
+                    szQuery = $"CREATE TABLE {qTable} (\n{string.Join(",\n", lsColumn)}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+                }
+                else
+                {
+                    // SQL Server, PostgreSQL, SQLite, Oracle.
+                    szQuery = $"CREATE TABLE {qTable} (\n{string.Join(",\n", lsColumn)}\n);";
+                }
 
                 try
                 {
@@ -1341,11 +1442,6 @@ namespace Alien
             return (dicState, szLocalSaveDirPath);
         }
 
-        public async void fnFileNewFolder()
-        {
-
-        }
-
         public void fnFileNewFile()
         {
             frmTextEditor? f = fnFindForm<frmTextEditor>();
@@ -1463,7 +1559,7 @@ namespace Alien
 
             var config = (clsfnDb.stDbConfig)nodeSelected.Parent.Tag;
 
-            clsDbTablePageControls ctrls = new clsDbTablePageControls(config, nodeSelected, page, dbImageList, menuDbTable);
+            clsDbTablePageControls ctrls = new clsDbTablePageControls(m_dbMgr, config, nodeSelected, page, dbImageList, menuDbTable);
             ctrls.listView.DoubleClick += async (s, e) =>
             {
                 if (ctrls.listView.SelectedItems.Count == 0)
@@ -2944,9 +3040,65 @@ namespace Alien
         }
 
         // DbTable.Delete
-        private void toolStripMenuItem27_Click(object sender, EventArgs e)
+        private async void toolStripMenuItem27_Click(object sender, EventArgs e)
         {
+            TabPage? page = tabControl4.SelectedTab;
+            if (page == null || page.Tag == null)
+                return;
 
+            clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
+            if (ctrls.listView.Items.Count == 0)
+                return;
+
+            ListViewItem item = ctrls.listView.SelectedItems[0];
+            if (item == null)
+                return;
+
+            var config = ctrls.m_config;
+            string szDbName = ctrls.m_nodeRoot.Text;
+            string szTable = item.Text;
+
+            DialogResult dr = MessageBox.Show($"Are you sure you want to delete [{szTable}]? This action cannot be undone.", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dr != DialogResult.Yes)
+                return;
+
+            string szQuery = string.Empty;
+            switch (config.enDbType)
+            {
+                case enDatabase.MySQL:
+                    szQuery = $"DROP TABLE `{szDbName}`.`{szTable}`;";
+                    break;
+                case enDatabase.SQLServer:
+                    szQuery = $"DROP TABLE [{szDbName}].dbo.[{szTable}];";
+                    break;
+                case enDatabase.PostgreSQL:
+                    szQuery = $"DROP TABLE \"{szTable}\";";
+                    break;
+                case enDatabase.Oracle:
+                    szQuery = $"DROP TABLE \"{szTable.ToUpper()}\";";
+                    break;
+                case enDatabase.SQLite:
+                    szQuery = $"DROP TABLE \"{szTable}\";";
+                    break;
+                default:
+                    szQuery = $"DROP TABLE {szTable};";
+                    break;
+            }
+
+            try
+            {
+                var result = await m_dbMgr.fnSqlQueryEx(config, szQuery);
+                if (!result.bSuccess)
+                    throw new Exception($"Failed to delete: [{szTable}]");
+
+                ctrls.listView.Items.Remove(item);
+
+                MessageBox.Show($"Deleted [{szTable}] successfully.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -2958,20 +3110,12 @@ namespace Alien
             timerShell.Interval = 300;
             timerShell.Start();
 
-            textBox5.Text = "whoami";
-
-            ToolTip tip = new ToolTip();
-            tip.IsBalloon = true;
-            tip.ToolTipIcon = ToolTipIcon.Info;
-            tip.ToolTipTitle = "Please type here!";
-
-            tip.Show("Typing at this textbox is recommanded", textBox5, 5000);
+            textBox5.PlaceholderText = "Please enter your commands here";
         }
 
         private async void button2_Click(object sender, EventArgs e)
         {
             bool bStop = string.Equals(button2.Text, "Stop");
-
 
             await m_rShell.fnPipeCreate(textBox5.Text);
 
