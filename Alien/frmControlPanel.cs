@@ -176,11 +176,15 @@ namespace Alien
                     btnRefresh,
                     btnNew,
                 });
-                ts.Font = page.Font;
 
                 page.Controls.Add(ts);
                 page.Controls.Add(lv);
                 page.Controls.Add(tb);
+
+                ts.Font = page.Font;
+                btnNew.Font = page.Font;
+                btnRefresh.Font = page.Font;
+                ts.Refresh();
 
                 ts.Dock = DockStyle.Top;
                 lv.Dock = DockStyle.Fill;
@@ -203,33 +207,92 @@ namespace Alien
 
             public TextBox textBox { get; init; }
             public DataGridView dataGridView { get; init; }
+            public ToolStrip toolStrip { get; init; }
 
-            public clsDbSqlResultControls(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr)
+            private TabPage? m_page;
+            private DataTable? m_dt = null;
+            private string m_szDbName;
+            private string m_szTableName;
+
+            public clsDbSqlResultControls(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr, string szDbName, string szTableName)
             {
                 m_cfg = config;
                 m_dbMgr = dbMgr;
+                m_szDbName = szDbName;
+                m_szTableName = szTableName;
+                m_page = page;
 
                 if (page.Controls.Count > 0)
                 {
-                    dataGridView = (DataGridView)page.Controls[0];
-                    textBox = (TextBox)page.Controls[1];
+                    dataGridView = page.Controls.OfType<DataGridView>().FirstOrDefault();
+                    textBox = page.Controls.OfType<TextBox>().FirstOrDefault();
+                    toolStrip = page.Controls.OfType<ToolStrip>().FirstOrDefault();
 
                     return;
                 }
 
                 textBox = new TextBox();
                 dataGridView = new DataGridView();
+                toolStrip = new ToolStrip();
 
                 dataGridView.AllowUserToAddRows = true;
                 dataGridView.AllowUserToDeleteRows = true;
 
                 page.Controls.Add(textBox);
+                page.Controls.Add(toolStrip);
                 page.Controls.Add(dataGridView);
 
                 dataGridView.BringToFront();
 
                 textBox.Dock = DockStyle.Top;
                 dataGridView.Dock = DockStyle.Fill;
+
+                toolStrip.Font = page.Font;
+
+                ToolStripButton btnExport = new ToolStripButton("Export");
+                toolStrip.Items.Add(btnExport);
+
+                btnExport.Dock = DockStyle.Top;
+                btnExport.Click += (s, e) =>
+                {
+                    if (dataGridView.Rows.Count == 0)
+                    {
+                        MessageBox.Show("No any data was found...", "Nothing!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    using (SaveFileDialog sfd = new SaveFileDialog())
+                    {
+                        sfd.Filter = "CSV File (*.csv)|*.csv|SQL File (*.sql)|*.sql";
+                        sfd.FileName = $"{m_szTableName}_export";
+
+                        try
+                        {
+                            if (sfd.ShowDialog() == DialogResult.OK)
+                            {
+                                string szExt = Path.GetExtension(sfd.FileName).ToLower();
+                                if (szExt == ".csv")
+                                {
+                                    fnExportToCSV(sfd.FileName);
+                                }
+                                else if (szExt == ".sql")
+                                {
+                                    fnExportToSQL(sfd.FileName);
+                                }
+                                else
+                                {
+                                    throw new Exception("Unknown file extension: " + szExt);
+                                }
+
+                                MessageBox.Show("Export data successfully: " + sfd.FileName, "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                };
 
                 textBox.KeyDown += async (s, e) =>
                 {
@@ -241,6 +304,320 @@ namespace Alien
                         dataGridView.DataSource = dt;
                     }
                 };
+
+                dataGridView.RowValidated += async (s, e) => 
+                {
+                    if (await fnbDbSaveRemoteChanges())
+                    {
+                        page.Text = page.Text.Replace(" *", string.Empty).Trim();
+                    }
+                };
+                dataGridView.UserDeletedRow += async (s, e) => 
+                {
+                    if (await fnbDbSaveRemoteChanges())
+                    {
+                        page.Text = page.Text.Replace(" *", string.Empty).Trim();
+                    }
+                };
+                dataGridView.KeyDown += async (s, e) =>
+                {
+                    if (e.Control && e.KeyCode == Keys.S)
+                    {
+                        e.SuppressKeyPress = true;
+
+                        if (await fnbDbSaveRemoteChanges())
+                        {
+                            page.Text = page.Text.Replace(" *", string.Empty).Trim();
+                        }
+                    }
+                };
+                dataGridView.CellValueChanged += (s, e) =>
+                {
+                    if (!page.Text.Contains("*"))
+                    {
+                        page.Text += " *";
+                    }
+                };
+                dataGridView.UserAddedRow += (s, e) =>
+                {
+                    if (!page.Text.Contains("*"))
+                    {
+                        page.Text += " *";
+                    }
+                };
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="szFilePath"></param>
+            private void fnExportToCSV(string szFilePath)
+            {
+                StringBuilder sb = new StringBuilder();
+                var colNames = dataGridView.Columns.Cast<DataGridViewColumn>().Select(s => s.Name);
+                sb.AppendLine(string.Join(",", colNames));
+
+                foreach (DataGridViewRow row in dataGridView.Rows)
+                {
+                    if (row.IsNewRow)
+                        continue;
+
+                    var fields = row.Cells.Cast<DataGridViewCell>().Select(cell =>
+                    {
+                        string szVal = cell.Value?.ToString() ?? string.Empty;
+                        if (szVal.Contains(",") || szVal.Contains("\n") || szVal.Contains("\""))
+                            szVal = $"\"{szVal.Replace("\"", "\"\"")}\"";
+
+                        return szVal;
+                    });
+
+                    sb.AppendLine(string.Join(",", fields));
+                }
+
+                File.WriteAllText(szFilePath, sb.ToString(), Encoding.UTF8);
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="szFilePath"></param>
+            private void fnExportToSQL(string szFilePath)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"-- Exported from \"{m_cfg.szSource}\"");
+                sb.AppendLine($"-- Table: {m_szTableName}");
+                sb.AppendLine($"-- Data: {DateTime.Now}");
+
+                foreach (DataGridViewRow row in dataGridView.Rows)
+                {
+                    if (row.IsNewRow)
+                        continue;
+
+                    var lsColumn = new List<string>();
+                    var lsValue = new List<string>();
+
+                    foreach (DataGridViewColumn col in dataGridView.Columns)
+                    {
+                        lsColumn.Add(fnQuoteIdentifier(col.Name));
+
+                        object val = row.Cells[col.Index].Value;
+                        lsValue.Add(fnEscapeSqlValue(val));
+                    }
+
+                    sb.AppendLine($"INSERT INTO {fnQuoteIdentifier(m_szTableName)} ({string.Join(", ", lsColumn)}) VALUES ({string.Join(", ", lsValue)});");
+                }
+
+                File.WriteAllText(szFilePath, sb.ToString(), Encoding.UTF8);
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            private async Task<bool> fnbDbSaveRemoteChanges()
+            {
+                if (dataGridView.DataSource == null || string.IsNullOrEmpty(m_szTableName))
+                    return false;
+
+                m_dt = (DataTable)dataGridView.DataSource;
+                DataTable? dtChange = m_dt.GetChanges();
+                if (dtChange == null)
+                    return false;
+
+                try
+                {
+                    foreach (DataRow dr in dtChange.Rows)
+                    {
+                        string szQuery = string.Empty;
+                        if (dr.RowState == DataRowState.Added)
+                        {
+                            szQuery = fnBuildInsertSql(dr);
+                        }
+                        else if (dr.RowState == DataRowState.Modified)
+                        {
+                            szQuery = fnBuildUpdateSql(dr);
+                        }
+                        else if (dr.RowState == DataRowState.Deleted)
+                        {
+                            szQuery = fnBuildDeleteSql(dr);
+                        }
+
+                        if (!string.IsNullOrEmpty(szQuery))
+                        {
+                            var result = await m_dbMgr.fnSqlQueryEx(m_cfg, szQuery);
+                            if (!result.bSuccess)
+                                throw new Exception(result.szErrorMsg);
+                        }
+                        else
+                        {
+                            throw new Exception("SQL query is null or empty.");
+                        }
+                    }
+
+                    m_dt.AcceptChanges();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            private string fnGetFullTableName()
+            {
+                switch (m_cfg.enDbType)
+                {
+                    case enDatabase.MySQL:
+                        return $"`{m_szDbName}`.`{m_szTableName}`";
+                    case enDatabase.SQLServer:
+                        return $"[{m_szDbName}].[dbo].[{m_szTableName}]";
+                    case enDatabase.PostgreSQL:
+                        return $"\"{m_szDbName}\".\"{m_szTableName}\"";
+                    case enDatabase.SQLite:
+                        return $"\"{m_szTableName}\"";
+                    case enDatabase.Access:
+                        return $"[{m_szTableName}]";
+                    case enDatabase.Oracle:
+                        return $"\"{m_szTableName}\"";
+                    default:
+                        return m_szTableName;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="colName"></param>
+            /// <returns></returns>
+            private string fnQuoteIdentifier(string colName)
+            {
+                switch (m_cfg.enDbType)
+                {
+                    case enDatabase.MySQL:
+                        return $"`{colName}`";
+                    case enDatabase.SQLServer:
+                    case enDatabase.Access:
+                        return $"[{colName}]";
+                    case enDatabase.PostgreSQL:
+                    case enDatabase.SQLite:
+                    case enDatabase.Oracle:
+                        return $"\"{colName}\"";
+                    default:
+                        return colName;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="row"></param>
+            /// <returns></returns>
+            private string fnBuildUpdateSql(DataRow row)
+            {
+                var sets = new List<string>();
+                var wheres = new List<string>();
+
+                foreach (DataColumn col in row.Table.Columns)
+                {
+                    string quotedCol = fnQuoteIdentifier(col.ColumnName);
+                    object currentVal = row[col, DataRowVersion.Current];
+                    object originalVal = row[col, DataRowVersion.Original];
+
+                    if (!Equals(currentVal, originalVal))
+                    {
+                        sets.Add($"{quotedCol} = {fnEscapeSqlValue(currentVal)}");
+                    }
+
+                    if (originalVal == null || originalVal == DBNull.Value)
+                    {
+                        wheres.Add($"{quotedCol} IS NULL");
+                    }
+                    else
+                    {
+                        
+                        wheres.Add($"{quotedCol} = {fnEscapeSqlValue(originalVal)}");
+                    }
+                }
+
+                if (sets.Count == 0) return "";
+
+                return $"UPDATE {fnGetFullTableName()} SET {string.Join(", ", sets)} WHERE {string.Join(" AND ", wheres)};";
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="row"></param>
+            /// <returns></returns>
+            private string fnBuildDeleteSql(DataRow row)
+            {
+                var wheres = new List<string>();
+                foreach (DataColumn col in row.Table.Columns)
+                {
+                    string quotedCol = fnQuoteIdentifier(col.ColumnName);
+                    object originalVal = row[col, DataRowVersion.Original];
+
+                    if (originalVal == null || originalVal == DBNull.Value)
+                    {
+                        wheres.Add($"{quotedCol} IS NULL");
+                    }
+                    else
+                    {
+                        wheres.Add($"{quotedCol} = {fnEscapeSqlValue(originalVal)}");
+                    }
+                }
+
+                return $"DELETE FROM {fnGetFullTableName()} WHERE {string.Join(" AND ", wheres)};";
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="row"></param>
+            /// <returns></returns>
+            private string fnBuildInsertSql(DataRow row)
+            {
+                var columns = new List<string>();
+                var values = new List<string>();
+
+                foreach (DataColumn col in row.Table.Columns)
+                {
+                    object val = row[col];
+                    if (val == DBNull.Value) continue;
+
+                    columns.Add(fnQuoteIdentifier(col.ColumnName));
+                    values.Add(fnEscapeSqlValue(val));
+                }
+
+                return $"INSERT INTO {fnGetFullTableName()} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)});";
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            private string fnEscapeSqlValue(object value)
+            {
+                if (value == null || value == DBNull.Value) return "NULL";
+
+                if (value is string || value is DateTime)
+                {
+                    string str = value.ToString().Replace("'", "''");
+                    return $"'{str}'";
+                }
+                if (value is bool b)
+                {
+                    return b ? "1" : "0";
+                }
+                return value.ToString();
             }
         }
         private class clsDbSqlShellControls
@@ -337,6 +714,131 @@ namespace Alien
                 richTextBox.BackColor = Color.Black;
                 richTextBox.ForeColor = Color.White;
                 richTextBox.Font = new Font("Consolas", page.Font.Size);
+            }
+        }
+        private class clsDbNewTableControls
+        {
+            private clsfnDb.stDbConfig m_cfg { get; init; }
+            private clsfnDb m_dbMgr { get; init; }
+            private TabPage m_page;
+            private string m_szDbName;
+
+            public TextBox txtTableName { get; init; }
+            public DataGridView dgvSchema { get; init; }
+            public ToolStrip toolStrip { get; init; }
+
+            public clsDbNewTableControls(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr, string szDbName)
+            {
+                m_page = page;
+                m_cfg = config;
+                m_dbMgr = dbMgr;
+                m_szDbName = szDbName;
+
+                txtTableName = new TextBox
+                {
+                    PlaceholderText = "Please enter a new table name (ex. t_new_orders)",
+                    Dock = DockStyle.Top
+                };
+                dgvSchema = new DataGridView {
+                    Dock = DockStyle.Fill,
+                    AllowUserToAddRows = true,
+                    AllowUserToDeleteRows = true
+                };
+                toolStrip = new ToolStrip
+                {
+                    Dock = DockStyle.Top
+                };
+
+                ToolStripButton btnCreate = new ToolStripButton("Execute");
+                btnCreate.Click += async (s, e) =>
+                {
+                    await fnExecute();
+                };
+                toolStrip.Items.Add(btnCreate);
+
+                fnInitSchemaGrid();
+
+                page.Controls.Add(dgvSchema);
+                page.Controls.Add(toolStrip);
+                page.Controls.Add(txtTableName);
+
+                dgvSchema.BringToFront();
+            }
+
+            private void fnInitSchemaGrid()
+            {
+                dgvSchema.Columns.Add("ColName", "Column Name");
+
+                DataGridViewComboBoxColumn typeCol = new DataGridViewComboBoxColumn { Name = "ColType", HeaderText = "DataType" };
+                typeCol.Items.AddRange("VARCHAR", "INT", "BIGINT", "TEXT", "DATETIME", "DECIMAL", "BOOLEAN");
+                dgvSchema.Columns.Add(typeCol);
+
+                dgvSchema.Columns.Add("ColLength", "Length");
+
+                DataGridViewCheckBoxColumn nullCol = new DataGridViewCheckBoxColumn { Name = "ColNull", HeaderText = "Allow Null", DefaultCellStyle = { NullValue = true } };
+                dgvSchema.Columns.Add(nullCol);
+
+                DataGridViewCheckBoxColumn pkCol = new DataGridViewCheckBoxColumn { Name = "ColPK", HeaderText = "Primary Key (PK)" };
+                dgvSchema.Columns.Add(pkCol);
+            }
+
+            private async Task fnExecute()
+            {
+                string szTableName = txtTableName.Text.Trim();
+                if (string.IsNullOrEmpty(szTableName))
+                {
+                    MessageBox.Show("Please enter table name", "NO!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (dgvSchema.Rows.Count <= 1)
+                {
+                    MessageBox.Show("Please create at least one row.", "NO!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                List<string> lsColumn = new List<string>();
+                List<string> lsPK = new List<string>();
+
+                foreach (DataGridViewRow row in dgvSchema.Rows)
+                {
+                    if (row.IsNewRow) continue;
+
+                    string? szColName = row.Cells["ColName"].Value?.ToString()?.Trim();
+                    string? szColType = row.Cells["ColType"].Value?.ToString();
+                    string? szColLength = row.Cells["ColLength"].Value?.ToString()?.Trim();
+                    bool bAllowNull = Convert.ToBoolean(row.Cells["ColNull"].Value ?? true);
+                    bool bIsPk = Convert.ToBoolean(row.Cells["ColPK"].Value ?? false);
+
+                    if (string.IsNullOrEmpty(szColName) || string.IsNullOrEmpty(szColType))
+                        continue;
+
+                    string szLengthStr = !string.IsNullOrEmpty(szColLength) ? $"({szColLength})" : "";
+                    string szNullStr = bAllowNull ? "NULL" : "NOT NULL";
+
+                    lsColumn.Add($"`{szColName}` {szColType}{szLengthStr} {szNullStr}");
+
+                    if (bIsPk)
+                        lsPK.Add($"`{szColName}`");
+                }
+
+                if (lsPK.Count > 0)
+                    lsColumn.Add($"PRIMARY KEY ({string.Join(", ", lsPK)})");
+
+                string szQuery = $"CREATE TABLE `{m_szDbName}`.`{szTableName}` (\n{string.Join(",\n", lsColumn)}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+                try
+                {
+                    var result = await m_dbMgr.fnSqlQueryEx(m_cfg, szQuery);
+                    if (!result.bSuccess)
+                        throw new Exception(result.szErrorMsg);
+
+                    MessageBox.Show($"Table [{szTableName}] was successfully created.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -974,7 +1476,7 @@ namespace Alien
                 var config = m_dbMgr.m_stDbConfig[szHost];
                 DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
 
-                fnDbShowData(config, dt, szQuery);
+                fnDbShowData(config, dt, szQuery, szDbName, szTable);
             };
             ctrls.textBox.KeyDown += (s, e) =>
             {
@@ -1036,7 +1538,7 @@ namespace Alien
             nodeSelected.Expand();
         }
 
-        void fnDbShowData(clsfnDb.stDbConfig config, DataTable data, string szQuery)
+        void fnDbShowData(clsfnDb.stDbConfig config, DataTable data, string szQuery, string szDbName, string szTable)
         {
             TabPage page = new TabPage($"Result[{config.szSource}]");
             foreach (TabPage p in tabControl4.TabPages)
@@ -1053,7 +1555,7 @@ namespace Alien
 
             tabControl4.SelectedTab = page;
 
-            clsDbSqlResultControls ctrls = new clsDbSqlResultControls(page, config, m_dbMgr);
+            clsDbSqlResultControls ctrls = new clsDbSqlResultControls(page, config, m_dbMgr, szDbName, szTable);
             ctrls.textBox.Text = szQuery;
             ctrls.dataGridView.DataSource = data;
         }
@@ -2284,7 +2786,7 @@ namespace Alien
                 string szQuery = m_dbMgr.fnBuildDataQuery(config.enDbType, szDbName, szTable, 100);
                 DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
 
-                fnDbShowData(config, dt, szQuery);
+                fnDbShowData(config, dt, szQuery, szDbName, szTable);
 
                 toolStripLabel2.Text = "Action successfully.";
             }
@@ -2393,19 +2895,52 @@ namespace Alien
             string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT 100;";
             DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
 
-            fnDbShowData(config, dt, szQuery);
+            fnDbShowData(config, dt, szQuery, szDbName, szTable);
         }
 
-        // DbTable.Dump
-        private void toolStripMenuItem28_Click(object sender, EventArgs e)
+        // DbTable.ShowAll
+        private async void toolStripMenuItem28_Click(object sender, EventArgs e)
         {
+            TabPage? page = tabControl4.SelectedTab;
+            if (page == null || page.Tag == null)
+                return;
 
+            clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
+
+            if (ctrls.listView.Items.Count == 0)
+                return;
+
+            ListViewItem item = ctrls.listView.SelectedItems[0];
+            if (item == null)
+                return;
+
+            var config = ctrls.m_config;
+            string szDbName = ctrls.m_nodeRoot.Text;
+            string szTable = item.Text;
+
+            string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}`;";
+            DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
+
+            fnDbShowData(config, dt, szQuery, szDbName, szTable);
         }
 
         // DbTable.New
         private void toolStripMenuItem26_Click(object sender, EventArgs e)
         {
+            TabPage? page = tabControl4.SelectedTab;
+            if (page == null || page.Tag == null)
+                return;
 
+            clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
+            var config = ctrls.m_config;
+            string szDbName = ctrls.m_nodeRoot.Text;
+
+            TabPage pageNewTable = new TabPage($"New Table ({szDbName})");
+            tabControl4.TabPages.Add(pageNewTable);
+            tabControl4.SelectedTab = pageNewTable;
+
+            clsDbNewTableControls ctrlsNewTable = new clsDbNewTableControls(pageNewTable, config, m_dbMgr, szDbName);
+            pageNewTable.Tag = ctrlsNewTable;
         }
 
         // DbTable.Delete

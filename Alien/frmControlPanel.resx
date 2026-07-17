@@ -226,7 +226,7 @@
 </value>
   </data>
   <data name="treeView4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>246, 398</value>
+    <value>246, 402</value>
   </data>
   <data name="treeView4.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -244,13 +244,13 @@
     <value>0</value>
   </data>
   <data name="tabPage14.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 28</value>
+    <value>4, 24</value>
   </data>
   <data name="tabPage14.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 3, 3, 3</value>
   </data>
   <data name="tabPage14.Size" type="System.Drawing.Size, System.Drawing">
-    <value>252, 404</value>
+    <value>252, 408</value>
   </data>
   <data name="tabPage14.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -887,7 +887,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAEZTeXN0ZW0uV2luZG93cy5Gb3JtcywgQ3VsdHVyZT1uZXV0cmFs
         LCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5BQEAAAAmU3lzdGVtLldpbmRvd3MuRm9ybXMu
         SW1hZ2VMaXN0U3RyZWFtZXIBAAAABERhdGEHAgIAAAAJAwAAAA8DAAAAJFEAAAJNU0Z0AUkBTAIBAQgB
-        AAG0AQsBtAELARkBAAEZAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABZAMAAUsDAAEBAQABIAUAATAB
+        AAHEAQsBxAELARkBAAEZAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABZAMAAUsDAAEBAQABIAUAATAB
         df8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/
         AP8A/wD/AP8A/wD/AP8A/wD/AKUAAwwBDwMZASIcAAQCAxMBGQMjATMDLwFJAz4BagNJAYUDTgGYA1IB
         owNTAacDUgGjA04BmANJAYYDPgFqAzABSgMjATMDEwEaAwMBBDgAAxcBHwMRARYoAANEAf8DRAH/A0QB
@@ -1891,7 +1891,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAEZTeXN0ZW0uV2luZG93cy5Gb3JtcywgQ3VsdHVyZT1uZXV0cmFs
         LCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5BQEAAAAmU3lzdGVtLldpbmRvd3MuRm9ybXMu
         SW1hZ2VMaXN0U3RyZWFtZXIBAAAABERhdGEHAgIAAAAJAwAAAA8DAAAA3CsAAAJNU0Z0AUkBTAIBAQQB
-        AAFkAQUBZAEFARkBAAEZAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABZAMAATIDAAEBAQABIAUAASAB
+        AAF0AQUBdAEFARkBAAEZAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABZAMAATIDAAEBAQABIAUAASAB
         Tv8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/
         AP8A/wD/AP8A/wD/AP8A/wD/AFkAAy0BRQNCAXIDQgFyA0IBcgNCAXIDQgFyA0IBcgNCAXIDQgFyA0IB
         cgNCAXIDQgFyA0IBcgNCAXIDQgFyA0IBcgMtAUVcAAMTARoDRwGDA1IBowNSAaMDUgGjAz0BaEwAAxMB
@@ -2087,7 +2087,7 @@
     <value>0</value>
   </data>
   <data name="treeView5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>267, 446</value>
+    <value>267, 442</value>
   </data>
   <data name="treeView5.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -2201,7 +2201,7 @@
     <value>0, 0</value>
   </data>
   <data name="listView3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>899, 446</value>
+    <value>899, 442</value>
   </data>
   <data name="listView3.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -2231,7 +2231,7 @@
     <value>1</value>
   </data>
   <data name="splitContainer6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1170, 446</value>
+    <value>1170, 442</value>
   </data>
   <data name="splitContainer6.SplitterDistance" type="System.Int32, mscorlib">
     <value>267</value>
@@ -2403,7 +2403,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAEZTeXN0ZW0uV2luZG93cy5Gb3JtcywgQ3VsdHVyZT1uZXV0cmFs
         LCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5BQEAAAAmU3lzdGVtLldpbmRvd3MuRm9ybXMu
         SW1hZ2VMaXN0U3RyZWFtZXIBAAAABERhdGEHAgIAAAAJAwAAAA8DAAAAXBYBAAJNU0Z0AUkBTAIBAQMB
-        AAGQAQABkAEAAVABAAFQAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABQAEBAgABUAMAAQEBAAEgBgAB
+        AAGgAQABoAEAAVABAAFQAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABQAEBAgABUAMAAQEBAAEgBgAB
         kAEBPQADEgEXAyABLgM2AVcDRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cB
         gANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cB
         gANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cB
@@ -2462,16 +2462,16 @@
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2cB/wNfAfsDYwH2A18B0wNWAbADTgGYA0cBgANIAYMDSQGGA0kB
         hgNJAYYDSQGGA0kBhgMsAUP/AKUAAwMBBAMGBAgBCgMJAQwDCQEMAwkBDAMJAQwDCQEMAx0BKAMtAUQD
-        TQGTA2UB4gNoAfABfgF9AXwB/gJrAWoB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
+        TQGTA2UB4gNoAfABgAF/AX4B/gJrAWoB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
-        /wNmAf8DZwH/A2cB/wNjAfYBaQFoAWcB7ANUAaYDOgFgAyEBMAQAAwUBBgMJAQwDCQEMAwkBDAMJAQwD
+        /wNmAf8DZwH/A2cB/wNjAfYBZwFmAWUB7ANUAaYDOgFgAyEBMAQAAwUBBgMJAQwDCQEMAwkBDAMJAQwD
         CQEMAwUBBmQAAwMBBAMGBAgBCgMJAQwDCQEMAwkBDAMJAQwDCQEMAx0BKAMtAUQDTQGTA2UB4gNoAfAB
-        fgF9AXwB/gJrAWoB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
+        gAF/AX4B/gJrAWoB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZwH/A2cB
-        /wNjAfYBaQFoAWcB7ANUAaYDOgFgAyEBMAQAAwUBBgMJAQwDCQEMAwkBDAMJAQwDCQEMAwUBBmQAAwMB
-        BAMGBAgBCgMJAQwDCQEMAwkBDAMJAQwDCQEMAx0BKAMtAUQDTQGTA2UB4gNoAfABfgF9AXwB/gJrAWoB
+        /wNjAfYBZwFmAWUB7ANUAaYDOgFgAyEBMAQAAwUBBgMJAQwDCQEMAwkBDAMJAQwDCQEMAwUBBmQAAwMB
+        BAMGBAgBCgMJAQwDCQEMAwkBDAMJAQwDCQEMAx0BKAMtAUQDTQGTA2UB4gNoAfABgAF/AX4B/gJrAWoB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
-        /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZwH/A2cB/wNjAfYBaQFoAWcB
+        /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZwH/A2cB/wNjAfYBZwFmAWUB
         7ANUAaYDOgFgAyEBMAQAAwUBBgMJAQwDCQEMAwkBDAMJAQwDCQEMAwUBBv8ApQAEAgMDBAQEBQEGAwUB
         BgMFAQYDBQEGAwUBBgMPARQDGQEiAzABSgNBAXEDRAF4A0YBfwNHAYADRwGAA1kBvAF7AXgBdAH4AXEB
         bwFsAfwDZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
@@ -2542,34 +2542,34 @@
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         YwHpA18B0wNUAakDRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYAD
         RwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAA0cBgANHAYADRwGAAz0BaAMzAVAD
-        HQEo/wBFAANEAXsBcQFrAWkB9gNfAfsDZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
+        HQEo/wBFAANEAXsBbQFnAWUB9gNfAfsDZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
-        ZgH/A2YB/wNmAf8DZgH/A18B0ANSAaADMwFQBAADRAF7AXEBawFpAfYDXwH7A2YB/wNmAf8DZgH/A2YB
+        ZgH/A2YB/wNmAf8DZgH/A18B0ANSAaADMwFQBAADRAF7AW0BZwFlAfYDXwH7A2YB/wNmAf8DZgH/A2YB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
         /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB
-        /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNfAdADUgGgAzMBUAQAA0QBewFxAWsB
-        aQH2A18B+wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
+        /wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNfAdADUgGgAzMBUAQAA0QBewFtAWcB
+        ZQH2A18B+wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
-        XwHQA1IBoAMzAVD/AEEAAw8BEwNJAYcDXwH7AWEBXgFcAf0DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
+        XwHQA1IBoAMzAVD/AEEAAw8BEwNJAYcDXwH7AV8BXAFaAf0DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
-        ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2UB5wNfAdADPQFoAw8BEwNJAYcDXwH7AWEBXgFcAf0D
+        ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2UB5wNfAdADPQFoAw8BEwNJAYcDXwH7AV8BXAFaAf0D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2UB5wNfAdAD
-        PQFoAw8BEwNJAYcDXwH7AWEBXgFcAf0DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
+        PQFoAw8BEwNJAYcDXwH7AV8BXAFaAf0DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
         ZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8DZgH/A2YB/wNmAf8D
@@ -5685,7 +5685,7 @@
     <value>toolStripStatusLabel4</value>
   </data>
   <data name="statusStrip5.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 502</value>
+    <value>3, 498</value>
   </data>
   <data name="statusStrip5.Size" type="System.Drawing.Size, System.Drawing">
     <value>1170, 24</value>
@@ -5757,13 +5757,13 @@
     <value>3</value>
   </data>
   <data name="tabPage18.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 24</value>
+    <value>4, 28</value>
   </data>
   <data name="tabPage18.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 3, 3, 3</value>
   </data>
   <data name="tabPage18.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1176, 529</value>
+    <value>1176, 525</value>
   </data>
   <data name="tabPage18.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -6109,7 +6109,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAEZTeXN0ZW0uV2luZG93cy5Gb3JtcywgQ3VsdHVyZT1uZXV0cmFs
         LCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5BQEAAAAmU3lzdGVtLldpbmRvd3MuRm9ybXMu
         SW1hZ2VMaXN0U3RyZWFtZXIBAAAABERhdGEHAgIAAAAJAwAAAA8DAAAAABgAAAJNU0Z0AUkBTAIBAQIB
-        AAGUAREBlAERARkBAAEZAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABZAMAARkDAAEBAQABIAUAARAB
+        AAGkAREBpAERARkBAAEZAQAE/wEhAQAI/wFCAU0BNgcAATYDAAEoAwABZAMAARkDAAEBAQABIAUAARAB
         J/8A/wD/ADkAAlIBUQGkAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcB
         XQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcBXQHqAmcB
         XQHqAmcBXQHqAmcBXQHqAmcBXQHqAlIBUQGk/wA1AAJoAVMB9AH/AZQBQgL/AZQBQgL/AZQBQgL/AZQB
@@ -6221,34 +6221,34 @@
     <value>Microsoft JhengHei UI, 11.25pt</value>
   </data>
   <data name="toolStripMenuItem25.Size" type="System.Drawing.Size, System.Drawing">
-    <value>122, 24</value>
+    <value>180, 24</value>
   </data>
   <data name="toolStripMenuItem25.Text" xml:space="preserve">
     <value>Open</value>
   </data>
   <data name="toolStripMenuItem28.Size" type="System.Drawing.Size, System.Drawing">
-    <value>122, 24</value>
+    <value>180, 24</value>
   </data>
   <data name="toolStripMenuItem28.Text" xml:space="preserve">
-    <value>Dump</value>
+    <value>Show All</value>
   </data>
   <data name="toolStripSeparator5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>119, 6</value>
+    <value>177, 6</value>
   </data>
   <data name="toolStripMenuItem26.Size" type="System.Drawing.Size, System.Drawing">
-    <value>122, 24</value>
+    <value>180, 24</value>
   </data>
   <data name="toolStripMenuItem26.Text" xml:space="preserve">
     <value>New</value>
   </data>
   <data name="toolStripMenuItem27.Size" type="System.Drawing.Size, System.Drawing">
-    <value>122, 24</value>
+    <value>180, 24</value>
   </data>
   <data name="toolStripMenuItem27.Text" xml:space="preserve">
     <value>Delete</value>
   </data>
   <data name="menuDbTable.Size" type="System.Drawing.Size, System.Drawing">
-    <value>123, 106</value>
+    <value>181, 128</value>
   </data>
   <data name="&gt;&gt;menuDbTable.Name" xml:space="preserve">
     <value>menuDbTable</value>

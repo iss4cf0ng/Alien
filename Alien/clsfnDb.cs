@@ -591,6 +591,8 @@ namespace Alien
                 dt.Rows.Add(dr);
             }
 
+            dt.AcceptChanges();
+
             return dt;
         }
 

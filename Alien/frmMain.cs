@@ -224,11 +224,11 @@ namespace Alien
                 }
 
                 //await web.fnbTestWebConnection(true) && await web.fnbTestShellConnection()
-                bool bValidate = false;
+                bool bValidate = true;
                 if (bDoHttpGet)
                     bValidate = await web.fnbTestWebConnection();
 
-                bValidate = await web.fnbTestShellConnection();
+                bValidate = bValidate && await web.fnbTestShellConnection();
 
                 if (bValidate)
                 {
@@ -447,6 +447,8 @@ namespace Alien
                 var semaphore = new SemaphoreSlim(nThread);
                 List<Task> lsTask = new List<Task>();
 
+                bool bDoHttpGet = m_iniMgr.ReadBool("General", "DoHttpGet");
+
                 foreach (clsWeb web in dic.Keys)
                 {
                     lsTask.Add(Task.Run(async () =>
@@ -455,7 +457,12 @@ namespace Alien
 
                         try
                         {
-                            bool bAlive = await web.fnbTestWebConnection(false) && await web.fnbTestShellConnection(false);
+                            bool bAlive = true;
+                            if (bDoHttpGet)
+                                bAlive = await web.fnbTestWebConnection(false);
+
+                            bAlive = bAlive && await web.fnbTestShellConnection(false);
+
                             Invoke(() => dic[web].ImageKey = bAlive ? "yes" : "no");
                         }
                         finally
