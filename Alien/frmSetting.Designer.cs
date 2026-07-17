@@ -33,9 +33,9 @@
             comboBox1 = new ComboBox();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
-            tabPage2 = new TabPage();
             toolStrip1 = new ToolStrip();
             toolStripButton1 = new ToolStripButton();
+            checkBox1 = new CheckBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             toolStrip1.SuspendLayout();
@@ -47,14 +47,14 @@
             label1.Location = new Point(11, 10);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new Size(79, 19);
+            label1.Size = new Size(86, 19);
             label1.TabIndex = 0;
-            label1.Text = "Language";
+            label1.Text = "Language :";
             // 
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(98, 7);
+            comboBox1.Location = new Point(105, 7);
             comboBox1.Margin = new Padding(4);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(154, 27);
@@ -63,7 +63,6 @@
             // tabControl1
             // 
             tabControl1.Controls.Add(tabPage1);
-            tabControl1.Controls.Add(tabPage2);
             tabControl1.Dock = DockStyle.Fill;
             tabControl1.Location = new Point(0, 26);
             tabControl1.Name = "tabControl1";
@@ -74,6 +73,7 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(checkBox1);
             tabPage1.Controls.Add(comboBox1);
             tabPage1.Controls.Add(label1);
             tabPage1.Location = new Point(4, 28);
@@ -83,16 +83,6 @@
             tabPage1.TabIndex = 0;
             tabPage1.Text = "General";
             tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // tabPage2
-            // 
-            tabPage2.Location = new Point(4, 24);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(729, 293);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "Loader";
-            tabPage2.UseVisualStyleBackColor = true;
             // 
             // toolStrip1
             // 
@@ -114,6 +104,16 @@
             toolStripButton1.Size = new Size(53, 23);
             toolStripButton1.Text = "Apply";
             toolStripButton1.Click += toolStripButton1_Click;
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(11, 41);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(218, 23);
+            checkBox1.TabIndex = 2;
+            checkBox1.Text = "Do HTTP GET before exploit";
+            checkBox1.UseVisualStyleBackColor = true;
             // 
             // frmSetting
             // 
@@ -145,8 +145,8 @@
         private ComboBox comboBox1;
         private TabControl tabControl1;
         private TabPage tabPage1;
-        private TabPage tabPage2;
         private ToolStrip toolStrip1;
         private ToolStripButton toolStripButton1;
+        private CheckBox checkBox1;
     }
 }

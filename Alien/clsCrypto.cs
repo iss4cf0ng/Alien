@@ -56,17 +56,43 @@ namespace Alien
 
         public static byte[] fnAesDecrypt(byte[] abBuffer, byte[] abKey)
         {
+            int nExcessBytes = abBuffer.Length % 16;
+            byte[] abCleanBuffer = abBuffer;
+
+            if (nExcessBytes != 0)
+            {
+                int nCleanLength = abBuffer.Length - nExcessBytes;
+                abCleanBuffer = new byte[nCleanLength];
+                Buffer.BlockCopy(abBuffer, 0, abCleanBuffer, 0, nCleanLength);
+            }
+
             using (Aes aes = Aes.Create())
             {
                 aes.Key = abKey;
                 aes.Mode = CipherMode.ECB;
-                aes.Padding = PaddingMode.PKCS7;
+                aes.Padding = PaddingMode.None;
 
                 using (ICryptoTransform decryptor = aes.CreateDecryptor())
                 {
-                    return decryptor.TransformFinalBlock(abBuffer, 0, abBuffer.Length);
+                    byte[] abDecryptedRaw = decryptor.TransformFinalBlock(abCleanBuffer, 0, abCleanBuffer.Length);
+
+                    if (abDecryptedRaw.Length == 0)
+                        return abDecryptedRaw;
+
+                    int nPaddingLength = abDecryptedRaw[abDecryptedRaw.Length - 1];
+
+                    if (nPaddingLength >= 1 && nPaddingLength <= 16)
+                    {
+                        int nRealLength = abDecryptedRaw.Length - nPaddingLength;
+                        byte[] abRealResult = new byte[nRealLength];
+                        Buffer.BlockCopy(abDecryptedRaw, 0, abRealResult, 0, nRealLength);
+                        return abRealResult;
+                    }
+
+                    return abDecryptedRaw;
                 }
             }
         }
+
     }
 }

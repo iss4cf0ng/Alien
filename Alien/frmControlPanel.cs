@@ -1352,6 +1352,53 @@ namespace Alien
 
         #endregion
 
+        private void fnLoadAllPlugins(string szCurrentDir, TreeNodeCollection currentNodes)
+        {
+            try
+            {
+                string[] aszSubDirs = Directory.GetDirectories(szCurrentDir);
+
+                foreach (string szDirName in aszSubDirs)
+                {
+                    string szFolderName = Path.GetFileName(szDirName);
+                    TreeNode nodeDir = new TreeNode(szFolderName);
+
+                    var manifest = m_plugin.fnLoadPluginManifest(szDirName);
+
+                    if (manifest != null && manifest.HasValue)
+                    {
+                        currentNodes.Add(nodeDir);
+                        continue;
+                    }
+
+                    string szIndexPath = Path.Combine(szDirName, "index.html");
+                    if (File.Exists(szIndexPath))
+                    {
+
+                    }
+
+                    fnLoadAllPlugins(szDirName, nodeDir.Nodes);
+
+                    currentNodes.Add(nodeDir);
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+
+        private int fnCountNodes(TreeNode node)
+        {
+            int count = node.Nodes.Count;
+            foreach (TreeNode subNode in node.Nodes)
+            {
+                count += fnCountNodes(subNode);
+            }
+            return count;
+        }
+
         async void fnClose()
         {
             timerShell.Stop();
@@ -1631,13 +1678,22 @@ namespace Alien
                 string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
                 webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
 
-                foreach (string szDir in Directory.GetDirectories(Path.Combine(Application.StartupPath, "Plugins")))
+                treeView1.Nodes.Clear();
+                string szPluginsBaseDir = Path.Combine(Application.StartupPath, "Plugins");
+
+                if (Directory.Exists(szPluginsBaseDir))
                 {
-                    TreeNode node = new TreeNode(Path.GetFileName(szDir));
-                    treeView1.Nodes.Add(node);
+                    fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes);
                 }
 
-                toolStripStatusLabel8.Text = $"Module[{treeView1.Nodes.Count}]";
+                treeView1.ExpandAll();
+                int nTotalModules = 0;
+                foreach (TreeNode n in treeView1.Nodes)
+                {
+                    nTotalModules += fnCountNodes(n) + 1;
+                }
+
+                toolStripStatusLabel8.Text = $"Module[{nTotalModules}]";
             }
             catch
             {
@@ -2251,7 +2307,8 @@ namespace Alien
         // Database.Add
         private void toolStripMenuItem22_Click(object sender, EventArgs e)
         {
-
+            frmDbEdit f = new frmDbEdit(m_dbMgr, this);
+            f.ShowDialog();
         }
 
         // Database.Edit
@@ -3333,6 +3390,12 @@ namespace Alien
                 frmPortInfo f = new frmPortInfo(szIP, ports);
                 f.Show();
             }
+        }
+
+        // File.Datetime
+        private void toolStripMenuItem14_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

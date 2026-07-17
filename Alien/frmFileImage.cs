@@ -33,13 +33,27 @@ namespace Alien
             m_szImgDir = Path.Combine(victim.m_szPortfolio, "Images");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private struct stImageEntity
         {
             public string szFilePath;
             public Image img;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private stImageEntity fnGetItemTag(ListViewItem item) => (stImageEntity)item.Tag;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szFilePath"></param>
+        /// <param name="img"></param>
         public void fnAddImage(string szFilePath, Image img)
         {
             stImageEntity entity = new stImageEntity()
@@ -65,6 +79,10 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
         private void fnShowImage(ListViewItem item)
         {
             var entity = fnGetItemTag(item);
