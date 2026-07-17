@@ -30,14 +30,17 @@ namespace Alien
         {
             "ASCII",
             "UTF-8",
-            "Big5", //Traditional Chinese
-            "GB2312", //Simplified Chinese
+            "Unicode",
+            "Big5",                 //Traditional Chinese
+            "Big5-HKSCS",
+            "GB2312",               //Simplified Chinese
             "GBK",
+            "GB18030",
             "ISO-8859-1",
-            "Windows-1252",
-            "Shift_JIS", //Japanese
-            "EUC-JP", //Japanese
-            "EUC-KR", //Korean
+            "Shift_JIS",            //Japanese
+            "EUC-JP",               //Japanese
+            "ISO-2022-JP",
+            "EUC-KR",               //Korean
         };
 
         public frmEditShell(clsTamper tamper, clsSqlite sqlConn, stShellConfig config, bool bNewShell, List<string> lsGroupName)

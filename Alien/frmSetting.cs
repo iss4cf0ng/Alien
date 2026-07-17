@@ -29,7 +29,7 @@ namespace Alien
             comboBox1.ValueMember = nameof(clsLanguage.clsLanguageItem.Culture);
             comboBox1.DataSource = clsLanguage.clsLanguageManager.Languages;
 
-            comboBox1.Text = m_iniMgr.ReadString("General", "Language");
+            comboBox1.SelectedValue = m_iniMgr.ReadString("General", "Language");
         }
 
         private void frmSetting_Load(object sender, EventArgs e)

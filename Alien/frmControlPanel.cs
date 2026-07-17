@@ -668,62 +668,73 @@ namespace Alien
             {
                 foreach (string szSrcFilePath in lsSrcFilePath)
                 {
-                    long nFileSize = -1;
+                    if (!m_fileMgr.m_bUploadFile)
+                        break;
 
-                    string szFileName = Path.GetFileName(szSrcFilePath);
-                    string szDstFilePath = Path.Combine(szCurrentDir, szFileName).Replace("\\", "/");
-
-                    if (nFileSize == -1)
+                    try
                     {
-                        FileInfo info = new FileInfo(szSrcFilePath);
-                        nFileSize = info.Length;
-                    }
+                        long nFileSize = -1;
 
-                    long nProgress = 0;
+                        string szFileName = Path.GetFileName(szSrcFilePath);
+                        string szDstFilePath = Path.Combine(szCurrentDir, szFileName).Replace("\\", "/");
 
-                    TreeNode node = dicNode[szSrcFilePath];
-                    node.Tag = nProgress;
-
-                    Action act = () =>
-                    {
-                        Invoke(new Action(() =>
+                        if (nFileSize == -1)
                         {
-                            nProgress = (long)node.Tag;
-                            nProgress += nChunkSize;
-                            node.Tag = nProgress;
+                            FileInfo info = new FileInfo(szSrcFilePath);
+                            nFileSize = info.Length;
+                        }
 
-                            string szProgress = (((decimal)nProgress / nFileSize) * 100).ToString("0.00");
-                            node.Text = $"[{szProgress}%|{nProgress}/{nFileSize}]{szFileName}";
+                        long nProgress = 0;
 
-                            if (nProgress >= nFileSize)
-                            {
-                                nodeUpload.Nodes.Remove(node);
-                            }
-                        }));
-                    };
+                        TreeNode node = dicNode[szSrcFilePath];
+                        node.Tag = nProgress;
 
-                    lsTask.Add(Task.Run(async () =>
-                    {
-                        await semaphore.WaitAsync();
-
-                        try
+                        Action act = () =>
                         {
-                            bool bRet = await m_fileMgr.fnbFileUpload(szSrcFilePath, szDstFilePath, nChunkSize, act, fnOnCallback);
-                            dicState[szFileName] = bRet;
-
                             Invoke(new Action(() =>
                             {
-                                if (dicNode.ContainsKey(szSrcFilePath))
-                                    dicNode.Remove(szSrcFilePath);
-                            }));
-                        }
-                        finally
-                        {
-                            semaphore.Release();
-                        }
-                    }));
+                                nProgress = (long)node.Tag;
+                                nProgress += nChunkSize;
+                                node.Tag = nProgress;
 
-                    await Task.WhenAll(lsTask);
+                                string szProgress = (((decimal)nProgress / nFileSize) * 100).ToString("0.00");
+                                node.Text = $"[{szProgress}%|{nProgress}/{nFileSize}]{szFileName}";
+
+                                if (nProgress >= nFileSize)
+                                {
+                                    nodeUpload.Nodes.Remove(node);
+                                }
+                            }));
+                        };
+
+                        lsTask.Add(Task.Run(async () =>
+                        {
+                            await semaphore.WaitAsync();
+
+                            try
+                            {
+                                bool bRet = await m_fileMgr.fnbFileUpload(szSrcFilePath, szDstFilePath, nChunkSize, act, fnOnCallback);
+                                dicState[szFileName] = bRet;
+
+                                Invoke(new Action(() =>
+                                {
+                                    if (dicNode.ContainsKey(szSrcFilePath))
+                                        dicNode.Remove(szSrcFilePath);
+                                }));
+                            }
+                            finally
+                            {
+                                semaphore.Release();
+                            }
+                        }));
+
+                        await Task.WhenAll(lsTask);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
                 }
             }
 
@@ -732,6 +743,8 @@ namespace Alien
 
         public async Task<(Dictionary<string, bool> dicState, string szSaveDirPath)> fnFileDownload(List<(string, long)> lsRemoteFile, int nThread = 3, int nChunkSize = 5 * 1024, Action fnCallback = null)
         {
+            m_fileMgr.m_bDownloadFile = true;
+
             string szLocalSaveDirPath = Path.Combine("Victim", m_victim.m_szShellDomain, "Downloads");
             if (!Directory.Exists(szLocalSaveDirPath))
                 Directory.CreateDirectory(szLocalSaveDirPath);
@@ -764,6 +777,9 @@ namespace Alien
             {
                 for (int i = 0; i < lsRemoteFile.Count; i++)
                 {
+                    if (!m_fileMgr.m_bDownloadFile)
+                        break;
+
                     string szRemoteFilePath = lsRemoteFilePath[i];
                     string szFileName = Path.GetFileName(szRemoteFilePath);
                     string szLocalFilePath = Path.Combine(szLocalSaveDirPath, szFileName);
@@ -3395,7 +3411,41 @@ namespace Alien
         // File.Datetime
         private void toolStripMenuItem14_Click(object sender, EventArgs e)
         {
+            var entries = listView2.SelectedItems.Cast<ListViewItem>().Select(x => fnFileGetItemTag(x)).Where(x => !x.bIsDirectory).ToList();
+            if (entries.Count == 0)
+                return;
 
+            var entry = entries.First();
+            frmFileDateTime f = new frmFileDateTime(m_fileMgr, entry.szEntryPath, entry.dtLastAccessedDate);
+            f.ShowDialog();
+
+            fnFileMgrRefresh();
+        }
+
+        private void toolStripMenuItem51_Click(object sender, EventArgs e)
+        {
+            if (m_fileMgr.m_bDownloadFile || m_fileMgr.m_bUploadFile)
+            {
+                DialogResult dr = MessageBox.Show("Your files are still being transferred. Do you want to stop all transfers?", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (dr != DialogResult.Yes)
+                    return;
+            }
+
+            try
+            {
+                m_fileMgr.m_bDownloadFile = false;
+                m_fileMgr.m_bUploadFile = false;
+
+                TreeNode nodeUpload = treeView4.Nodes[0];
+                TreeNode nodeDownload = treeView4.Nodes[1];
+
+                nodeUpload.Nodes.Clear();
+                nodeDownload.Nodes.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

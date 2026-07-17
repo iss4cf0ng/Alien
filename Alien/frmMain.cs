@@ -15,6 +15,7 @@ namespace Alien
         private const string m_szAuthor = "iss4cf0ng/ISSAC";
 
         private clsTamper m_tamper { get; set; }
+        private clsIniManager m_iniMgr { get; init; }
 
         private List<string> m_lsGroupName
         {
@@ -37,6 +38,8 @@ namespace Alien
         public frmMain()
         {
             InitializeComponent();
+
+            m_iniMgr = new clsIniManager("config.ini");
         }
 
         #region Tool
@@ -194,19 +197,6 @@ namespace Alien
             fnLoadGroup();
 
             toolStripStatusLabel4.Text = "Action successfully";
-
-            return;
-
-            string szInput = "ABCDEFGHIJK";
-            var parameters = new Dictionary<string, object>
-            {
-                { "key", "123" }
-            };
-
-            string szPayload = await m_tamper.fnObfuscate("RC4", szInput, parameters);
-
-            Visible = false;
-            MessageBox.Show(szPayload);
         }
 
         private async void Form1_Load(object sender, EventArgs e)
@@ -217,6 +207,7 @@ namespace Alien
         //Control Panel
         private async void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            bool bDoHttpGet = m_iniMgr.ReadBool("General", "DoHttpGet");
             foreach (ListViewItem item in listView1.SelectedItems)
             {
                 toolStripStatusLabel4.Text = "Loading...";
@@ -233,7 +224,13 @@ namespace Alien
                 }
 
                 //await web.fnbTestWebConnection(true) && await web.fnbTestShellConnection()
-                if (await web.fnbTestShellConnection())
+                bool bValidate = false;
+                if (bDoHttpGet)
+                    bValidate = await web.fnbTestWebConnection();
+
+                bValidate = await web.fnbTestShellConnection();
+
+                if (bValidate)
                 {
                     string szDomain = item.SubItems[1].Text.Split('/')[2];
 

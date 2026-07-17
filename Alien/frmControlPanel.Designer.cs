@@ -36,6 +36,8 @@
             treeView3 = new TreeView();
             tabPage14 = new TabPage();
             treeView4 = new TreeView();
+            menuFileTransfer = new ContextMenuStrip(components);
+            toolStripMenuItem51 = new ToolStripMenuItem();
             listView2 = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -278,6 +280,7 @@
             tabControl6.SuspendLayout();
             tabPage13.SuspendLayout();
             tabPage14.SuspendLayout();
+            menuFileTransfer.SuspendLayout();
             menuFile.SuspendLayout();
             toolStrip9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer2).BeginInit();
@@ -425,9 +428,22 @@
             // 
             // treeView4
             // 
+            treeView4.ContextMenuStrip = menuFileTransfer;
             resources.ApplyResources(treeView4, "treeView4");
             treeView4.Name = "treeView4";
             treeView4.Nodes.AddRange(new TreeNode[] { (TreeNode)resources.GetObject("treeView4.Nodes"), (TreeNode)resources.GetObject("treeView4.Nodes1") });
+            // 
+            // menuFileTransfer
+            // 
+            resources.ApplyResources(menuFileTransfer, "menuFileTransfer");
+            menuFileTransfer.Items.AddRange(new ToolStripItem[] { toolStripMenuItem51 });
+            menuFileTransfer.Name = "menuFileTransfer";
+            // 
+            // toolStripMenuItem51
+            // 
+            toolStripMenuItem51.Name = "toolStripMenuItem51";
+            resources.ApplyResources(toolStripMenuItem51, "toolStripMenuItem51");
+            toolStripMenuItem51.Click += toolStripMenuItem51_Click;
             // 
             // listView2
             // 
@@ -2051,6 +2067,7 @@
             tabControl6.ResumeLayout(false);
             tabPage13.ResumeLayout(false);
             tabPage14.ResumeLayout(false);
+            menuFileTransfer.ResumeLayout(false);
             menuFile.ResumeLayout(false);
             toolStrip9.ResumeLayout(false);
             toolStrip9.PerformLayout();
@@ -2439,5 +2456,7 @@
         private ToolStripMenuItem toolStripMenuItem50;
         private ImageList voidImageList;
         private Button button4;
+        private ContextMenuStrip menuFileTransfer;
+        private ToolStripMenuItem toolStripMenuItem51;
     }
 }

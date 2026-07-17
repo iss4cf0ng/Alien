@@ -133,7 +133,6 @@ namespace Alien
                 {
                     // NebulaPulsar, read binary
                     szPayload = Convert.ToBase64String(File.ReadAllBytes(szPayloadPath));
-                    MessageBox.Show(szPayloadPath);
                 }
                 else
                 {
@@ -184,7 +183,7 @@ namespace Alien
             {
                 //MessageBox.Show(szJson);
                 string szResp = await m_web.fnszSendPayload("plugin", new string[] { szPayload, szJson });
-                MessageBox.Show(szResp);
+                //MessageBox.Show(szResp);
                 //Clipboard.SetText(szResp);
 
                 return szResp;

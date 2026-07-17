@@ -12,14 +12,27 @@ namespace Alien
 {
     public partial class frmFileDateTime : Form
     {
-        public frmFileDateTime()
+        private clsfnFileMgr m_fileMgr { get; init; }
+        private string m_szFilePath { get; init; }
+        private DateTime m_dtOriginal { get; init; }
+
+        public frmFileDateTime(clsfnFileMgr fileMgr, string szFilePath, DateTime dtOriginal)
         {
             InitializeComponent();
+
+            m_fileMgr = fileMgr;
+            m_szFilePath = szFilePath;
+
+            Text = "Last Modified & Accessed";
+            m_dtOriginal = dtOriginal;
         }
 
         void fnSetup()
         {
+            dateTimePicker1.Format = DateTimePickerFormat.Custom;
+            dateTimePicker1.CustomFormat = "yyyy-MM-dd HH:mm:ss";
 
+            dateTimePicker1.Value = m_dtOriginal;
         }
 
         private void frmFileDateTime_Load(object sender, EventArgs e)
@@ -27,9 +40,20 @@ namespace Alien
             fnSetup();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
+            try
+            {
+                long unixTimestamp = long.Parse(textBox1.Text);
+                await m_fileMgr.fnSetTimestamp(m_szFilePath, unixTimestamp);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
+            MessageBox.Show("Set timestamp successfully.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DialogResult = DialogResult.OK;
         }
 
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
