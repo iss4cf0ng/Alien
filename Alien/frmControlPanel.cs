@@ -3157,7 +3157,13 @@ namespace Alien
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            bool bStop = string.Equals(button1.Text, "Stop");
+            bool bStop = string.Equals(button1.Text, "Start");
+
+            if (!bStop)
+            {
+                // Is running
+                timerShell.Stop();
+            }
 
             await m_rShell.fnPipeCreate(textBox4.Text);
 
@@ -3169,7 +3175,13 @@ namespace Alien
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            bool bStop = string.Equals(button2.Text, "Stop");
+            bool bStop = string.Equals(button2.Text, "Start");
+
+            if (!bStop)
+            {
+                // Is running
+                timerShell.Stop();
+            }
 
             await m_rShell.fnPipeCreate(textBox5.Text);
 

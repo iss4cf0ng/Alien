@@ -238,6 +238,30 @@
   <data name="comboBox1.Size" type="System.Drawing.Size, System.Drawing">
     <value>397, 27</value>
   </data>
+  <data name="groupBox2.Text" xml:space="preserve">
+    <value>事件界線</value>
+  </data>
+  <data name="groupBox4.Text" xml:space="preserve">
+    <value>說明</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>參數 (JSON)</value>
+  </data>
+  <data name="checkBox1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>58, 23</value>
+  </data>
+  <data name="checkBox1.Text" xml:space="preserve">
+    <value>啟用</value>
+  </data>
+  <data name="label4.Location" type="System.Drawing.Point, System.Drawing">
+    <value>26, 58</value>
+  </data>
+  <data name="label4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label4.Text" xml:space="preserve">
+    <value>腳本 :</value>
+  </data>
   <data name="tabPage1.Text" xml:space="preserve">
     <value>基本設定</value>
   </data>
@@ -273,5 +297,17 @@
   </data>
   <data name="tabPage3.Text" xml:space="preserve">
     <value>漂移彗星</value>
+  </data>
+  <data name="groupBox5.Text" xml:space="preserve">
+    <value>跳板</value>
+  </data>
+  <data name="button5.Text" xml:space="preserve">
+    <value>加載</value>
+  </data>
+  <data name="button7.Text" xml:space="preserve">
+    <value>圖像</value>
+  </data>
+  <data name="button6.Text" xml:space="preserve">
+    <value>檢查存活</value>
   </data>
 </root>
