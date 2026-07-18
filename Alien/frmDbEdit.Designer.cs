@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDbEdit));
             comboBox1 = new ComboBox();
             label1 = new Label();
             textBox1 = new TextBox();
@@ -45,116 +46,77 @@
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(106, 13);
-            comboBox1.Margin = new Padding(4);
+            resources.ApplyResources(comboBox1, "comboBox1");
             comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(296, 27);
-            comboBox1.TabIndex = 0;
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(23, 16);
+            resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
-            label1.Size = new Size(80, 19);
-            label1.TabIndex = 1;
-            label1.Text = "Database :";
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(106, 47);
-            textBox1.Multiline = true;
+            resources.ApplyResources(textBox1, "textBox1");
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(296, 83);
-            textBox1.TabIndex = 2;
             // 
             // button1
             // 
-            button1.Location = new Point(16, 245);
+            resources.ApplyResources(button1, "button1");
             button1.Name = "button1";
-            button1.Size = new Size(184, 51);
-            button1.TabIndex = 3;
-            button1.Text = "Test";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(106, 135);
+            resources.ApplyResources(textBox2, "textBox2");
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(296, 27);
-            textBox2.TabIndex = 4;
             textBox2.TextChanged += textBox2_TextChanged;
             // 
             // label2
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(36, 138);
+            resources.ApplyResources(label2, "label2");
             label2.Name = "label2";
-            label2.Size = new Size(64, 19);
-            label2.TabIndex = 5;
-            label2.Text = "Source :";
             // 
             // label3
             // 
-            label3.AutoSize = true;
-            label3.Location = new Point(13, 171);
+            resources.ApplyResources(label3, "label3");
             label3.Name = "label3";
-            label3.Size = new Size(87, 19);
-            label3.TabIndex = 7;
-            label3.Text = "Username :";
             // 
             // textBox3
             // 
-            textBox3.Location = new Point(106, 168);
+            resources.ApplyResources(textBox3, "textBox3");
             textBox3.Name = "textBox3";
-            textBox3.Size = new Size(296, 27);
-            textBox3.TabIndex = 6;
             textBox3.TextChanged += textBox3_TextChanged;
             // 
             // label4
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(16, 204);
+            resources.ApplyResources(label4, "label4");
             label4.Name = "label4";
-            label4.Size = new Size(84, 19);
-            label4.TabIndex = 9;
-            label4.Text = "Password :";
             // 
             // textBox4
             // 
-            textBox4.Location = new Point(106, 201);
+            resources.ApplyResources(textBox4, "textBox4");
             textBox4.Name = "textBox4";
-            textBox4.Size = new Size(296, 27);
-            textBox4.TabIndex = 8;
             textBox4.UseSystemPasswordChar = true;
             textBox4.TextChanged += textBox4_TextChanged;
             // 
             // label5
             // 
-            label5.AutoSize = true;
-            label5.Location = new Point(23, 47);
+            resources.ApplyResources(label5, "label5");
             label5.Name = "label5";
-            label5.Size = new Size(77, 19);
-            label5.TabIndex = 10;
-            label5.Text = "Conn Str :";
             // 
             // button2
             // 
-            button2.Location = new Point(218, 245);
+            resources.ApplyResources(button2, "button2");
             button2.Name = "button2";
-            button2.Size = new Size(184, 51);
-            button2.TabIndex = 11;
-            button2.Text = "Save";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
             // frmDbEdit
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(415, 306);
             Controls.Add(button2);
             Controls.Add(label5);
             Controls.Add(label4);
@@ -167,12 +129,8 @@
             Controls.Add(textBox1);
             Controls.Add(label1);
             Controls.Add(comboBox1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            Margin = new Padding(4);
             Name = "frmDbEdit";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmDbEdit";
             Load += frmDbEdit_Load;
             ResumeLayout(false);
             PerformLayout();

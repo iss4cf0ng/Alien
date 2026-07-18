@@ -1,6 +1,6 @@
 ﻿namespace Alien
 {
-    partial class frmRegEditBytes
+    partial class frmRename
     {
         /// <summary>
         /// Required designer variable.
@@ -28,63 +28,53 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRegEditBytes));
             label1 = new Label();
             textBox1 = new TextBox();
-            label2 = new Label();
-            panel1 = new Panel();
             button1 = new Button();
-            button2 = new Button();
             SuspendLayout();
             // 
             // label1
             // 
-            resources.ApplyResources(label1, "label1");
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 9);
             label1.Name = "label1";
+            label1.Size = new Size(58, 19);
+            label1.TabIndex = 0;
+            label1.Text = "Name :";
             // 
             // textBox1
             // 
-            resources.ApplyResources(textBox1, "textBox1");
+            textBox1.Location = new Point(76, 6);
             textBox1.Name = "textBox1";
-            // 
-            // label2
-            // 
-            resources.ApplyResources(label2, "label2");
-            label2.Name = "label2";
-            // 
-            // panel1
-            // 
-            resources.ApplyResources(panel1, "panel1");
-            panel1.Name = "panel1";
+            textBox1.Size = new Size(252, 27);
+            textBox1.TabIndex = 1;
             // 
             // button1
             // 
-            resources.ApplyResources(button1, "button1");
+            button1.Location = new Point(12, 39);
             button1.Name = "button1";
+            button1.Size = new Size(316, 50);
+            button1.TabIndex = 2;
+            button1.Text = "Rename";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
-            // button2
+            // frmRename
             // 
-            resources.ApplyResources(button2, "button2");
-            button2.Name = "button2";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
-            // 
-            // frmRegEditBytes
-            // 
-            resources.ApplyResources(this, "$this");
+            AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(button2);
+            ClientSize = new Size(342, 94);
             Controls.Add(button1);
-            Controls.Add(panel1);
-            Controls.Add(label2);
             Controls.Add(textBox1);
             Controls.Add(label1);
+            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            Margin = new Padding(4);
             MaximizeBox = false;
-            Name = "frmRegEditBytes";
-            Load += frmRegEditBytes_Load;
+            Name = "frmRename";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "frmFileRename";
+            Load += frmRename_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -93,9 +83,6 @@
 
         private Label label1;
         private TextBox textBox1;
-        private Label label2;
-        private Panel panel1;
         private Button button1;
-        private Button button2;
     }
 }

@@ -25,6 +25,7 @@ using ICSharpCode.TextEditor.Src.Document.FoldingStrategy;
 using System.Globalization;
 using System.Reflection.Metadata;
 using System.Data.Entity.Core.Metadata.Edm;
+using System.Text.Json.Nodes;
 
 namespace Alien
 {
@@ -357,14 +358,14 @@ namespace Alien
                     }
                 };
 
-                dataGridView.RowValidated += async (s, e) => 
+                dataGridView.RowValidated += async (s, e) =>
                 {
                     if (await fnbDbSaveRemoteChanges())
                     {
                         page.Text = page.Text.Replace(" *", string.Empty).Trim();
                     }
                 };
-                dataGridView.UserDeletedRow += async (s, e) => 
+                dataGridView.UserDeletedRow += async (s, e) =>
                 {
                     if (await fnbDbSaveRemoteChanges())
                     {
@@ -593,7 +594,7 @@ namespace Alien
                     }
                     else
                     {
-                        
+
                         wheres.Add($"{quotedCol} = {fnEscapeSqlValue(originalVal)}");
                     }
                 }
@@ -791,7 +792,8 @@ namespace Alien
                     PlaceholderText = "Please enter a new table name (ex. t_new_orders)",
                     Dock = DockStyle.Top
                 };
-                dgvSchema = new DataGridView {
+                dgvSchema = new DataGridView
+                {
                     Dock = DockStyle.Fill,
                     AllowUserToAddRows = true,
                     AllowUserToDeleteRows = true
@@ -822,7 +824,7 @@ namespace Alien
                 dgvSchema.Columns.Add("ColName", "Column Name");
 
                 DataGridViewComboBoxColumn typeCol = new DataGridViewComboBoxColumn { Name = "ColType", HeaderText = "DataType" };
-                
+
                 switch (m_cfg.enDbType)
                 {
                     case enDatabase.Oracle:
@@ -1510,6 +1512,8 @@ namespace Alien
 
             toolStripLabel1.Text = "Loading...";
 
+            tabControl4.TabPages.Clear();
+
             treeView2.Nodes.Clear();
             listView4.Items.Clear();
             foreach (TabPage tab in tabControl4.TabPages)
@@ -1654,6 +1658,12 @@ namespace Alien
             clsDbSqlResultControls ctrls = new clsDbSqlResultControls(page, config, m_dbMgr, szDbName, szTable);
             ctrls.textBox.Text = szQuery;
             ctrls.dataGridView.DataSource = data;
+
+            if (data.Rows.Count == 0)
+            {
+                MessageBox.Show($"Cannot fine any data in the table [{szTable}]");
+                ctrls.dataGridView.Rows.Add();
+            }
         }
 
         void fnDbShowSqlQuery(clsfnDb.stDbConfig config, string szDbName)
@@ -1966,42 +1976,88 @@ namespace Alien
 
         #endregion
 
-        private void fnLoadAllPlugins(string szCurrentDir, TreeNodeCollection currentNodes)
+        private async Task<int> fnLoadAllPlugins(string szCurrentDir, TreeNodeCollection currentNodes, string szFilter = "")
         {
+            int nPluginCount = 0;
+
             try
             {
-                string[] aszSubDirs = Directory.GetDirectories(szCurrentDir);
+                string[] aszSubDirs = await Task.Run(() => Directory.GetDirectories(szCurrentDir));
 
                 foreach (string szDirName in aszSubDirs)
                 {
                     string szFolderName = Path.GetFileName(szDirName);
                     TreeNode nodeDir = new TreeNode(szFolderName);
 
-                    var manifest = m_plugin.fnLoadPluginManifest(szDirName);
+                    var manifest = await Task.Run(() => m_plugin.fnLoadPluginManifest(szDirName));
+                    bool bAddNode = false;
+                    bool bIsPlugin = false;
 
                     if (manifest != null && manifest.HasValue)
                     {
-                        currentNodes.Add(nodeDir);
-                        continue;
-                    }
+                        var info = manifest.Value;
 
-                    string szIndexPath = Path.Combine(szDirName, "index.html");
-                    if (File.Exists(szIndexPath))
+                        if (toolStripComboBox1.SelectedIndex == 0 && !info.lsEnvironment.Contains(m_plugin.m_szEnvironment))
+                        {
+                            bAddNode = false;
+                        }
+                        else
+                        {
+                            bAddNode = true;
+                            bIsPlugin = true;
+                        }
+                    }
+                    else
                     {
-
+                        string szIndexPath = Path.Combine(szDirName, "index.html");
+                        bool bFileExists = await Task.Run(() => File.Exists(szIndexPath));
+                        if (bFileExists)
+                        {
+                            bAddNode = true;
+                        }
                     }
 
-                    fnLoadAllPlugins(szDirName, nodeDir.Nodes);
+                    if (bAddNode && !string.IsNullOrEmpty(szFilter))
+                    {
+                        if (szFolderName.IndexOf(szFilter, StringComparison.OrdinalIgnoreCase) < 0)
+                        {
+                            bAddNode = false;
+                            bIsPlugin = false;
+                        }
+                    }
 
-                    currentNodes.Add(nodeDir);
+                    if (bAddNode)
+                    {
+                        nPluginCount++;
+                    }
+
+                    if (bIsPlugin)
+                    {
+                        nodeDir.ImageKey = "sword";
+                        nodeDir.SelectedImageKey = "sword";
+                    }
+                    else
+                    {
+                        nodeDir.ImageKey = "folder";
+                        nodeDir.SelectedImageKey = "folder";
+                    }
+
+                    int nSubCount = await fnLoadAllPlugins(szDirName, nodeDir.Nodes, szFilter);
+                    nPluginCount += nSubCount;
+
+                    if (bAddNode || nodeDir.Nodes.Count > 0)
+                    {
+                        currentNodes.Add(nodeDir);
+                    }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
 
+            return nPluginCount;
+        }
 
         private int fnCountNodes(TreeNode node)
         {
@@ -2036,6 +2092,7 @@ namespace Alien
             // Clear status labels
             toolStripStatusLabel1.Text = string.Empty;
             toolStripStatusLabel2.Text = string.Empty;
+            toolStripStatusLabel4.Text = "Loading...";
             toolStripStatusLabel5.Text = string.Empty;
             toolStripStatusLabel6.Text = string.Empty;
             toolStripStatusLabel7.Text = string.Empty;
@@ -2249,6 +2306,16 @@ namespace Alien
                 draggedTab = null;
             };
 
+            // Eval Script
+
+            if (m_dicEvalScript.ContainsKey(m_victim.ShellLanguage))
+            {
+                m_ctrlEvalEditor.Text = m_dicEvalScript[m_victim.ShellLanguage](m_victim.ShellMethod);
+                m_ctrlEvalEditor.Refresh();
+            }
+
+            // Linux / Windows
+
             if (m_victim.m_bUnixLike)
             {
                 // Linux
@@ -2265,6 +2332,8 @@ namespace Alien
 
                 await fnWinUserInit();
                 await fnRegInit();
+
+                toolStripStatusLabel4.Text = "Action successfully.";
             }
 
             // Plugins
@@ -2292,22 +2361,7 @@ namespace Alien
                 string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
                 webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
 
-                treeView1.Nodes.Clear();
-                string szPluginsBaseDir = Path.Combine(Application.StartupPath, "Plugins");
-
-                if (Directory.Exists(szPluginsBaseDir))
-                {
-                    fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes);
-                }
-
-                treeView1.ExpandAll();
-                int nTotalModules = 0;
-                foreach (TreeNode n in treeView1.Nodes)
-                {
-                    nTotalModules += fnCountNodes(n) + 1;
-                }
-
-                toolStripStatusLabel8.Text = $"Module[{nTotalModules}]";
+                toolStripComboBox1.SelectedIndex = 0;
             }
             catch
             {
@@ -2794,7 +2848,7 @@ namespace Alien
         // Database.Reload
         private void toolStripMenuItem19_Click(object sender, EventArgs e)
         {
-
+            fnDbInit();
         }
 
         private async void treeView2_DoubleClick(object sender, EventArgs e)
@@ -3415,19 +3469,8 @@ namespace Alien
 
             var regItem = (clsfnWinReg.stRegItem)item.Tag;
 
-            string szNewName = Interaction.InputBox("Name: ", "Rename", string.Empty).Trim();
-            if (string.IsNullOrEmpty(szNewName))
-            {
-                MessageBox.Show("Value name cannot be null or empty.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            bool bVal = await m_winReg.fnbRenameValue(m_winReg.m_szCurrentPath, regItem.szName, szNewName);
-            if (!bVal)
-            {
-                MessageBox.Show("Cannot delete: " + regItem.szName, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            frmRename f = new frmRename(m_winReg, false, m_winReg.m_szCurrentPath, regItem.szName);
+            f.ShowDialog();
 
             fnRegRefresh();
         }
@@ -3907,45 +3950,60 @@ namespace Alien
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            TreeNode node = treeView1.SelectedNode;
-            if (node == null)
-                return;
-
-            string szDir = Path.Combine(Application.StartupPath, "Plugins", node.FullPath);
-
-            var manifest = m_plugin.fnLoadPluginManifest(szDir);
-            if (manifest == null || !manifest.HasValue)
+            try
             {
+                TreeNode node = treeView1.SelectedNode;
+                if (node == null)
+                    return;
+
+                textBox12.Text = node.FullPath;
+                listView15.Items.Clear();
+
+                node.SelectedImageKey = node.ImageKey;
+
+                string szDir = Path.Combine(Application.StartupPath, "Plugins", node.FullPath);
                 string szIndexPath = Path.Combine(szDir, "index.html");
-                string[] nodes = node.Nodes.Cast<TreeNode>().Select(x => x.Text).ToArray();
 
-                foreach (string szDirName in Directory.GetDirectories(szDir))
+                var manifest = m_plugin.fnLoadPluginManifest(szDir);
+                if (manifest == null || !manifest.HasValue)
                 {
-                    if (nodes.Contains(Path.GetFileName(szDirName)))
-                        continue;
+                    if (!File.Exists(szIndexPath))
+                    {
+                        node.Expand();
+                        return;
+                    }
 
-                    TreeNode nodeDir = new TreeNode(Path.GetFileName(szDirName));
-                    node.Nodes.Add(nodeDir);
+                    node.Expand();
+                    webViewPlugin.CoreWebView2.Navigate(szIndexPath);
+                    return;
                 }
 
                 node.Expand();
 
-                if (!File.Exists(szIndexPath))
-                    return;
+                var plugin = manifest.Value;
 
                 webViewPlugin.CoreWebView2.Navigate(szIndexPath);
 
-                return;
+                var dict = new Dictionary<string, string>
+                {
+                    { "Name", plugin.szPluginName },
+                    { "Version", plugin.szVersion },
+                    { "Author", plugin.szAuthor },
+                    { "Description", plugin.szDescription },
+                };
+
+                foreach (string szKey in dict.Keys)
+                {
+                    ListViewItem item = new ListViewItem(szKey);
+                    item.SubItems.Add(dict[szKey]);
+
+                    listView15.Items.Add(item);
+                }
             }
-
-            node.Expand();
-
-            var plugin = manifest.Value;
-
-            string szHtmlPath = Path.Combine(Application.StartupPath, "Plugins", node.FullPath, "index.html");
-            webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
-
-            textBox12.Text = node.FullPath;
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void toolStripMenuItem48_Click(object sender, EventArgs e)
@@ -4125,6 +4183,100 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void toolStripMenuItem52_Click(object sender, EventArgs e)
+        {
+            treeView2.ExpandAll();
+        }
+
+        private void toolStripMenuItem53_Click(object sender, EventArgs e)
+        {
+            treeView2.CollapseAll();
+        }
+
+        private void toolStripComboBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private async void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            treeView1.Nodes.Clear();
+
+            string szPluginsBaseDir = Path.Combine(Application.StartupPath, "Plugins");
+            int nCount = await fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes);
+
+            treeView1.ExpandAll();
+
+            toolStripStatusLabel8.Text = $"Plugin[{nCount}]";
+        }
+
+        private async void toolStripButton16_Click(object sender, EventArgs e)
+        {
+            treeView1.Nodes.Clear();
+
+            string szPluginsBaseDir = Path.Combine(Application.StartupPath, "Plugins");
+            int nCount = await fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes);
+
+            treeView1.ExpandAll();
+
+            toolStripStatusLabel8.Text = $"Plugin[{nCount}]";
+        }
+
+        private void textBox12_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (string.IsNullOrEmpty(textBox13.Text))
+                {
+                    string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
+                    webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+                }
+            }
+        }
+
+        private async void textBox13_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                treeView1.Nodes.Clear();
+
+                string szPluginsBaseDir = Path.Combine(Application.StartupPath, "Plugins");
+                int nCount = await fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes, textBox12.Text);
+
+                treeView1.ExpandAll();
+
+                toolStripStatusLabel8.Text = $"Plugin[{nCount}]";
+            }
+        }
+
+        private void toolStripMenuItem54_Click(object sender, EventArgs e)
+        {
+            treeView1.ExpandAll();
+        }
+
+        private void toolStripMenuItem55_Click(object sender, EventArgs e)
+        {
+            treeView1.CollapseAll();
+        }
+
+        private void toolStripMenuItem56_Click(object sender, EventArgs e)
+        {
+            List<ListViewItem> items = listView2.SelectedItems.Cast<ListViewItem>().ToList();
+            if (items.Count == 0)
+                return;
+
+            ListViewItem? item = items.FirstOrDefault();
+            if (item == null)
+                return;
+
+            var entry = fnFileGetItemTag(item);
+
+            frmRename f = new frmRename(m_fileMgr, entry.szEntryPath);
+            f.ShowDialog();
+
+            fnFileMgrRefresh();
         }
     }
 }

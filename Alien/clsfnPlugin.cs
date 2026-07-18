@@ -13,6 +13,7 @@ namespace Alien
         private clsWeb m_web { get; init; }
         private clsVictim m_victim { get { return m_web.m_victim; } }
         public string m_szPluginsDir { get; init; }
+        public string m_szEnvironment { get { return Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/"); } }
 
         public clsfnPlugin(clsWeb web, string szDir = "Plugins")
         {

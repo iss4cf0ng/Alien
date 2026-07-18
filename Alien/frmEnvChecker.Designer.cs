@@ -37,46 +37,30 @@
             // 
             // richTextBox1
             // 
-            richTextBox1.Location = new Point(15, 83);
-            richTextBox1.Margin = new Padding(4);
+            resources.ApplyResources(richTextBox1, "richTextBox1");
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(499, 200);
-            richTextBox1.TabIndex = 0;
-            richTextBox1.Text = "";
             // 
             // progressBar1
             // 
-            progressBar1.Location = new Point(15, 291);
-            progressBar1.Margin = new Padding(4);
+            resources.ApplyResources(progressBar1, "progressBar1");
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(499, 35);
-            progressBar1.TabIndex = 3;
             // 
             // pictureBox1
             // 
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(15, 12);
+            resources.ApplyResources(pictureBox1, "pictureBox1");
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(498, 64);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 4;
             pictureBox1.TabStop = false;
             // 
             // frmEnvChecker
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(525, 335);
             Controls.Add(pictureBox1);
             Controls.Add(progressBar1);
             Controls.Add(richTextBox1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            Margin = new Padding(4);
             MaximizeBox = false;
             Name = "frmEnvChecker";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmEnvChecker";
             Load += frmEnvChecker_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);

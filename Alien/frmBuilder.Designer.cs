@@ -58,12 +58,24 @@
             label4 = new Label();
             label3 = new Label();
             comboBox3 = new ComboBox();
+            tabPage3 = new TabPage();
+            textBox6 = new TextBox();
+            label9 = new Label();
+            label8 = new Label();
+            textBox5 = new TextBox();
+            button8 = new Button();
+            richTextBox1 = new RichTextBox();
+            label7 = new Label();
+            comboBox5 = new ComboBox();
+            comboBox4 = new ComboBox();
+            label6 = new Label();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             tabPage2.SuspendLayout();
             groupBox3.SuspendLayout();
+            tabPage3.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -96,6 +108,7 @@
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
             resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -273,6 +286,79 @@
             comboBox3.Name = "comboBox3";
             comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
             // 
+            // tabPage3
+            // 
+            tabPage3.Controls.Add(textBox6);
+            tabPage3.Controls.Add(label9);
+            tabPage3.Controls.Add(label8);
+            tabPage3.Controls.Add(textBox5);
+            tabPage3.Controls.Add(button8);
+            tabPage3.Controls.Add(richTextBox1);
+            tabPage3.Controls.Add(label7);
+            tabPage3.Controls.Add(comboBox5);
+            tabPage3.Controls.Add(comboBox4);
+            tabPage3.Controls.Add(label6);
+            resources.ApplyResources(tabPage3, "tabPage3");
+            tabPage3.Name = "tabPage3";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // textBox6
+            // 
+            resources.ApplyResources(textBox6, "textBox6");
+            textBox6.Name = "textBox6";
+            textBox6.ReadOnly = true;
+            // 
+            // label9
+            // 
+            resources.ApplyResources(label9, "label9");
+            label9.Name = "label9";
+            // 
+            // label8
+            // 
+            resources.ApplyResources(label8, "label8");
+            label8.Name = "label8";
+            // 
+            // textBox5
+            // 
+            resources.ApplyResources(textBox5, "textBox5");
+            textBox5.Name = "textBox5";
+            textBox5.TextChanged += textBox5_TextChanged;
+            // 
+            // button8
+            // 
+            resources.ApplyResources(button8, "button8");
+            button8.Name = "button8";
+            button8.UseVisualStyleBackColor = true;
+            button8.Click += button8_Click;
+            // 
+            // richTextBox1
+            // 
+            resources.ApplyResources(richTextBox1, "richTextBox1");
+            richTextBox1.Name = "richTextBox1";
+            // 
+            // label7
+            // 
+            resources.ApplyResources(label7, "label7");
+            label7.Name = "label7";
+            // 
+            // comboBox5
+            // 
+            comboBox5.FormattingEnabled = true;
+            resources.ApplyResources(comboBox5, "comboBox5");
+            comboBox5.Name = "comboBox5";
+            // 
+            // comboBox4
+            // 
+            comboBox4.FormattingEnabled = true;
+            resources.ApplyResources(comboBox4, "comboBox4");
+            comboBox4.Name = "comboBox4";
+            comboBox4.SelectedIndexChanged += comboBox4_SelectedIndexChanged;
+            // 
+            // label6
+            // 
+            resources.ApplyResources(label6, "label6");
+            label6.Name = "label6";
+            // 
             // frmBuilder
             // 
             resources.ApplyResources(this, "$this");
@@ -290,6 +376,8 @@
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
             groupBox3.ResumeLayout(false);
+            tabPage3.ResumeLayout(false);
+            tabPage3.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -324,5 +412,16 @@
         private Button button6;
         private CheckBox checkBox1;
         private Label label5;
+        private TabPage tabPage3;
+        private RichTextBox richTextBox1;
+        private Label label7;
+        private ComboBox comboBox5;
+        private ComboBox comboBox4;
+        private Label label6;
+        private TextBox textBox6;
+        private Label label9;
+        private Label label8;
+        private TextBox textBox5;
+        private Button button8;
     }
 }
