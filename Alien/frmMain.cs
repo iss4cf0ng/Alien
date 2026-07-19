@@ -125,9 +125,6 @@ namespace Alien
 
         void fnUpdateState()
         {
-            treeView1.Refresh();
-            listView1.Refresh();
-
             Text = $"{m_szName} {m_szVersion} by {m_szAuthor} | Tamper sever: {m_tamper.m_szPyServerUri} | Selected[{listView1.SelectedItems.Count}]";
             toolStripStatusLabel1.Text = $"Shell[{listView1.Items.Count}]";
             toolStripStatusLabel3.Text = "iss4cf0ng/ISSAC";
@@ -135,7 +132,8 @@ namespace Alien
 
         async Task fnSetup()
         {
-            m_tamper = new clsTamper("http://127.0.0.1:8000", "python", "Tamper\\server.py");
+            int nPort = m_iniMgr.ReadInt("General", "Port");
+            m_tamper = new clsTamper($"http://127.0.0.1:{nPort}", "python", "Tamper\\server.py");
             if (new frmEnvChecker(m_tamper).ShowDialog() != DialogResult.OK)
             {
                 Close();
@@ -334,6 +332,7 @@ namespace Alien
             f.ShowDialog();
 
             fnLoadShell();
+            fnLoadGroup();
         }
 
         private void toolStripMenuItem4_Click(object sender, EventArgs e)
@@ -420,6 +419,7 @@ namespace Alien
             f.ShowDialog();
 
             fnLoadShell();
+            fnLoadGroup();
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -545,6 +545,11 @@ namespace Alien
         {
             frmProxy f = new frmProxy();
             f.ShowDialog();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+
         }
     }
 

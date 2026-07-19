@@ -59,12 +59,14 @@
             label3 = new Label();
             comboBox3 = new ComboBox();
             tabPage3 = new TabPage();
+            groupBox4 = new GroupBox();
+            richTextBox2 = new RichTextBox();
+            button9 = new Button();
             textBox6 = new TextBox();
             label9 = new Label();
             label8 = new Label();
             textBox5 = new TextBox();
             button8 = new Button();
-            richTextBox1 = new RichTextBox();
             label7 = new Label();
             comboBox5 = new ComboBox();
             comboBox4 = new ComboBox();
@@ -76,6 +78,7 @@
             tabPage2.SuspendLayout();
             groupBox3.SuspendLayout();
             tabPage3.SuspendLayout();
+            groupBox4.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -288,12 +291,13 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(groupBox4);
+            tabPage3.Controls.Add(button9);
             tabPage3.Controls.Add(textBox6);
             tabPage3.Controls.Add(label9);
             tabPage3.Controls.Add(label8);
             tabPage3.Controls.Add(textBox5);
             tabPage3.Controls.Add(button8);
-            tabPage3.Controls.Add(richTextBox1);
             tabPage3.Controls.Add(label7);
             tabPage3.Controls.Add(comboBox5);
             tabPage3.Controls.Add(comboBox4);
@@ -301,6 +305,27 @@
             resources.ApplyResources(tabPage3, "tabPage3");
             tabPage3.Name = "tabPage3";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(richTextBox2);
+            resources.ApplyResources(groupBox4, "groupBox4");
+            groupBox4.Name = "groupBox4";
+            groupBox4.TabStop = false;
+            // 
+            // richTextBox2
+            // 
+            richTextBox2.BackColor = Color.Black;
+            resources.ApplyResources(richTextBox2, "richTextBox2");
+            richTextBox2.ForeColor = Color.Lime;
+            richTextBox2.Name = "richTextBox2";
+            // 
+            // button9
+            // 
+            resources.ApplyResources(button9, "button9");
+            button9.Name = "button9";
+            button9.UseVisualStyleBackColor = true;
+            button9.Click += button9_Click;
             // 
             // textBox6
             // 
@@ -331,11 +356,6 @@
             button8.UseVisualStyleBackColor = true;
             button8.Click += button8_Click;
             // 
-            // richTextBox1
-            // 
-            resources.ApplyResources(richTextBox1, "richTextBox1");
-            richTextBox1.Name = "richTextBox1";
-            // 
             // label7
             // 
             resources.ApplyResources(label7, "label7");
@@ -346,6 +366,7 @@
             comboBox5.FormattingEnabled = true;
             resources.ApplyResources(comboBox5, "comboBox5");
             comboBox5.Name = "comboBox5";
+            comboBox5.SelectedIndexChanged += comboBox5_SelectedIndexChanged;
             // 
             // comboBox4
             // 
@@ -378,6 +399,7 @@
             groupBox3.ResumeLayout(false);
             tabPage3.ResumeLayout(false);
             tabPage3.PerformLayout();
+            groupBox4.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -413,7 +435,6 @@
         private CheckBox checkBox1;
         private Label label5;
         private TabPage tabPage3;
-        private RichTextBox richTextBox1;
         private Label label7;
         private ComboBox comboBox5;
         private ComboBox comboBox4;
@@ -423,5 +444,8 @@
         private Label label8;
         private TextBox textBox5;
         private Button button8;
+        private Button button9;
+        private RichTextBox richTextBox2;
+        private GroupBox groupBox4;
     }
 }

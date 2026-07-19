@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -80,6 +81,24 @@ namespace Alien
 
         void fnBuildMemoryShell(string szType, string szPayload, string szKey)
         {
+            fnBuildMemoryShell(szType, szPayload, szKey);
+
+            byte[] abBytes = Convert.FromHexString(richTextBox2.Text);
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = szType == "Java" ? "Java Class File (*.class)|*.class" : ".NET DLL File (*.dll)|*.dll";
+            sfd.FileName = "implant_" + szPayload + (szType == "Java" ? ".class" : ".dll");
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllBytes(sfd.FileName, abBytes);
+
+                MessageBox.Show("Saved payload successfully: " + sfd.FileName, "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        void fnShowMemoryShellHex(string szType, string szPayload, string szKey)
+        {
             bool fnbMatchBytes(byte[] abSource, int nIdxStart, byte[] abPattern)
             {
                 for (int i = 0; i < abPattern.Length; i++)
@@ -87,7 +106,6 @@ namespace Alien
                     if (abSource[nIdxStart + i] != abPattern[i])
                         return false;
                 }
-
                 return true;
             }
 
@@ -114,14 +132,8 @@ namespace Alien
 
             if (bPatched)
             {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = szType == "Java" ? "Java Class File (*.class)|*.class" : ".NET DLL File (*.dll)|*.dll";
-                sfd.FileName = "implant." + (szType == "Java" ? "class" : "dll");
-
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    File.WriteAllBytes(sfd.FileName, abBytes);
-                }
+                richTextBox2.Text = Convert.ToHexString(abBytes);
+                richTextBox2.Refresh();
             }
             else
             {
@@ -347,7 +359,16 @@ namespace Alien
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            textBox6.Text = clsCrypto.fnGetMD5Last16(textBox5.Text);
+            try
+            {
+                textBox6.Text = clsCrypto.fnGetMD5Last16(textBox5.Text);
+
+                fnShowMemoryShellHex(comboBox4.Text, comboBox5.Text, textBox6.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
@@ -386,6 +407,34 @@ namespace Alien
             try
             {
                 fnBuildMemoryShell(comboBox4.Text, comboBox5.Text, textBox6.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(textBox6.Text))
+                return;
+
+            try
+            {
+                fnShowMemoryShellHex(comboBox4.Text, comboBox5.Text, textBox6.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Clipboard.SetText(richTextBox2.Text);
+                MessageBox.Show("Set clipboard text successfully.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {

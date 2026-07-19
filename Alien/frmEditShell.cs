@@ -96,9 +96,7 @@ namespace Alien
         {
             //Validate
             if (m_sqlConn == null)
-            {
-                MessageBox.Show("m_sqlConn is NULL.", "NULL", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+                throw new Exception("m_sqlConn is NULL.");
 
             //Controls init
             foreach (string szName in Enum.GetNames(typeof(enLanguage)))
@@ -117,10 +115,13 @@ namespace Alien
 
             // Load groups
 
-            foreach (string szName in m_lsGroupName)
+            var groups = new List<string>() { "_Orphan", };
+            groups.AddRange(m_sqlConn.fnGetGroups());
+
+            foreach (string szName in groups)
                 comboBox6.Items.Add(szName);
 
-            comboBox6.SelectedIndex = 1; // _Orphan
+            comboBox6.SelectedIndex = 0; // _Orphan
 
             string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper\\Obfuscators");
             if (Directory.Exists(szTamperDirPath))
@@ -317,6 +318,16 @@ namespace Alien
             frmEditGroup f = new frmEditGroup(m_sqlConn);
 
             f.ShowDialog();
+
+            comboBox6.Items.Clear();
+
+            var groups = new List<string>() { "_Orphan", };
+            groups.AddRange(m_sqlConn.fnGetGroups());
+
+            foreach (string szName in groups)
+                comboBox6.Items.Add(szName);
+
+            comboBox6.Text = m_sqlConn.fnGetShellConfig(m_stShellConfig.ID).szGroupName;
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)

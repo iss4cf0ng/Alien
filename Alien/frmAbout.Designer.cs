@@ -37,6 +37,8 @@
             // richTextBox1
             // 
             richTextBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            richTextBox1.BackColor = Color.Black;
+            richTextBox1.ForeColor = Color.White;
             richTextBox1.Location = new Point(15, 210);
             richTextBox1.Margin = new Padding(4);
             richTextBox1.Name = "richTextBox1";
@@ -47,6 +49,7 @@
             // pictureBox1
             // 
             pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pictureBox1.BackColor = Color.Black;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.Location = new Point(15, 13);
             pictureBox1.Margin = new Padding(4);

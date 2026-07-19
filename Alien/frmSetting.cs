@@ -30,6 +30,8 @@ namespace Alien
             comboBox1.DataSource = clsLanguage.clsLanguageManager.Languages;
 
             comboBox1.SelectedValue = m_iniMgr.ReadString("General", "Language");
+
+            checkBox1.Checked = m_iniMgr.ReadBool("General", "DoHttpGet");
         }
 
         private void frmSetting_Load(object sender, EventArgs e)
@@ -44,6 +46,8 @@ namespace Alien
             {
                 m_iniMgr.Write("General", "Language", szLanguage);
             }
+
+            m_iniMgr.Write("General", "DoHttpGet", checkBox1.Checked ? "True" : "False");
 
             MessageBox.Show("All the configuration is saved, please restart the application.", "Nice!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

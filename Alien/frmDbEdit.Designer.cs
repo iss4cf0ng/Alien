@@ -45,8 +45,8 @@
             // 
             // comboBox1
             // 
-            comboBox1.FormattingEnabled = true;
             resources.ApplyResources(comboBox1, "comboBox1");
+            comboBox1.FormattingEnabled = true;
             comboBox1.Name = "comboBox1";
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
@@ -98,7 +98,6 @@
             // 
             resources.ApplyResources(textBox4, "textBox4");
             textBox4.Name = "textBox4";
-            textBox4.UseSystemPasswordChar = true;
             textBox4.TextChanged += textBox4_TextChanged;
             // 
             // label5

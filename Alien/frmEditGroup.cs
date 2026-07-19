@@ -35,6 +35,8 @@ namespace Alien
 
                 listView1.Items.Add(item);
             }
+
+            toolStripStatusLabel1.Text = $"Group[{listView1.Items.Count}]";
         }
 
         private void frmEditGroup_Load(object sender, EventArgs e)
