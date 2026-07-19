@@ -117,83 +117,44 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="columnHeader1.Text" xml:space="preserve">
-    <value>Port</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="columnHeader1.Width" type="System.Int32, mscorlib">
-    <value>150</value>
-  </data>
-  <data name="columnHeader2.Text" xml:space="preserve">
-    <value>Service</value>
-  </data>
-  <data name="columnHeader2.Width" type="System.Int32, mscorlib">
-    <value>200</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="listView1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
+  <data name="button1.Text" xml:space="preserve">
+    <value>スキャン</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="listView1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
+  <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>64, 15</value>
   </data>
-  <data name="listView1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>402, 347</value>
+  <data name="textBox1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>99, 12</value>
   </data>
-  <data name="listView1.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
+  <data name="textBox1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>277, 27</value>
   </data>
-  <data name="&gt;&gt;listView1.Name" xml:space="preserve">
-    <value>listView1</value>
+  <data name="textBox2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>99, 45</value>
   </data>
-  <data name="&gt;&gt;listView1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ListView, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="textBox2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>277, 27</value>
   </data>
-  <data name="&gt;&gt;listView1.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>61, 19</value>
   </data>
-  <data name="&gt;&gt;listView1.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="label2.Text" xml:space="preserve">
+    <value>ポート :</value>
   </data>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>9, 19</value>
+  <data name="label3.Location" type="System.Drawing.Point, System.Drawing">
+    <value>17, 80</value>
   </data>
-  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>402, 347</value>
+  <data name="label3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>76, 19</value>
   </data>
-  <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft JhengHei UI, 11.25pt</value>
+  <data name="label3.Text" xml:space="preserve">
+    <value>スレッド :</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
+  <data name="numericUpDown1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>99, 78</value>
   </data>
-  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
-    <value>CenterScreen</value>
-  </data>
-  <data name="$this.Text" xml:space="preserve">
-    <value>frmPortInfo</value>
-  </data>
-  <data name="&gt;&gt;columnHeader1.Name" xml:space="preserve">
-    <value>columnHeader1</value>
-  </data>
-  <data name="&gt;&gt;columnHeader1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ColumnHeader, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;columnHeader2.Name" xml:space="preserve">
-    <value>columnHeader2</value>
-  </data>
-  <data name="&gt;&gt;columnHeader2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ColumnHeader, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>frmPortInfo</value>
-  </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="numericUpDown1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>277, 27</value>
   </data>
 </root>

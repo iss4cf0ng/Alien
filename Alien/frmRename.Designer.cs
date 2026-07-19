@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRename));
             label1 = new Label();
             textBox1 = new TextBox();
             button1 = new Button();
@@ -35,45 +36,31 @@
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 9);
+            resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
-            label1.Size = new Size(58, 19);
-            label1.TabIndex = 0;
-            label1.Text = "Name :";
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(76, 6);
+            resources.ApplyResources(textBox1, "textBox1");
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(252, 27);
-            textBox1.TabIndex = 1;
             // 
             // button1
             // 
-            button1.Location = new Point(12, 39);
+            resources.ApplyResources(button1, "button1");
             button1.Name = "button1";
-            button1.Size = new Size(316, 50);
-            button1.TabIndex = 2;
-            button1.Text = "Rename";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // frmRename
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(342, 94);
             Controls.Add(button1);
             Controls.Add(textBox1);
             Controls.Add(label1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            Margin = new Padding(4);
             MaximizeBox = false;
             Name = "frmRename";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmFileRename";
             Load += frmRename_Load;
             ResumeLayout(false);
             PerformLayout();

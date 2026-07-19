@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRegEditMultiString));
             label1 = new Label();
             textBox1 = new TextBox();
             textBox2 = new TextBox();
@@ -38,77 +39,51 @@
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 9);
+            resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
-            label1.Size = new Size(58, 19);
-            label1.TabIndex = 0;
-            label1.Text = "Name :";
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(12, 31);
+            resources.ApplyResources(textBox1, "textBox1");
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(445, 27);
-            textBox1.TabIndex = 1;
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(12, 106);
-            textBox2.Multiline = true;
+            resources.ApplyResources(textBox2, "textBox2");
             textBox2.Name = "textBox2";
-            textBox2.ScrollBars = ScrollBars.Both;
-            textBox2.Size = new Size(445, 201);
-            textBox2.TabIndex = 3;
-            textBox2.WordWrap = false;
             // 
             // label2
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(12, 84);
+            resources.ApplyResources(label2, "label2");
             label2.Name = "label2";
-            label2.Size = new Size(55, 19);
-            label2.TabIndex = 2;
-            label2.Text = "Value :";
             // 
             // button1
             // 
-            button1.Location = new Point(12, 313);
+            resources.ApplyResources(button1, "button1");
             button1.Name = "button1";
-            button1.Size = new Size(211, 49);
-            button1.TabIndex = 4;
-            button1.Text = "Save";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // button2
             // 
-            button2.Location = new Point(246, 313);
+            resources.ApplyResources(button2, "button2");
             button2.Name = "button2";
-            button2.Size = new Size(211, 49);
-            button2.TabIndex = 5;
-            button2.Text = "Cancel";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
             // frmRegEditMultiString
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(471, 371);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(textBox2);
             Controls.Add(label2);
             Controls.Add(textBox1);
             Controls.Add(label1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            Margin = new Padding(4);
             MaximizeBox = false;
             Name = "frmRegEditMultiString";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmRegEditMultiString";
             Load += frmRegEditMultiString_Load;
             ResumeLayout(false);
             PerformLayout();

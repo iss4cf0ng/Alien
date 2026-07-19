@@ -46,110 +46,81 @@
             // 
             // toolStrip1
             // 
-            toolStrip1.Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            resources.ApplyResources(toolStrip1, "toolStrip1");
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1 });
-            toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(935, 26);
-            toolStrip1.TabIndex = 0;
-            toolStrip1.Text = "toolStrip1";
             // 
             // toolStripDropDownButton1
             // 
             toolStripDropDownButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
             toolStripDropDownButton1.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem1, toolStripMenuItem4 });
-            toolStripDropDownButton1.Image = (Image)resources.GetObject("toolStripDropDownButton1.Image");
-            toolStripDropDownButton1.ImageTransparentColor = Color.Magenta;
+            resources.ApplyResources(toolStripDropDownButton1, "toolStripDropDownButton1");
             toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            toolStripDropDownButton1.Size = new Size(46, 23);
-            toolStripDropDownButton1.Text = "File";
             // 
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem2, toolStripMenuItem3 });
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(180, 24);
-            toolStripMenuItem1.Text = "Save";
+            resources.ApplyResources(toolStripMenuItem1, "toolStripMenuItem1");
             // 
             // toolStripMenuItem2
             // 
             toolStripMenuItem2.Name = "toolStripMenuItem2";
-            toolStripMenuItem2.Size = new Size(132, 24);
-            toolStripMenuItem2.Text = "Remote";
+            resources.ApplyResources(toolStripMenuItem2, "toolStripMenuItem2");
             toolStripMenuItem2.Click += toolStripMenuItem2_Click;
             // 
             // toolStripMenuItem3
             // 
             toolStripMenuItem3.Name = "toolStripMenuItem3";
-            toolStripMenuItem3.Size = new Size(132, 24);
-            toolStripMenuItem3.Text = "Local";
+            resources.ApplyResources(toolStripMenuItem3, "toolStripMenuItem3");
             toolStripMenuItem3.Click += toolStripMenuItem3_Click;
             // 
             // toolStripMenuItem4
             // 
             toolStripMenuItem4.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem5, toolStripMenuItem6 });
             toolStripMenuItem4.Name = "toolStripMenuItem4";
-            toolStripMenuItem4.Size = new Size(180, 24);
-            toolStripMenuItem4.Text = "Save All";
+            resources.ApplyResources(toolStripMenuItem4, "toolStripMenuItem4");
             // 
             // toolStripMenuItem5
             // 
             toolStripMenuItem5.Name = "toolStripMenuItem5";
-            toolStripMenuItem5.Size = new Size(180, 24);
-            toolStripMenuItem5.Text = "Local";
+            resources.ApplyResources(toolStripMenuItem5, "toolStripMenuItem5");
             toolStripMenuItem5.Click += toolStripMenuItem5_Click;
             // 
             // toolStripMenuItem6
             // 
             toolStripMenuItem6.Name = "toolStripMenuItem6";
-            toolStripMenuItem6.Size = new Size(180, 24);
-            toolStripMenuItem6.Text = "Remote";
+            resources.ApplyResources(toolStripMenuItem6, "toolStripMenuItem6");
             toolStripMenuItem6.Click += toolStripMenuItem6_Click;
             // 
             // tabControl1
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
-            tabControl1.Dock = DockStyle.Fill;
-            tabControl1.Location = new Point(0, 26);
+            resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(935, 452);
-            tabControl1.TabIndex = 1;
             tabControl1.KeyDown += tabControl1_KeyDown;
             // 
             // tabPage1
             // 
-            tabPage1.Location = new Point(4, 28);
+            resources.ApplyResources(tabPage1, "tabPage1");
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(927, 420);
-            tabPage1.TabIndex = 0;
-            tabPage1.Text = "tabPage1";
             tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
-            tabPage2.Location = new Point(4, 24);
+            resources.ApplyResources(tabPage2, "tabPage2");
             tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(927, 424);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "tabPage2";
             tabPage2.UseVisualStyleBackColor = true;
             // 
             // frmFileHexEditor
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(935, 478);
             Controls.Add(tabControl1);
             Controls.Add(toolStrip1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            Margin = new Padding(4);
             Name = "frmFileHexEditor";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmFileHexEditor";
             Load += frmFileHexEditor_Load;
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();

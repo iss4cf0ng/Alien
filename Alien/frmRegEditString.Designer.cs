@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRegEditString));
             label1 = new Label();
             textBox1 = new TextBox();
             button1 = new Button();
@@ -38,78 +39,51 @@
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(13, 9);
-            label1.Margin = new Padding(4, 0, 4, 0);
+            resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
-            label1.Size = new Size(58, 19);
-            label1.TabIndex = 0;
-            label1.Text = "Name :";
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(13, 32);
-            textBox1.Margin = new Padding(4);
+            resources.ApplyResources(textBox1, "textBox1");
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(383, 27);
-            textBox1.TabIndex = 1;
             // 
             // button1
             // 
-            button1.Location = new Point(13, 136);
+            resources.ApplyResources(button1, "button1");
             button1.Name = "button1";
-            button1.Size = new Size(178, 43);
-            button1.TabIndex = 2;
-            button1.Text = "Save";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // button2
             // 
-            button2.Location = new Point(218, 136);
+            resources.ApplyResources(button2, "button2");
             button2.Name = "button2";
-            button2.Size = new Size(178, 43);
-            button2.TabIndex = 3;
-            button2.Text = "Cancel";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(13, 102);
-            textBox2.Margin = new Padding(4);
+            resources.ApplyResources(textBox2, "textBox2");
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(383, 27);
-            textBox2.TabIndex = 5;
             // 
             // label2
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(13, 79);
-            label2.Margin = new Padding(4, 0, 4, 0);
+            resources.ApplyResources(label2, "label2");
             label2.Name = "label2";
-            label2.Size = new Size(55, 19);
-            label2.TabIndex = 4;
-            label2.Text = "Value :";
             // 
             // frmRegEditString
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(411, 192);
             Controls.Add(textBox2);
             Controls.Add(label2);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(textBox1);
             Controls.Add(label1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            Margin = new Padding(4);
             MaximizeBox = false;
             Name = "frmRegEditString";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmRegEditString";
             Load += frmRegEditString_Load;
             ResumeLayout(false);
             PerformLayout();

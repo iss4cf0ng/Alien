@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmFileDateTime));
             label1 = new Label();
             label2 = new Label();
             dateTimePicker1 = new DateTimePicker();
@@ -37,64 +38,44 @@
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 18);
+            resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
-            label1.Size = new Size(79, 19);
-            label1.TabIndex = 0;
-            label1.Text = "Datetime :";
             // 
             // label2
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(44, 48);
+            resources.ApplyResources(label2, "label2");
             label2.Name = "label2";
-            label2.Size = new Size(47, 19);
-            label2.TabIndex = 1;
-            label2.Text = "Unix :";
             // 
             // dateTimePicker1
             // 
-            dateTimePicker1.Location = new Point(97, 12);
+            resources.ApplyResources(dateTimePicker1, "dateTimePicker1");
             dateTimePicker1.Name = "dateTimePicker1";
-            dateTimePicker1.Size = new Size(287, 27);
-            dateTimePicker1.TabIndex = 2;
             dateTimePicker1.ValueChanged += dateTimePicker1_ValueChanged;
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(97, 45);
+            resources.ApplyResources(textBox1, "textBox1");
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(287, 27);
-            textBox1.TabIndex = 3;
             // 
             // button1
             // 
-            button1.Location = new Point(12, 78);
+            resources.ApplyResources(button1, "button1");
             button1.Name = "button1";
-            button1.Size = new Size(372, 51);
-            button1.TabIndex = 4;
-            button1.Text = "Save";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // frmFileDateTime
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(394, 139);
             Controls.Add(button1);
             Controls.Add(textBox1);
             Controls.Add(dateTimePicker1);
             Controls.Add(label2);
             Controls.Add(label1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            Margin = new Padding(4);
             MaximizeBox = false;
             Name = "frmFileDateTime";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmFileDateTime";
             Load += frmFileDateTime_Load;
             ResumeLayout(false);
             PerformLayout();

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPortInfo));
             listView1 = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -36,36 +37,26 @@
             // listView1
             // 
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
-            listView1.Dock = DockStyle.Fill;
+            resources.ApplyResources(listView1, "listView1");
             listView1.FullRowSelect = true;
-            listView1.Location = new Point(0, 0);
             listView1.Name = "listView1";
-            listView1.Size = new Size(402, 347);
-            listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
             // 
             // columnHeader1
             // 
-            columnHeader1.Text = "Port";
-            columnHeader1.Width = 150;
+            resources.ApplyResources(columnHeader1, "columnHeader1");
             // 
             // columnHeader2
             // 
-            columnHeader2.Text = "Service";
-            columnHeader2.Width = 200;
+            resources.ApplyResources(columnHeader2, "columnHeader2");
             // 
             // frmPortInfo
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(402, 347);
             Controls.Add(listView1);
-            Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            Margin = new Padding(4, 4, 4, 4);
             Name = "frmPortInfo";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "frmPortInfo";
             Load += frmPortInfo_Load;
             ResumeLayout(false);
         }
