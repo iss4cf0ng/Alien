@@ -133,9 +133,6 @@
   <data name="button1.Text" xml:space="preserve">
     <value>儲存</value>
   </data>
-  <data name="tabPage1.Text" xml:space="preserve">
-    <value>事件視界</value>
-  </data>
   <data name="button5.Text" xml:space="preserve">
     <value>-&gt; 解密 -&gt;</value>
   </data>
@@ -160,14 +157,11 @@
   <data name="groupBox1.Text" xml:space="preserve">
     <value>參數 (JSON)</value>
   </data>
-  <data name="tabPage2.Text" xml:space="preserve">
-    <value>星雲脈衝星</value>
-  </data>
   <data name="checkBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>73, 23</value>
+    <value>104, 23</value>
   </data>
   <data name="checkBox1.Text" xml:space="preserve">
-    <value>最小化</value>
+    <value>去除 CR/LF</value>
   </data>
   <data name="button7.Text" xml:space="preserve">
     <value>儲存</value>
@@ -192,5 +186,32 @@
   </data>
   <data name="label3.Text" xml:space="preserve">
     <value>語言 :</value>
+  </data>
+  <data name="tabPage3.Text" xml:space="preserve">
+    <value>內存馬</value>
+  </data>
+  <data name="button9.Text" xml:space="preserve">
+    <value>複製 Hex</value>
+  </data>
+  <data name="label8.Location" type="System.Drawing.Point, System.Drawing">
+    <value>76, 42</value>
+  </data>
+  <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>金鑰 :</value>
+  </data>
+  <data name="button8.Text" xml:space="preserve">
+    <value>生成</value>
+  </data>
+  <data name="label6.Location" type="System.Drawing.Point, System.Drawing">
+    <value>76, 9</value>
+  </data>
+  <data name="label6.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label6.Text" xml:space="preserve">
+    <value>類型 :</value>
   </data>
 </root>

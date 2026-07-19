@@ -88,8 +88,8 @@
             // 
             // comboBox1
             // 
-            comboBox1.FormattingEnabled = true;
             resources.ApplyResources(comboBox1, "comboBox1");
+            comboBox1.FormattingEnabled = true;
             comboBox1.Name = "comboBox1";
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
@@ -109,16 +109,17 @@
             // 
             // tabControl1
             // 
+            resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
             tabControl1.Controls.Add(tabPage3);
-            resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
             tabControl1.SizeMode = TabSizeMode.Fixed;
             // 
             // tabPage1
             // 
+            resources.ApplyResources(tabPage1, "tabPage1");
             tabPage1.Controls.Add(textBox3);
             tabPage1.Controls.Add(textBox2);
             tabPage1.Controls.Add(button5);
@@ -133,7 +134,6 @@
             tabPage1.Controls.Add(button1);
             tabPage1.Controls.Add(label1);
             tabPage1.Controls.Add(comboBox1);
-            resources.ApplyResources(tabPage1, "tabPage1");
             tabPage1.Name = "tabPage1";
             tabPage1.UseVisualStyleBackColor = true;
             // 
@@ -187,15 +187,15 @@
             // 
             // comboBox2
             // 
-            comboBox2.FormattingEnabled = true;
             resources.ApplyResources(comboBox2, "comboBox2");
+            comboBox2.FormattingEnabled = true;
             comboBox2.Name = "comboBox2";
             comboBox2.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
             // 
             // groupBox2
             // 
-            groupBox2.Controls.Add(textEditorControl2);
             resources.ApplyResources(groupBox2, "groupBox2");
+            groupBox2.Controls.Add(textEditorControl2);
             groupBox2.Name = "groupBox2";
             groupBox2.TabStop = false;
             // 
@@ -207,13 +207,14 @@
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(textEditorControl1);
             resources.ApplyResources(groupBox1, "groupBox1");
+            groupBox1.Controls.Add(textEditorControl1);
             groupBox1.Name = "groupBox1";
             groupBox1.TabStop = false;
             // 
             // tabPage2
             // 
+            resources.ApplyResources(tabPage2, "tabPage2");
             tabPage2.Controls.Add(label5);
             tabPage2.Controls.Add(checkBox1);
             tabPage2.Controls.Add(groupBox3);
@@ -223,7 +224,6 @@
             tabPage2.Controls.Add(label4);
             tabPage2.Controls.Add(label3);
             tabPage2.Controls.Add(comboBox3);
-            resources.ApplyResources(tabPage2, "tabPage2");
             tabPage2.Name = "tabPage2";
             tabPage2.UseVisualStyleBackColor = true;
             // 
@@ -241,8 +241,8 @@
             // 
             // groupBox3
             // 
-            groupBox3.Controls.Add(textEditorControl3);
             resources.ApplyResources(groupBox3, "groupBox3");
+            groupBox3.Controls.Add(textEditorControl3);
             groupBox3.Name = "groupBox3";
             groupBox3.TabStop = false;
             // 
@@ -284,13 +284,14 @@
             // 
             // comboBox3
             // 
-            comboBox3.FormattingEnabled = true;
             resources.ApplyResources(comboBox3, "comboBox3");
+            comboBox3.FormattingEnabled = true;
             comboBox3.Name = "comboBox3";
             comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
             // 
             // tabPage3
             // 
+            resources.ApplyResources(tabPage3, "tabPage3");
             tabPage3.Controls.Add(groupBox4);
             tabPage3.Controls.Add(button9);
             tabPage3.Controls.Add(textBox6);
@@ -302,21 +303,20 @@
             tabPage3.Controls.Add(comboBox5);
             tabPage3.Controls.Add(comboBox4);
             tabPage3.Controls.Add(label6);
-            resources.ApplyResources(tabPage3, "tabPage3");
             tabPage3.Name = "tabPage3";
             tabPage3.UseVisualStyleBackColor = true;
             // 
             // groupBox4
             // 
-            groupBox4.Controls.Add(richTextBox2);
             resources.ApplyResources(groupBox4, "groupBox4");
+            groupBox4.Controls.Add(richTextBox2);
             groupBox4.Name = "groupBox4";
             groupBox4.TabStop = false;
             // 
             // richTextBox2
             // 
-            richTextBox2.BackColor = Color.Black;
             resources.ApplyResources(richTextBox2, "richTextBox2");
+            richTextBox2.BackColor = Color.Black;
             richTextBox2.ForeColor = Color.Lime;
             richTextBox2.Name = "richTextBox2";
             // 
@@ -363,15 +363,15 @@
             // 
             // comboBox5
             // 
-            comboBox5.FormattingEnabled = true;
             resources.ApplyResources(comboBox5, "comboBox5");
+            comboBox5.FormattingEnabled = true;
             comboBox5.Name = "comboBox5";
             comboBox5.SelectedIndexChanged += comboBox5_SelectedIndexChanged;
             // 
             // comboBox4
             // 
-            comboBox4.FormattingEnabled = true;
             resources.ApplyResources(comboBox4, "comboBox4");
+            comboBox4.FormattingEnabled = true;
             comboBox4.Name = "comboBox4";
             comboBox4.SelectedIndexChanged += comboBox4_SelectedIndexChanged;
             // 
