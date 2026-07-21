@@ -67,6 +67,7 @@
             Controls.Add(pictureBox1);
             Controls.Add(richTextBox1);
             Font = new Font("Microsoft JhengHei UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             Name = "frmAbout";
             StartPosition = FormStartPosition.CenterScreen;

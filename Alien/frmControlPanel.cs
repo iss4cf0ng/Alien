@@ -1104,9 +1104,9 @@ namespace Alien
                 ListViewItem item = new ListViewItem(entry.szEntryName);
                 item.SubItems.Add(entry.szPriviledge);
                 item.SubItems.Add(entry.nSize.ToString());
-                item.SubItems.Add(entry.dtCreationDate.ToString("F"));
-                item.SubItems.Add(entry.dtLastModifiedDate.ToString("F"));
-                item.SubItems.Add(entry.dtLastAccessedDate.ToString("F"));
+                item.SubItems.Add(entry.dtCreationDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+                item.SubItems.Add(entry.dtLastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+                item.SubItems.Add(entry.dtLastAccessedDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
 
                 string szExtension = entry.szEntryName.Split('.').Last();
                 if (!entry.bIsDirectory)
@@ -2971,9 +2971,9 @@ namespace Alien
 
                     item.SubItems.Add(entry.szEntryPath);
                     item.SubItems.Add(entry.szPriviledge);
-                    item.SubItems.Add(entry.dtCreationDate.ToString("F"));
-                    item.SubItems.Add(entry.dtLastModifiedDate.ToString("F"));
-                    item.SubItems.Add(entry.dtLastAccessedDate.ToString("F"));
+                    item.SubItems.Add(entry.dtCreationDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+                    item.SubItems.Add(entry.dtLastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+                    item.SubItems.Add(entry.dtLastAccessedDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
 
                     listView1.Items.Add(item);
                 }

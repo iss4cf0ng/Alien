@@ -18,13 +18,15 @@ namespace Alien
         /// </summary>
 
         private clsTamper m_tamper { get; init; }
+        private clsIniManager m_iniMgr { get; init; }
 
-        public frmEnvChecker(clsTamper tamper)
+        public frmEnvChecker(clsTamper tamper, clsIniManager iniMgr)
         {
             InitializeComponent();
 
             Text = "Checking Your Environment...";
             m_tamper = tamper;
+            m_iniMgr = iniMgr;
         }
 
         void fnAddLog(string szMsg)
@@ -112,6 +114,8 @@ namespace Alien
 
             fnAddLog("=> OK");
             progressBar1.Increment(1);
+
+            fnAddLog("Language => " + m_iniMgr.ReadString("General", "Language"));
 
             fnAddLog("Starting the tamper script server...");
 

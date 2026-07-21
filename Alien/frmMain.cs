@@ -134,7 +134,7 @@ namespace Alien
         {
             int nPort = m_iniMgr.ReadInt("General", "Port");
             m_tamper = new clsTamper($"http://127.0.0.1:{nPort}", "python", "Tamper\\server.py");
-            if (new frmEnvChecker(m_tamper).ShowDialog() != DialogResult.OK)
+            if (new frmEnvChecker(m_tamper, m_iniMgr).ShowDialog() != DialogResult.OK)
             {
                 Close();
                 return;

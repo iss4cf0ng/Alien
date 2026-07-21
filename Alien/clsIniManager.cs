@@ -8,7 +8,7 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace Alien
 {
-    internal sealed class clsIniManager
+    public sealed class clsIniManager
     {
         private readonly string m_szPath;
         private readonly Dictionary<string, Dictionary<string, string>> m_dicData = new(StringComparer.OrdinalIgnoreCase);
