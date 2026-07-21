@@ -23,7 +23,7 @@ It provides a unified architecture for managing multiple types of webshells thro
 | Script | Server | Execution Method | Payload Type |
 | --- | --- | --- | --- |
 | PHP | Linux/Windows | v5.X, v7.X | OneShell |
-| | | v8.X | OneShell, ECDH(Elliptic Curve Diffie-Hellman) |
+| | | v8.X | OneShell, ECDH (Elliptic Curve Diffie-Hellman) |
 | ASP | Windows | Classic | OneShell |
 | ASPX, ASHX, ASMX | Linux/Windows | JScript | OneShell |
 | | | NebulaPulsar | DarkMatter |
