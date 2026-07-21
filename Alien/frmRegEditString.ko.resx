@@ -119,21 +119,21 @@
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>46, 19</value>
+    <value>38, 19</value>
   </data>
   <data name="label1.Text" xml:space="preserve">
-    <value>名称 :</value>
-  </data>
-  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>46, 19</value>
-  </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>数据 :</value>
+    <value>이름 :</value>
   </data>
   <data name="button1.Text" xml:space="preserve">
-    <value>保存</value>
+    <value>저장</value>
   </data>
   <data name="button2.Text" xml:space="preserve">
-    <value>取消</value>
+    <value>취소</value>
+  </data>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>27, 19</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>값 :</value>
   </data>
 </root>

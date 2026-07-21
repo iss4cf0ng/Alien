@@ -26,6 +26,8 @@ class BridgeRequestHandler(BaseHTTPRequestHandler):
             action = 'example'
         elif self.path == '/available':
             action = 'available'
+        elif self.path == '/help':
+            action = 'help'
         else:
             action = None
         

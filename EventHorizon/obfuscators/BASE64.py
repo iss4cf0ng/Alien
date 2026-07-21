@@ -8,6 +8,8 @@ PARAM_SCHEM = {
     "encoding" : "utf-8"
 }
 
+HELP = 'Obfuscate the payload with Base64.'
+
 dicObfuscator = {
     'PHP' : textwrap.dedent('''
         function Encrypt($data) {
@@ -210,6 +212,9 @@ dicPayload = {
         eval $code;
         ''').strip()
 }
+
+def help(payload, **kwargs):
+    return HELP
 
 def obfuscator(payload, script, key=None, **kwargs):
     if script in dicObfuscator.keys():

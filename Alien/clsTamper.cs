@@ -245,6 +245,11 @@ namespace Alien
             return await fnSendRequest("obfuscator", szScriptName, string.Empty, dicParam);
         }
 
+        public async Task<string?> fnGetHelp(string szScriptName)
+        {
+            return await fnSendRequest("help", szScriptName, string.Empty, new Dictionary<string, object>());
+        }
+
         /// <summary>
         /// Get available scripts from a specified tamper script.
         /// </summary>

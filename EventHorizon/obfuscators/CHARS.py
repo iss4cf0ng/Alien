@@ -9,6 +9,8 @@ PARAM_SCHEM = {
     "encoding" : "utf-8"
 }
 
+HELP = 'Substituting chars (please set Encoding to UTF-8)'
+
 B64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
 CHAOS_CHARS  = "가나다라마바사아자차카타파하거너더러머버서어저처커허고노도로모보소초코토포호구누두루放佛梵ॐ卐符密玄靈神鬼魂魄陰陽乾坤震巽坎離兌卍"
 
@@ -142,6 +144,9 @@ def _xor_crypt(data: bytes, key: bytes) -> bytes:
     for i, byte in enumerate(data):
         out.append(byte ^ key[i % key_len])
     return bytes(out)
+
+def help(payload, **kwargs):
+    return HELP
 
 def obfuscator(payload, script, key, **kwargs):
     if script in dicObfuscator.keys():

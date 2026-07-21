@@ -9,6 +9,8 @@ PARAM_SCHEM = {
     "encoding" : "utf-8"
 }
 
+HELP = 'Obfuscate the payload with RC4.'
+
 dicObfuscator = {
     'PHP' : textwrap.dedent('''
         function Encrypt($data) {
@@ -543,6 +545,9 @@ def _rc4_crypt(data: bytes, key: bytes) -> bytes:
         out.append(byte ^ S[t])
         
     return bytes(out)
+
+def help(payload, **kwargs):
+    return HELP
 
 def obfuscator(payload, script, key, **kwargs):
     if script in dicObfuscator.keys():

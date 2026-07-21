@@ -122,18 +122,18 @@
     <value>46, 19</value>
   </data>
   <data name="label1.Text" xml:space="preserve">
-    <value>名称 :</value>
-  </data>
-  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>46, 19</value>
-  </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>数据 :</value>
+    <value>名稱 :</value>
   </data>
   <data name="button1.Text" xml:space="preserve">
-    <value>保存</value>
+    <value>儲存</value>
   </data>
   <data name="button2.Text" xml:space="preserve">
     <value>取消</value>
+  </data>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>31, 19</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>值 :</value>
   </data>
 </root>

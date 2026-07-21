@@ -285,15 +285,39 @@ namespace Alien
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             if (tabControl1.SelectedIndex == 0)
+            {
+                MessageBox.Show("Invalid page.", "NO", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
+            }
 
-
+            //Save image in selected page.
+            try
+            {
+                PictureBox pb = (PictureBox)tabControl1.SelectedTab.Controls[0];
+                SaveFileDialog sfd = new SaveFileDialog();
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    pb.Image.Save(sfd.FileName);
+                    MessageBox.Show("Action successfully.", "OK", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         // Save All
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            
+            try
+            {
+                fnSaveImage(listView1.SelectedItems.Cast<ListViewItem>().ToList());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         // Open Folder

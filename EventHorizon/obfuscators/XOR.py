@@ -9,6 +9,8 @@ PARAM_SCHEM = {
     "encoding" : "utf-8"
 }
 
+HELP = 'Obfuscate the payload with XOR.'
+
 dicObfuscator = {
     'PHP' : textwrap.dedent('''
         function Encrypt($data) {
@@ -372,6 +374,9 @@ def _xor_crypt(data: bytes, key: bytes) -> bytes:
         out.append(byte ^ key[i % key_len])
     return bytes(out)
 
+def help(payload, **kwargs):
+    return HELP
+
 def obfuscator(payload, script, key, **kwargs):
     if script in dicObfuscator.keys():
         return dicObfuscator[script].replace('[XOR_KEY]', key)
@@ -401,7 +406,6 @@ def obfuscate(payload, encoding='utf-8', key="secret", **kwargs):
     data_bytes = payload.encode(encoding)
     key_bytes = key.encode(encoding)
     
-    # 進行 XOR
     out = bytearray()
     key_len = len(key_bytes)
     for i, byte in enumerate(data_bytes):

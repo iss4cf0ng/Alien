@@ -375,6 +375,12 @@ namespace Alien
 
             textEditorControl1.Text = szJson;
             textEditorControl1.Refresh();
+
+            string? szHelp = await m_tamper.fnGetHelp(szScriptName);
+            if (string.IsNullOrEmpty(szHelp))
+                return;
+
+            richTextBox1.Text = szHelp;
         }
 
         private void button4_Click(object sender, EventArgs e)

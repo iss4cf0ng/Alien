@@ -292,26 +292,7 @@ namespace Alien
             }
         }
 
-        private async void toolStripMenuItem5_Click(object sender, EventArgs e)
-        {
-            foreach (TabPage page in tabControl1.TabPages)
-            {
-                if (page.Tag == null)
-                    continue;
-
-                var file = (stFile)page.Tag;
-                if (file.hexBox.ByteProvider == null)
-                    continue;
-
-                byte[] abData = ((DynamicByteProvider)file.hexBox.ByteProvider).Bytes.ToArray();
-                if (!await m_frmCtrl.m_fileMgr.fnbFileWriteAllBytes(file.szFilePath, abData))
-                    MessageBox.Show("Save file failed: " + file.szFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                page.Text = page.Text.Replace("*", string.Empty);
-            }
-        }
-
-        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() == DialogResult.OK)
@@ -338,6 +319,25 @@ namespace Alien
                         MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 });
+            }
+        }
+
+        private async void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            foreach (TabPage page in tabControl1.TabPages)
+            {
+                if (page.Tag == null)
+                    continue;
+
+                var file = (stFile)page.Tag;
+                if (file.hexBox.ByteProvider == null)
+                    continue;
+
+                byte[] abData = ((DynamicByteProvider)file.hexBox.ByteProvider).Bytes.ToArray();
+                if (!await m_frmCtrl.m_fileMgr.fnbFileWriteAllBytes(file.szFilePath, abData))
+                    MessageBox.Show("Save file failed: " + file.szFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                page.Text = page.Text.Replace("*", string.Empty);
             }
         }
 
