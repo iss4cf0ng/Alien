@@ -75,7 +75,31 @@ namespace Alien
                     if (method == "JScript")
                         return "Response.Write(\"JScript ASPX\");";
                     else if (method == "NebulaPulsar")
-                        return "Response.Write(\"CSharp ASP.NET\");";
+                        return "int a = 1;\r\nint b = 2;\r\nreturn a + b;";
+                    else
+                        return string.Empty;
+                }
+            },
+            {
+                enLanguage.ASHX,
+                (method) =>
+                {
+                    if (method == "JScript")
+                        return "Response.Write(\"JScript ASPX\");";
+                    else if (method == "NebulaPulsar")
+                        return "int a = 1;\r\nint b = 2;\r\nreturn a + b;";
+                    else
+                        return string.Empty;
+                }
+            },
+            {
+                enLanguage.ASMX,
+                (method) =>
+                {
+                    if (method == "JScript")
+                        return "Response.Write(\"JScript ASPX\");";
+                    else if (method == "NebulaPulsar")
+                        return "int a = 1;\r\nint b = 2;\r\nreturn a + b;";
                     else
                         return string.Empty;
                 }
@@ -85,7 +109,39 @@ namespace Alien
                 (method) =>
                 {
                     if (method == "Nashorn")
+                        return "response.getWriter().println(\"Hello here is the test\");";
+                    else if (method == "NebulaPulsar")
+                        return "int a = 1;\r\nint b = 1;\r\nreturn a + b;";
+                    else
                         return string.Empty;
+                }
+            },
+            {
+                enLanguage.CFM,
+                (method) =>
+                {
+                    if (method == "NebulaPulsar")
+                        return "int a = 1;\r\nint b = 1;\r\nreturn a + b;";
+                    else
+                        return string.Empty;
+                }
+            },
+            {
+                enLanguage.Perl,
+                (method) =>
+                {
+                    if (method == "CGI")
+                        return "print(\"Hello here is the test\")";
+                    else
+                        return string.Empty;
+                }
+            },
+            {
+                enLanguage.Ruby,
+                (method) =>
+                {
+                    if (method == "CGI")
+                        return "puts \"Hello here is the test\"";
                     else
                         return string.Empty;
                 }

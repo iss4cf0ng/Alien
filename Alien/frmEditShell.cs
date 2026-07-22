@@ -184,6 +184,12 @@ namespace Alien
         {
             List<string> lsID = listView1.Items.Cast<ListViewItem>().Where(x => x.Tag != null).Select(x => (clsWeb)x.Tag).Select(x => x.m_victim.ShellID).ToList();
 
+            if (!Uri.IsWellFormedUriString(textBox1.Text, UriKind.Absolute))
+            {
+                MessageBox.Show("Invalid URL: " + textBox1.Text, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             stShellConfig config = new stShellConfig()
             {
                 szUrl = textBox1.Text,
@@ -223,6 +229,12 @@ namespace Alien
         private void button2_Click(object sender, EventArgs e)
         {
             List<string> lsID = listView1.Items.Cast<ListViewItem>().Where(x => x.Tag != null).Select(x => (clsWeb)x.Tag).Select(x => x.m_victim.ShellID).ToList();
+
+            if (!Uri.IsWellFormedUriString(textBox1.Text, UriKind.Absolute))
+            {
+                MessageBox.Show("Invalid URL: " + textBox1.Text, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             stShellConfig config = new stShellConfig();
             config.ID = m_bNewShell ? Guid.NewGuid().ToString() : m_stShellConfig.ID;
@@ -296,7 +308,6 @@ namespace Alien
                 comboBox2.SelectedIndex = 0;
             else if (scripts.Contains(szOriginal))
                 comboBox2.Text = szOriginal;
-
         }
 
         private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
