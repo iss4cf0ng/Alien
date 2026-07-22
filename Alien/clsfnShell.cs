@@ -119,5 +119,18 @@ namespace Alien
                 return string.Empty;
             }
         }
+
+        public async Task<string> fnPipeStop()
+        {
+            try
+            {
+                string szResp = await m_web.fnszSendPayload("shell_virtual", new string[] { "stop" });
+                return szResp;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
     }
 }

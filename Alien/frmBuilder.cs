@@ -149,7 +149,7 @@ namespace Alien
 
             label5.Text = string.Empty;
 
-            string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper\\Obfuscators");
+            string szTamperDirPath = Path.Combine(Application.StartupPath, "EventHorizon\\Obfuscators");
             if (Directory.Exists(szTamperDirPath))
             {
                 comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
