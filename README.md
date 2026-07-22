@@ -10,16 +10,6 @@ It provides a unified post-exploitation framework for managing different web tec
 
 Rather than embedding every feature inside the webshell itself, Alien treats webshells as lighteight execution layers. Once arbitrary code execution is obtained, advanced capabilities-including file management, database interaction, virtual shells, SOCKS5 proxying, plugins, and reflective loading, are provided by Alien.
 
-## Project Status
-
-<p align="center">
-    <h1>This tool will be released soon</h1>
-</p>
-
-Alien is a complete redesign of my previous webshell management tool.
-
-The first four generations were developed while I was still learning software engineering, resulting in several architectural and maintainability limitations. Instead of continuing to extend the old codebase, I decided to redesign the framework from scratch with modularity, extensibility, and cross-language compatibility as the primary goals.
-
 # Disclaimer
 
 Alien is developed for cybersecurity research, education, and authorized penetration testing only.
