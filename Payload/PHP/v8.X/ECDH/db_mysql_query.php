@@ -19,6 +19,9 @@ function parseConn($str)
 
 try {
 
+    if (!extension_loaded('mysqli'))
+        throw new Exception('Cannot find module "mysqli"');
+
     $cfg = parseConn($connStr);
 
     $host = $cfg['Server'] ?? $cfg['Host'] ?? 'localhost';

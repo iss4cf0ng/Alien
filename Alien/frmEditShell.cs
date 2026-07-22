@@ -123,7 +123,7 @@ namespace Alien
 
             comboBox6.SelectedIndex = 0; // _Orphan
 
-            string szTamperDirPath = Path.Combine(Application.StartupPath, "Tamper\\Obfuscators");
+            string szTamperDirPath = Path.Combine(Application.StartupPath, "EventHorizon\\Obfuscators");
             if (Directory.Exists(szTamperDirPath))
             {
                 comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;

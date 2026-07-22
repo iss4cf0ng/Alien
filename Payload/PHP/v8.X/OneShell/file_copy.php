@@ -15,7 +15,7 @@ function do_copy($src, $dest) {
             if ($file === '.' || $file === '..')
                 continue;
 
-            if (!do_copy("$source/$file", "$dest/$file")) {
+            if (!do_copy("$src/$file", "$dest/$file")) {
                 return false;
             }
         }
@@ -24,12 +24,12 @@ function do_copy($src, $dest) {
     } else {
         $dir = dirname($dest);
         if (!is_dir($dir)) {
-            if (!mkdir($dir, 0755, true)) {
+            if (!mkdir($dir, 0755, true)) { 
                 return false;
             }
         }
-
-        return do_copy($source, $dest);
+        
+        return copy($src, $dest);
     }
 }
 

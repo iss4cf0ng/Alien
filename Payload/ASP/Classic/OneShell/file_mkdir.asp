@@ -60,7 +60,7 @@ Function Main()
     Dim z0
     z0 = Request.Form("z0")
     If Trim(z0) = "" Then
-        Main = "Failed to create folder. (Missing parameter)"
+        Main = "0|Failed to create folder. (Missing parameter)"
         Exit Function
     End If
 
@@ -71,7 +71,7 @@ Function Main()
     Set fso = Server.CreateObject("Scripting.FileSystemObject")
 
     If fso.FolderExists(dir_name) Then
-        Main = "Folder already exists"
+        Main = "0|Folder already exists"
         Set fso = Nothing
         Exit Function
     End If
@@ -80,9 +80,9 @@ Function Main()
     CreateFolderRecursive fso, dir_name
 
     If Err.Number = 0 Then
-        Main = "Created folder successfully."
+        Main = "1|Created folder successfully."
     Else
-        Main = "Failed to create folder. Error: " & Err.Description
+        Main = "0|Failed to create folder. Error: " & Err.Description
     End If
     
     On Error GoTo 0

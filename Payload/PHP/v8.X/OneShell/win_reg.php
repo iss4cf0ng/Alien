@@ -50,7 +50,7 @@ function registry_value_to_bytes(string $value, string $type): string
         case 'REG_EXPAND_SZ':
         case 'REG_MULTI_SZ':
         default:
-            return iconv("UTF-8", "UTF-16LE", $value . "\0");
+            return $value . "\0";
     }
 }
 

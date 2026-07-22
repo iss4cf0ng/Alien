@@ -1,5 +1,4 @@
 <%
-
 On Error Resume Next
 Server.ScriptTimeout = 900
 
@@ -26,13 +25,12 @@ End Function
 
 Function HasPowerShell()
     Dim output, ret
-    ret = RunCommand("powershell -Command ""Get-Host"" 2>NUL", output)
-    HasPowerShell = (ret = 0)
+    ret = RunCommand("powershell -NoProfile -Command ""$PSVersionTable"" 2>NUL", output)
+    HasPowerShell = (ret = 0 And Not IsEmpty(output))
 End Function
 
-' Escapes control characters, quotes, and backslashes for safe JSON output
 Function CleanJsonValue(v)
-    If IsNull(v) Then
+    If IsNull(v) Or IsEmpty(v) Then
         CleanJsonValue = ""
         Exit Function
     End If
@@ -54,8 +52,8 @@ End Function
 Function ParseWmic(wmicClass)
     Dim output, ret, i, line, parts, k, v
     Dim jsonResult, currentObject, isFirstProp, isFirstObj
-    
-    ret = RunCommand("wmic path " & wmicClass & " get /format:list", output)
+
+    ret = RunCommand("wmic " & wmicClass & " get /format:list 2>NUL", output)
     
     If ret <> 0 Or IsEmpty(output) Then
         ParseWmic = "[]"
@@ -70,7 +68,7 @@ Function ParseWmic(wmicClass)
     For i = 0 To UBound(output)
         line = Trim(output(i))
         line = Replace(line, ChrW(&hFEFF), "") 
-        line = Replace(line, ChrM(&hEFBBBF), "")
+        line = Replace(line, ChrW(&hEFBB), "")
         
         If line = "" Then
             If currentObject <> "" Then
@@ -95,7 +93,6 @@ Function ParseWmic(wmicClass)
         End If
     Next
     
-    ' Catch any trailing data block
     If currentObject <> "" Then
         If Not isFirstObj Then jsonResult = jsonResult & ","
         jsonResult = jsonResult & "{" & currentObject & "}"
@@ -105,10 +102,9 @@ Function ParseWmic(wmicClass)
     ParseWmic = jsonResult
 End Function
 
-' Executes queries in powershell and pulls the compressed raw JSON string out directly
 Function RunPowerShell(query)
     Dim cmd, output, ret, fullString, i
-    cmd = "powershell -NoProfile -Command """ & query & " | ConvertTo-Json -Depth 3 -Compress"""
+    cmd = "powershell -NoProfile -ExecutionPolicy Bypass -Command ""$data = @(" & query & "); $data | ConvertTo-Json -Depth 3 -Compress"""
     ret = RunCommand(cmd, output)
     
     If ret <> 0 Or IsEmpty(output) Then
@@ -123,7 +119,12 @@ Function RunPowerShell(query)
     
     fullString = Trim(fullString)
     
-    ' Force output array encapsulation if PowerShell returns a single raw object response
+    Dim regEx
+    Set regEx = New RegExp
+    regEx.Pattern = "[\x00-\x1F\x7F]"
+    regEx.Global = True
+    fullString = regEx.Replace(fullString, "")
+
     If Left(fullString, 1) = "{" Then
         fullString = "[" & fullString & "]"
     End If
@@ -131,7 +132,6 @@ Function RunPowerShell(query)
     RunPowerShell = fullString
 End Function
 
-' Decision controller: Tries PowerShell, drops back to WMIC if failing or empty
 Function GetData(psQuery, wmicClass)
     Dim dataStr : dataStr = ""
     
@@ -139,7 +139,6 @@ Function GetData(psQuery, wmicClass)
         dataStr = RunPowerShell(psQuery)
     End If
     
-    ' Fallback to WMIC manual parser if String is Empty
     If dataStr = "" Or dataStr = "[]" Then
         dataStr = ParseWmic(wmicClass)
     End If
@@ -147,21 +146,29 @@ Function GetData(psQuery, wmicClass)
     GetData = dataStr
 End Function
 
+Function Directives(val, name)
+    Directives = """" & name & """:" & val
+End Function
+
+Function IIf(expr, trueVal, falseVal)
+    If expr Then IIf = trueVal Else IIf = falseVal
+End Function
+
 Response.ContentType = "application/json"
 Response.CharSet = "utf-8"
+
+Dim userAccounts, userProfiles, groups, groupUsers, loggedOn, logonSession
+
+userAccounts = GetData("Get-CimInstance Win32_UserAccount", "useraccount")
+userProfiles = GetData("Get-CimInstance Win32_UserProfile", "path Win32_UserProfile")
+groups       = GetData("Get-CimInstance Win32_Group", "group")
+groupUsers   = GetData("Get-CimInstance Win32_GroupUser", "path Win32_GroupUser")
+loggedOn     = GetData("Get-CimInstance Win32_LoggedOnUser", "path Win32_LoggedOnUser")
+logonSession = GetData("Get-CimInstance Win32_LogonSession", "netlogin")
 
 Dim success, errMsg, dataBlock
 success = "false"
 errMsg = ""
-
-Dim userAccounts, userProfiles, groups, groupUsers, loggedOn, logonSession
-
-userAccounts = GetData("Get-CimInstance Win32_UserAccount", "Win32_UserAccount")
-userProfiles = GetData("Get-CimInstance Win32_UserProfile", "Win32_UserProfile")
-groups = GetData("Get-CimInstance Win32_Group", "Win32_Group")
-groupUsers = GetData("Get-CimInstance Win32_GroupUser", "Win32_GroupUser")
-loggedOn = GetData("Get-CimInstance Win32_LoggedOnUser", "Win32_LoggedOnUser")
-logonSession = GetData("Get-CimInstance Win32_LogonSession", "Win32_LogonSession")
 
 If Err.Number <> 0 Then
     errMsg = CleanJsonValue(Err.Description)
@@ -179,17 +186,9 @@ dataBlock = "{" & _
     """logon_session"":" & logonSession & _
 "}"
 
-Function Directives(val, name)
-    Directives = """" & name & """:" & val
-End Function
-
 Response.Write "{" & _
     """success"":" & success & "," & _
     """error"":" & IIf(errMsg = "", "null", """" & errMsg & """") & "," & _
     """data"":" & dataBlock & "}"
-
-Function IIf(expr, trueVal, falseVal)
-    If expr Then IIf = trueVal Else IIf = falseVal
-End Function
 
 %>

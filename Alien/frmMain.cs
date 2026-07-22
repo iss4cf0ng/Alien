@@ -133,9 +133,10 @@ namespace Alien
         async Task fnSetup()
         {
             int nPort = m_iniMgr.ReadInt("General", "Port");
-            m_tamper = new clsTamper($"http://127.0.0.1:{nPort}", "python", "Tamper\\server.py");
+            m_tamper = new clsTamper($"http://127.0.0.1:{nPort}", "python", "EventHorizon\\server.py");
             if (new frmEnvChecker(m_tamper, m_iniMgr).ShowDialog() != DialogResult.OK)
             {
+                MessageBox.Show("Failed to check environment!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
                 return;
             }
