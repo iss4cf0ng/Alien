@@ -12,7 +12,9 @@ Rather than embedding every feature inside the webshell itself, Alien treats web
 
 ## Project Status
 
-> **This project is currently under active development.**
+<p align="center">
+    <h1>This tool will be released soon</h1>
+</p>
 
 Alien is a complete redesign of my previous webshell management tool.
 

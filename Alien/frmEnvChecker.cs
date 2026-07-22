@@ -78,6 +78,9 @@ namespace Alien
 
         bool fnbCheckPayloads()
         {
+            if (!Directory.Exists("Payload"))
+                return false;
+
 
 
             return true;

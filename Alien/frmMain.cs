@@ -307,7 +307,7 @@ namespace Alien
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             frmSetting f = new frmSetting();
-            f.Show();
+            f.ShowDialog();
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)

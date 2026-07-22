@@ -26,7 +26,7 @@ namespace Alien
             m_client = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
 
             m_pyExecutable = szPyExecutable;
-            m_dirModule = Path.Combine(Application.StartupPath, "Tamper");
+            m_dirModule = Path.Combine(Application.StartupPath, "EventHorizon");
 
             m_szServerPath = szServer;
             m_bIsReady = false;

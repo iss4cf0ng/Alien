@@ -10,7 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="config.ini" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="alien.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="config.ini" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,12 +36,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resource1.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource1.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resource1.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
