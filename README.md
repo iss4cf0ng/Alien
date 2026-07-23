@@ -1,5 +1,7 @@
 # Alien
 
+[English](README.md) | [繁體中文](README.zh-TW.md) | [简体中文](README.zh-CN.md)
+
 ![status](https://img.shields.io/badge/status-development-orange)
 ![C#](https://img.shields.io/badge/language-C%23-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -8,7 +10,7 @@ Alien is a modular webshell client developed for cybersecurity research and educ
 
 It provides a unified post-exploitation framework for managing different web technologies through reusable modules.
 
-Rather than embedding every feature inside the webshell itself, Alien treats webshells as lighteight execution layers. Once arbitrary code execution is obtained, advanced capabilities-including file management, database interaction, virtual shells, SOCKS5 proxying, plugins, and reflective loading, are provided by Alien.
+Rather than embedding every feature inside the webshell itself, Alien treats webshells as lightweight execution layers. Once arbitrary code execution is obtained, advanced capabilities, including file management, database interaction, virtual shells, SOCKS5 proxying, plugins, and reflective loading, are provided by Alien.
 
 If you find this project helpful or informative, I would truly appreciate a ⭐ on the repository. Your support would be a great motivation for me to continue improving this tool!
 
