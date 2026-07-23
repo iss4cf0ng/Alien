@@ -275,7 +275,7 @@
                 }
             } else {
                 appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. STANDALONE DRY-RUN MODE SIMULATION.");
-                sendBtn.disabled = false; // 為了方便本地除錯，沒 bridge 時也能看
+                sendBtn.disabled = false;
             }
         } catch (e) {
             appendLog("[!] EXCEPTION_CAUGHT: " + e.message.toUpperCase());
