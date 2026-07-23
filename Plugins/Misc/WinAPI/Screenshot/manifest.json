@@ -3,8 +3,8 @@
     "version": "1.0",
     "author": "iss4cf0ng/ISSAC",
     "environment": [
-        "PHP/v8.X/OneShell",
-        "ASPX/JScript/OneShell"
+        "ASPX/NebulaPulsar/DarkMatter",
+        "JSP/NebulaPulsar/DarkMatter"
     ],
-    "description": "Scan all Anti-Virus."
+    "description": "Take a screenshot."
 }

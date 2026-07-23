@@ -5,7 +5,7 @@
     <title>Socket Packet Sender</title>
     <style>
         html, body {
-            height: 100%;
+            min-height: 100%;
             margin: 0;
             padding: 0;
             background-color: #000000;
@@ -18,6 +18,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding: 20px;
         }
         
         .container { 
@@ -27,6 +30,8 @@
             padding: 25px; 
             border-radius: 0px;
             border: 1px solid #ffffff;
+            box-sizing: border-box;
+            margin: auto; 
         }
         
         h2 { 
@@ -196,6 +201,9 @@
 <script>
     const pluginManifest = {
         "supportedLangs": [
+            "ASPX/NebulaPulsar/DarkMatter",
+            "PHP/v5.X/OneShell",
+            "PHP/v7.X/OneShell",
             "PHP/v8.X/OneShell",
         ]
     };
@@ -275,7 +283,7 @@
                 }
             } else {
                 appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. STANDALONE DRY-RUN MODE SIMULATION.");
-                sendBtn.disabled = false; // 為了方便本地除錯，沒 bridge 時也能看
+                sendBtn.disabled = false;
             }
         } catch (e) {
             appendLog("[!] EXCEPTION_CAUGHT: " + e.message.toUpperCase());
@@ -292,7 +300,7 @@
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
                 const bridge = window.chrome.webview.hostObjects.nativeBridge;
-                const currentDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1);
                 
                 const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
                 

