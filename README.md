@@ -31,7 +31,7 @@ The author is **not responsible** for any misuse or damage caused by this softwa
 Before running Alien, please ensure the following requirements are met:
 
 - **Python 3** must be installed.
-- The Python executable (`python` or `python3`) must be accessible from the command line (added to the system `PATH` environment variable).
+- The Python executable (`python`) must be accessible from the command line (added to the system `PATH` environment variable).
 
 You can verify your installation by running:
 
