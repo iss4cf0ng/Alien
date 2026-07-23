@@ -14,6 +14,10 @@ Rather than embedding every feature inside the webshell itself, Alien treats web
 
 If you find this project helpful or informative, I would truly appreciate a ⭐ on the repository. Your support would be a great motivation for me to continue improving this tool!
 
+<p align="center">
+    <img src="https://iss4cf0ng.github.io/images/meme/Rio/7.png" width=250/>
+</p>
+
 # Disclaimer
 
 Alien is developed for cybersecurity research, education, and authorized penetration testing only.

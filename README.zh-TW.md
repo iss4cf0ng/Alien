@@ -12,6 +12,10 @@ Alien 內建檔案管理、虛擬終端、資料庫管理等後滲透功能，�
 
 要是你喜歡這項目，請按一個星吧⭐！ 你的支持是我更新這工具的最大動力！
 
+<p align="center">
+    <img src="https://iss4cf0ng.github.io/images/meme/Rio/7.png" width=250/>
+</p>
+
 # 免責聲明
 
 編寫 Alien 的目的是為了合法滲透測試、CTF 和學習用途。使用者不得在未授權的情況下攻擊受保護的設備。

@@ -12,6 +12,10 @@ Alien 内置文件管理、虚拟终端、数据库管理等后渗透功能，�
 
 如果你喜欢这个项目，欢迎点一个 ⭐！你的支持将是我持续完善这个项目的最大动力！
 
+<p align="center">
+    <img src="https://iss4cf0ng.github.io/images/meme/Rio/7.png" width=250/>
+</p>
+
 # 免责声明
 
 Alien 仅用于合法的渗透测试、CTF 竞赛以及网络安全学习。
