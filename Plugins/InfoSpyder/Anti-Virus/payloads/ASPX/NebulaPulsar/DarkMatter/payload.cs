@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Diagnostics; // 必須引入進程命名空間
+using System.Diagnostics;
 
 public class payload
 {

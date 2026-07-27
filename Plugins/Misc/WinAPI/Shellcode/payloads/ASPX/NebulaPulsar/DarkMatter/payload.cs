@@ -25,7 +25,6 @@ public class payload
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool CloseHandle(IntPtr hObject);
 
-    // 常數定義
     private const uint PROCESS_ALL_ACCESS = 0x001F0FFF;
     private const uint MEM_COMMIT = 0x1000;
     private const uint PAGE_EXECUTE_READWRITE = 0x40;
