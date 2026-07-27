@@ -42,11 +42,13 @@ namespace Alien
         {
             try
             {
+                string szExec = m_iniMgr.ReadString("General", "Python");
+
                 var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
-                        FileName = "python",
+                        FileName = szExec,
                         Arguments = "--version",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,

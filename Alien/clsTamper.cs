@@ -10,15 +10,15 @@ namespace Alien
 {
     public class clsTamper : IDisposable
     {
-        private readonly HttpClient m_client;
-        public readonly string m_szPyServerUri;
-        private Process? m_serverProcess = null;
+        private readonly HttpClient m_client;        // HTTP client object
+        public readonly string m_szPyServerUri;      // Server URL
+        private Process? m_serverProcess = null;     // Server process object
 
-        private string m_pyExecutable { get; init; }
-        private string m_dirModule { get; init; }
-        private string m_szServerPath { get; init; }
+        private string m_pyExecutable { get; init; } // Python executable for running the server
+        private string m_dirModule { get; init; }    // Tamper scripts directory.
+        private string m_szServerPath { get; init; } // Tamper scripts' path
 
-        public bool m_bIsReady { get; set; }
+        public bool m_bIsReady { get; set; }         // Get server's status
 
         public clsTamper(string szPySrvUri, string szPyExecutable, string szServer)
         {
@@ -128,7 +128,7 @@ namespace Alien
         }
 
         /// <summary>
-        /// 
+        /// Initiate the server.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
@@ -142,7 +142,7 @@ namespace Alien
 
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = "python",
+                FileName = m_pyExecutable,
                 Arguments = $"\"{m_szServerPath}\"",
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -173,6 +173,10 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// Check the status of the server.
+        /// </summary>
+        /// <returns></returns>
         private async Task<bool> fnIsServerRunningAsync()
         {
             try
