@@ -85,8 +85,8 @@ namespace Alien
         [ComVisible(true)]
         public class clsBridge
         {
-            private clsWeb m_web { get; init; }
-            private string m_szEnvironment { get; set; }
+            private clsWeb m_web { get; init; } // Webshell object
+            private string m_szEnvironment { get; set; } // Environment (e.g., PHP/v8.X/OneShell)
 
             public clsBridge(clsWeb web, string szEnvironment)
             {
@@ -95,7 +95,7 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Get current environment.
             /// </summary>
             /// <returns></returns>
             public string fnGetShellType()
@@ -104,7 +104,7 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Get payload file.
             /// </summary>
             /// <param name="szDirName"></param>
             /// <param name="szEnv"></param>
