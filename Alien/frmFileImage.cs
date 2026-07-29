@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmFileImage : Form
+    public partial class frmFileImage : BaseForm
     {
         private clsVictim m_victim { get; init; }
         private int m_nImageCount { get; init; }

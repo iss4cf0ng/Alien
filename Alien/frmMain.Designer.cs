@@ -120,6 +120,7 @@
             // 
             resources.ApplyResources(textBox2, "textBox2");
             textBox2.Name = "textBox2";
+            textBox2.KeyDown += textBox2_KeyDown;
             // 
             // listView1
             // 
@@ -331,6 +332,7 @@
             Controls.Add(splitContainer1);
             Controls.Add(statusStrip1);
             Controls.Add(toolStrip1);
+            ForeColor = Color.Black;
             Name = "frmMain";
             FormClosing += frmMain_FormClosing;
             Load += Form1_Load;

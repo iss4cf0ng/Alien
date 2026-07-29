@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmEnvChecker : Form
+    public partial class frmEnvChecker : BaseForm
     {
         /// <summary>
         /// Check prerequiste programs and environment variables

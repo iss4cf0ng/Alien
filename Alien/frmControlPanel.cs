@@ -26,10 +26,11 @@ using System.Globalization;
 using System.Reflection.Metadata;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Text.Json.Nodes;
+using static Alien.clsThemeManager;
 
 namespace Alien
 {
-    public partial class frmControlPanel : Form
+    public partial class frmControlPanel : BaseForm
     {
         private TabPage draggedTab = null;
 
@@ -159,6 +160,8 @@ namespace Alien
         public frmControlPanel(clsWeb web)
         {
             InitializeComponent();
+
+            ThemeManager.Apply(this);
 
             m_web = web;
 
@@ -2334,6 +2337,13 @@ namespace Alien
             toolStripStatusLabel6.Text = string.Empty;
             toolStripStatusLabel7.Text = string.Empty;
             toolStripStatusLabel8.Text = "Loading...";
+
+            // Void
+            listView14.BackColor = Color.Black;
+            listView14.ForeColor = Color.Lime;
+
+            richTextBox3.BackColor = Color.Black;
+            richTextBox3.ForeColor = Color.Lime;
 
             textBox8.Text = m_victim.ShellURL;
 

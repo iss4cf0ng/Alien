@@ -12,7 +12,7 @@ using ICSharpCode.TextEditor;
 
 namespace Alien
 {
-    public partial class frmTextEditor : Form
+    public partial class frmTextEditor : BaseForm
     {
         public frmTextEditor()
         {

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using static Alien.clsThemeManager;
 
 namespace Alien
 {
@@ -38,6 +39,8 @@ namespace Alien
         public frmMain()
         {
             InitializeComponent();
+
+            ThemeManager.Apply(this);
 
             m_iniMgr = new clsIniManager("config.ini");
         }
@@ -552,6 +555,32 @@ namespace Alien
         private void timer1_Tick(object sender, EventArgs e)
         {
 
+        }
+
+        private void textBox2_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                var groups = m_sqlConn.fnGetGroups();
+                string szPattern = textBox2.Text;
+
+                groups.Insert(0, "_Orphan");
+                groups.Insert(0, "_All");
+
+                TreeNode nodeGroup = treeView1.Nodes[0];
+
+                try
+                {
+                    List<string> matchedNames = groups.Where(x => Regex.IsMatch(x, szPattern, RegexOptions.IgnoreCase)).ToList();
+
+                    nodeGroup.Nodes.Clear();
+                    nodeGroup.Nodes.AddRange(matchedNames.Select(x => new TreeNode(x)).ToArray());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 

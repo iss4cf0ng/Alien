@@ -583,7 +583,7 @@ namespace Alien
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            bool bOneShell = comboBox3.Text.Equals("OneShell");
+            bool bOneShell = comboBox3.Text.Equals("OneShell") || comboBox3.Text.Equals("DarkMatter");
             groupBox2.Enabled = bOneShell;
             groupBox5.Enabled = bOneShell;
         }
