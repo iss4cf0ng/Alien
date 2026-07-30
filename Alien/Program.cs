@@ -28,7 +28,14 @@ namespace Alien
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
-            ThemeManager.SetTheme(Themes.Dark);
+            try
+            {
+                ThemeManager.SetTheme(new clsIniManager("config.ini").ReadString("General", "Theme", "Default"));
+            }
+            catch (Exception ex)
+            {
+                ThemeManager.SetTheme("Default");
+            }
 
             Application.Run(new frmMain());
         }

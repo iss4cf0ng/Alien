@@ -12,7 +12,7 @@ namespace Alien
     public partial class frmMain : Form
     {
         private const string m_szName = "Alien";
-        private const string m_szVersion = "v5.0.0";
+        private const string m_szVersion = "v5.1.0";
         private const string m_szAuthor = "iss4cf0ng/ISSAC";
 
         private clsTamper m_tamper { get; set; }

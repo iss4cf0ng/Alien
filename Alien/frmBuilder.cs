@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmBuilder : Form
+    public partial class frmBuilder : BaseForm
     {
         private clsTamper m_tamper { get; init; }
         private List<string> m_lsNbPayload = new List<string>();

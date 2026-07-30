@@ -5,11 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Alien
 {
     internal class clsThemeManager
     {
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
+        private static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
+
         /// <summary>
         /// 
         /// </summary>
@@ -41,63 +46,73 @@ namespace Alien
         public class ThemeColorTable : ProfessionalColorTable
         {
             public override Color ToolStripDropDownBackground => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ImageMarginGradientBegin => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ImageMarginGradientMiddle => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ImageMarginGradientEnd => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ImageMarginRevealedGradientBegin => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ImageMarginRevealedGradientMiddle => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ImageMarginRevealedGradientEnd => ThemeManager.Current.ControlBackColor;
-
-
             public override Color MenuItemSelected => ThemeManager.Current.SelectionBackColor;
-
-
             public override Color MenuItemSelectedGradientBegin => ThemeManager.Current.SelectionBackColor;
-
-
             public override Color MenuItemSelectedGradientEnd => ThemeManager.Current.SelectionBackColor;
-
-
             public override Color MenuItemPressedGradientBegin => ThemeManager.Current.SelectionBackColor;
-
-
             public override Color MenuItemPressedGradientMiddle => ThemeManager.Current.SelectionBackColor;
-
-
             public override Color MenuItemPressedGradientEnd => ThemeManager.Current.SelectionBackColor;
-
-
             public override Color MenuBorder => ThemeManager.Current.BorderColor;
-
-
             public override Color SeparatorDark => ThemeManager.Current.BorderColor;
-
-
             public override Color SeparatorLight => ThemeManager.Current.BorderColor;
-
-
             public override Color ToolStripBorder => ThemeManager.Current.BorderColor;
-
-
             public override Color ToolStripGradientBegin => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ToolStripGradientMiddle => ThemeManager.Current.ControlBackColor;
-
-
             public override Color ToolStripGradientEnd => ThemeManager.Current.ControlBackColor;
+        }
+
+        public class clsThemeItem
+        {
+            public string Name { get; set; } = "";
+            public AppTheme Theme { get; set; } = default;
+        }
+
+        public static class ThemeItemManager
+        {
+            public static List<clsThemeItem> _Themes { get; } =
+            [
+                new()
+                {
+                    Name = "Default",
+                    Theme = Themes.Default,
+                },
+                new()
+                {
+                    Name = "Light",
+                    Theme = Themes.Light,
+                },
+                new()
+                {
+                    Name = "Gray",
+                    Theme = Themes.Gray,
+                },
+                new()
+                {
+                    Name = "Dark",
+                    Theme = Themes.Dark,
+                },
+                new()
+                {
+                    Name = "Uplink",
+                    Theme = Themes.Uplink,
+                },
+                new()
+                {
+                    Name = "DarkLime",
+                    Theme = Themes.DarkLime,
+                },
+                new()
+                {
+                    Name = "DarkYellow",
+                    Theme = Themes.DarkYellow,
+                },
+            ];
         }
 
         /// <summary>
@@ -273,23 +288,144 @@ namespace Alien
             };
         }
 
+        internal class TabZeroHook : NativeWindow
+        {
+            private readonly TabControl _tab;
+            private const int WM_ERASEBKGND = 0x0014;
+
+            public TabZeroHook(TabControl tab)
+            {
+                _tab = tab;
+                AssignHandle(tab.Handle);
+            }
+
+            protected override void WndProc(ref Message m)
+            {
+                if (m.Msg == WM_ERASEBKGND && _tab.TabCount == 0)
+                {
+                    try
+                    {
+                        using (Graphics g = Graphics.FromHdc(m.WParam))
+                        {
+                            using (Brush b = new SolidBrush(ThemeManager.Current.ControlBackColor))
+                            {
+                                g.FillRectangle(b, _tab.ClientRectangle);
+                            }
+                        }
+                        m.Result = (IntPtr)1;
+                        return;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                base.WndProc(ref m);
+            }
+        }
+
+        private class TabControlEraseHook : NativeWindow
+        {
+            private readonly TabControl _tab;
+            private const int WM_ERASEBKGND = 0x0014;
+
+            public TabControlEraseHook(TabControl tab)
+            {
+                _tab = tab;
+                AssignHandle(tab.Handle);
+            }
+
+            protected override void WndProc(ref Message m)
+            {
+                if (m.Msg == WM_ERASEBKGND && _tab.DrawMode == TabDrawMode.OwnerDrawFixed)
+                {
+                    try
+                    {
+                        using (Graphics g = Graphics.FromHdc(m.WParam))
+                        {
+                            using (Brush b = new SolidBrush(ThemeManager.Current.ControlBackColor))
+                            {
+                                if (_tab.TabCount == 0)
+                                {
+                                    g.FillRectangle(b, _tab.ClientRectangle);
+                                    m.Result = (IntPtr)1;
+                                    return;
+                                }
+
+                                int headerHeight = _tab.DisplayRectangle.Top;
+                                if (headerHeight > 0)
+                                {
+                                    Rectangle headerRect = new Rectangle(0, 0, _tab.Width, headerHeight);
+                                    g.FillRectangle(b, headerRect);
+                                }
+
+                                Rectangle lastTab = _tab.GetTabRect(_tab.TabCount - 1);
+                                if (lastTab.Right < _tab.Width)
+                                {
+                                    Rectangle leftover = new Rectangle(
+                                        lastTab.Right,
+                                        lastTab.Top,
+                                        _tab.Width - lastTab.Right,
+                                        lastTab.Height);
+                                    g.FillRectangle(b, leftover);
+                                }
+                            }
+                        }
+                        m.Result = (IntPtr)1;
+                        return;
+                    }
+                    catch
+                    {
+                        
+                    }
+                }
+
+                base.WndProc(ref m);
+            }
+        }
+
         public static class ThemeManager
         {
             public static AppTheme Current { get; private set; } = Themes.Default;
             private static readonly Dictionary<Control, (Color Back, Color Fore)> OriginalColors = new();
+            private static readonly Dictionary<TabControl, TabControlEraseHook> EraseHooks = new();
 
             public static event EventHandler ThemeChanged;
 
+            public static string CurrentName { get; private set; } = "Default";
+
             public static void SetTheme(AppTheme theme)
             {
+                if (theme == null)
+                    return;
+
                 Current = theme;
+                ThemeChanged?.Invoke(
+                    null,
+                    EventArgs.Empty
+                );
 
                 foreach (Form form in Application.OpenForms)
                 {
                     Apply(form);
                 }
+            }
 
-                ThemeChanged?.Invoke(null, EventArgs.Empty);
+            public static void SetTheme(string name)
+            {
+                var item = ThemeItemManager._Themes.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+                if (item == null)
+                {
+                    SetTheme(Themes.Default);
+                    CurrentName = "Default";
+                    return;
+                }
+
+                CurrentName = item.Name;
+
+                SetTheme(item.Theme);
             }
 
             public static void Apply(Control root)
@@ -307,14 +443,12 @@ namespace Alien
 
             private static void SaveOriginalColor(Control c)
             {
-                if (!OriginalColors.ContainsKey(c))
-                {
-                    OriginalColors[c] =
-                    (
-                        c.BackColor,
-                        c.ForeColor
-                    );
-                }
+                if (OriginalColors.ContainsKey(c))
+                    return;
+
+                OriginalColors[c] = (c.BackColor, c.ForeColor);
+
+                c.Disposed += (_, __) => OriginalColors.Remove(c);
             }
 
             private static void SetBackColorIfUnmodified(Control c, Color themedColor)
@@ -443,6 +577,12 @@ namespace Alien
 
                 switch (control)
                 {
+                    case TabControl tc:
+                        ApplyTabControl(tc);
+                        break;
+                    case BaseForm f:
+                        ApplyBaseForm(f);
+                        break;
                     case Form f:
                         ApplyForm(f);
                         break;
@@ -500,9 +640,6 @@ namespace Alien
                     case ProgressBar pb:
                         ApplyProgressBar(pb);
                         break;
-                    case TabControl tc:
-                        ApplyTabControl(tc);
-                        break;
                     case MenuStrip ms:
                         ApplyMenuStrip(ms);
                         break;
@@ -518,7 +655,7 @@ namespace Alien
                     case SplitContainer sc:
                         ApplySplitContainer(sc);
                         break;
-                    case ICSharpCode.TextEditor.TextEditorControl editor:
+                    case TextEditorControl editor:
                         ApplyTextEditor(editor);
                         break;
                 }
@@ -543,8 +680,14 @@ namespace Alien
 
             private static void ApplyForm(Form f)
             {
-                SetBackColorIfUnmodified(f, Current.FormBackColor);
-                SetForeColorIfUnmodified(f, Current.ForeColor);
+                f.BackColor = Current.FormBackColor;
+                f.ForeColor = Current.ForeColor;
+            }
+
+            private static void ApplyBaseForm(BaseForm f)
+            {
+                f.BackColor = Current.FormBackColor;
+                f.ForeColor = Current.ForeColor;
             }
 
             private static void ApplyPanel(Panel p)
@@ -618,7 +761,15 @@ namespace Alien
 
             private static void ApplyTextEditor(TextEditorControl editor)
             {
+                var strategy = editor.Document.HighlightingStrategy as DefaultHighlightingStrategy;
+                if (strategy == null)
+                    return;
 
+                var bgCol = new HighlightColor(Current.ForeColor, Current.TextBoxBackColor, false, false);
+
+                strategy.SetColorFor("Default", bgCol);
+                strategy.SetColorFor("Digits", bgCol);
+                strategy.SetColorFor("LineNumbers", bgCol);
             }
 
             private static void ApplyTextBox(TextBox tb)
@@ -792,16 +943,21 @@ namespace Alien
 
                 foreach (TabPage page in tab.TabPages)
                 {
+                    page.BackColor = Current.ControlBackColor;
+                    page.ForeColor = Current.ForeColor;
                     ApplyTabPage(page);
                 }
 
                 if (!Current.UseCustomDraw)
                 {
                     tab.DrawMode = TabDrawMode.Normal;
-
                     tab.DrawItem -= TabControl_DrawItem;
-                    tab.Paint -= TabControl_Paint;
 
+                    if (EraseHooks.ContainsKey(tab))
+                    {
+                        EraseHooks[tab].ReleaseHandle();
+                        EraseHooks.Remove(tab);
+                    }
                     return;
                 }
 
@@ -810,8 +966,10 @@ namespace Alien
                 tab.DrawItem -= TabControl_DrawItem;
                 tab.DrawItem += TabControl_DrawItem;
 
-                tab.Paint -= TabControl_Paint;
-                tab.Paint += TabControl_Paint;
+                if (!EraseHooks.ContainsKey(tab))
+                {
+                    EraseHooks[tab] = new TabControlEraseHook(tab);
+                }
             }
 
             private static void TabControl_Paint(object sender, PaintEventArgs e)
@@ -1060,8 +1218,9 @@ namespace Alien
             private static void ApplyToolStrip(ToolStrip strip)
             {
                 strip.BackColor = Current.ControlBackColor;
-
                 strip.ForeColor = Current.ForeColor;
+
+                strip.Renderer = new ToolStripProfessionalRenderer(new ThemeColorTable());
 
                 foreach (ToolStripItem item in strip.Items)
                 {
@@ -1085,18 +1244,6 @@ namespace Alien
             {
                 item.BackColor = Current.ControlBackColor;
                 item.ForeColor = Current.ForeColor;
-
-                if (item is ToolStripMenuItem menuItem)
-                {
-                    ApplyToolStripMenuItem(menuItem);
-                    return;
-                }
-
-                if (item is ToolStripDropDownButton dropDownButton)
-                {
-                    ApplyToolStripDropDownButton(dropDownButton);
-                    return;
-                }
 
                 if (item is ToolStripDropDownItem dropDown)
                 {

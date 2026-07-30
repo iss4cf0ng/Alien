@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Alien.clsThemeManager;
 
 namespace Alien
 {
@@ -150,7 +151,103 @@ namespace Alien
             toolStripProgressBar1.Maximum = m_nImageCount;
             toolStripProgressBar1.Value = 0;
 
+            tabControl1.AllowDrop = true;
+            tabControl1.Padding = new Point(30, 3);
+            tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl1.ItemSize = new Size(140, 28);
+
+            tabControl1.DrawItem += (s, e) =>
+            {
+                if (e.Index < 0 || e.Index >= tabControl1.TabPages.Count)
+                    return;
+
+                TabPage page = tabControl1.TabPages[e.Index];
+                Rectangle rect = tabControl1.GetTabRect(e.Index);
+
+                bool selected = e.Index == tabControl1.SelectedIndex;
+
+                // background
+                using (Brush bg = new SolidBrush(ThemeManager.Current.ControlBackColor))
+                {
+                    e.Graphics.FillRectangle(bg, rect);
+                }
+
+                // selected line
+                if (selected)
+                {
+                    using (Brush accent = new SolidBrush(ThemeManager.Current.AccentColor))
+                    {
+                        e.Graphics.FillRectangle(accent, new Rectangle(rect.Left + 5, rect.Bottom - 3, rect.Width - 10, 3));
+                    }
+                }
+
+                // text area reserve X space
+                Rectangle textRect = rect;
+
+                if (e.Index > 0)
+                {
+                    textRect.Width -= 22;
+                }
+
+                TextRenderer.DrawText(
+                    e.Graphics,
+                    page.Text,
+                    e.Font,
+                    textRect,
+                    selected
+                        ? ThemeManager.Current.AccentColor
+                        : ThemeManager.Current.ForeColor,
+                    TextFormatFlags.HorizontalCenter |
+                    TextFormatFlags.VerticalCenter);
+
+                // first tab cannot close
+                if (e.Index == 0)
+                    return;
+
+                // X button
+                Rectangle closeRect = new Rectangle(rect.Right - 22, rect.Top + 8, 14, 14);
+
+                using (Pen pen = new Pen(ThemeManager.Current.ForeColor, 2))
+                {
+                    e.Graphics.DrawLine(pen, closeRect.Left + 2, closeRect.Top + 2, closeRect.Right - 2, closeRect.Bottom - 2);
+                    e.Graphics.DrawLine(pen, closeRect.Right - 2, closeRect.Top + 2, closeRect.Left + 2, closeRect.Bottom - 2);
+                }
+            };
+
+            tabControl1.MouseDown += (s, e) =>
+            {
+                int nIdx = fnGetTabIndexAt(e.Location);
+
+                if (nIdx < 0)
+                    return;
+
+                // close button
+                if (nIdx > 0)
+                {
+                    Rectangle closeRect = new Rectangle(tabControl1.GetTabRect(nIdx).Right - 18, tabControl1.GetTabRect(nIdx).Top + (tabControl1.GetTabRect(nIdx).Height - 12) / 2, 12, 12);
+
+                    if (closeRect.Contains(e.Location))
+                    {
+                        tabControl1.TabPages.RemoveAt(nIdx);
+                        return;
+                    }
+                }
+
+                // select tab
+                tabControl1.SelectedIndex = nIdx;
+            };
+
             timer1.Start();
+        }
+
+        private int fnGetTabIndexAt(Point p)
+        {
+            for (int i = 0; i < tabControl1.TabPages.Count; i++)
+            {
+                if (tabControl1.GetTabRect(i).Contains(p))
+                    return i;
+            }
+            return -1;
         }
 
         private void frmFileImage_Load(object sender, EventArgs e)

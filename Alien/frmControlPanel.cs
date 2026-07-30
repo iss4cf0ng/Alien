@@ -258,6 +258,8 @@ namespace Alien
                 lv.View = View.LargeIcon;
                 lv.ContextMenuStrip = menuTable;
 
+                ThemeManager.Apply(page);
+
                 // ImageList
                 lv.LargeImageList = dbListImageList;
 
@@ -365,6 +367,8 @@ namespace Alien
 
                 ToolStripButton btnExport = new ToolStripButton("Export");
                 toolStrip.Items.Add(btnExport);
+
+                ThemeManager.Apply(page);
 
                 btnExport.Dock = DockStyle.Top;
                 btnExport.Click += (s, e) =>
@@ -2338,13 +2342,6 @@ namespace Alien
             toolStripStatusLabel7.Text = string.Empty;
             toolStripStatusLabel8.Text = "Loading...";
 
-            // Void
-            listView14.BackColor = Color.Black;
-            listView14.ForeColor = Color.Lime;
-
-            richTextBox3.BackColor = Color.Black;
-            richTextBox3.ForeColor = Color.Lime;
-
             textBox8.Text = m_victim.ShellURL;
 
             treeView3.ImageList = fileImageList;
@@ -2491,13 +2488,57 @@ namespace Alien
             tabControl4.AllowDrop = true;
             tabControl4.Padding = new Point(30, 3);
             tabControl4.DrawMode = TabDrawMode.OwnerDrawFixed;
+
+            new TabZeroHook(tabControl4);
+
             tabControl4.DrawItem += (s, e) =>
             {
+                using (Brush bg = new SolidBrush(ThemeManager.Current.ControlBackColor))
+                {
+                    if (tabControl4.TabCount == 0)
+                    {
+                        e.Graphics.FillRectangle(bg, tabControl4.ClientRectangle);
+                        return;
+                    }
+
+                    if (e.Index == tabControl4.TabCount - 1)
+                    {
+                        Rectangle lastTabRect = tabControl4.GetTabRect(e.Index);
+                        if (lastTabRect.Right < tabControl4.Width)
+                        {
+                            Rectangle leftover = new Rectangle(
+                                lastTabRect.Right,
+                                lastTabRect.Top,
+                                tabControl4.Width - lastTabRect.Right,
+                                lastTabRect.Height);
+
+                            e.Graphics.FillRectangle(bg, leftover);
+                        }
+                    }
+                }
+
                 if (e.Index < 0 || e.Index >= tabControl4.TabPages.Count)
                     return;
 
                 TabPage page = tabControl4.TabPages[e.Index];
                 Rectangle rect = tabControl4.GetTabRect(e.Index);
+
+                bool selected = e.Index == tabControl4.SelectedIndex;
+
+                // tab background
+                using (Brush bg = new SolidBrush(ThemeManager.Current.ControlBackColor))
+                {
+                    e.Graphics.FillRectangle(bg, rect);
+                }
+
+                // selected highlight
+                if (selected)
+                {
+                    using (Brush accent = new SolidBrush(ThemeManager.Current.AccentColor))
+                    {
+                        e.Graphics.FillRectangle(accent, new Rectangle(rect.Left + 5, rect.Bottom - 3, rect.Width - 10, 3));
+                    }
+                }
 
                 // text
                 TextRenderer.DrawText(
@@ -2505,17 +2546,21 @@ namespace Alien
                     page.Text,
                     e.Font,
                     rect,
-                    Color.Black);
+                    selected ? ThemeManager.Current.AccentColor : ThemeManager.Current.ForeColor,
+                    TextFormatFlags.HorizontalCenter |
+                    TextFormatFlags.VerticalCenter
+                );
 
                 // X button
                 Rectangle closeRect = fnGetCloseRect(e.Index);
 
-                ControlPaint.DrawCaptionButton(
-                    e.Graphics,
-                    closeRect,
-                    CaptionButton.Close,
-                    ButtonState.Flat);
+                using (Pen pen = new Pen(ThemeManager.Current.ForeColor, 2))
+                {
+                    e.Graphics.DrawLine(pen, closeRect.Left + 4, closeRect.Top + 4, closeRect.Right - 4, closeRect.Bottom - 4);
+                    e.Graphics.DrawLine(pen, closeRect.Right - 4, closeRect.Top + 4, closeRect.Left + 4, closeRect.Bottom - 4);
+                }
             };
+
             tabControl4.MouseDown += (s, e) =>
             {
                 int nIdx = fnGetTabIndexAt(e.Location);
@@ -2535,10 +2580,12 @@ namespace Alien
 
                 tabControl4.DoDragDrop(draggedTab, DragDropEffects.Move);
             };
+
             tabControl4.DragOver += (s, e) =>
             {
                 e.Effect = DragDropEffects.Move;
             };
+
             tabControl4.DragDrop += (s, e) =>
             {
                 Point p = tabControl4.PointToClient(new Point(e.X, e.Y));
@@ -2565,6 +2612,7 @@ namespace Alien
 
                 draggedTab = null;
             };
+
             tabControl4.DragLeave += (s, e) =>
             {
                 draggedTab = null;
@@ -2694,6 +2742,15 @@ namespace Alien
                     button4.Enabled = false;
                 });
             };
+
+            // Void
+            listView14.BackColor = Color.Black;
+            listView14.ForeColor = Color.Lime;
+            listView14.Refresh();
+
+            richTextBox3.BackColor = Color.Black;
+            richTextBox3.ForeColor = Color.Lime;
+            richTextBox3.Refresh();
 
             // Note
             try
@@ -2951,7 +3008,7 @@ namespace Alien
 
         private void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
         {
-
+            
         }
 
         //Upload

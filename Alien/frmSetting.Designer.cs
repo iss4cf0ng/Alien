@@ -36,6 +36,8 @@
             checkBox1 = new CheckBox();
             toolStrip1 = new ToolStrip();
             toolStripButton1 = new ToolStripButton();
+            comboBox2 = new ComboBox();
+            label2 = new Label();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             toolStrip1.SuspendLayout();
@@ -48,24 +50,26 @@
             // 
             // comboBox1
             // 
-            resources.ApplyResources(comboBox1, "comboBox1");
             comboBox1.FormattingEnabled = true;
+            resources.ApplyResources(comboBox1, "comboBox1");
             comboBox1.Name = "comboBox1";
             // 
             // tabControl1
             // 
-            resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Controls.Add(tabPage1);
+            resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
             tabControl1.SizeMode = TabSizeMode.Fixed;
             // 
             // tabPage1
             // 
-            resources.ApplyResources(tabPage1, "tabPage1");
+            tabPage1.Controls.Add(comboBox2);
+            tabPage1.Controls.Add(label2);
             tabPage1.Controls.Add(checkBox1);
             tabPage1.Controls.Add(comboBox1);
             tabPage1.Controls.Add(label1);
+            resources.ApplyResources(tabPage1, "tabPage1");
             tabPage1.Name = "tabPage1";
             tabPage1.UseVisualStyleBackColor = true;
             // 
@@ -83,10 +87,21 @@
             // 
             // toolStripButton1
             // 
-            resources.ApplyResources(toolStripButton1, "toolStripButton1");
             toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(toolStripButton1, "toolStripButton1");
             toolStripButton1.Name = "toolStripButton1";
             toolStripButton1.Click += toolStripButton1_Click;
+            // 
+            // comboBox2
+            // 
+            comboBox2.FormattingEnabled = true;
+            resources.ApplyResources(comboBox2, "comboBox2");
+            comboBox2.Name = "comboBox2";
+            // 
+            // label2
+            // 
+            resources.ApplyResources(label2, "label2");
+            label2.Name = "label2";
             // 
             // frmSetting
             // 
@@ -116,5 +131,7 @@
         private ToolStrip toolStrip1;
         private ToolStripButton toolStripButton1;
         private CheckBox checkBox1;
+        private ComboBox comboBox2;
+        private Label label2;
     }
 }

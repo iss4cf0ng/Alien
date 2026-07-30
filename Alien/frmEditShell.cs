@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmEditShell : Form
+    public partial class frmEditShell : BaseForm
     {
         public clsTamper m_tamper { get; init; }
         public clsSqlite m_sqlConn { get; init; }

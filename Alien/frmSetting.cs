@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmSetting : Form
+    public partial class frmSetting : BaseForm
     {
         private clsIniManager m_iniMgr { get; init; }
 
@@ -28,8 +28,13 @@ namespace Alien
             comboBox1.DisplayMember = nameof(clsLanguage.clsLanguageItem.Name);
             comboBox1.ValueMember = nameof(clsLanguage.clsLanguageItem.Culture);
             comboBox1.DataSource = clsLanguage.clsLanguageManager.Languages;
-
             comboBox1.SelectedValue = m_iniMgr.ReadString("General", "Language");
+
+            comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox2.DisplayMember = nameof(clsThemeManager.clsThemeItem.Name);
+            comboBox2.ValueMember = nameof(clsThemeManager.clsThemeItem.Theme);
+            comboBox2.DataSource = clsThemeManager.ThemeItemManager._Themes;
+            comboBox2.Text = m_iniMgr.ReadString("General", "Theme");
 
             checkBox1.Checked = m_iniMgr.ReadBool("General", "DoHttpGet");
         }
@@ -43,9 +48,11 @@ namespace Alien
         {
             string? szLanguage = comboBox1.SelectedValue!.ToString();
             if (!string.IsNullOrEmpty(szLanguage))
-            {
                 m_iniMgr.Write("General", "Language", szLanguage);
-            }
+
+            string? szTheme = comboBox2.Text!.ToString();
+            if (!string.IsNullOrEmpty(szTheme))
+                m_iniMgr.Write("General", "Theme", szTheme);
 
             m_iniMgr.Write("General", "DoHttpGet", checkBox1.Checked ? "True" : "False");
 

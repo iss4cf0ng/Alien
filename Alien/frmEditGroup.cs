@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmEditGroup : Form
+    public partial class frmEditGroup : BaseForm
     {
         private clsSqlite m_sqlConn { get; init; }
 
