@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmDbEdit : Form
+    public partial class frmDbEdit : BaseForm
     {
         private clsfnDb m_db { get; init; }
         private frmControlPanel m_frmCtrl { get; init; }

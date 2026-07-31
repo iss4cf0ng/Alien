@@ -102,6 +102,8 @@ namespace Alien
 
             pb.Image = entity.img;
             pb.Refresh();
+
+            ThemeManager.Apply(this);
         }
 
         private void fnSaveImage(ListViewItem item) => fnSaveImage(new List<stImageEntity>() { fnGetItemTag(item) });

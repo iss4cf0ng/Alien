@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmProxy : Form
+    public partial class frmProxy : BaseForm
     {
         private clsIniManager m_iniMgr { get; init; }
 

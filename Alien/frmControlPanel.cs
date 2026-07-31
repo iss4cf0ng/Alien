@@ -722,7 +722,7 @@ namespace Alien
             /// </summary>
             /// <param name="value"></param>
             /// <returns></returns>
-            private string fnEscapeSqlValue(object value)
+            private string? fnEscapeSqlValue(object value)
             {
                 if (value == null || value == DBNull.Value) return "NULL";
 
@@ -735,6 +735,7 @@ namespace Alien
                 {
                     return b ? "1" : "0";
                 }
+
                 return value.ToString();
             }
         }

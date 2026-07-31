@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmAbout : Form
+    public partial class frmAbout : BaseForm
     {
         private const string m_szREADME = "" +
             "Alien webshell management tool v5.0.0 by iss4cf0ng (ISSAC)\n" +

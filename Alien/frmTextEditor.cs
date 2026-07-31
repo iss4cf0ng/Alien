@@ -233,8 +233,8 @@ namespace Alien
             bool bIsSelected = e.Index == tab.SelectedIndex;
 
             // White background, black text
-            Color backColor = Color.White;
-            Color foreColor = Color.Black;
+            Color backColor = clsThemeManager.ThemeManager.Current.TextBoxBackColor;
+            Color foreColor = clsThemeManager.ThemeManager.Current.ForeColor;
 
             if (page.Tag is clsTabColor tc)
             {

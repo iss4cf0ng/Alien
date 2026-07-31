@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmCometDiagram : Form
+    public partial class frmCometDiagram : BaseForm
     {
         private clsSqlite m_sqlConn { get; init; }
         private clsVictim m_victim { get; init; }

@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 namespace Alien
 {
-    public partial class frmFileHexEditor : Form
+    public partial class frmFileHexEditor : BaseForm
     {
         private frmControlPanel m_frmCtrl { get; init; }
         private clsWeb m_web { get { return m_frmCtrl.m_web; } }
@@ -138,6 +138,8 @@ namespace Alien
                     }
                 }
             };
+
+            clsThemeManager.ThemeManager.Apply(this);
         }
 
         void fnSetup()
@@ -168,7 +170,7 @@ namespace Alien
                         tabRect.Y + 4,
                         tabRect.Width - 20,
                         tabRect.Height),
-                    Color.Black);
+                    clsThemeManager.ThemeManager.Current.ForeColor);
 
                 Rectangle closeRect = new Rectangle(
                     tabRect.Right - 15,

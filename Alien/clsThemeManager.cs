@@ -266,22 +266,22 @@ namespace Alien
 
             public static readonly AppTheme Uplink = new AppTheme
             {
-                FormBackColor = Color.FromArgb(3, 8, 20),
-                ControlBackColor = Color.FromArgb(5, 15, 35),
+                FormBackColor = Color.Black,
+                ControlBackColor = Color.FromArgb(10, 10, 10),
                 ForeColor = Color.FromArgb(150, 210, 255),
                 BorderColor = Color.FromArgb(0, 80, 150),
                 AccentColor = Color.Cyan,
-                ButtonBackColor = Color.FromArgb(0, 40, 90),
+                ButtonBackColor = Color.FromArgb(0, 30, 70),
                 ButtonForeColor = Color.Cyan,
                 ButtonDangerColor = Color.DarkRed,
                 ButtonSuccessColor = Color.Teal,
-                TextBoxBackColor = Color.FromArgb(0, 5, 15),
+                TextBoxBackColor = Color.Black,
                 SelectionBackColor = Color.FromArgb(0, 80, 140),
                 SelectionForeColor = Color.White,
-                GridColor = Color.FromArgb(0, 60, 120),
-                HeaderBackColor = Color.FromArgb(0, 20, 50),
+                GridColor = Color.FromArgb(0, 50, 100),
+                HeaderBackColor = Color.FromArgb(5, 15, 30),
                 HeaderForeColor = Color.Cyan,
-                DisabledBackColor = Color.FromArgb(20, 30, 40),
+                DisabledBackColor = Color.FromArgb(25, 25, 25),
                 DisabledForeColor = Color.Gray,
 
                 UseCustomDraw = true,
@@ -577,6 +577,9 @@ namespace Alien
 
                 switch (control)
                 {
+                    case WebBrowser wb:
+                        ApplyWebBrowser(wb);
+                        break;
                     case TabControl tc:
                         ApplyTabControl(tc);
                         break;
@@ -934,6 +937,12 @@ namespace Alien
 
                 lv.DrawSubItem -= ListView_DrawSubItem;
                 lv.DrawSubItem += ListView_DrawSubItem;
+            }
+
+            private static void ApplyWebBrowser(WebBrowser wb)
+            {
+                SetBackColorIfUnmodified(wb, Current.TextBoxBackColor);
+                SetForeColorIfUnmodified(wb, Current.ForeColor);
             }
 
             private static void ApplyTabControl(TabControl tab)

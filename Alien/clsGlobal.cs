@@ -26,7 +26,7 @@ namespace Alien
         JSPX,
         Ruby,
         Perl,
-        //Python,
+        Python,
         CFM,
     }
 
