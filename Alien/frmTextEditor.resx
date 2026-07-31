@@ -228,11 +228,8 @@
   <data name="tabPage1.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 28</value>
   </data>
-  <data name="tabPage1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
-  </data>
   <data name="tabPage1.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
+    <value>3, 3, 3, 3</value>
   </data>
   <data name="tabPage1.Size" type="System.Drawing.Size, System.Drawing">
     <value>1066, 501</value>
@@ -258,14 +255,11 @@
   <data name="tabPage2.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 28</value>
   </data>
-  <data name="tabPage2.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
-  </data>
   <data name="tabPage2.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
+    <value>3, 3, 3, 3</value>
   </data>
   <data name="tabPage2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1066, 501</value>
+    <value>192, 68</value>
   </data>
   <data name="tabPage2.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -291,9 +285,6 @@
   </data>
   <data name="tabControl1.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 29</value>
-  </data>
-  <data name="tabControl1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
   </data>
   <data name="tabControl1.Size" type="System.Drawing.Size, System.Drawing">
     <value>1074, 533</value>

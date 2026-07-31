@@ -81,7 +81,7 @@ namespace Alien
 
         void fnBuildMemoryShell(string szType, string szPayload, string szKey)
         {
-            fnBuildMemoryShell(szType, szPayload, szKey);
+            fnShowMemoryShellHex(szType, szPayload, szKey);
 
             byte[] abBytes = Convert.FromHexString(richTextBox2.Text);
 

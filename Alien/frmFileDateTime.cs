@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmFileDateTime : Form
+    public partial class frmFileDateTime : BaseForm
     {
         private clsfnFileMgr m_fileMgr { get; init; }
         private string m_szFilePath { get; init; }

@@ -1306,8 +1306,7 @@ namespace Alien
             frmTextEditor? f = fnFindForm<frmTextEditor>();
             if (f == null)
             {
-                f = new frmTextEditor();
-                f.Owner = this;
+                f = new frmTextEditor(this);
                 f.Show();
             }
 
@@ -1557,8 +1556,7 @@ namespace Alien
             frmTextEditor? f = fnFindForm<frmTextEditor>();
             if (null == f)
             {
-                f = new frmTextEditor();
-                f.Owner = this;
+                f = new frmTextEditor(this);
                 f.Show();
             }
 
@@ -2231,68 +2229,78 @@ namespace Alien
 
                 foreach (string szDirName in aszSubDirs)
                 {
-                    string szFolderName = Path.GetFileName(szDirName);
-                    TreeNode nodeDir = new TreeNode(szFolderName);
-
-                    var manifest = await Task.Run(() => m_plugin.fnLoadPluginManifest(szDirName));
-                    bool bAddNode = false;
-                    bool bIsPlugin = false;
-
-                    if (manifest != null && manifest.HasValue)
+                    try
                     {
-                        var info = manifest.Value;
+                        string szFolderName = Path.GetFileName(szDirName);
+                        TreeNode nodeDir = new TreeNode(szFolderName);
 
-                        if (toolStripComboBox1.SelectedIndex == 0 && !info.lsEnvironment.Contains(m_plugin.m_szEnvironment))
+                        var manifest = await Task.Run(() => m_plugin.fnLoadPluginManifest(szDirName));
+                        bool bAddNode = false;
+                        bool bIsPlugin = false;
+
+                        if (manifest != null && manifest.HasValue)
                         {
-                            bAddNode = false;
+                            var info = manifest.Value;
+
+                            if (m_plugin == null || toolStripComboBox1 == null || info.lsEnvironment == null || m_plugin.m_szEnvironment == null)
+                                return 0;
+
+                            if (toolStripComboBox1.SelectedIndex == 0 && !info.lsEnvironment.Contains(m_plugin.m_szEnvironment))
+                            {
+                                bAddNode = false;
+                            }
+                            else
+                            {
+                                bAddNode = true;
+                                bIsPlugin = true;
+                            }
                         }
                         else
                         {
-                            bAddNode = true;
-                            bIsPlugin = true;
+                            string szIndexPath = Path.Combine(szDirName, "index.html");
+                            bool bFileExists = await Task.Run(() => File.Exists(szIndexPath));
+                            if (bFileExists)
+                            {
+                                bAddNode = true;
+                            }
                         }
-                    }
-                    else
-                    {
-                        string szIndexPath = Path.Combine(szDirName, "index.html");
-                        bool bFileExists = await Task.Run(() => File.Exists(szIndexPath));
-                        if (bFileExists)
+
+                        if (bAddNode && !string.IsNullOrEmpty(szFilter))
                         {
-                            bAddNode = true;
+                            if (szFolderName.IndexOf(szFilter, StringComparison.OrdinalIgnoreCase) < 0)
+                            {
+                                bAddNode = false;
+                                bIsPlugin = false;
+                            }
                         }
-                    }
 
-                    if (bAddNode && !string.IsNullOrEmpty(szFilter))
-                    {
-                        if (szFolderName.IndexOf(szFilter, StringComparison.OrdinalIgnoreCase) < 0)
+                        if (bAddNode)
                         {
-                            bAddNode = false;
-                            bIsPlugin = false;
+                            nPluginCount++;
+                        }
+
+                        if (bIsPlugin)
+                        {
+                            nodeDir.ImageKey = "sword";
+                            nodeDir.SelectedImageKey = "sword";
+                        }
+                        else
+                        {
+                            nodeDir.ImageKey = "folder";
+                            nodeDir.SelectedImageKey = "folder";
+                        }
+
+                        int nSubCount = await fnLoadAllPlugins(szDirName, nodeDir.Nodes, szFilter);
+                        nPluginCount += nSubCount;
+
+                        if (bAddNode || nodeDir.Nodes.Count > 0)
+                        {
+                            currentNodes.Add(nodeDir);
                         }
                     }
-
-                    if (bAddNode)
+                    catch (NullReferenceException)
                     {
-                        nPluginCount++;
-                    }
-
-                    if (bIsPlugin)
-                    {
-                        nodeDir.ImageKey = "sword";
-                        nodeDir.SelectedImageKey = "sword";
-                    }
-                    else
-                    {
-                        nodeDir.ImageKey = "folder";
-                        nodeDir.SelectedImageKey = "folder";
-                    }
-
-                    int nSubCount = await fnLoadAllPlugins(szDirName, nodeDir.Nodes, szFilter);
-                    nPluginCount += nSubCount;
-
-                    if (bAddNode || nodeDir.Nodes.Count > 0)
-                    {
-                        currentNodes.Add(nodeDir);
+                        return 0;
                     }
                 }
             }
@@ -2322,6 +2330,26 @@ namespace Alien
             m_socks5.fnStop();
 
             //await m_web.DisposeAsync();
+        }
+
+        async void fnPluginInit()
+        {
+            try
+            {
+                string szEnv = Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/");
+
+                await webViewPlugin.EnsureCoreWebView2Async(null);
+                webViewPlugin.CoreWebView2.AddHostObjectToScript("nativeBridge", new clsfnPlugin.clsBridge(m_web, szEnv));
+
+                string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
+                webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+
+                toolStripComboBox1.SelectedIndex = 0;
+            }
+            catch
+            {
+                return;
+            }
         }
 
         async void fnSetup()
@@ -2370,6 +2398,10 @@ namespace Alien
             listView12.FullRowSelect = true;
             listView16.FullRowSelect = true;
             listView17.FullRowSelect = true;
+
+            // Plugins
+
+            fnPluginInit();
 
             //Information
             m_ctrlInfoBrowser.DocumentText = await fnszGetInfo();
@@ -2667,38 +2699,6 @@ namespace Alien
                 }
 
                 toolStripStatusLabel4.Text = "Action successfully.";
-            }
-
-            // Plugins
-
-            /*
-              
-            var plugins = m_plugin.fnGetPlugins();
-            foreach (var plugin in plugins)
-            {
-                TreeNode node = new TreeNode(plugin.szPluginName);
-                node.Tag = plugin;
-
-                treeView1.Nodes.Add(node);
-            }
-
-            */
-
-            try
-            {
-                string szEnv = Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/");
-
-                await webViewPlugin.EnsureCoreWebView2Async(null);
-                webViewPlugin.CoreWebView2.AddHostObjectToScript("nativeBridge", new clsfnPlugin.clsBridge(m_web, szEnv));
-
-                string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
-                webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
-
-                toolStripComboBox1.SelectedIndex = 0;
-            }
-            catch
-            {
-                return;
             }
 
             // SOCKS5

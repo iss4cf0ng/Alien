@@ -18,6 +18,7 @@ namespace Alien
         private clsVictim m_victim { get; init; }
         private int m_nImageCount { get; init; }
         private ImageList m_ImageList { get; init; }
+        private TabPage? draggedTab { get; set; } = null;
         private string m_szImgDir { get; init; }
 
         public frmFileImage(clsVictim victim, int nImageCount)
@@ -102,8 +103,6 @@ namespace Alien
 
             pb.Image = entity.img;
             pb.Refresh();
-
-            ThemeManager.Apply(this);
         }
 
         private void fnSaveImage(ListViewItem item) => fnSaveImage(new List<stImageEntity>() { fnGetItemTag(item) });
@@ -153,13 +152,37 @@ namespace Alien
             toolStripProgressBar1.Maximum = m_nImageCount;
             toolStripProgressBar1.Value = 0;
 
-            tabControl1.AllowDrop = true;
-            tabControl1.Padding = new Point(30, 3);
             tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
-            tabControl1.ItemSize = new Size(140, 28);
+            tabControl1.Padding = new Point(30, 5);
+
+            new TabZeroHook(tabControl1);
 
             tabControl1.DrawItem += (s, e) =>
             {
+                using (Brush bg = new SolidBrush(ThemeManager.Current.ControlBackColor))
+                {
+                    if (tabControl1.TabCount == 0)
+                    {
+                        e.Graphics.FillRectangle(bg, tabControl1.ClientRectangle);
+                        return;
+                    }
+
+                    if (e.Index == tabControl1.TabCount - 1)
+                    {
+                        Rectangle lastTabRect = tabControl1.GetTabRect(e.Index);
+                        if (lastTabRect.Right < tabControl1.Width)
+                        {
+                            Rectangle leftover = new Rectangle(
+                                lastTabRect.Right,
+                                lastTabRect.Top,
+                                tabControl1.Width - lastTabRect.Right,
+                                lastTabRect.Height);
+
+                            e.Graphics.FillRectangle(bg, leftover);
+                        }
+                    }
+                }
+
                 if (e.Index < 0 || e.Index >= tabControl1.TabPages.Count)
                     return;
 
@@ -168,13 +191,13 @@ namespace Alien
 
                 bool selected = e.Index == tabControl1.SelectedIndex;
 
-                // background
+                // tab background
                 using (Brush bg = new SolidBrush(ThemeManager.Current.ControlBackColor))
                 {
                     e.Graphics.FillRectangle(bg, rect);
                 }
 
-                // selected line
+                // selected highlight
                 if (selected)
                 {
                     using (Brush accent = new SolidBrush(ThemeManager.Current.AccentColor))
@@ -183,60 +206,120 @@ namespace Alien
                     }
                 }
 
-                // text area reserve X space
-                Rectangle textRect = rect;
-
-                if (e.Index > 0)
-                {
-                    textRect.Width -= 22;
-                }
-
+                // text
                 TextRenderer.DrawText(
                     e.Graphics,
                     page.Text,
                     e.Font,
-                    textRect,
-                    selected
-                        ? ThemeManager.Current.AccentColor
-                        : ThemeManager.Current.ForeColor,
+                    rect,
+                    selected ? ThemeManager.Current.AccentColor : ThemeManager.Current.ForeColor,
                     TextFormatFlags.HorizontalCenter |
-                    TextFormatFlags.VerticalCenter);
-
-                // first tab cannot close
-                if (e.Index == 0)
-                    return;
+                    TextFormatFlags.VerticalCenter
+                );
 
                 // X button
-                Rectangle closeRect = new Rectangle(rect.Right - 22, rect.Top + 8, 14, 14);
+                Rectangle closeRect = fnGetCloseRect(e.Index);
 
                 using (Pen pen = new Pen(ThemeManager.Current.ForeColor, 2))
                 {
-                    e.Graphics.DrawLine(pen, closeRect.Left + 2, closeRect.Top + 2, closeRect.Right - 2, closeRect.Bottom - 2);
-                    e.Graphics.DrawLine(pen, closeRect.Right - 2, closeRect.Top + 2, closeRect.Left + 2, closeRect.Bottom - 2);
+                    e.Graphics.DrawLine(pen, closeRect.Left + 4, closeRect.Top + 4, closeRect.Right - 4, closeRect.Bottom - 4);
+                    e.Graphics.DrawLine(pen, closeRect.Right - 4, closeRect.Top + 4, closeRect.Left + 4, closeRect.Bottom - 4);
                 }
             };
+            tabControl1.KeyDown += async (s, e) =>
+            {
+                if (e.Modifiers == Keys.Control)
+                {
+                    TabPage? page = tabControl1.SelectedTab;
+                    if (page == null)
+                        return;
 
+                    switch (e.KeyCode)
+                    {
+                        case Keys.W:
+                            //Close page.
+
+                            {
+                                if (page.Text.Contains("*"))
+                                {
+                                    DialogResult dr = MessageBox.Show("The data is modified. Close anyway?", "Wait!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                                    if (dr != DialogResult.Yes)
+                                        return;
+                                }
+
+                                int nIdx = tabControl1.SelectedIndex;
+                                if (nIdx < 0)
+                                    return;
+
+                                if (tabControl1.TabPages.Count > 1)
+                                {
+                                    if (nIdx > 0 && nIdx == tabControl1.TabPages.Count - 1)
+                                        tabControl1.SelectedTab = tabControl1.TabPages[nIdx - 1];
+                                    else
+                                        tabControl1.SelectedTab = tabControl1.TabPages[nIdx + 1];
+                                }
+
+                                tabControl1.TabPages.Remove(page);
+                            }
+                            break;
+                    }
+                }
+            };
             tabControl1.MouseDown += (s, e) =>
             {
                 int nIdx = fnGetTabIndexAt(e.Location);
-
-                if (nIdx < 0)
+                if (nIdx == -1)
                     return;
 
-                // close button
-                if (nIdx > 0)
+                if (fnGetCloseRect(nIdx).Contains(e.Location))
                 {
-                    Rectangle closeRect = new Rectangle(tabControl1.GetTabRect(nIdx).Right - 18, tabControl1.GetTabRect(nIdx).Top + (tabControl1.GetTabRect(nIdx).Height - 12) / 2, 12, 12);
-
-                    if (closeRect.Contains(e.Location))
-                    {
-                        tabControl1.TabPages.RemoveAt(nIdx);
-                        return;
-                    }
+                    tabControl1.TabPages.RemoveAt(nIdx);
+                    return;
                 }
 
-                // select tab
-                tabControl1.SelectedIndex = nIdx;
+                if (e.Button != MouseButtons.Left)
+                    return;
+
+                draggedTab = tabControl1.TabPages[nIdx];
+
+                tabControl1.DoDragDrop(draggedTab, DragDropEffects.Move);
+            };
+
+            tabControl1.DragOver += (s, e) =>
+            {
+                e.Effect = DragDropEffects.Move;
+            };
+
+            tabControl1.DragDrop += (s, e) =>
+            {
+                Point p = tabControl1.PointToClient(new Point(e.X, e.Y));
+                int nIdx = fnGetTabIndexAt(p);
+
+                if (nIdx < 0 || draggedTab == null)
+                    return;
+
+                int oldIdx = tabControl1.TabPages.IndexOf(draggedTab);
+
+                if (oldIdx == -1 || oldIdx == nIdx)
+                    return;
+
+                tabControl1.TabPages.Remove(draggedTab);
+
+                if (nIdx > oldIdx)
+                    nIdx--;
+
+                nIdx = Math.Max(0, Math.Min(nIdx, tabControl1.TabPages.Count));
+
+                tabControl1.TabPages.Insert(nIdx, draggedTab);
+
+                tabControl1.SelectedTab = draggedTab;
+
+                draggedTab = null;
+            };
+
+            tabControl1.DragLeave += (s, e) =>
+            {
+                draggedTab = null;
             };
 
             timer1.Start();
@@ -250,6 +333,17 @@ namespace Alien
                     return i;
             }
             return -1;
+        }
+
+        private Rectangle fnGetCloseRect(int i)
+        {
+            Rectangle tabRect = tabControl1.GetTabRect(i);
+
+            return new Rectangle(
+                tabRect.Right - 20,
+                tabRect.Top + 4,
+                15,
+                15);
         }
 
         private void frmFileImage_Load(object sender, EventArgs e)

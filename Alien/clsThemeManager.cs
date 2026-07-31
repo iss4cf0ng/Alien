@@ -441,6 +441,17 @@ namespace Alien
                 root.Invalidate();
             }
 
+            public static void ApplyRange(Control.ControlCollection controls)
+            {
+                foreach (var ctrl in controls)
+                    Apply((Control)ctrl);
+            }
+            public static void ApplyRange(Control[] controls)
+            {
+                foreach (var ctrl in controls)
+                    Apply(ctrl);
+            }
+
             private static void SaveOriginalColor(Control c)
             {
                 if (OriginalColors.ContainsKey(c))
@@ -1179,38 +1190,45 @@ namespace Alien
 
             private static void TabControl_DrawItem(object sender, DrawItemEventArgs e)
             {
-                TabControl tab = (TabControl)sender;
-
-                bool selected = e.Index == tab.SelectedIndex;
-
-                Rectangle rect = e.Bounds;
-
-                using Brush bg = new SolidBrush(Current.ControlBackColor);
-
-                e.Graphics.FillRectangle(bg, rect);
-
-                Color textColor = Current.ForeColor;
-
-                // Selected Tab
-                if (selected)
+                try
                 {
-                    textColor = Current.AccentColor;
-                    Rectangle highlight = new Rectangle(rect.Left + 8, rect.Bottom - 3, rect.Width - 16, 3);
+                    TabControl tab = (TabControl)sender;
 
-                    using Brush accent = new SolidBrush(Current.AccentColor);
+                    bool selected = e.Index == tab.SelectedIndex;
 
-                    e.Graphics.FillRectangle(accent, highlight);
+                    Rectangle rect = e.Bounds;
+
+                    using Brush bg = new SolidBrush(Current.ControlBackColor);
+
+                    e.Graphics.FillRectangle(bg, rect);
+
+                    Color textColor = Current.ForeColor;
+
+                    // Selected Tab
+                    if (selected)
+                    {
+                        textColor = Current.AccentColor;
+                        Rectangle highlight = new Rectangle(rect.Left + 8, rect.Bottom - 3, rect.Width - 16, 3);
+
+                        using Brush accent = new SolidBrush(Current.AccentColor);
+
+                        e.Graphics.FillRectangle(accent, highlight);
+                    }
+
+                    TextRenderer.DrawText(
+                        e.Graphics,
+                        tab.TabPages[e.Index].Text,
+                        tab.Font,
+                        rect,
+                        textColor,
+                        TextFormatFlags.HorizontalCenter |
+                        TextFormatFlags.VerticalCenter
+                    );
                 }
+                catch
+                {
 
-                TextRenderer.DrawText(
-                    e.Graphics,
-                    tab.TabPages[e.Index].Text,
-                    tab.Font,
-                    rect,
-                    textColor,
-                    TextFormatFlags.HorizontalCenter |
-                    TextFormatFlags.VerticalCenter
-                );
+                }
             }
 
             private static void ApplyMenuStrip(MenuStrip menu)

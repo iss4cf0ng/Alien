@@ -105,9 +105,6 @@
             resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.DrawItem += tabControl1_DrawItem;
-            tabControl1.KeyDown += tabControl1_KeyDown;
-            tabControl1.MouseDown += tabControl1_MouseDown;
             // 
             // tabPage1
             // 
@@ -143,9 +140,6 @@
 
         private MenuStrip menuStrip1;
         private StatusStrip statusStrip1;
-        private TabControl tabControl1;
-        private TabPage tabPage1;
-        private TabPage tabPage2;
         private ToolStripMenuItem toolStripMenuItem1;
         private ToolStripMenuItem toolStripMenuItem2;
         private ToolStripMenuItem toolStripMenuItem4;
@@ -153,5 +147,8 @@
         private ToolStripMenuItem toolStripMenuItem3;
         private ToolStripMenuItem toolStripMenuItem6;
         private ToolStripMenuItem toolStripMenuItem7;
+        private TabControl tabControl1;
+        private TabPage tabPage1;
+        private TabPage tabPage2;
     }
 }
