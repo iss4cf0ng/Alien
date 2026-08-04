@@ -171,6 +171,9 @@ namespace Alien
                 fnLoadComet(lsComet);
 
                 listView1.Sort();
+
+                groupBox3.Enabled = checkBox1.Checked;
+                textBox5.Enabled = !checkBox1.Checked && listView1.Items.Count == 0;
             }
         }
 

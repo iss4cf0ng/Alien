@@ -58,7 +58,9 @@
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             toolStripMenuItem7 = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripMenuItem();
-            toolStripButton1 = new ToolStripButton();
+            toolStripDropDownButton2 = new ToolStripDropDownButton();
+            toolStripMenuItem10 = new ToolStripMenuItem();
+            toolStripMenuItem11 = new ToolStripMenuItem();
             toolStripButton4 = new ToolStripButton();
             toolStripButton2 = new ToolStripButton();
             toolStripButton3 = new ToolStripButton();
@@ -234,7 +236,7 @@
             // toolStrip1
             // 
             resources.ApplyResources(toolStrip1, "toolStrip1");
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton1, toolStripButton4, toolStripButton2, toolStripButton3 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2, toolStripButton4, toolStripButton2, toolStripButton3 });
             toolStrip1.Name = "toolStrip1";
             // 
             // toolStripDropDownButton1
@@ -256,12 +258,24 @@
             resources.ApplyResources(toolStripMenuItem8, "toolStripMenuItem8");
             toolStripMenuItem8.Click += toolStripMenuItem8_Click;
             // 
-            // toolStripButton1
+            // toolStripDropDownButton2
             // 
-            toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            resources.ApplyResources(toolStripButton1, "toolStripButton1");
-            toolStripButton1.Name = "toolStripButton1";
-            toolStripButton1.Click += toolStripButton1_Click;
+            toolStripDropDownButton2.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton2.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem10, toolStripMenuItem11 });
+            resources.ApplyResources(toolStripDropDownButton2, "toolStripDropDownButton2");
+            toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            // 
+            // toolStripMenuItem10
+            // 
+            toolStripMenuItem10.Name = "toolStripMenuItem10";
+            resources.ApplyResources(toolStripMenuItem10, "toolStripMenuItem10");
+            toolStripMenuItem10.Click += toolStripMenuItem10_Click;
+            // 
+            // toolStripMenuItem11
+            // 
+            toolStripMenuItem11.Name = "toolStripMenuItem11";
+            resources.ApplyResources(toolStripMenuItem11, "toolStripMenuItem11");
+            toolStripMenuItem11.Click += toolStripMenuItem11_Click;
             // 
             // toolStripButton4
             // 
@@ -384,7 +398,6 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.Timer timer1;
-        private ToolStripButton toolStripButton1;
         private ImageList imageList1;
         private ToolStripProgressBar toolStripProgressBar1;
         private ToolStripStatusLabel toolStripStatusLabel4;
@@ -394,5 +407,8 @@
         private ContextMenuStrip contextMenuStrip2;
         private ToolStripMenuItem toolStripMenuItem9;
         private ToolStripButton toolStripButton4;
+        private ToolStripDropDownButton toolStripDropDownButton2;
+        private ToolStripMenuItem toolStripMenuItem10;
+        private ToolStripMenuItem toolStripMenuItem11;
     }
 }

