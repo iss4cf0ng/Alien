@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmPortInfo : Form
+    public partial class frmPortInfo : BaseForm
     {
         private string m_szIP { get; init; }
         private List<int> m_lnPort { get; init; }

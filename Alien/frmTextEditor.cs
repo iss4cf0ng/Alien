@@ -109,7 +109,7 @@ namespace Alien
             tabControl1.DrawMode = TabDrawMode.OwnerDrawFixed;
             tabControl1.Padding = new Point(30, 5);
 
-            ThemeManager.Apply(menuStrip1);
+            ThemeManager.ApplyRange(new Control[] {menuStrip1,statusStrip1});
 
             new TabZeroHook(tabControl1);
 

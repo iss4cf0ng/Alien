@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace Alien
 {
-    public partial class frmRegEditWord : Form
+    public partial class frmRegEditWord : BaseForm
     {
         private clsfnWinReg m_winReg { get; init; }
 

@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmWGET : Form
+    public partial class frmWGET : BaseForm
     {
         private clsfnFileMgr m_fileMgr { get; init; }
         private frmControlPanel m_frmCtrl { get; init; }

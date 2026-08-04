@@ -148,7 +148,7 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Read file as text
             /// </summary>
             /// <param name="szFilePath"></param>
             /// <returns></returns>
@@ -161,7 +161,7 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Read file as bytes
             /// </summary>
             /// <param name="szFilePath"></param>
             /// <returns></returns>
@@ -174,7 +174,7 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Execute payload with JSON parameters
             /// </summary>
             /// <param name="szJson"></param>
             /// <param name="szPayload"></param>

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmScanHost : Form
+    public partial class frmScanHost : BaseForm
     {
         public string m_szHosts { get; set; } = string.Empty;
         public string m_szPorts { get; set; } = string.Empty;

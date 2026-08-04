@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmRegEditMultiString : Form
+    public partial class frmRegEditMultiString : BaseForm
     {
         private clsfnWinReg m_winReg { get; init; }
 

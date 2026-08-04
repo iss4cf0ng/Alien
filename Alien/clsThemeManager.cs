@@ -391,7 +391,7 @@ namespace Alien
             private static readonly Dictionary<Control, (Color Back, Color Fore)> OriginalColors = new();
             private static readonly Dictionary<TabControl, TabControlEraseHook> EraseHooks = new();
 
-            public static event EventHandler ThemeChanged;
+            public static event EventHandler? ThemeChanged;
 
             public static string CurrentName { get; private set; } = "Default";
 
@@ -952,8 +952,7 @@ namespace Alien
 
             private static void ApplyWebBrowser(WebBrowser wb)
             {
-                SetBackColorIfUnmodified(wb, Current.TextBoxBackColor);
-                SetForeColorIfUnmodified(wb, Current.ForeColor);
+                
             }
 
             private static void ApplyTabControl(TabControl tab)

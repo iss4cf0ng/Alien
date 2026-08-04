@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmRename : Form
+    public partial class frmRename : BaseForm
     {
         private clsfnFileMgr? m_fileMgr { get; init; } = null;
         private clsfnWinReg? m_winReg { get; init; } = null;

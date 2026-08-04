@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmFileCopyMoveProgress : Form
+    public partial class frmFileCopyMoveProgress : BaseForm
     {
         private int m_nThread { get; set; } = 10;
         private clsfnFileMgr m_fileMgr { get; init; }

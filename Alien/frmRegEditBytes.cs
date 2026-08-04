@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Alien
 {
-    public partial class frmRegEditBytes : Form
+    public partial class frmRegEditBytes : BaseForm
     {
         private HexBox m_hexBox = new HexBox();
 
