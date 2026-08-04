@@ -70,6 +70,8 @@ namespace Alien
 
         void fnSetup()
         {
+            textBox1.PlaceholderText = "Plain text";
+
             textBox2.PlaceholderText = "Encode this text";
             textBox3.PlaceholderText = "Decode this text";
             textBox4.PlaceholderText = "Encode this text";

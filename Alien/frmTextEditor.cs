@@ -224,14 +224,15 @@ namespace Alien
                             if (fnbIsModified())
                             {
                                 var ctrls = fnGetTabControl();
+
+
                                 string szFilePath = ctrls.tbPath.Text;
                                 string szContent = ctrls.editorEx.Text;
 
-                                if (Owner == null)
+                                if (m_frmControl == null)
                                     return;
 
-                                frmControlPanel f = (frmControlPanel)Owner;
-                                if (await f.fnbFileWrite(szFilePath, szContent))
+                                if (await m_frmControl.fnbFileWrite(szFilePath, szContent))
                                 {
                                     page.Text = page.Text.Replace("*", string.Empty);
 
@@ -412,6 +413,7 @@ namespace Alien
                 return;
 
             var ctrls = fnGetTabControl(page);
+
             string szFilePath = ctrls.tbPath.Text;
             string szContent = ctrls.editorEx.Text;
 
