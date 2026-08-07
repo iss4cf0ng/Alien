@@ -72,16 +72,16 @@ namespace Alien
             lvwSorter.SortColumn = nIdx;
             lvwSorter.Order = defaultOrder == ListViewHeaderChanger.SortOrder.Ascending ? SortOrder.Ascending : SortOrder.Descending;
 
-            listView1.Sort();
-            listView1.SetSortArrow(nIdx, defaultOrder);
-
             foreach (int nPort in m_lnPort)
             {
                 ListViewItem item = new ListViewItem(nPort.ToString());
                 item.SubItems.Add(m_dicPortService.ContainsKey(nPort) ? m_dicPortService[nPort] : "Unknown");
 
                 listView1.Items.Add(item);
-            }    
+            }
+
+            listView1.Sort();
+            listView1.SetSortArrow(nIdx, defaultOrder);
         }
 
         private void frmPortInfo_Load(object sender, EventArgs e)

@@ -135,7 +135,10 @@ namespace Alien
                         {
                             byte[] abData = provider.Bytes.ToArray();
                             if (!await m_frmCtrl.m_fileMgr.fnbFileWriteAllBytes(file.szFilePath, abData))
+                            {
                                 MessageBox.Show("Save file failed: " + file.szFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
 
                             Invoke(() => page.Text = page.Text.Replace("*", string.Empty));
                         });

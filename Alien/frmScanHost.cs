@@ -16,16 +16,20 @@ namespace Alien
         public string m_szPorts { get; set; } = string.Empty;
         public int m_nThread { get; set; } = 3;
 
-        public frmScanHost()
+        private clsIniManager m_iniMgr { get; init; }
+
+        public frmScanHost(clsIniManager iniMgr)
         {
             InitializeComponent();
 
             Text = "Scan Host";
+
+            m_iniMgr = iniMgr;
         }
 
         void fnSetup()
         {
-            textBox2.Text = "80-88,135,139,445,1433,3306,3389,8080,8088,8888";
+            textBox2.Text = m_iniMgr.ReadString("ScanPort", "Ports");
         }
 
         private void frmScanHost_Load(object sender, EventArgs e)

@@ -239,6 +239,10 @@ namespace Alien
                                     if (!string.Equals(Path.GetFileName(szFilePath), page.Text))
                                         page.Text = Path.GetFileName(szFilePath);
                                 }
+                                else
+                                {
+                                    MessageBox.Show("Failed to save: " + szFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
                             }
 
                             break;

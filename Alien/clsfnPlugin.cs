@@ -174,6 +174,85 @@ namespace Alien
             }
 
             /// <summary>
+            /// Save file as text
+            /// </summary>
+            /// <param name="szFileContent"></param>
+            /// <returns></returns>
+            public string fnSaveFileText(string szFileName, string szFileContent)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.FileName = szFileName;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        File.WriteAllText(sfd.FileName, szFileContent);
+
+                        return "[+] Saved file successfully: " + sfd.FileName;
+                    }
+                    catch (Exception ex)
+                    {
+                        return "[-] " + ex.Message;
+                    }
+                }
+                else
+                {
+                    return "[!] Action was cancelled.";
+                }
+            }
+
+            /// <summary>
+            /// Save file as bytes
+            /// </summary>
+            /// <param name="abFileBytes"></param>
+            /// <returns></returns>
+            public string fnSaveFileBytes(string szFileName, string szB64Data)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.FileName = szFileName;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        byte[] abFileBytes = Convert.FromBase64String(szB64Data);
+                        File.WriteAllBytes(sfd.FileName, abFileBytes);
+
+                        return "[+] Saved file successfully: " + sfd.FileName;
+                    }
+                    catch (Exception ex)
+                    {
+                        return "[-] " + ex.Message;
+                    }
+                }
+                else
+                {
+                    return "[!] Action was cancelled.";
+                }
+            }
+
+            /// <summary>
+            /// Upload file
+            /// </summary>
+            /// <returns></returns>
+            public byte[] fnFileUpload()
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        return File.ReadAllBytes(ofd.FileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+
+                return new byte[] { };
+            }
+
+            /// <summary>
             /// Execute payload with JSON parameters
             /// </summary>
             /// <param name="szJson"></param>

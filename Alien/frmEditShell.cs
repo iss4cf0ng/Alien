@@ -161,6 +161,12 @@ namespace Alien
                 comboBox4.Text = m_stShellConfig.szMethod;
                 comboBox3.Text = m_stShellConfig.payloadType.ToString();
 
+                textBox4.Text = m_stShellConfig.szUserAgent;
+                numericUpDown1.Value = m_stShellConfig.nTimeout;
+                textBox6.Text = m_stShellConfig.szCookie;
+                textBox5.Text = m_stShellConfig.szExtraPost;
+                comboBox7.SelectedIndex = m_stShellConfig.nExtraPostPosition;
+
                 checkBox1.Checked = m_stShellConfig.bEHEnable;
                 textBox3.Text = m_stShellConfig.szDescription;
                 textBox4.Text = m_stShellConfig.szUserAgent;

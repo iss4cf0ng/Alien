@@ -306,6 +306,7 @@
             panel2 = new Panel();
             textBox8 = new TextBox();
             label1 = new Label();
+            toolStripMenuItem57 = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -1319,7 +1320,7 @@
             // menuVoid
             // 
             resources.ApplyResources(menuVoid, "menuVoid");
-            menuVoid.Items.AddRange(new ToolStripItem[] { toolStripMenuItem48, toolStripMenuItem49, toolStripMenuItem50 });
+            menuVoid.Items.AddRange(new ToolStripItem[] { toolStripMenuItem48, toolStripMenuItem49, toolStripMenuItem57, toolStripMenuItem50 });
             menuVoid.Name = "contextMenuStrip1";
             // 
             // toolStripMenuItem48
@@ -2323,6 +2324,11 @@
             resources.ApplyResources(label1, "label1");
             label1.Name = "label1";
             // 
+            // toolStripMenuItem57
+            // 
+            toolStripMenuItem57.Name = "toolStripMenuItem57";
+            resources.ApplyResources(toolStripMenuItem57, "toolStripMenuItem57");
+            // 
             // frmControlPanel
             // 
             resources.ApplyResources(this, "$this");
@@ -2792,5 +2798,6 @@
         private ToolStripButton toolStripButton20;
         private ToolStripStatusLabel toolStripStatusLabel12;
         private ToolStripButton toolStripButton21;
+        private ToolStripMenuItem toolStripMenuItem57;
     }
 }

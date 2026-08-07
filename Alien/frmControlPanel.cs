@@ -38,6 +38,8 @@ namespace Alien
         public clsWeb m_web { get; init; }
         public clsVictim m_victim { get { return m_web.m_victim; } }
 
+        private clsIniManager m_iniMgr { get; init; }
+
         private bool m_isReading = false;                   // Virtual Shell
 
         public clsfnInfoSpyder m_infoSpyder { get; init; }  // Infospyder
@@ -170,7 +172,7 @@ namespace Alien
         };
         private bool fnbIsImageFile(string szExtension) => m_asImageExt.Contains(szExtension.Replace(".", string.Empty));
 
-        public frmControlPanel(clsWeb web)
+        public frmControlPanel(clsWeb web, clsIniManager iniMgr)
         {
             InitializeComponent();
 
@@ -189,6 +191,8 @@ namespace Alien
             m_socks5 = new clsfnSocks5(web);
 
             m_dbMgr = new clsfnDb(web, "db.sqlite");
+
+            m_iniMgr = iniMgr;
         }
 
         #region Classes
@@ -3544,21 +3548,22 @@ namespace Alien
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            bool bStart = string.Equals(button2.Text, "Start");
+            bool bStart = string.Equals(button1.Text, "Start");
 
             if (!bStart)
             {
-                timerShell.Stop();
-                button2.Text = "Start";
-                m_rShell.m_bIsRunning = false;
-
                 try
                 {
+                    timerShell.Stop();
+                    button1.Text = "Start";
+                    m_rShell.m_bIsRunning = false;
+
                     await m_rShell.fnPipeStop();
                 }
                 catch { }
 
                 m_isReading = false;
+
                 return;
             }
 
@@ -4455,7 +4460,7 @@ namespace Alien
 
         private async void toolStripMenuItem48_Click(object sender, EventArgs e)
         {
-            frmScanHost f = new frmScanHost();
+            frmScanHost f = new frmScanHost(m_iniMgr);
             if (f.ShowDialog() != DialogResult.OK)
                 return;
 
