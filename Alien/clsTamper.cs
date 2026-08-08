@@ -50,7 +50,7 @@ namespace Alien
         }
 
         /// <summary>
-        /// 
+        /// Merge parameters into a payload
         /// </summary>
         /// <param name="config"></param>
         /// <param name="szPayload"></param>

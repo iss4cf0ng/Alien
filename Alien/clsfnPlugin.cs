@@ -15,6 +15,11 @@ namespace Alien
         public string m_szPluginsDir { get; init; }
         public string m_szEnvironment { get { return Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/"); } }
 
+        /// <summary>
+        /// Remote plugin object
+        /// </summary>
+        /// <param name="web">Web object</param>
+        /// <param name="szDir">Plugins directory</param>
         public clsfnPlugin(clsWeb web, string szDir = "Plugins")
         {
             m_web = web;
@@ -85,8 +90,8 @@ namespace Alien
         [ComVisible(true)]
         public class clsBridge
         {
-            private clsWeb m_web { get; init; } // Webshell object
-            private string m_szEnvironment { get; set; } // Environment (e.g., PHP/v8.X/OneShell)
+            private clsWeb m_web { get; init; }             // Webshell object
+            private string m_szEnvironment { get; set; }    // Environment (e.g., PHP/v8.X/OneShell)
 
             public clsBridge(clsWeb web, string szEnvironment)
             {
@@ -101,6 +106,15 @@ namespace Alien
             public string fnGetShellType()
             {
                 return m_szEnvironment;
+            }
+
+            /// <summary>
+            /// Check target's operating system
+            /// </summary>
+            /// <returns></returns>
+            public bool fnbIsUnixLike()
+            {
+                return m_web.m_victim.m_bUnixLike;
             }
 
             /// <summary>
