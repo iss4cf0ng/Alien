@@ -631,11 +631,18 @@ namespace Alien
 
                 if (!result.success)
                 {
-                    MessageBox.Show(result.error, "SQL query error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(result.error + "\n" + szQuery, "SQL query error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return dt;
                 }
 
-                dt = fnConvertToTable(result.data);
+                try
+                {
+                    dt = fnConvertToTable(result.data);
+                }
+                catch
+                {
+
+                }
             }
             catch (Exception ex)
             {
@@ -684,9 +691,12 @@ namespace Alien
         public async Task<bool> fnDbTest(stDbConfig config)
         {
             string szQuery = "SELECT 1;";
-            DataTable dt = await fnSqlQuery(config, szQuery);
+            var result = await fnSqlQueryEx(config, szQuery);
 
-            return dt.Rows.Count > 0 && dt.Columns.Count > 0 && Convert.ToInt32(dt.Rows[0][0]) == 1;
+            if (!result.bSuccess)
+                MessageBox.Show(result.szErrorMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            return result.bSuccess;
         }
 
         public async Task<DataTable> fnDbInfo(stDbConfig config)

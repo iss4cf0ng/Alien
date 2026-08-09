@@ -24,6 +24,8 @@ namespace Alien
 
             m_db = db;
             m_frmCtrl = frmCtrl;
+
+            Text = "Configuration";
         }
 
         public frmDbEdit(clsfnDb db, frmControlPanel frmCtrl, clsfnDb.stDbConfig dbConfig)

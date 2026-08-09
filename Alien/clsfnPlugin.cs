@@ -45,6 +45,11 @@ namespace Alien
             public string szDescription { get; set; }
         }
 
+        /// <summary>
+        /// Get manifest json object
+        /// </summary>
+        /// <param name="szPluginDirName"></param>
+        /// <returns></returns>
         public stManifest? fnLoadPluginManifest(string szPluginDirName)
         {
             try
@@ -65,6 +70,10 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// Get all plugins
+        /// </summary>
+        /// <returns></returns>
         public List<stManifest> fnGetPlugins()
         {
             List<stManifest> plugins = new List<stManifest>();
@@ -93,6 +102,11 @@ namespace Alien
             private clsWeb m_web { get; init; }             // Webshell object
             private string m_szEnvironment { get; set; }    // Environment (e.g., PHP/v8.X/OneShell)
 
+            /// <summary>
+            /// Plugin bridging object
+            /// </summary>
+            /// <param name="web"></param>
+            /// <param name="szEnvironment"></param>
             public clsBridge(clsWeb web, string szEnvironment)
             {
                 m_web = web;
@@ -241,6 +255,68 @@ namespace Alien
                 else
                 {
                     return "[!] Action was cancelled.";
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="dicFile"></param>
+            /// <returns></returns>
+            public string fnSaveTextFiles(Dictionary<string, string> dicFile)
+            {
+                FolderBrowserDialog fbd = new FolderBrowserDialog();
+                if (fbd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        foreach (var szFilename in dicFile.Keys)
+                        {
+                            string szContent = dicFile[szFilename];
+                            File.WriteAllText(szFilename, szContent);
+                        }
+
+                        return "[+] Action successfully: " + fbd.SelectedPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        return "[-] " + ex.Message;
+                    }
+                }
+                else
+                {
+                    return "[!] Action was aborted.";
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="dicFile"></param>
+            /// <returns></returns>
+            public string fnSaveByteFiles(Dictionary<string, byte[]> dicFile)
+            {
+                FolderBrowserDialog fbd = new FolderBrowserDialog();
+                if (fbd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        foreach (var szFilename in dicFile.Keys)
+                        {
+                            byte[] abContent = dicFile[szFilename];
+                            File.WriteAllBytes(szFilename, abContent);
+                        }
+
+                        return "[+] Action successfully: " + fbd.SelectedPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        return "[-] " + ex.Message;
+                    }
+                }
+                else
+                {
+                    return "[!] Action was aborted.";
                 }
             }
 

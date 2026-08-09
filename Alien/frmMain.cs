@@ -240,8 +240,8 @@ namespace Alien
                     frmControlPanel f = new frmControlPanel(web, m_iniMgr);
                     f.Text = $"{szDomain} | " +
                         $"{Enum.GetName(typeof(enLanguage), web.m_victim.ShellLanguage)} | " +
+                        $"{web.m_victim.m_ShellConfig.szMethod} | " +
                         $"{Enum.GetName(typeof(enPayloadType), web.m_victim.ShellPayloadType)} | " +
-                        $"{web.m_victim.m_ShellConfig.szMethod}" +
                         (web.m_victim.m_ShellConfig.bEHEnable ? " | " + web.m_victim.m_ShellConfig.szEventHorizonScript : string.Empty);
 
                     f.Show();

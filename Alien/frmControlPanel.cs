@@ -1711,8 +1711,8 @@ namespace Alien
                 ListViewItem item = ctrls.listView.SelectedItems[0];
                 string szTable = item.Text;
 
-                string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT 100;";
                 var config = m_dbMgr.m_stDbConfig[szHost];
+                string szQuery = m_dbMgr.fnBuildDataQuery(config.enDbType, szDbName, szTable);
                 DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
 
                 fnDbShowData(config, dt, szQuery, szDbName, szTable);
@@ -3433,7 +3433,7 @@ namespace Alien
             string szDbName = ctrls.m_nodeRoot.Text;
             string szTable = item.Text;
 
-            string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}` LIMIT 100;";
+            string szQuery = m_dbMgr.fnBuildDataQuery(config.enDbType, szDbName, szTable);
             DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
 
             fnDbShowData(config, dt, szQuery, szDbName, szTable);
@@ -3459,7 +3459,7 @@ namespace Alien
             string szDbName = ctrls.m_nodeRoot.Text;
             string szTable = item.Text;
 
-            string szQuery = $"SELECT * FROM `{szDbName}`.`{szTable}`;";
+            string szQuery = m_dbMgr.fnBuildDataQuery(config.enDbType, szDbName, szTable);
             DataTable dt = await m_dbMgr.fnSqlQuery(config, szQuery);
 
             fnDbShowData(config, dt, szQuery, szDbName, szTable);
