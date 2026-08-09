@@ -238,6 +238,11 @@ namespace Alien
 
         #region Local Function
 
+        /// <summary>
+        /// Check database existence
+        /// </summary>
+        /// <param name="szSource"></param>
+        /// <returns></returns>
         public bool fnbDbExists(string szSource)
         {
             string szQuery = "SELECT EXISTS(SELECT 1 FROM \"Database\" WHERE \"Source\" = @src);";
@@ -250,6 +255,11 @@ namespace Alien
             return Convert.ToInt32(result) == 1;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         private bool fnbDbWriteValidate(stDbConfig config)
         {
             if (!fnbDbExists(config.szSource))
@@ -266,6 +276,11 @@ namespace Alien
             return bRet;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public bool fnbSaveDatabase(stDbConfig config)
         {
             string szQuery = string.Empty;
@@ -313,6 +328,11 @@ namespace Alien
             return fnbDbWriteValidate(config);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szId"></param>
+        /// <returns></returns>
         public stDbConfig fnGetDbConfig(string szId)
         {
             var ls = fnGetAllDbConfig();
@@ -321,6 +341,10 @@ namespace Alien
             return config;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public List<stDbConfig> fnGetAllDbConfig()
         {
             List<stDbConfig> ls = new List<stDbConfig>();
@@ -362,6 +386,11 @@ namespace Alien
             return ls;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public bool fnbDbDelete(stDbConfig config)
         {
             if (!fnbDbExists(config.szSource))
@@ -382,6 +411,11 @@ namespace Alien
 
         #region Tools
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static string fnPrintTable(DataTable dt)
         {
             if (dt == null || dt.Columns.Count == 0)
@@ -403,8 +437,7 @@ namespace Alien
 
             StringBuilder sb = new StringBuilder();
 
-            string szSeparate =
-                "+" + string.Join("+", nWidths.Select(w => new string('-', w + 2))) + "+";
+            string szSeparate = "+" + string.Join("+", nWidths.Select(w => new string('-', w + 2))) + "+";
 
             sb.AppendLine(szSeparate);
 
@@ -442,6 +475,12 @@ namespace Alien
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cfg"></param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public static string fnBuildConnURL(stDbConfig cfg)
         {
             string user = Uri.EscapeDataString(cfg.szUsername ?? "");
@@ -496,6 +535,15 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbType"></param>
+        /// <param name="szDbName"></param>
+        /// <param name="szTable"></param>
+        /// <param name="nLimit"></param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public string fnBuildDataQuery(enDatabase dbType, string szDbName, string szTable, int nLimit = 100)
         {
             switch (dbType)
@@ -534,6 +582,11 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szSQL"></param>
+        /// <returns></returns>
         public string fnToSingleLineSql(string szSQL)
         {
             if (string.IsNullOrEmpty(szSQL))
@@ -565,6 +618,10 @@ namespace Alien
 
         #region Remote Function
 
+        /// <summary>
+        /// Get information of the remote database
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<(string, bool)>> fnDbInit()
         {
             string szContent = await m_web.fnszSendPayload("db_init");
@@ -573,6 +630,11 @@ namespace Alien
             return result;
         }
 
+        /// <summary>
+        /// Convert Dictionary object into DataTable object
+        /// </summary>
+        /// <param name="objData"></param>
+        /// <returns></returns>
         private DataTable fnConvertToTable(List<Dictionary<string, object>> objData)
         {
             DataTable dt = new DataTable();
@@ -596,6 +658,12 @@ namespace Alien
             return dt;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="szQuery"></param>
+        /// <returns></returns>
         public async Task<string> fnszSqlExec(stDbConfig config, string szQuery)
         {
             string? szDb = Enum.GetName(typeof(enDatabase), config.enDbType);
@@ -615,6 +683,12 @@ namespace Alien
             return szResp;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="szQuery"></param>
+        /// <returns></returns>
         public async Task<DataTable> fnSqlQuery(stDbConfig config, string szQuery)
         {
             DataTable dt = new DataTable();
@@ -652,6 +726,12 @@ namespace Alien
             return dt;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="szQuery"></param>
+        /// <returns></returns>
         public async Task<clsSqlQueryExResult> fnSqlQueryEx(stDbConfig config, string szQuery)
         {
             DataTable dt = new DataTable();
@@ -688,6 +768,11 @@ namespace Alien
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public async Task<bool> fnDbTest(stDbConfig config)
         {
             string szQuery = "SELECT 1;";
@@ -699,6 +784,11 @@ namespace Alien
             return result.bSuccess;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public async Task<DataTable> fnDbInfo(stDbConfig config)
         {
             DataTable dt = new DataTable();
@@ -713,6 +803,12 @@ namespace Alien
             return dt;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="szDbName"></param>
+        /// <returns></returns>
         public async Task<List<string>> fnDbGetTables(stDbConfig config, string szDbName)
         {
             string fnGetSQL(enDatabase dbType, string dbName)
