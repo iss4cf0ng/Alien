@@ -68,7 +68,7 @@ namespace Alien
                     SERVERPROPERTY('InstanceName') AS instance_name,
                     @@VERSION AS version,
                     DB_NAME() AS current_database,
-                    SYSTEM_USER AS current_user;"
+                    SYSTEM_USER AS [current_user];"
             },
             {
                 enDatabase.PostgreSQL,
@@ -641,20 +641,38 @@ namespace Alien
             if (objData == null || objData.Count == 0)
                 return dt;
 
+            int emptyColIndex = 1;
             foreach (var key in objData.First().Keys)
-                dt.Columns.Add(key);
+            {
+                string colName = key;
+                if (string.IsNullOrWhiteSpace(colName))
+                {
+                    colName = "Column_" + emptyColIndex++;
+                }
+
+                string uniqueColName = colName;
+                int dup = 1;
+                while (dt.Columns.Contains(uniqueColName))
+                {
+                    uniqueColName = colName + "_" + dup++;
+                }
+
+                dt.Columns.Add(uniqueColName);
+            }
 
             foreach (var dict in objData)
             {
                 DataRow dr = dt.NewRow();
+                int i = 0;
                 foreach (var key in dict.Keys)
-                    dr[key] = dict[key]?.ToString();
-
+                {
+                    dr[dt.Columns[i].ColumnName] = dict[key]?.ToString();
+                    i++;
+                }
                 dt.Rows.Add(dr);
             }
 
             dt.AcceptChanges();
-
             return dt;
         }
 
@@ -720,7 +738,7 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                MessageBox.Show(szResp, "HTTP response", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message + "\n" + szResp, "HTTP response", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return dt;
@@ -732,7 +750,7 @@ namespace Alien
         /// <param name="config"></param>
         /// <param name="szQuery"></param>
         /// <returns></returns>
-        public async Task<clsSqlQueryExResult> fnSqlQueryEx(stDbConfig config, string szQuery)
+        public async Task<clsSqlQueryExResult?> fnSqlQueryEx(stDbConfig config, string szQuery)
         {
             DataTable dt = new DataTable();
             string szResp = await fnszSqlExec(config, szQuery);
@@ -747,25 +765,33 @@ namespace Alien
                 };
             }
 
-            clsQueryResponse? result = JsonSerializer.Deserialize<clsQueryResponse>(szResp);
-            if (result == null)
+            try
             {
+                clsQueryResponse? result = JsonSerializer.Deserialize<clsQueryResponse>(szResp);
+                if (result == null)
+                {
+                    return new clsSqlQueryExResult()
+                    {
+                        bSuccess = false,
+                        szQuery = szQuery,
+                        szErrorMsg = "JSON deserialization is failed. Responsed result is invalid.",
+                        dtOutput = dt,
+                    };
+                }
+
                 return new clsSqlQueryExResult()
                 {
-                    bSuccess = false,
+                    bSuccess = result.success,
                     szQuery = szQuery,
-                    szErrorMsg = "JSON deserialization is failed. Responsed result is invalid.",
-                    dtOutput = dt,
+                    szErrorMsg = result.error,
+                    dtOutput = result.success ? fnConvertToTable(result.data) : dt
                 };
             }
-
-            return new clsSqlQueryExResult()
+            catch (Exception ex)
             {
-                bSuccess = result.success,
-                szQuery = szQuery,
-                szErrorMsg = result.error,
-                dtOutput = result.success ? fnConvertToTable(result.data) : dt
-            };
+                MessageBox.Show(ex.Message + "\n" + szResp, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
         }
 
         /// <summary>
@@ -775,8 +801,11 @@ namespace Alien
         /// <returns></returns>
         public async Task<bool> fnDbTest(stDbConfig config)
         {
-            string szQuery = "SELECT 1;";
+            string szQuery = "SELECT 1 AS val;";
             var result = await fnSqlQueryEx(config, szQuery);
+
+            if (result == null)
+                return false;
 
             if (!result.bSuccess)
                 MessageBox.Show(result.szErrorMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

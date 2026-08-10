@@ -170,7 +170,7 @@ namespace Alien
         {
             "png", "jpg", "bmp", "ico",
         };
-        private bool fnbIsImageFile(string szExtension) => m_asImageExt.Contains(szExtension.Replace(".", string.Empty));
+        private bool fnbIsImageFile(string szExtension) => m_asImageExt.Contains(szExtension.ToLower().Replace(".", string.Empty));
 
         public frmControlPanel(clsWeb web, clsIniManager iniMgr)
         {
@@ -779,6 +779,9 @@ namespace Alien
             public ToolStrip toolStrip { get; init; }
             public TextEditorControlEx textEditorControl { get; init; }
 
+            private List<string> m_lsSqlHistory = new List<string>();
+            private int m_nIdxSQL = 0;
+
             public clsDbSqlShellControls(TabPage page, clsfnDb.stDbConfig config, clsfnDb dbMgr)
             {
                 m_config = config;
@@ -811,14 +814,74 @@ namespace Alien
                 textEditorControl.BringToFront();
 
                 ToolStripButton btnExec = new ToolStripButton("Execute");
+                ToolStripComboBox comboSQL = new ToolStripComboBox();
 
                 toolStrip.Items.AddRange(new ToolStripItem[]
                 {
                     btnExec,
+                    new ToolStripLabel() { Text = " | " },
+                    new ToolStripLabel() { Text = "SQL: " },
+                    comboSQL,
                 });
                 toolStrip.Font = page.Font;
 
                 ThemeManager.ApplyRange(page.Controls);
+
+                comboSQL.Width = 300;
+
+                string szJson = Path.Combine(Application.StartupPath, "Tools", "useful_sql.json");
+                if (File.Exists(szJson))
+                {
+                    try
+                    {
+                        string szContent = File.ReadAllText(szJson);
+                        var jsonObj = JObject.Parse(szContent);
+                        var databases = jsonObj["databases"];
+
+                        string? szTargetDB = Enum.GetName(typeof(enDatabase), config.enDbType);
+                        if (string.IsNullOrEmpty(szTargetDB))
+                            throw new Exception("Unknown database type");
+
+                        var sqlList = databases?[szTargetDB];
+                        if (sqlList == null)
+                            throw new Exception("JSON error.");
+
+                        comboSQL.ComboBox.Items.Clear();
+
+                        Dictionary<string, string> dicSQL = new Dictionary<string, string>();
+
+                        foreach (var item in sqlList)
+                        {
+                            string? szName = item["name"]?.ToString();
+                            string? szSQL = item["sql"]?.ToString();
+
+                            if (string.IsNullOrEmpty(szName) || string.IsNullOrEmpty(szSQL))
+                                continue;
+
+                            dicSQL.Add(szName, szSQL);
+                            comboSQL.Items.Add(szName);
+                        }
+
+                        comboSQL.SelectedIndexChanged += (s, e) =>
+                        {
+                            string szName = comboSQL.Text;
+                            if (!dicSQL.ContainsKey(szName))
+                                return;
+
+                            string szSQL = dicSQL[szName];
+                            
+                            textEditorControl.Text = szSQL;
+                            textEditorControl.Refresh();
+                        };
+
+                        if (comboSQL.Items.Count > 0)
+                            comboSQL.SelectedIndex = 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
 
                 btnExec.Click += async (s, e) =>
                 {
@@ -837,7 +900,46 @@ namespace Alien
                     richTextBox.AppendText(m_szPrompt);
                     richTextBox.ScrollToCaret();
                     m_nPromitStart = richTextBox.TextLength;
+
+                    fnPushSQL(szSQL);
                 };
+            }
+
+            public string fnPreviousSQL()
+            {
+                if (m_lsSqlHistory.Count == 0)
+                    return string.Empty;
+
+                m_nIdxSQL--;
+                if (m_nIdxSQL < 0)
+                    m_nIdxSQL = 0;
+
+                return m_lsSqlHistory[m_nIdxSQL];
+            }
+
+            public string fnNextSQL()
+            {
+                if (m_lsSqlHistory.Count == 0)
+                    return string.Empty;
+
+                m_nIdxSQL++;
+                if (m_nIdxSQL > m_lsSqlHistory.Count - 1)
+                    fnResetSqlIndex();
+
+                return m_lsSqlHistory[m_nIdxSQL];
+            }
+
+            private void fnResetSqlIndex()
+            {
+                m_nIdxSQL = m_lsSqlHistory.Count - 1;
+                if (m_nIdxSQL < 0)
+                    m_nIdxSQL = 0;
+            }
+
+            public void fnPushSQL(string szSQL)
+            {
+                m_lsSqlHistory.Add(szSQL);
+                fnResetSqlIndex();
             }
         }
         private class clsDbInformation
@@ -853,6 +955,7 @@ namespace Alien
                 m_config = config;
 
                 richTextBox = new RichTextBox();
+                richTextBox.WordWrap = false;
 
                 page.Tag = this;
                 page.Controls.Add(richTextBox);
@@ -1378,6 +1481,7 @@ namespace Alien
         public async Task<Dictionary<string, bool>> fnFileUpload(List<string> lsSrcFilePath, int nThread = 3, int nChunkSize = 5 * 1024, Action fnOnCallback = null)
         {
             tabControl6.SelectedIndex = 1;
+            m_fileMgr.m_bUploadFile = true;
 
             string szCurrentDir = m_fileMgr.m_szCurrentPath;
             Dictionary<string, bool> dicState = new Dictionary<string, bool>();
@@ -1485,6 +1589,7 @@ namespace Alien
 
         public async Task<(Dictionary<string, bool> dicState, string szSaveDirPath)> fnFileDownload(List<(string, long)> lsRemoteFile, int nThread = 3, int nChunkSize = 5 * 1024, Action fnCallback = null)
         {
+            tabControl6.SelectedIndex = 1;
             m_fileMgr.m_bDownloadFile = true;
 
             string szLocalSaveDirPath = Path.Combine("Victim", m_victim.m_szShellDomain, "Downloads");
@@ -1837,6 +1942,8 @@ namespace Alien
                     e.SuppressKeyPress = true;
 
                     string szCmd = ctrls.richTextBox.Text.Substring(nPrompt);
+                    if (string.IsNullOrEmpty(szCmd))
+                        return;
 
                     ctrls.richTextBox.AppendText("\n\n");
 
@@ -1853,10 +1960,34 @@ namespace Alien
 
                     ctrls.m_nPromitStart = ctrls.richTextBox.TextLength;
 
+                    ctrls.fnPushSQL(szCmd);
+
                     return;
                 }
 
-                if (e.KeyCode == Keys.Back && ctrls.richTextBox.SelectionStart <= nPrompt && ctrls.richTextBox.SelectionLength == 0)
+                if (e.KeyCode == Keys.Up)
+                {
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+
+                    string szSQL = ctrls.fnPreviousSQL();
+
+                    ctrls.richTextBox.Text = ctrls.richTextBox.Text.Substring(0, ctrls.m_nPromitStart);
+                    ctrls.richTextBox.AppendText(szSQL);
+                }
+
+                if (e.KeyCode == Keys.Down)
+                {
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+
+                    string szSQL = ctrls.fnNextSQL();
+
+                    ctrls.richTextBox.Text = ctrls.richTextBox.Text.Substring(0, ctrls.m_nPromitStart);
+                    ctrls.richTextBox.AppendText(szSQL);
+                }
+
+                if ((e.KeyCode == Keys.Back || e.KeyCode == Keys.Left) && ctrls.richTextBox.SelectionStart <= nPrompt && ctrls.richTextBox.SelectionLength == 0)
                 {
                     e.SuppressKeyPress = true;
                     return;
@@ -3259,10 +3390,18 @@ namespace Alien
                 var config = m_dbMgr.m_stDbConfig[node.Text];
                 var result = await m_dbMgr.fnSqlQueryEx(config, m_dbMgr.m_dicShowDatabaseSQL[config.enDbType]);
 
+                if (result == null)
+                {
+                    MessageBox.Show("An error was occured in database configuration.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    toolStripLabel2.Text = "Action was failed";
+
+                    return;
+                }
+
                 if (!result.bSuccess)
                 {
                     MessageBox.Show(result.szErrorMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    toolStripLabel2.Text = "Action failed!";
+                    toolStripLabel2.Text = "Action was failed!";
 
                     return;
                 }
