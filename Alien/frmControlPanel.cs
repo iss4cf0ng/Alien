@@ -827,7 +827,7 @@ namespace Alien
 
                 ThemeManager.ApplyRange(page.Controls);
 
-                comboSQL.Width = 300;
+                comboSQL.ComboBox.Width = 300;
 
                 string szJson = Path.Combine(Application.StartupPath, "Tools", "useful_sql.json");
                 if (File.Exists(szJson))

