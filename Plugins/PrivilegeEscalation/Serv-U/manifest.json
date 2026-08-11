@@ -7,7 +7,8 @@
         "PHP/v7.X/OneShell",
         "PHP/v8.X/OneShell",
         "ASP/Classic/OneShell",
-        "ASPX/JScript/OneShell"
+        "ASPX/JScript/OneShell",
+        "ASPX/NebulaPulsar/DarkMatter"
     ],
     "description": "Serv-U privilege escalation"
 }

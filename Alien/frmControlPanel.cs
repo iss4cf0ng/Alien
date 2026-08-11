@@ -905,10 +905,22 @@ namespace Alien
                 };
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
             public string fnPreviousSQL()
             {
                 if (m_lsSqlHistory.Count == 0)
                     return string.Empty;
+
+                if (m_nIdxSQL == m_lsSqlHistory.Count - 1)
+                {
+                    string szSQL = m_lsSqlHistory[m_nIdxSQL];
+                    m_nIdxSQL--;
+
+                    return szSQL;
+                }
 
                 m_nIdxSQL--;
                 if (m_nIdxSQL < 0)
@@ -917,6 +929,10 @@ namespace Alien
                 return m_lsSqlHistory[m_nIdxSQL];
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
             public string fnNextSQL()
             {
                 if (m_lsSqlHistory.Count == 0)
@@ -929,6 +945,9 @@ namespace Alien
                 return m_lsSqlHistory[m_nIdxSQL];
             }
 
+            /// <summary>
+            /// Reset History SQL command index.
+            /// </summary>
             private void fnResetSqlIndex()
             {
                 m_nIdxSQL = m_lsSqlHistory.Count - 1;
@@ -936,6 +955,10 @@ namespace Alien
                     m_nIdxSQL = 0;
             }
 
+            /// <summary>
+            /// Add SQL command into History List.
+            /// </summary>
+            /// <param name="szSQL"></param>
             public void fnPushSQL(string szSQL)
             {
                 m_lsSqlHistory.Add(szSQL);
@@ -2380,6 +2403,13 @@ namespace Alien
         #endregion
         #endregion
 
+        /// <summary>
+        /// Load and display all plugins
+        /// </summary>
+        /// <param name="szCurrentDir"></param>
+        /// <param name="currentNodes"></param>
+        /// <param name="szFilter"></param>
+        /// <returns>Number of plugins</returns>
         private async Task<int> fnLoadAllPlugins(string szCurrentDir, TreeNodeCollection currentNodes, string szFilter = "")
         {
             int nPluginCount = 0;
@@ -3586,6 +3616,8 @@ namespace Alien
                 return;
 
             clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
+            if (ctrls.listView == null)
+                return;
 
             if (ctrls.listView.Items.Count == 0)
                 return;

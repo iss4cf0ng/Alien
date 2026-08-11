@@ -181,8 +181,12 @@
 <script>
     const pluginManifest = {
         "supportedLangs": [
+            "PHP/v5.X/OneShell",
+            "PHP/v7.X/OneShell",
             "PHP/v8.X/OneShell",
-            "ASPX/JScript/OneShell"
+            "ASP/Classic/OneShell",
+            "ASPX/JScript/OneShell",
+            "ASPX/NebulaPulsar/DarkMatter"
         ]
     };
 
@@ -266,8 +270,6 @@
         appendLog('[*] EXECUTING REMOTE SHELL ENGINE...');
 
         const szJsonConfig = JSON.stringify(configParams);
-
-
 
         const result = await bridge.fnRun(szJsonConfig, payloadCode, currentShellType);
         
