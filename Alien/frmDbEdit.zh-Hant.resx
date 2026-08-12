@@ -128,10 +128,10 @@
     <value>測試</value>
   </data>
   <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>61, 19</value>
+    <value>46, 19</value>
   </data>
   <data name="label2.Text" xml:space="preserve">
-    <value>伺服器 :</value>
+    <value>來源 :</value>
   </data>
   <data name="label3.Size" type="System.Drawing.Size, System.Drawing">
     <value>46, 19</value>

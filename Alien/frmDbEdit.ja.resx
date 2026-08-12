@@ -152,10 +152,10 @@
     <value>16, 161</value>
   </data>
   <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>76, 19</value>
+    <value>61, 19</value>
   </data>
   <data name="label2.Text" xml:space="preserve">
-    <value>サーバー :</value>
+    <value>ソース :</value>
   </data>
   <data name="label3.Location" type="System.Drawing.Point, System.Drawing">
     <value>16, 213</value>
