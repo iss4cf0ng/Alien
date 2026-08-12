@@ -209,15 +209,15 @@ else if ($type == "write") {
         $rawBytes = $z1; 
     }
 
-    // Write keystrokes to completely unique isolated file chunks.
-    // High-resolution microtime ensures perfect chronologically sorted filenames.
-    $chunk_file = $queue_dir . '/' . sprintf("%015.4f", microtime(true)) . '_' . rand(1000, 9999) . '.txt';
+    $nanoTime = function_exists('hrtime') ? hrtime(true) : microtime(true) * 1000000000;
+    $chunk_file = $queue_dir . '/' . sprintf("%020.0f", $nanoTime) . '_' . rand(10000, 99999) . '.txt';
+    
     file_put_contents($chunk_file, $rawBytes, LOCK_EX);
     
     $result["status"] = "success";
     $result["msg"] = "Input buffer queued.";
     echo json_encode($result);
-} 
+}
 
 else if ($type == "read") {
     $readContent = '';
@@ -269,8 +269,32 @@ else if ($type == "resize") {
 
 else if ($type == "stop") {
     file_put_contents($pid_file, 'stopped');
+
+    if (is_dir($queue_dir)) {
+        foreach (glob($queue_dir . '/*.txt') as $queue_file) {
+            @unlink($queue_file);
+        }
+    }
+
+    $resize_file = $work_dir . '/.resize.txt';
+    if (file_exists($resize_file)) {
+        @unlink($resize_file);
+    }
+
+    if (FALSE !== strpos(strtolower(PHP_OS), 'win')) {
+        foreach (glob(sys_get_temp_dir() . '/out_*.txt') as $tmp_out) {
+            @unlink($tmp_out);
+        }
+        foreach (glob(sys_get_temp_dir() . '/err_*.txt') as $tmp_err) {
+            @unlink($tmp_err);
+        }
+    }
+
+    usleep(50000);
+    @unlink($pid_file);
+
     $result["status"] = "stop";
-    $result["msg"] = base64_encode("Engine shutdown initiated.");
+    $result["msg"] = base64_encode("Engine shutdown initiated and resources cleaned.");
     echo json_encode($result);
 }
 

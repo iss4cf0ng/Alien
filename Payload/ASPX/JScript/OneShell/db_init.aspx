@@ -4,21 +4,21 @@ Response.Buffer = true;
 
 var checks = new System.Collections.Hashtable();
 
-function checkProvider(progId) {
+function checkOleDbProvider(providerName) {
     try {
-        var t = System.Type.GetTypeFromProgID(progId, true);
-        var obj = System.Activator.CreateInstance(t);
+        var conn = System.Activator.CreateInstance(System.Type.GetTypeFromProgID("ADODB.Connection", true));
+        conn.Provider = providerName;
         return true;
     } catch (e) {
         return false;
     }
 }
 
-checks["MySQL ODBC"] = checkProvider("ADODB.Connection");
-checks["SQL Server (OLE DB)"] = checkProvider("ADODB.Connection");
-checks["Oracle (OLE DB/ODBC)"] = checkProvider("ADODB.Connection");
-checks["SQLite (ODBC)"] = checkProvider("ADODB.Connection");
-checks["PostgreSQL (ODBC)"] = checkProvider("ADODB.Connection");
+checks["MySQL ODBC"] = checkOleDbProvider("MSDASQL");
+checks["SQL Server (OLE DB)"] = checkOleDbProvider("SQLOLEDB");
+checks["Oracle (OLE DB/ODBC)"] = checkOleDbProvider("OraOLEDB.Oracle");
+checks["SQLite (ODBC)"] = checkOleDbProvider("MSDASQL");
+checks["PostgreSQL (ODBC)"] = checkOleDbProvider("MSDASQL");
 
 checks["Redis"] = false;
 checks["MongoDB"] = false;

@@ -69,7 +69,8 @@ public class db_query
             }
             catch (Exception ex)
             {
-                sb.Append(ex.Message);
+                // 錯誤時輸出符合 clsQueryResponse 的結構
+                sb.Append(string.Format("{{\"success\":false,\"rowCount\":0,\"data\":[],\"error\":\"{0}\"}}", fnEscapeJson(ex.Message)));
             }
 
             fnWriteOutput(driver, response, Encoding.UTF8.GetBytes(sb.ToString()));
@@ -91,18 +92,46 @@ public class db_query
         
         if (dbType == "mysql" || dbType == "pgsql" || dbType == "postgresql" || dbType == "oracle" || dbType == "sqlsrv")
         {
-            Uri uri = new Uri(dsnUrl);
-            string host = uri.Host;
-            int port = uri.Port;
-            string database = uri.AbsolutePath.TrimStart('/');
+            string rest = dsnUrl.Substring(dsnUrl.IndexOf("://") + 3);
+            
             string user = "";
             string pass = "";
+            string hostPortDb = rest;
 
-            if (!string.IsNullOrEmpty(uri.UserInfo))
+            int atIndex = rest.LastIndexOf('@');
+            if (atIndex >= 0)
             {
-                string[] userInfo = uri.UserInfo.Split(':');
-                user = userInfo[0];
-                if (userInfo.Length > 1) pass = userInfo[1];
+                string userInfo = rest.Substring(0, atIndex);
+                hostPortDb = rest.Substring(atIndex + 1);
+                
+                string[] up = userInfo.Split(':');
+                user = up[0];
+                if (up.Length > 1) pass = up[1];
+            }
+
+            string host = "";
+            int port = -1;
+            string database = "";
+
+            int slashIndex = hostPortDb.IndexOf('/');
+            if (slashIndex >= 0)
+            {
+                database = hostPortDb.Substring(slashIndex + 1);
+                host = hostPortDb.Substring(0, slashIndex);
+            }
+            else
+            {
+                host = hostPortDb;
+            }
+
+            int colonIndex = host.LastIndexOf(':');
+            if (colonIndex >= 0 && !host.EndsWith(")"))
+            {
+                if (int.TryParse(host.Substring(colonIndex + 1), out int parsedPort))
+                {
+                    port = parsedPort;
+                    host = host.Substring(0, colonIndex);
+                }
             }
 
             switch (dbType)
@@ -118,7 +147,12 @@ public class db_query
                     break;
                 case "sqlsrv":
                     className = "System.Data.SqlClient.SqlConnection";
-                    connectionString = string.Format("Server={0},{1};Database={2};User ID={3};Password={4};Encrypt=false;", host, port == -1 ? 1433 : port, database, user, pass);
+                    connectionString = string.Format("Server={0}{1};Database={2};User ID={3};Password={4};Encrypt=false;TrustServerCertificate=True;", 
+                        host, 
+                        port == -1 ? "" : "," + port, 
+                        database, 
+                        user, 
+                        pass);
                     break;
                 case "oracle":
                     className = "Oracle.ManagedDataAccess.Client.OracleConnection";
@@ -167,13 +201,16 @@ public class db_query
             conn.Open();
 
             if (string.IsNullOrEmpty(sql.Trim()))
-                return "{\"success\":true,\"message\":\"Database connection is OK\"}";
+                return "{\"success\":true,\"rowCount\":0,\"data\":[],\"error\":null}";
 
             using (IDbCommand cmd = conn.CreateCommand())
             {
                 cmd.CommandText = sql;
 
-                try
+                string trimmedSql = sql.Trim().ToLower();
+                bool isQuery = trimmedSql.StartsWith("select") || trimmedSql.StartsWith("show") || trimmedSql.StartsWith("exec") || trimmedSql.StartsWith("with");
+
+                if (isQuery)
                 {
                     using (IDataReader reader = cmd.ExecuteReader())
                     {
@@ -197,13 +234,15 @@ public class db_query
                             jsonRows.Add(fnMapToJsonObject(row));
                         }
 
-                        return string.Format("{\"success\":true,\"rowCount\":%d,\"data\":[{0}]}", jsonRows.Count, string.Join(",", jsonRows.ToArray()));
+                        // 補上 error: null
+                        return string.Format("{{\"success\":true,\"rowCount\":{0},\"data\":[{1}],\"error\":null}}", jsonRows.Count, string.Join(",", jsonRows.ToArray()));
                     }
                 }
-                catch (Exception)
+                else
                 {
                     int updateCount = cmd.ExecuteNonQuery();
-                    return string.Format("{\"success\":true,\"rowCount\":{0},\"data\":[]}", updateCount);
+                    // 補上 error: null
+                    return string.Format("{{\"success\":true,\"rowCount\":{0},\"data\":[],\"error\":null}}", updateCount);
                 }
             }
         }
@@ -255,9 +294,47 @@ public class db_query
 
     private static string fnEscapeJson(string str)
     {
-        if (str == null)
+        if (string.IsNullOrEmpty(str))
             return "";
 
-        return str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r");
+        StringBuilder sb = new StringBuilder();
+        foreach (char c in str)
+        {
+            switch (c)
+            {
+                case '\"':
+                    sb.Append("\\\"");
+                    break;
+                case '\\':
+                    sb.Append("\\\\");
+                    break;
+                case '\b':
+                    sb.Append("\\b");
+                    break;
+                case '\f':
+                    sb.Append("\\f");
+                    break;
+                case '\n':
+                    sb.Append("\\n");
+                    break;
+                case '\r':
+                    sb.Append("\\r");
+                    break;
+                case '\t':
+                    sb.Append("\\t");
+                    break;
+                default:
+                    if (c < ' ')
+                    {
+                        sb.AppendFormat("\\u{0:x4}", (int)c);
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                    break;
+            }
+        }
+        return sb.ToString();
     }
 }

