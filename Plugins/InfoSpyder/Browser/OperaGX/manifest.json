@@ -1,0 +1,11 @@
+{
+    "name": "OperaGX Dumper",
+    "version": "1.0",
+    "author": "iss4cf0ng/ISSAC",
+    "environment": [
+        "ASHX/NebulaPulsar/DarkMatter",
+        "ASMX/NebulaPulsar/DarkMatter",
+        "ASPX/NebulaPulsar/DarkMatter"
+    ],
+    "description": "OperaGX Dumper"
+}

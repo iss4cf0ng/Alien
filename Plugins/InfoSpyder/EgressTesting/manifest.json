@@ -1,0 +1,22 @@
+{
+    "name": "Egress Testing",
+    "version": "1.0",
+    "author": "iss4cf0ng/ISSAC",
+    "environment": [
+        "PHP/v5.X/OneShell",
+        "PHP/v7.X/OneShell",
+        "PHP/v8.X/OneShell",
+        "ASP/Classic/OneShell",
+        "ASPX/JScript/OneShell",
+        "ASPX/NebulaPulsar/DarkMatter",
+        "ASHX/JScript/OneShell",
+        "ASHX/NebulaPulsar/DarkMatter",
+        "ASMX/JScript/OneShell",
+        "ASMX/NebulaPulsar/DarkMatter",
+        "JSP/Nashorn/OneShell",
+        "JSP/NebulaPulsar/DarkMatter",
+        "JSPX/NebulaPulsar/DarkMatter",
+        "CFM/NebulaPulsar/DarkMatter"
+    ],
+    "description": "Network Egress Testing"
+}

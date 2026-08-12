@@ -2510,6 +2510,7 @@ namespace Alien
             {
                 count += fnCountNodes(subNode);
             }
+
             return count;
         }
 
@@ -2523,11 +2524,29 @@ namespace Alien
             //await m_web.DisposeAsync();
         }
 
+        /// <summary>
+        /// Initialize plugin system.
+        /// </summary>
         async void fnPluginInit()
         {
             try
             {
-                string szEnv = Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/");
+                string? szLang = Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage);
+                string? szPayloadType = Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType);
+
+                if (string.IsNullOrEmpty(szLang))
+                {
+                    MessageBox.Show("Failed to convert shell script language", "Null", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(szPayloadType))
+                {
+                    MessageBox.Show("Failed to convert payload type", "Null", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string szEnv = Path.Combine(szLang, m_victim.ShellMethod, szPayloadType).Replace("\\", "/");
 
                 await webViewPlugin.EnsureCoreWebView2Async(null);
                 webViewPlugin.CoreWebView2.AddHostObjectToScript("nativeBridge", new clsfnPlugin.clsBridge(m_web, szEnv));

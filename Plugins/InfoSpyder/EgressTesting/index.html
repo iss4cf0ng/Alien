@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>AV Scanner & Matcher</title>
+    <title>Network Egress Testing</title>
     <style>
         html, body {
             min-height: 100%;
@@ -25,7 +25,7 @@
         
         .container { 
             width: 100%;
-            max-width: 650px; 
+            max-width: 750px; 
             background: #000000; 
             padding: 25px; 
             border-radius: 0px;
@@ -68,7 +68,7 @@
             font-weight: bold;
         }
         
-        input[type="text"] { 
+        textarea { 
             width: 100%; 
             background: #000000; 
             border: 1px solid #ffffff; 
@@ -77,8 +77,10 @@
             border-radius: 0px; 
             box-sizing: border-box; 
             font-family: inherit;
+            resize: vertical;
+            height: 90px;
         }
-        input[type="text"]:focus {
+        textarea:focus {
             outline: none;
             background: #111111;
         }
@@ -112,14 +114,43 @@
             margin-top: 25px;
         }
         
+        /* Listview / Table 樣式 */
+        .listview-container {
+            border: 1px solid #ffffff;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        table.listview {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: left;
+        }
+        table.listview th, table.listview td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #333333;
+        }
+        table.listview th {
+            background-color: #111111;
+            color: #ffffff;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        table.listview tr:hover {
+            background-color: #111111;
+        }
+
         .console { 
             background: #000000; 
             border: 1px solid #ffffff; 
             padding: 15px; 
-            height: 220px; 
+            height: 130px; 
             overflow-y: auto; 
             white-space: pre-wrap;
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -133,38 +164,66 @@
 <body>
 
 <div class="container">
-    <h2>[ AV Task Scanner ]</h2>
+    <h2>[ Network Egress Testing ]</h2>
     
     <div class="status-bar" id="statusBar">
         [*] Initializing system controller... awaiting logs...
     </div>
     
     <div class="form-group">
-        <label>> Tasklist Command Config (JSON)</label>
-        <input type="text" id="targetJson" value='{"cmd": "tasklist /v"}'>
+        <label>> Target List (IP:Port or Host:Port, One per line)</label>
+        <textarea id="targetListInput">8.8.8.8:53
+1.1.1.1:443
+api.ipify.org:80
+google.com
+firefox.com
+github.com
+microsoft.com</textarea>
     </div>
 
-    <button id="scanBtn" onclick="executePlugin()" disabled>Start Audit</button>
+    <button id="scanBtn" onclick="executePlugin()" disabled>Start Egress Probe</button>
 
-    <h3>Output & Matching Log</h3>
+    <h3>Egress Status View</h3>
+    <div class="listview-container">
+        <table class="listview" id="statusTable">
+            <thead>
+                <tr>
+                    <th>Target</th>
+                    <th>Protocol</th>
+                    <th>Status</th>
+                    <th>Latency</th>
+                    <th>Reason / Details</th>
+                </tr>
+            </thead>
+            <tbody id="statusTableBody">
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #666666;">Awaiting execution...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Raw Execution Console</h3>
     <div class="console" id="consoleOutput"></div>
 </div>
 
 <script>
     const pluginManifest = {
         "supportedLangs": [
-            "ASP/Classic/OneShell",
-            "ASHX/JScript/OneShell",
-            "ASMX/JScript/OneShell",
-            "ASPX/JScript/OneShell",
-            "ASHX/NebulaPulsar/DarkMatter",
-            "ASMX/NebulaPulsar/DarkMatter",
-            "ASPX/NebulaPulsar/DarkMatter",
             "PHP/v5.X/OneShell",
             "PHP/v7.X/OneShell",
             "PHP/v8.X/OneShell",
+            "ASP/Classic/OneShell",
+            "ASPX/JScript/OneShell",
+            "ASPX/NebulaPulsar/DarkMatter",
+            "ASHX/JScript/OneShell",
+            "ASHX/NebulaPulsar/DarkMatter",
+            "ASMX/JScript/OneShell",
+            "ASMX/NebulaPulsar/DarkMatter",
+            "JSP/Nashorn/OneShell",
             "JSP/NebulaPulsar/DarkMatter",
-            "CFM/NebulaPulsar/DarkMatter"
+            "JSPX/NebulaPulsar/DarkMatter",
+            "CFM/NebulaPulsar/DarkMatter",
         ]
     };
 
@@ -214,10 +273,10 @@
                     statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-active">${currentShellType.toUpperCase()}</span> // STATUS: PROBE READY`;
                     scanBtn.disabled = false;
                     appendLog("[*] LINK ESTABLISHED.");
-                    appendLog("[*] READY TO RUN TASKLIST & MATCH SIGNATURES.");
+                    appendLog("[*] READY TO RUN EGRESS CONNECTIVITY PROBE.");
                 } else {
                     statusBar.innerHTML = `GATEWAY_ENV: <span class="badge badge-error">${currentShellType.toUpperCase()}</span> // STATUS: INCOMPATIBLE`;
-                    appendLog(`[-] ABORTED. SCANNER REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
+                    appendLog(`[-] ABORTED. PLUGIN REQUIRES: [${pluginManifest.supportedLangs.join(', ')}].`);
                     appendLog(`[-] NODE RUNNING: ${currentShellType}.`);
                 }
             } else {
@@ -228,79 +287,112 @@
         }
     });
 
-    async function executePlugin() {
-        const jsonConfig = document.getElementById('targetJson').value;
+    function updateListView(probeResults) {
+        const tbody = document.getElementById('statusTableBody');
+        tbody.innerHTML = "";
 
-        appendLog(`[*] ALLOCATING INVENTORY PAYLOAD FOR: ${currentShellType.toUpperCase()}`);
+        if (!Array.isArray(probeResults) || probeResults.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #666666;">No results found</td></tr>`;
+            return;
+        }
+
+        probeResults.forEach(res => {
+            const tr = document.createElement('tr');
+            
+            const isOpen = (res.status === "open" || res.success === true);
+            const statusColor = isOpen ? "#2ecc71" : "#e74c3c";
+            const statusText = isOpen ? "OPEN" : "BLOCKED";
+
+            tr.innerHTML = `
+                <td>${escapeHtml(res.target)}</td>
+                <td>${escapeHtml(res.protocol || 'TCP')}</td>
+                <td style="color: ${statusColor}; font-weight: bold;">${statusText}</td>
+                <td>${res.latency ? res.latency + 'ms' : 'N/A'}</td>
+                <td>${escapeHtml(res.reason || '')}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    async function executePlugin() {
+        const rawText = document.getElementById('targetListInput').value;
+        const lines = rawText.split('\n');
+        const targets = [];
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if (trimmed !== "") {
+                targets.push(trimmed);
+            }
+        });
+
+        if (targets.length === 0) {
+            appendLog("[-] ERROR: No valid targets specified in the list.");
+            return;
+        }
+
+        const jsonConfig = JSON.stringify({ targets: targets });
+
+        appendLog(`[*] ALLOCATING EGRESS PAYLOAD FOR: ${currentShellType.toUpperCase()}`);
+        appendLog(`[*] PARSED ${targets.length} TARGET ENDPOINTS INTO JSON CONFIG.`);
 
         const bridge = window.chrome.webview.hostObjects.nativeBridge;
         const currentDir = window.location.pathname.substring(1, window.location.pathname.lastIndexOf('/') + 1);
         
         const payloadCode = await bridge.fnGetPayload(currentDir, currentShellType, "payload");
-        appendLog('[*] ENGAGING REMOTE TASKLIST QUERY...');
+        appendLog('[*] ENGAGING REMOTE EGRESS PROBE QUERY...');
         
-        const tasklistResultRaw = await bridge.fnRun(jsonConfig, payloadCode, currentShellType);
+        const egressResultRaw = await bridge.fnRun(jsonConfig, payloadCode, currentShellType);
         
-        appendLog('[+] RECEIVED TASKLIST FROM TARGET NODE.');
-
-        let localJsonPath = currentDir + "av_list.json";
-        if (localJsonPath.startsWith("file:///")) {
-            localJsonPath = localJsonPath.replace("file:///", "").replace(/\//g, "\\");
-        }
-
-        if (localJsonPath.startsWith("/") && localJsonPath.charAt(2) === ':') {
-            localJsonPath = localJsonPath.substring(1);
-        }
-        
-        appendLog(`[*] LOADING LOCAL SIGNATURE MATRIX FROM: ${localJsonPath}`);
-        const jsonContentRaw = await bridge.fnReadFileText(localJsonPath);
-
-        if (!jsonContentRaw) {
-            appendLog("[!] WARNING: LOCAL SIGNATURE FILE IS EMPTY OR NOT FOUND. UNABLE TO PERFORM MATCHING.");
-            appendLog("--- RAW TASKLIST OUTPUT ---");
-            appendLog(tasklistResultRaw);
-            return;
-        }
+        appendLog('[+] RECEIVED EGRESS PROBE RESULTS FROM TARGET NODE.');
 
         try {
-            const remoteProcesses = JSON.parse(tasklistResultRaw);
-            const upperProcessList = Array.isArray(remoteProcesses) ? remoteProcesses.map(p => p.toUpperCase()) : [];
+            let jsonString = egressResultRaw;
+            if (jsonString.includes("[+] SUCCESS\n")) {
+                jsonString = jsonString.substring(jsonString.indexOf("[+] SUCCESS\n") + 12);
+            } else if (jsonString.startsWith("[+] SUCCESS")) {
+                jsonString = jsonString.replace("[+] SUCCESS", "").trim();
+            }
 
-            const avDatabase = JSON.parse(jsonContentRaw); 
-            // { "antivirus_list": [ { "name_zh": "...", "process_keywords": [...] }, ... ] }
+            const probeResults = JSON.parse(jsonString);
             
-            appendLog("[*] PARSED SIGNATURE DATABASE SUCCESSFULLY. COMMENCING MATCHING...");
+            appendLog("[*] PARSED EGRESS RESULT MATRIX SUCCESSFULLY. UPDATING LISTVIEW...");
             
-            let matchCount = 0;
+            let successCount = 0;
+            let failCount = 0;
 
-            if (avDatabase && Array.isArray(avDatabase.antivirus_list)) {
-                avDatabase.antivirus_list.forEach(av => {
-                    const avName = av.name;
-                    if (Array.isArray(av.process_keywords)) {
-                        av.process_keywords.forEach(keyword => {
-                            
-                            if (upperProcessList.includes(keyword.toUpperCase())) {
-                                appendLog(`[!] ALERT: DETECTED -> [${keyword}] <=> MATCHED TO: ${avName} (${av.region})`);
-                                matchCount++;
-                            }
-                        });
+            if (Array.isArray(probeResults)) {
+                probeResults.forEach(res => {
+                    if (res.status === "open" || res.success === true) {
+                        appendLog(`[+] EGRESS ALLOWED -> [${res.target}] via Protocol: ${res.protocol || 'TCP'} (Latency: ${res.latency || 'N/A'}ms)`);
+                        successCount++;
+                    } else {
+                        appendLog(`[-] EGRESS BLOCKED -> [${res.target}] Reason: ${res.reason || 'Filtered/Timeout'}`);
+                        failCount++;
                     }
                 });
-
+                
+                updateListView(probeResults);
             } else {
-                throw new Error("INVALID JSON FORMAT: MISSING 'antivirus_list' ARRAY.");
+                appendLog("--- RAW EGRESS OUTPUT ---");
+                appendLog(egressResultRaw);
+                return;
             }
 
-            if (matchCount === 0) {
-                appendLog("[+] ANALYSIS COMPLETE: NO KNOWN ANTI-VIRUS PROCESSES DETECTED.");
-            } else {
-                appendLog(`[+] ANALYSIS COMPLETE: DETECTED ${matchCount} CONFLICTING SYSTEM DEFENDERS.`);
-            }
+            appendLog(`[+] ANALYSIS COMPLETE: ${successCount} OUTBOUND PATHS OPEN, ${failCount} BLOCKED.`);
 
         } catch (jsonErr) {
-            appendLog("[-] MATRIX PARSE ERROR: FAILED TO PARSE LOCAL JSON CONTENT. " + jsonErr.message.toUpperCase());
-            appendLog("--- RAW TASKLIST OUTPUT ---");
-            appendLog(tasklistResultRaw);
+            appendLog("[!] PARSE NOTE: RECEIVED PLAIN TEXT RESPONSE INSTEAD OF JSON MATRIX.");
+            appendLog("--- RAW EGRESS OUTPUT ---");
+            appendLog(egressResultRaw);
         }
     }
 </script>
