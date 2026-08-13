@@ -1,11 +1,9 @@
 <?php
 
 error_reporting(0);
-@header('Content-Type: text/plain'); // 加上 @ 預防前面已有輸出導致 header 報錯
+@header('Content-Type: text/plain');
 
-// 檢查是否為二進位/Byte 資料的輔助函式
 function is_binary($data) {
-    // 判斷是否包含非列印字元
     if (preg_match('~[^\x20-\x7E\t\r\n]~', $data)) {
         return true;
     }
@@ -18,7 +16,6 @@ function http_post($url, $data, &$http_code)
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
 
-    // 根據資料型態動態決定 Content-Type
     if (is_binary($data)) {
         $content_type = 'Content-Type: application/octet-stream';
     } else {
@@ -27,7 +24,6 @@ function http_post($url, $data, &$http_code)
 
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
 
-    // 💡 PHP 5 舊版相容：將 [] 改為傳統的 array()
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         $content_type
     ));
