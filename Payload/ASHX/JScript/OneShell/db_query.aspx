@@ -1,7 +1,7 @@
 <%
 
 function base64Decode(str) {
-    if (!str || str.Trim() == "") return "";
+    if (!str || System.String(str).Trim() == "") return "";
     try {
         var bytes = System.Convert.FromBase64String(str);
         return System.Text.Encoding.UTF8.GetString(bytes);
@@ -21,7 +21,7 @@ function parseDSN(url) {
     var rest = p[1];
 
     if (driver != "sqlite" && driver != "access") {
-        var atPos = rest.indexOf("@");
+        var atPos = rest.lastIndexOf("@");
         var userpass = rest.substring(0, atPos);
         var hostpart = rest.substring(atPos + 1);
 
@@ -47,7 +47,8 @@ function parseDSN(url) {
 
 function jsonEscape(str) {
     if (!str) return "";
-    return str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r\n", "\\n").Replace("\r", "\\n").Replace("\n", "\\n");
+    var s = String(str);
+    return s.replace(/\\/g, "\\\\").replace(/\"/g, "\\\"").replace(/\r\n/g, "\\n").replace(/\r/g, "\\n").replace(/\n/g, "\\n");
 }
 
 function executeQueryOleDb(connStr, sql) {
@@ -123,18 +124,42 @@ try {
 
     switch (driver) {
         case "mysql":
-            connStr = "Driver={MySQL ODBC 8.0 Driver};Server=" + cfg["host"] + ";Database=" + cfg["database"] + ";User=" + cfg["user"] + ";Password=" + cfg["password"] + ";";
+            var mysqlDrivers = [
+                "{MySQL ODBC 8.0 Unicode Driver}",
+                "{MySQL ODBC 8.0 Driver}",
+                "{MySQL ODBC 5.3 Unicode Driver}",
+                "{MySQL ODBC 3.51 Driver}",
+                "{MySQL ODBC Driver}"
+            ];
+            
+            var successConn = false;
+            for (var m = 0; m < mysqlDrivers.length; m++) {
+                var testStr = "Driver=" + mysqlDrivers[m] + ";Server=" + cfg["host"] + ";Port=" + (cfg["port"] ? cfg["port"] : "3306") + ";Database=" + cfg["database"] + ";Uid=" + cfg["user"] + ";Pwd=" + cfg["password"] + ";";
+                try {
+                    var testConn = new System.Data.Odbc.OdbcConnection(testStr);
+                    testConn.Open();
+                    testConn.Close();
+                    connStr = testStr;
+                    successConn = true;
+                    break;
+                } catch(ex) {}
+            }
+            
+            if (!successConn) {
+                connStr = "DSN=" + cfg["database"] + ";UID=" + cfg["user"] + ";PWD=" + cfg["password"] + ";";
+            }
             isOdbc = true;
             break;
         case "pgsql":
-            connStr = "Driver={PostgreSQL Unicode};Server=" + cfg["host"] + ";Port=" + cfg["port"] + ";Database=" + cfg["database"] + ";Uid=" + cfg["user"] + ";Pwd=" + cfg["password"] + ";";
+            connStr = "Driver={PostgreSQL ODBC Driver(ANSI)};Server=" + cfg["host"] + ";Port=" + (cfg["port"] ? cfg["port"] : "5432") + ";Database=" + cfg["database"] + ";Uid=" + cfg["user"] + ";Pwd=" + cfg["password"] + ";";
             isOdbc = true;
             break;
         case "sqlsrv":
-            connStr = "Provider=SQLOLEDB;Data Source=" + cfg["host"] + ";Initial Catalog=" + cfg["database"] + ";User ID=" + cfg["user"] + ";Password=" + cfg["password"] + ";";
+            connStr = "Provider=SQLOLEDB;Data Source=" + cfg["host"] + (cfg["port"] ? "," + cfg["port"] : "") + ";Initial Catalog=" + cfg["database"] + ";User ID=" + cfg["user"] + ";Password=" + cfg["password"] + ";";
             break;
         case "sqlite":
-            connStr = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + cfg["database"] + ";";
+            connStr = "Driver={SQLite3 ODBC Driver};Database=" + cfg["database"] + ";";
+            isOdbc = true;
             break;
         case "access":
             connStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + cfg["database"] + ";";
@@ -149,11 +174,11 @@ try {
 
     if (sql == "") {
         if (isOdbc) {
-            var tConn = new System.Data.Odbc.OdbcConnection(connStr);
-            tConn.Open(); tConn.Close();
+            var tConnOdbc = new System.Data.Odbc.OdbcConnection(connStr);
+            tConnOdbc.Open(); tConnOdbc.Close();
         } else {
-            var tConn = new System.Data.OleDb.OleDbConnection(connStr);
-            tConn.Open(); tConn.Close();
+            var tConnOle = new System.Data.OleDb.OleDbConnection(connStr);
+            tConnOle.Open(); tConnOle.Close();
         }
         Response.Write("{\"success\":true,\"message\":\"Database connection is OK\"}");
     } else {
