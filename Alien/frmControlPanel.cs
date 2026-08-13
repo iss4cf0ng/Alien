@@ -3925,6 +3925,26 @@ namespace Alien
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
+
+            if (e.KeyCode == Keys.Up)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+
+                string szCmd = m_rShell.fnLastCommand();
+                richTextBox1.Text = richTextBox1.Text.Substring(0, (int)richTextBox1.Tag) + " " + szCmd;
+                richTextBox1.SelectionStart = richTextBox1.Text.Length;
+            }
+
+            if (e.KeyCode == Keys.Down)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+
+                string szCmd = m_rShell.fnNextCommand();
+                richTextBox1.Text = richTextBox1.Text.Substring(0, (int)richTextBox1.Tag) + " " + szCmd;
+                richTextBox1.SelectionStart = richTextBox1.Text.Length;
+            }
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)

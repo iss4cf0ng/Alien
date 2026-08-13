@@ -130,6 +130,15 @@
   <data name="tabPage1.Text" xml:space="preserve">
     <value>常规</value>
   </data>
+  <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>333, 10</value>
+  </data>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 19</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>主题 :</value>
+  </data>
   <data name="checkBox1.Size" type="System.Drawing.Size, System.Drawing">
     <value>144, 23</value>
   </data>

