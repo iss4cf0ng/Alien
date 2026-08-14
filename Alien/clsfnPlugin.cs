@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
@@ -28,7 +27,7 @@ namespace Alien
             m_szPluginsDir = Path.Combine(Application.StartupPath, szDir);
         }
 
-        public struct stManifest
+        public class stManifest
         {
             [JsonProperty("name")]
             public string szPluginName { get; set; }
@@ -39,7 +38,6 @@ namespace Alien
             [JsonProperty("author")]
             public string szAuthor { get; set; }
 
-            // ex. PHP/v8.X/OneShell, JSP/NebulaPulsar/DarkMatter, ASPX/JScript/OneShell, etc.
             [JsonProperty("environment")]
             public List<string> lsEnvironment { get; set; }
 
@@ -50,9 +48,7 @@ namespace Alien
         /// <summary>
         /// Get manifest json object
         /// </summary>
-        /// <param name="szPluginDirName"></param>
-        /// <returns></returns>
-        public stManifest? fnLoadPluginManifest(string szPluginDirName)
+        public stManifest fnLoadPluginManifest(string szPluginDirName)
         {
             try
             {
@@ -67,7 +63,6 @@ namespace Alien
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
         }
@@ -75,7 +70,6 @@ namespace Alien
         /// <summary>
         /// Get all plugins
         /// </summary>
-        /// <returns></returns>
         public List<stManifest> fnGetPlugins()
         {
             List<stManifest> plugins = new List<stManifest>();
@@ -84,11 +78,10 @@ namespace Alien
 
             foreach (string szDir in Directory.GetDirectories(m_szPluginsDir))
             {
-                stManifest? manifestResult = fnLoadPluginManifest(Path.GetFileName(szDir));
-                if (manifestResult == null || !manifestResult.HasValue)
+                stManifest manifest = fnLoadPluginManifest(Path.GetFileName(szDir));
+                if (manifest == null || manifest.lsEnvironment == null)
                     continue;
 
-                var manifest = manifestResult.Value;
                 if (!manifest.lsEnvironment.Contains(szEnv))
                     continue;
 
@@ -101,45 +94,39 @@ namespace Alien
         [ComVisible(true)]
         public class clsBridge
         {
-            private clsWeb m_web { get; init; }             // Webshell object
-            private string m_szEnvironment { get; set; }    // Environment (e.g., PHP/v8.X/OneShell)
+            private clsWeb m_web { get; init; }
+            private string m_szEnvironment { get; set; }
 
-            /// <summary>
-            /// Plugin bridging object
-            /// </summary>
-            /// <param name="web"></param>
-            /// <param name="szEnvironment"></param>
             public clsBridge(clsWeb web, string szEnvironment)
             {
                 m_web = web;
                 m_szEnvironment = szEnvironment;
             }
 
-            /// <summary>
-            /// Get current environment.
-            /// </summary>
-            /// <returns></returns>
             public string fnGetShellType()
             {
                 return m_szEnvironment;
             }
 
-            /// <summary>
-            /// Check target's operating system
-            /// </summary>
-            /// <returns></returns>
             public bool fnbIsUnixLike()
             {
                 return m_web.m_victim.m_bUnixLike;
             }
 
-            /// <summary>
-            /// Get payload file.
-            /// </summary>
-            /// <param name="szDirName"></param>
-            /// <param name="szEnv"></param>
-            /// <param name="szName"></param>
-            /// <returns></returns>
+            public string fnAvailableEnvironment(string szPath)
+            {
+                string szJsonPath = Path.Combine(szPath, "manifest.json");
+                if (!File.Exists(szJsonPath))
+                    return "[]";
+
+                string szJson = File.ReadAllText(szJsonPath);
+                var manifest = JsonConvert.DeserializeObject<stManifest>(szJson);
+
+                var envList = manifest?.lsEnvironment ?? new List<string>();
+
+                return JsonConvert.SerializeObject(envList);
+            }
+
             public string fnGetPayload(string szDirName, string szEnv, string szName)
             {
                 string szExtension = string.Empty;
@@ -162,12 +149,10 @@ namespace Alien
                 string szPayload = string.Empty;
                 if (szPayloadPath.Contains("NebulaPulsar"))
                 {
-                    // NebulaPulsar, read binary
                     szPayload = Convert.ToBase64String(File.ReadAllBytes(szPayloadPath));
                 }
                 else
                 {
-                    // OneShell, read text file
                     szPayload = File.ReadAllText(szPayloadPath);
 
                     foreach (string s in clsWeb.m_dicRemoveSyntax[m_web.m_victim.ShellLanguage])
@@ -177,11 +162,6 @@ namespace Alien
                 return szPayload;
             }
 
-            /// <summary>
-            /// Read file as text
-            /// </summary>
-            /// <param name="szFilePath"></param>
-            /// <returns></returns>
             public string fnReadFileText(string szFilePath)
             {
                 if (!File.Exists(szFilePath))
@@ -190,11 +170,6 @@ namespace Alien
                 return File.ReadAllText(szFilePath);
             }
 
-            /// <summary>
-            /// Read file as bytes
-            /// </summary>
-            /// <param name="szFilePath"></param>
-            /// <returns></returns>
             public string fnReadFileBytes(string szFilePath)
             {
                 if (!File.Exists(szFilePath))
@@ -203,11 +178,6 @@ namespace Alien
                 return Convert.ToBase64String(File.ReadAllBytes(szFilePath));
             }
 
-            /// <summary>
-            /// Save file as text
-            /// </summary>
-            /// <param name="szFileContent"></param>
-            /// <returns></returns>
             public string fnSaveFileText(string szFileName, string szFileContent)
             {
                 SaveFileDialog sfd = new SaveFileDialog();
@@ -217,7 +187,6 @@ namespace Alien
                     try
                     {
                         File.WriteAllText(sfd.FileName, szFileContent);
-
                         return "[+] Saved file successfully: " + sfd.FileName;
                     }
                     catch (Exception ex)
@@ -231,11 +200,6 @@ namespace Alien
                 }
             }
 
-            /// <summary>
-            /// Save file as bytes
-            /// </summary>
-            /// <param name="abFileBytes"></param>
-            /// <returns></returns>
             public string fnSaveFileBytes(string szFileName, string szB64Data)
             {
                 SaveFileDialog sfd = new SaveFileDialog();
@@ -246,7 +210,6 @@ namespace Alien
                     {
                         byte[] abFileBytes = Convert.FromBase64String(szB64Data);
                         File.WriteAllBytes(sfd.FileName, abFileBytes);
-
                         return "[+] Saved file successfully: " + sfd.FileName;
                     }
                     catch (Exception ex)
@@ -260,11 +223,6 @@ namespace Alien
                 }
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="dicFile"></param>
-            /// <returns></returns>
             public string fnSaveTextFiles(Dictionary<string, string> dicFile)
             {
                 FolderBrowserDialog fbd = new FolderBrowserDialog();
@@ -277,7 +235,6 @@ namespace Alien
                             string szContent = dicFile[szFilename];
                             File.WriteAllText(szFilename, szContent);
                         }
-
                         return "[+] Action successfully: " + fbd.SelectedPath;
                     }
                     catch (Exception ex)
@@ -291,11 +248,6 @@ namespace Alien
                 }
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="dicFile"></param>
-            /// <returns></returns>
             public string fnSaveByteFiles(Dictionary<string, byte[]> dicFile)
             {
                 FolderBrowserDialog fbd = new FolderBrowserDialog();
@@ -308,7 +260,6 @@ namespace Alien
                             byte[] abContent = dicFile[szFilename];
                             File.WriteAllBytes(szFilename, abContent);
                         }
-
                         return "[+] Action successfully: " + fbd.SelectedPath;
                     }
                     catch (Exception ex)
@@ -322,10 +273,6 @@ namespace Alien
                 }
             }
 
-            /// <summary>
-            /// Upload file
-            /// </summary>
-            /// <returns></returns>
             public byte[] fnFileUpload()
             {
                 OpenFileDialog ofd = new OpenFileDialog();
@@ -340,24 +287,12 @@ namespace Alien
                         MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-
                 return new byte[] { };
             }
 
-            /// <summary>
-            /// Execute payload with JSON parameters
-            /// </summary>
-            /// <param name="szJson"></param>
-            /// <param name="szPayload"></param>
-            /// <param name="szEnvironment"></param>
-            /// <returns></returns>
             public async Task<string> fnRun(string szJson, string szPayload, string szEnvironment)
             {
-                //MessageBox.Show(szJson);
                 string szResp = await m_web.fnszSendPayload("plugin", new string[] { szPayload, szJson });
-                //MessageBox.Show(szResp);
-                //Clipboard.SetText(szResp);
-
                 return szResp;
             }
         }

@@ -1401,12 +1401,13 @@ namespace Alien
         private byte[]? fnGetNebulaPulsar()
         {
             string? szLang = Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage);
+            string szType = m_victim.ShellMethod;
             if (string.IsNullOrEmpty(szLang))
                 return null;
             
             bool bIsJava = m_victim.ShellLanguage == enLanguage.JSP || m_victim.ShellLanguage == enLanguage.JSPX || m_victim.ShellLanguage == enLanguage.CFM;
 
-            string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, "NebulaPulsar", "DarkMatter", "NebulaPulsar." + (bIsJava ? "class" : "dll"));
+            string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, szType, "DarkMatter", "NebulaPulsar." + (bIsJava ? "class" : "dll"));
             if (!Path.Exists(szPath))
                 return null;
 
@@ -1416,12 +1417,13 @@ namespace Alien
         private byte[]? fnGetNebulaPulsar(stShellConfig config)
         {
             string? szLang = Enum.GetName(typeof(enLanguage), config.language);
+            string szType = m_victim.ShellMethod;
             if (string.IsNullOrEmpty(szLang))
                 return null;
 
             bool bIsJava = config.language == enLanguage.JSP || config.language == enLanguage.JSPX || config.language == enLanguage.CFM;
 
-            string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, "NebulaPulsar", "DarkMatter", "NebulaPulsar." + (bIsJava ? "class" : "dll"));
+            string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, szType, "DarkMatter", "NebulaPulsar." + (bIsJava ? "class" : "dll"));
             if (!Path.Exists(szPath))
                 return null;
 
@@ -1435,12 +1437,13 @@ namespace Alien
         private byte[]? fnGetDarkMatter(stShellConfig config, string szName)
         {
             string? szLang = Enum.GetName(typeof(enLanguage), config.language);
+            string szType = m_victim.ShellMethod;
             if (string.IsNullOrEmpty(szLang))
                 return null;
 
             bool bIsJava = config.language == enLanguage.JSP || config.language == enLanguage.JSPX || config.language == enLanguage.CFM;
             
-            string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, "NebulaPulsar", "DarkMatter", szName + "." + (bIsJava ? "class" : "dll"));
+            string szPath = Path.Combine(Application.StartupPath, "Payload", szLang, szType, "DarkMatter", szName + "." + (bIsJava ? "class" : "dll"));
             if (!Path.Exists(szPath))
                 throw new Exception("File not found: " + szPath);
 

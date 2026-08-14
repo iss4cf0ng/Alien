@@ -2429,14 +2429,12 @@ namespace Alien
                         bool bAddNode = false;
                         bool bIsPlugin = false;
 
-                        if (manifest != null && manifest.HasValue)
+                        if (manifest != null)
                         {
-                            var info = manifest.Value;
-
-                            if (m_plugin == null || toolStripComboBox1 == null || info.lsEnvironment == null || m_plugin.m_szEnvironment == null)
+                            if (m_plugin == null || toolStripComboBox1 == null || manifest.lsEnvironment == null || m_plugin.m_szEnvironment == null)
                                 return 0;
 
-                            if (toolStripComboBox1.SelectedIndex == 0 && !info.lsEnvironment.Contains(m_plugin.m_szEnvironment))
+                            if (toolStripComboBox1.SelectedIndex == 0 && !manifest.lsEnvironment.Contains(m_plugin.m_szEnvironment))
                             {
                                 bAddNode = false;
                             }
@@ -4627,7 +4625,7 @@ namespace Alien
                 string szIndexPath = Path.Combine(szDir, "index.html");
 
                 var manifest = m_plugin.fnLoadPluginManifest(szDir);
-                if (manifest == null || !manifest.HasValue)
+                if (manifest == null)
                 {
                     if (!File.Exists(szIndexPath))
                     {
@@ -4642,16 +4640,14 @@ namespace Alien
 
                 node.Expand();
 
-                var plugin = manifest.Value;
-
                 webViewPlugin.CoreWebView2.Navigate(szIndexPath);
 
                 var dict = new Dictionary<string, string>
                 {
-                    { "Name", plugin.szPluginName },
-                    { "Version", plugin.szVersion },
-                    { "Author", plugin.szAuthor },
-                    { "Description", plugin.szDescription },
+                    { "Name", manifest.szPluginName },
+                    { "Version", manifest.szVersion },
+                    { "Author", manifest.szAuthor },
+                    { "Description", manifest.szDescription },
                 };
 
                 foreach (string szKey in dict.Keys)
