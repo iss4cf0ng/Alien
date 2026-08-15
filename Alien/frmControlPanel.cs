@@ -1457,6 +1457,10 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// Read remote file with a specified path
+        /// </summary>
+        /// <param name="szFilePath"></param>
         async void fnFileRead(string szFilePath)
         {
             frmTextEditor? f = fnFindForm<frmTextEditor>();
@@ -1472,6 +1476,12 @@ namespace Alien
             f.fnShowContent(szFilePath, szContent);
         }
 
+        /// <summary>
+        /// Write string content into the remote file with a specified path
+        /// </summary>
+        /// <param name="szFilePath"></param>
+        /// <param name="szContent"></param>
+        /// <returns></returns>
         public async Task<bool> fnbFileWrite(string szFilePath, string szContent)
         {
             if (await m_fileMgr.fnbWrite(szFilePath, szContent))
@@ -1486,6 +1496,10 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="szDirPath"></param>
         async void fnFileDirExists(string szDirPath)
         {
             szDirPath = await m_fileMgr.fnszCheckPathExists(szDirPath);
@@ -1501,6 +1515,14 @@ namespace Alien
             treeView3.SelectedNode = node;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lsSrcFilePath"></param>
+        /// <param name="nThread"></param>
+        /// <param name="nChunkSize"></param>
+        /// <param name="fnOnCallback"></param>
+        /// <returns></returns>
         public async Task<Dictionary<string, bool>> fnFileUpload(List<string> lsSrcFilePath, int nThread = 3, int nChunkSize = 5 * 1024, Action fnOnCallback = null)
         {
             tabControl6.SelectedIndex = 1;
@@ -1610,6 +1632,14 @@ namespace Alien
             return dicState;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lsRemoteFile"></param>
+        /// <param name="nThread"></param>
+        /// <param name="nChunkSize"></param>
+        /// <param name="fnCallback"></param>
+        /// <returns></returns>
         public async Task<(Dictionary<string, bool> dicState, string szSaveDirPath)> fnFileDownload(List<(string, long)> lsRemoteFile, int nThread = 3, int nChunkSize = 5 * 1024, Action fnCallback = null)
         {
             tabControl6.SelectedIndex = 1;
@@ -2402,6 +2432,7 @@ namespace Alien
 
         #endregion
         #endregion
+        #region Plugins
 
         /// <summary>
         /// Load and display all plugins
@@ -2511,6 +2542,8 @@ namespace Alien
 
             return count;
         }
+
+        #endregion
 
         async void fnClose()
         {
@@ -3138,8 +3171,6 @@ namespace Alien
             }
         }
 
-
-
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -3608,7 +3639,7 @@ namespace Alien
 
             clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
 
-            if (ctrls.listView.Items.Count == 0)
+            if (ctrls.listView == null || ctrls.listView.Items.Count == 0)
                 return;
 
             ListViewItem item = ctrls.listView.SelectedItems[0];
@@ -3680,7 +3711,7 @@ namespace Alien
                 return;
 
             clsDbTablePageControls ctrls = (clsDbTablePageControls)page.Tag;
-            if (ctrls.listView.Items.Count == 0)
+            if (ctrls.listView == null || ctrls.listView.Items.Count == 0)
                 return;
 
             ListViewItem item = ctrls.listView.SelectedItems[0];

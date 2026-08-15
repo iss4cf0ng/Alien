@@ -14,7 +14,19 @@ namespace Alien
         private clsWeb m_web { get; init; }
         private clsVictim m_victim { get { return m_web.m_victim; } }
         public string m_szPluginsDir { get; init; }
-        public string m_szEnvironment { get { return Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/"); } }
+        public string m_szEnvironment 
+        { 
+            get 
+            {
+                string? szLang = Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage);
+                string? szPayloadType = Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType);
+
+                if (string.IsNullOrEmpty(szLang) || string.IsNullOrEmpty(szPayloadType))
+                    return string.Empty;
+
+                return Path.Combine(szLang, m_victim.ShellMethod, szPayloadType).Replace("\\", "/");
+            }
+        }
 
         /// <summary>
         /// Remote plugin object
@@ -30,25 +42,25 @@ namespace Alien
         public class stManifest
         {
             [JsonProperty("name")]
-            public string szPluginName { get; set; }
+            public string? szPluginName { get; set; }
 
             [JsonProperty("version")]
-            public string szVersion { get; set; }
+            public string? szVersion { get; set; }
 
             [JsonProperty("author")]
-            public string szAuthor { get; set; }
+            public string? szAuthor { get; set; }
 
             [JsonProperty("environment")]
-            public List<string> lsEnvironment { get; set; }
+            public List<string>? lsEnvironment { get; set; }
 
             [JsonProperty("description")]
-            public string szDescription { get; set; }
+            public string? szDescription { get; set; }
         }
 
         /// <summary>
         /// Get manifest json object
         /// </summary>
-        public stManifest fnLoadPluginManifest(string szPluginDirName)
+        public stManifest? fnLoadPluginManifest(string szPluginDirName)
         {
             try
             {
@@ -57,7 +69,7 @@ namespace Alien
                     throw new FileNotFoundException($"Configuration file not found: " + szJsonPath);
 
                 string szJsonContent = File.ReadAllText(szJsonPath);
-                stManifest manifest = JsonConvert.DeserializeObject<stManifest>(szJsonContent);
+                stManifest? manifest = JsonConvert.DeserializeObject<stManifest>(szJsonContent);
 
                 return manifest;
             }
@@ -74,11 +86,11 @@ namespace Alien
         {
             List<stManifest> plugins = new List<stManifest>();
 
-            string szEnv = Path.Combine(Enum.GetName(typeof(enLanguage), m_victim.ShellLanguage), m_victim.ShellMethod, Enum.GetName(typeof(enPayloadType), m_victim.ShellPayloadType)).Replace("\\", "/");
+            string szEnv = m_szEnvironment;
 
             foreach (string szDir in Directory.GetDirectories(m_szPluginsDir))
             {
-                stManifest manifest = fnLoadPluginManifest(Path.GetFileName(szDir));
+                stManifest? manifest = fnLoadPluginManifest(Path.GetFileName(szDir));
                 if (manifest == null || manifest.lsEnvironment == null)
                     continue;
 
