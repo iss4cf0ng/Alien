@@ -71,7 +71,6 @@
             comboBox5 = new ComboBox();
             comboBox4 = new ComboBox();
             label6 = new Label();
-            tabPage4 = new TabPage();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -113,7 +112,6 @@
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
             tabControl1.Controls.Add(tabPage3);
-            tabControl1.Controls.Add(tabPage4);
             resources.ApplyResources(tabControl1, "tabControl1");
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -382,12 +380,6 @@
             resources.ApplyResources(label6, "label6");
             label6.Name = "label6";
             // 
-            // tabPage4
-            // 
-            resources.ApplyResources(tabPage4, "tabPage4");
-            tabPage4.Name = "tabPage4";
-            tabPage4.UseVisualStyleBackColor = true;
-            // 
             // frmBuilder
             // 
             resources.ApplyResources(this, "$this");
@@ -455,6 +447,5 @@
         private Button button9;
         private RichTextBox richTextBox2;
         private GroupBox groupBox4;
-        private TabPage tabPage4;
     }
 }

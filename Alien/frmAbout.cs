@@ -13,14 +13,27 @@ namespace Alien
     public partial class frmAbout : BaseForm
     {
         private const string m_szREADME = "" +
-            "Alien webshell management tool v5.0.0 by iss4cf0ng (ISSAC)\n" +
+            "Alien webshell client v5.1.0 by iss4cf0ng (ISSAC)\n" +
             "GitHub: https://github.com/iss4cf0ng/Alien\n" +
             "\n" +
             "Please do not use this tool for illegal purposes!\n" +
             "\n" +
             "Previous versions (1–4) were removed by the author because I had limited experience at the time.\n" +
             "Alien v5.0.0 is much more powerful than the previous versions.\n" +
-            "I hope you enjoy using this tool. Thanks for checking it out!";
+            "I hope you enjoy using this tool. Thanks for checking it out!\n" +
+            "\n" +
+            "Update logs:\n" +
+            "July 23, 2026: Alien v5.0.0 is released.\n" +
+            "Rewritten version of Alien is released.\n" +
+            "\n" +
+            "August 16, 2026: Alien v5.1.0 is released.\n" +
+            "New features:\n" +
+            "\t - More plugins are available\n" +
+            "\t - Theme manager\n" +
+            "\t - Fixed several bugs\n" +
+            "\t - NebulaPulsar supports Java 8 and 11\n" +
+            "\t - Added a new tool, the Encoder in the main page\n" +
+            "\t - Event Horizon now partially supports NebulaPulsar. The last webshell must be NebulaPulsar, while the others must be OneShell.";
 
         public frmAbout()
         {
@@ -31,7 +44,9 @@ namespace Alien
 
         void fnSetup()
         {
+            richTextBox1.WordWrap = false;
             richTextBox1.Text = m_szREADME;
+
         }
 
         private void frmAbout_Load(object sender, EventArgs e)
