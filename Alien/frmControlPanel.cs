@@ -2462,7 +2462,7 @@ namespace Alien
 
                         if (manifest != null)
                         {
-                            if (m_plugin == null || toolStripComboBox1 == null || manifest.lsEnvironment == null || m_plugin.m_szEnvironment == null)
+                            if (toolStripComboBox1 == null || toolStripComboBox1.IsDisposed)
                                 return 0;
 
                             if (toolStripComboBox1.SelectedIndex == 0 && !manifest.lsEnvironment.Contains(m_plugin.m_szEnvironment))
