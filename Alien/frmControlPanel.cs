@@ -869,7 +869,7 @@ namespace Alien
                                 return;
 
                             string szSQL = dicSQL[szName];
-                            
+
                             textEditorControl.Text = szSQL;
                             textEditorControl.Refresh();
                         };
@@ -2593,7 +2593,7 @@ namespace Alien
             }
         }
 
-        async void fnSetup()
+        async Task fnSetup()
         {
             /*
             if (!await fnbValidator())
@@ -2617,7 +2617,8 @@ namespace Alien
             textBox8.Text = m_victim.ShellURL;
 
             treeView3.ImageList = fileImageList;
-            m_fileMgr.m_ExtIcon.Images.Add(fileImageList.Images["folder"]);
+            m_fileMgr.m_ExtIcon.Images.Add(fileImageList.Images["folder"]!);
+
             m_fileMgr.m_ExtIcon.Images.SetKeyName(m_fileMgr.m_ExtIcon.Images.Count - 1, "folder");
             listView2.SmallImageList = m_fileMgr.m_ExtIcon;
 
@@ -3036,7 +3037,7 @@ namespace Alien
 
         private void frmControlPanel_Load(object sender, EventArgs e)
         {
-            fnSetup();
+
         }
 
         private void treeView3_AfterSelect(object sender, TreeViewEventArgs e)
@@ -3250,7 +3251,7 @@ namespace Alien
 
         private void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            
+
         }
 
         //Upload
@@ -4534,7 +4535,7 @@ namespace Alien
 
         private void textEditorControl1_KeyDown(object sender, KeyEventArgs e)
         {
-            
+
         }
 
         private void toolStripButton13_Click(object sender, EventArgs e)
@@ -4675,10 +4676,10 @@ namespace Alien
 
                 var dict = new Dictionary<string, string>
                 {
-                    { "Name", manifest.szPluginName },
-                    { "Version", manifest.szVersion },
-                    { "Author", manifest.szAuthor },
-                    { "Description", manifest.szDescription },
+                    { "Name", manifest.szPluginName ?? string.Empty },
+                    { "Version", manifest.szVersion ?? string.Empty },
+                    { "Author", manifest.szAuthor ?? string.Empty },
+                    { "Description", manifest.szDescription ?? string.Empty },
                 };
 
                 foreach (string szKey in dict.Keys)
@@ -5040,6 +5041,11 @@ namespace Alien
         private async void toolStripButton21_Click(object sender, EventArgs e)
         {
             await fnWinUserInit();
+        }
+
+        private async void frmControlPanel_Shown(object sender, EventArgs e)
+        {
+            await fnSetup();
         }
     }
 }

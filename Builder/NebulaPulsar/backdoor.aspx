@@ -40,5 +40,10 @@
                 
             }
         }
+        else
+        {
+            Response.StatusCode = 404;
+            Response.End();
+        }
     }
 </script>
