@@ -69,6 +69,9 @@ namespace Alien
                 if (checkBox1.Checked)
                     textEditorControl3.Text = textEditorControl3.Text.Replace("\r", string.Empty).Replace("\n", string.Empty).Replace("\t", string.Empty).Replace("  ", string.Empty);
 
+                if (checkBox2.Checked)
+                    textEditorControl3.Text = textEditorControl3.Text.Replace("/* [STEALTH_404_START]", string.Empty).Replace("[STEALTH_404_END] */", string.Empty);
+
                 textEditorControl3.Refresh();
 
                 label5.Text = $"Length: {textEditorControl3.Text.Length}";
@@ -440,6 +443,11 @@ namespace Alien
             {
                 MessageBox.Show(ex.Message, ex.GetType().Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            fnUpdateNbPayload();
         }
     }
 }

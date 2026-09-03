@@ -71,6 +71,7 @@
             comboBox5 = new ComboBox();
             comboBox4 = new ComboBox();
             label6 = new Label();
+            checkBox2 = new CheckBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -214,6 +215,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(checkBox2);
             tabPage2.Controls.Add(label5);
             tabPage2.Controls.Add(checkBox1);
             tabPage2.Controls.Add(groupBox3);
@@ -380,6 +382,13 @@
             resources.ApplyResources(label6, "label6");
             label6.Name = "label6";
             // 
+            // checkBox2
+            // 
+            resources.ApplyResources(checkBox2, "checkBox2");
+            checkBox2.Name = "checkBox2";
+            checkBox2.UseVisualStyleBackColor = true;
+            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+            // 
             // frmBuilder
             // 
             resources.ApplyResources(this, "$this");
@@ -447,5 +456,6 @@
         private Button button9;
         private RichTextBox richTextBox2;
         private GroupBox groupBox4;
+        private CheckBox checkBox2;
     }
 }

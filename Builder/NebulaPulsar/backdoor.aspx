@@ -42,8 +42,10 @@
         }
         else
         {
+            /* [STEALTH_404_START]
             Response.StatusCode = 404;
             Response.End();
+            [STEALTH_404_END] */
         }
     }
 </script>

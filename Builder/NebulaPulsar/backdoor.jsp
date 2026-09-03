@@ -56,6 +56,8 @@ if (request.getMethod().equals("POST")) {
         } catch (Exception e) {}
     }
 } else {
+    /* [STEALTH_404_START]
     response.setStatus(404);
+    [STEALTH_404_END] */
 }
 %>

