@@ -82,6 +82,12 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// Save memory shell as file
+        /// </summary>
+        /// <param name="szType"></param>
+        /// <param name="szPayload"></param>
+        /// <param name="szKey"></param>
         void fnBuildMemoryShell(string szType, string szPayload, string szKey)
         {
             fnShowMemoryShellHex(szType, szPayload, szKey);
@@ -100,6 +106,14 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// Display hex string of the memory shell payload
+        /// </summary>
+        /// <param name="szType"></param>
+        /// <param name="szPayload"></param>
+        /// <param name="szKey"></param>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="Exception"></exception>
         void fnShowMemoryShellHex(string szType, string szPayload, string szKey)
         {
             bool fnbMatchBytes(byte[] abSource, int nIdxStart, byte[] abPattern)
